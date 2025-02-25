@@ -1,6 +1,8 @@
 # stereo cam ref: https://learnopencv.com/depth-perception-using-stereo-camera-python-c/
 # marker det ref: https://docs.opencv.org/4.x/d5/dae/tutorial_aruco_detection.html
 
+# graph for distance measurements from lidar
+
 import capture, imu
 import json
 from flask import Flask
