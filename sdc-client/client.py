@@ -1,3 +1,5 @@
+import graphwindow
+
 import sys
 import socketio
 import base64
@@ -5,6 +7,7 @@ import json
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import QApplication, QLabel, QMainWindow, QPushButton
+from multiprocessing import Process, Queue
 import cv2
 import numpy as np
 
@@ -12,6 +15,7 @@ import numpy as np
 sio = socketio.Client()
 
 frame = None
+fps = None
 sensor = None
 
 class CameraWindow(QMainWindow):
@@ -20,8 +24,11 @@ class CameraWindow(QMainWindow):
         self.setWindowTitle("Camera Feed")
         self.setGeometry(100, 100, 750, 530)
 
-        self.label = QLabel(self)
-        self.label.setGeometry(10, 10, 620, 460)
+        self.image_label = QLabel(self)
+        self.image_label.setGeometry(10, 10, 620, 460)
+
+        self.fps_label = QLabel("FPS: -1", self)
+        self.fps_label.setGeometry(10, 0, 140, 40)
 
         self.sensor_text = QLabel('Temperature: -1\nHumidity: -1', self)
         self.sensor_text.setGeometry(640, 20, 140, 40)
@@ -34,9 +41,16 @@ class CameraWindow(QMainWindow):
         self.invert_button.setGeometry(350, 480, 140, 40)
         self.invert_button.clicked.connect(self.invert_video)  # Connect to the invert function on click
 
+        # THINK ABOUT SWITCHING TO THIS LAYOUT
+        #self.layout = QVBoxLayout()
+        #self.layout.addWidget(self.image_label)
+        #self.layout.addWidget(self.fps_label)
+        #self.setLayout(self.layout)
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.request_data)  # Request every 30 ms
         self.timer.timeout.connect(self.update_frame)  # Update frame
+        self.timer.timeout.connect(self.update_fps_data)  # Update fps data
         self.timer.timeout.connect(self.update_sensor_data)  # Update sensor data
         self.timer.start(updateFreq)  # Update every 30 ms
 
@@ -52,10 +66,15 @@ class CameraWindow(QMainWindow):
 
             # Create QImage from the frame
             height, width, channels = rgb_frame.shape
+            bytes_per_line = 3 * width
             q_img = QImage(rgb_frame.data, width, height, width * channels, QImage.Format.Format_RGB888)
 
             # Display the image in the QLabel
-            self.label.setPixmap(QPixmap.fromImage(q_img))
+            self.image_label.setPixmap(QPixmap.fromImage(q_img))
+
+    def update_fps_data(self):
+        if fps is not None:
+            self.fps_label.setText(f"FPS: {fps:.2f}")
 
     def update_sensor_data(self):
         if sensor is not None:
@@ -83,15 +102,17 @@ def disconnect():
 
 @sio.event
 def response_data(data): # Receive frames from the server
-    global frame, sensor
+    global frame, fps, sensor
 
     # Parse the incoming JSON data
     json_data = json.loads(data)  # Decode the JSON string
 
     # Retrieve 'image' (frame_data) and 'sensors' from the parsed JSON
     frame_data = json_data.get('image')
+    fps_data = json_data.get('fps')
     sensor_data = json_data.get('sensors')
 
+    fps = fps_data
     sensor = sensor_data
 
     try:
@@ -103,14 +124,24 @@ def response_data(data): # Receive frames from the server
 
 # Setup PyQt6 and run
 def main():
+    #set time interval bewteen frames and graph update rate
+    time_interval = 100 #milliseconds
+    graphing_rate = 0.01 #seconds
+
+    queue = Queue()
+    graph_process = Process(target=graphwindow.graph_updater, args=(queue,graphing_rate,))
+    graph_process.start()
+
     app = QApplication(sys.argv)
-    window = CameraWindow(30)
+    window = CameraWindow(time_interval)
 
     # Connect to the server
     sio.connect('http://127.0.0.1:5000')
 
     window.show()
     sys.exit(app.exec())
+
+    graph_process.join()
 
 if __name__ == "__main__":
     main()
