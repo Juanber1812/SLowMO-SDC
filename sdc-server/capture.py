@@ -3,15 +3,22 @@ import base64
 import numpy as np
 import pyapriltags
 import time
-#from collections import deque
+from collections import deque
+from gevent import monkey
+
+monkey.patch_all()
 
 class AprilTagCaptureObject():
     def __init__(self):
+        self.latest_frame_data = None
+
         self.last_time = time.time()
         self.frame_count = 0
-        """self.pose_data = deque(maxlen=250)  # Deque to store rvec, tvec, and timestamp
-        self.prev_pose_data = None"""
+        self.pose_data = deque(maxlen=100)  # Deque to store rvec, tvec, and timestamp
+        self.prev_pose_data = None
         self.tag_detected = False
+        
+        self.pose_data_list = [self.pose_data, self.prev_pose_data, self.tag_detected]
 
         # Load the calibration data
         self.calibration_data = np.load('calibration_data.npz')
@@ -23,8 +30,8 @@ class AprilTagCaptureObject():
 
         # OpenCV Video Capture (0 = default webcam)
         self.cap = cv2.VideoCapture(0)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # Width
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # Height
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1000)  # Width
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1000)  # Height
 
         if not self.cap.isOpened():
             print(f"Error: Could not open video capture on camera index 0. Please check your camera connection.")
@@ -52,9 +59,9 @@ class AprilTagCaptureObject():
             [-self.tag_size / 2, self.tag_size / 2, 0]
         ], dtype=np.float32)
 
-    """def process_pose_data(self, pose_data):
+    def process_pose_data(self, pose_data):
         rvec, tvec, timestamp = pose_data
-        self.rotation_matrix, _ = cv2.Rodrigues(rvec)"""
+        self.rotation_matrix, _ = cv2.Rodrigues(rvec)
 
     def capture_frame(self):
         """ Capture a frame from the webcam and encode it as base64 """
@@ -83,15 +90,15 @@ class AprilTagCaptureObject():
                 image_points = np.array(corners, dtype=np.float32)
                 success, rvec, tvec = cv2.solvePnP(self.object_points, image_points, self.mtx, self.dist)
                 if success:
-                    """timestamp = time.time()
+                    timestamp = time.time()
                     self.pose_data.append((rvec, tvec, timestamp))
                     # Process the pose data
                     self.process_pose_data((rvec, tvec, timestamp))
                     if self.prev_pose_data is not None:
-                        self.update_graphs((rvec, tvec, timestamp), self.prev_pose_data)
-                    self.prev_pose_data = (rvec, tvec, timestamp)"""
+                        self.pose_data_list = [(rvec, tvec, timestamp), self.prev_pose_data]
+                    self.prev_pose_data = (rvec, tvec, timestamp)
 
-                                # Project 3D points to image plane to draw cubes (10 cm x 10 cm)
+                    # Project 3D points to image plane to draw cubes (10 cm x 10 cm)
                     cube_size = 0.10  # 10 cm
                     cube_points = np.array([
                         [-cube_size / 2, -cube_size / 2, 0],
@@ -169,9 +176,8 @@ class AprilTagCaptureObject():
             if self.invert_state:
                 undistorted_frame = cv2.bitwise_not(undistorted_frame)
 
-            _, buffer = cv2.imencode('.jpg', undistorted_frame)
-            return base64.b64encode(buffer).decode('utf-8')
-        return None
+            _, buffer = cv2.imencode('.jpg', undistorted_frame, [int(cv2.IMWRITE_JPEG_QUALITY), 70])  # Compress
+            self.latest_frame_data = base64.b64encode(buffer).decode('utf-8')
     
     def get_fps(self):
         # Calculate and display FPS

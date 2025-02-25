@@ -1,3 +1,5 @@
+import calculate_graph_data
+
 import time
 from collections import deque
 from PyQt6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget, QMainWindow, QPushButton
@@ -8,40 +10,40 @@ import threading
 # Add a shared start time variable
 shared_start_time = None
 
+
+
 def update_distance_graph(queue, distance_graph):
     while True:
         pose_data = queue.get()
-        if pose_data is None:
-            break
-        timestamp, distance = 0,0 #calculate_relative_distance(pose_data)
-        distance_graph.update_graph(timestamp, distance)
+        if pose_data is not None:
+            timestamp, distance = calculate_graph_data.calculate_relative_distance(pose_data)
+            distance_graph.update_graph(timestamp, distance)
 
 def update_velocity_graph(queue, velocity_graph):
     prev_pose_data = None
     while True:
         pose_data = queue.get()
-        if pose_data is None:
-            break
-        if prev_pose_data is not None:
-            timestamp, velocity = 0,0 #calculate_velocity(pose_data, prev_pose_data)
-            velocity_graph.update_graph(timestamp, velocity)
-        prev_pose_data = pose_data
+        if pose_data is not None:
+            if prev_pose_data is not None:
+                timestamp, velocity = calculate_graph_data.calculate_velocity(pose_data, prev_pose_data)
+                velocity_graph.update_graph(timestamp, velocity)
+            prev_pose_data = pose_data
 
 def update_angle_graph(queue, angle_graph):
     while True:
         pose_data = queue.get()
-        if pose_data is None:
-            break
-        timestamp, angle = 0,0 #calculate_relative_angle(pose_data)
-        angle_graph.update_graph(timestamp, angle)
+        if pose_data is not None:
+            timestamp, angle = calculate_graph_data.calculate_relative_angle(pose_data)
+            angle_graph.update_graph(timestamp, angle)
 
 def update_angular_position_graph(queue, angular_position_graph):
     while True:
         pose_data = queue.get()
-        if pose_data is None:
-            break
-        timestamp, angular_position = 0,0 #calculate_angular_position(pose_data)
-        angular_position_graph.update_graph(timestamp, angular_position)
+        if pose_data is not None:
+            timestamp, angular_position = calculate_graph_data.calculate_angular_position(pose_data)
+            angular_position_graph.update_graph(timestamp, angular_position)
+
+
 
 def graph_updater(queue, graphing_rate):
     app = QApplication([])
@@ -71,6 +73,8 @@ def graph_updater(queue, graphing_rate):
     angle_thread.join()
     angular_position_thread.join()
 
+
+
 class GraphWindow(QMainWindow):
     def __init__(self, title, graphing_rate, xlabel, ylabel, color):
         super().__init__()
@@ -82,8 +86,8 @@ class GraphWindow(QMainWindow):
         self.ax.set_ylabel(ylabel)
         self.ax.grid(True)
         self.setCentralWidget(self.canvas)
-        self.data = deque(maxlen=200)
-        self.time_data = deque(maxlen=200)
+        self.data = deque(maxlen=50)
+        self.time_data = deque(maxlen=50)
         self.plotting = False
         self.update_interval = graphing_rate  # Update graph every 0.1 seconds
         self.last_update_time = time.time()

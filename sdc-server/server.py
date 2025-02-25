@@ -8,16 +8,23 @@ import capture, imu
 import json
 from flask import Flask
 from flask_socketio import SocketIO
-
 from engineio.payload import Payload
+
+from collections import deque
+import numpy as np
+
+class CustomEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, deque):
+            return {"__deque__": True, "data": list(obj)}  # Convert deque to a list
+        elif isinstance(obj, np.ndarray):
+            return {"__ndarray__": True, "data": obj.tolist()}  # Convert ndarray to list
+        return super().default(obj)
+
 Payload.max_decode_packets = 500
-#socketio = SocketIO(async_mode='gevent', ping_timeout=1000, ping_interval=0)
 
 app = Flask(__name__)
-#socketio = SocketIO(app, cors_allowed_origins="*")
-#socketio = SocketIO(app, async_mode='gevent', ping_timeout=1000, ping_interval=0, cors_allowed_origins="*")
-socketio = SocketIO(app, async_mode="gevent", cors_allowed_origins="*", transports=["websocket", "polling"])
-
+socketio = SocketIO(app, async_mode="gevent", ping_timeout=1000, ping_interval=0, cors_allowed_origins="*", transports=["websocket", "polling"])
 
 aprcapobj = capture.AprilTagCaptureObject()
 
@@ -36,15 +43,20 @@ def handle_connect():
 @socketio.on('request_data')
 def send_data():
     """ Send video frame and sensor data """
-    frame_data = aprcapobj.capture_frame()
+    aprcapobj.capture_frame()
+    frame_data = aprcapobj.latest_frame_data
     if frame_data:
+        pose_data = aprcapobj.pose_data_list[0]
+        tag_detected_data = aprcapobj.tag_detected
         fps_data = aprcapobj.get_fps()
         sensor_data = imu.read_sensor_data()
         socketio.emit('response_data', json.dumps({
             "image": frame_data,
+            "pose": pose_data,
+            "tag": tag_detected_data,
             "fps": fps_data,
             "sensors": sensor_data
-        }))
+        }, cls=CustomEncoder))
 
 @socketio.on('flip')
 def flip():
