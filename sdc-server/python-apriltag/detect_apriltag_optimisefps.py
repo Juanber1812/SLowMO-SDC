@@ -19,8 +19,8 @@ dist = calibration_data['dist']
 
 # Capture the video from camera
 video_capture = cv2.VideoCapture(0)
-video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1000)
-video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1000)
+video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 if not video_capture.isOpened():
     print(f"Error: Could not open video capture on camera index 0. Please check your camera connection.")
     exit()
@@ -29,15 +29,11 @@ if not video_capture.isOpened():
 line_color = (0, 255, 0)
 #set time interval bewteen frames and graph update rate
 time_interval = 10 #milliseconds
-graphing_rate = 0.1 #seconds
+graphing_rate = 0.01 #seconds
 
 # Create an AprilTag detector
-import multiprocessing
-
-num_threads = multiprocessing.cpu_count()
-
 detector = pyapriltags.Detector(families='tag25h9',
-                                nthreads=num_threads,
+                                nthreads=4,
                                 quad_decimate=1.0,  # Adjust this value based on your performance and accuracy requirements
                                 quad_sigma=0.0,
                                 refine_edges=1,
@@ -56,6 +52,7 @@ object_points = np.array([
 
 def process_pose_data(pose_data):
     rvec, tvec, timestamp = pose_data
+    rotation_matrix, _ = cv2.Rodrigues(rvec)
 
 def calculate_relative_distance(pose_data):
     rvec, tvec, timestamp = pose_data
@@ -76,8 +73,8 @@ def calculate_relative_angle(pose_data):
 def calculate_angular_position(pose_data):
     rvec, tvec, timestamp = pose_data
     rotation_matrix, _ = cv2.Rodrigues(rvec)
-    rotation = R.from_matrix(rotation_matrix)
-    euler_angles = rotation.as_euler('xyz', degrees=True)
+    r = R.from_matrix(rotation_matrix)
+    euler_angles = r.as_euler('xyz', degrees=True)
     angular_position = euler_angles[1]  # Yaw angle
     return timestamp, angular_position
 
@@ -95,8 +92,8 @@ class GraphWindow(QMainWindow):
         self.ax.set_ylabel(ylabel)
         self.ax.grid(True)
         self.setCentralWidget(self.canvas)
-        self.data = deque(maxlen=50)
-        self.time_data = deque(maxlen=50)
+        self.data = deque(maxlen=200)
+        self.time_data = deque(maxlen=200)
         self.plotting = False
         self.update_interval = graphing_rate  # Update graph every 0.1 seconds
         self.last_update_time = time.time()
@@ -213,7 +210,7 @@ class AprilTagWindow(QWidget):
         self.initUI()
         self.last_time = time.time()
         self.frame_count = 0
-        self.pose_data = deque(maxlen=100)  # Deque to store rvec, tvec, and timestamp
+        self.pose_data = deque(maxlen=250)  # Deque to store rvec, tvec, and timestamp
         self.prev_pose_data = None
         self.queue = queue
         self.tag_detected = False
@@ -240,7 +237,7 @@ class AprilTagWindow(QWidget):
         undistorted_frame = cv2.undistort(frame, mtx, dist)
         gray_frame = cv2.cvtColor(undistorted_frame, cv2.COLOR_BGR2GRAY)
         tags = detector.detect(gray_frame)
-        
+
         self.tag_detected = len(tags) > 0
 
         # Draw the detected tags
@@ -281,6 +278,19 @@ class AprilTagWindow(QWidget):
                     [-cube_size / 2, cube_size / 2, -cube_size]
                 ], dtype=np.float32)
 
+                # Define the axis points (10 cm length) relative to the center of the cube
+                axis_length = 0.10  # 10 cm
+                axis_points = np.array([
+                    [0, 0, 0],  # Origin (center of the cube)
+                    [axis_length, 0, 0],  # X-axis
+                    [0, axis_length, 0],  # Y-axis
+                    [0, 0, axis_length]  # Z-axis
+                ], dtype=np.float32)
+
+                # Offset the axis points to the center of the cube
+                cube_center_offset = np.array([0, 0, -cube_size / 2], dtype=np.float32)
+                axis_points += cube_center_offset
+
                 # Draw the main cube
                 img_points, _ = cv2.projectPoints(cube_points, rvec, tvec, mtx, dist)
                 img_points = img_points.reshape(-1, 2).astype(int)
@@ -299,19 +309,6 @@ class AprilTagWindow(QWidget):
                 for i in range(4):
                     cv2.line(undistorted_frame, tuple(img_points[i]), tuple(img_points[(i+1)%4]), line_color, 2)
                     cv2.line(undistorted_frame, tuple(img_points[i+4]), tuple(img_points[(i+1)%4+4]), line_color, 2)
-                
-                                # Define the axis points (10 cm length) relative to the center of the cube
-                axis_length = 0.10  # 10 cm
-                axis_points = np.array([
-                    [0, 0, 0],  # Origin (center of the cube)
-                    [axis_length, 0, 0],  # X-axis
-                    [0, axis_length, 0],  # Y-axis
-                    [0, 0, axis_length]  # Z-axis
-                ], dtype=np.float32)
-
-                # Offset the axis points to the center of the cube
-                cube_center_offset = np.array([0, 0, -cube_size / 2], dtype=np.float32)
-                axis_points += cube_center_offset
 
                 # Draw the bottom cube
                 bottom_cube_points = cube_points + np.array([0, cube_size, 0])
