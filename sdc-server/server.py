@@ -12,6 +12,9 @@ from engineio.payload import Payload
 
 from collections import deque
 import numpy as np
+from gevent import monkey
+
+monkey.patch_all()
 
 class CustomEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -24,7 +27,7 @@ class CustomEncoder(json.JSONEncoder):
 Payload.max_decode_packets = 500
 
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode="gevent", ping_timeout=1000, ping_interval=0, cors_allowed_origins="*", transports=["websocket", "polling"])
+socketio = SocketIO(app, async_mode="gevent", cors_allowed_origins="*", transports=["websocket", "polling"])
 
 aprcapobj = capture.AprilTagCaptureObject()
 
@@ -42,21 +45,19 @@ def handle_connect():
 
 @socketio.on('request_data')
 def send_data():
-    """ Send video frame and sensor data """
+    # Send video frame and sensor data
     aprcapobj.capture_frame()
-    frame_data = aprcapobj.latest_frame_data
-    if frame_data:
-        pose_data = aprcapobj.pose_data_list[0]
-        tag_detected_data = aprcapobj.tag_detected
-        fps_data = aprcapobj.get_fps()
-        sensor_data = imu.read_sensor_data()
-        socketio.emit('response_data', json.dumps({
-            "image": frame_data,
-            "pose": pose_data,
-            "tag": tag_detected_data,
-            "fps": fps_data,
-            "sensors": sensor_data
-        }, cls=CustomEncoder))
+
+    if aprcapobj.latest_frame_data:
+        payload = {
+            "image": aprcapobj.latest_frame_data,
+            "pose": aprcapobj.pose_data_list[0],
+            "tag": aprcapobj.tag_detected,
+            "fps": aprcapobj.get_fps(),
+            "sensors": imu.read_sensor_data()
+        }
+
+        socketio.emit('response_data', json.dumps(payload, cls=CustomEncoder))
 
 @socketio.on('flip')
 def flip():
@@ -66,8 +67,14 @@ def flip():
 def invert():
     aprcapobj.invert_state = not aprcapobj.invert_state
 
-if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
-
-    # Release the camera when the server stops
+# Graceful shutdown to release camera properly when the server stops
+def cleanup():
+    print("Shutting down server...")
     aprcapobj.cap.release()
+    print("Camera released.")
+
+if __name__ == '__main__':
+    try:
+        socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    finally:
+        cleanup()  # Ensure cleanup runs on exit
