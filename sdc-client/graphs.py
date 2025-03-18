@@ -6,8 +6,6 @@ from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import QVBoxLayout, QWidget, QPushButton
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-import threading
-
 
 shared_start_time = None # Add a shared start time variable
 

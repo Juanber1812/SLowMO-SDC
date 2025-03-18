@@ -124,6 +124,12 @@ class AprilTagCaptureObject():
                     cube_center_offset = np.array([0, 0, -cube_size / 2], dtype=np.float32)
                     axis_points += cube_center_offset
 
+                    #if np.any(np.isnan(img_points)):
+                     #   print("Warning: img_points contains NaN values.")
+                        # You can either skip this operation, set defaults, or handle as needed.
+                        # For example, replace NaN values with a default value:
+                        #img_points = np.nan_to_num(img_points, nan=0)
+
                     # Draw the main cube
                     img_points, _ = cv2.projectPoints(cube_points, rvec, tvec, self.mtx, self.dist)
                     img_points = img_points.reshape(-1, 2).astype(int)

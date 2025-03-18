@@ -67,9 +67,11 @@ def flip():
 def invert():
     aprcapobj.invert_state = not aprcapobj.invert_state
 
+
 # Graceful shutdown to release camera properly when the server stops
 def cleanup():
     print("Shutting down server...")
+    socketio.stop()  # Stop the SocketIO server
     aprcapobj.cap.release()
     print("Camera released.")
 
