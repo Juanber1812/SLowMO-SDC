@@ -5,13 +5,7 @@ import pyapriltags
 import time
 from collections import deque
 from gevent import monkey
-
-# Try to import Picamera2; fall back to OpenCV if unavailable
-try:
-    from picamera2 import Picamera2
-    USE_PICAMERA2 = True
-except ImportError:
-    USE_PICAMERA2 = False
+from picamera2 import Picamera2
 
 monkey.patch_all()
 
@@ -34,21 +28,13 @@ class AprilTagCaptureObject():
         self.flip_state = False
         self.invert_state = False
 
-        # Initialize capture based on environment
-        if USE_PICAMERA2:
-            self.camera = Picamera2()
-            config = self.camera.create_preview_configuration(
-                main={"format": "XRGB8888", "size": (1000, 1000)}
-            )
-            self.camera.configure(config)
-            self.camera.start()
-        else:
-            self.cap = cv2.VideoCapture(0)
-            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1000)
-            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1000)
-            if not self.cap.isOpened():
-                print("Error: Could not open video capture on camera index 0. Please check your camera connection.")
-                exit()
+        # Initialize Pi Camera via Picamera2
+        self.camera = Picamera2()
+        config = self.camera.create_preview_configuration(
+            main={"format": "XRGB8888", "size": (1000, 1000)}
+        )
+        self.camera.configure(config)
+        self.camera.start()
 
         # Prepare AprilTag detector
         self.detector = pyapriltags.Detector(
@@ -70,15 +56,8 @@ class AprilTagCaptureObject():
         self.rotation_matrix, _ = cv2.Rodrigues(rvec)
 
     def capture_frame(self):
-        # Grab frame from Pi Camera or webcam
-        if USE_PICAMERA2:
-            frame = self.camera.capture_array()
-            ret = True
-        else:
-            ret, frame = self.cap.read()
-
-        if not ret:
-            return
+        # Grab frame from Pi Camera
+        frame = self.camera.capture_array()
 
         # Undistort and convert to grayscale
         undist = cv2.undistort(frame, self.mtx, self.dist)
@@ -117,9 +96,12 @@ class AprilTagCaptureObject():
             axes = np.float32([[0,0,0],[0.1,0,0],[0,0.1,0],[0,0,0.1]])
             imgpts, _ = cv2.projectPoints(axes, rvec, tvec, self.mtx, self.dist)
             o, x, y, z = [tuple(pt.ravel().astype(int)) for pt in imgpts]
-            cv2.arrowedLine(undist, o, x, (0,0,255), 2); cv2.putText(undist, 'X', x, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
-            cv2.arrowedLine(undist, o, y, (0,255,0), 2); cv2.putText(undist, 'Y', y, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
-            cv2.arrowedLine(undist, o, z, (255,0,0), 2); cv2.putText(undist, 'Z', z, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
+            cv2.arrowedLine(undist, o, x, (0,0,255), 2)
+            cv2.putText(undist, 'X', x, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
+            cv2.arrowedLine(undist, o, y, (0,255,0), 2)
+            cv2.putText(undist, 'Y', y, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
+            cv2.arrowedLine(undist, o, z, (255,0,0), 2)
+            cv2.putText(undist, 'Z', z, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
 
         # Apply user flip/invert
         if self.flip_state:
