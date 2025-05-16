@@ -34,7 +34,7 @@ if __name__ == "__main__":
     
     # Connect to the server
     try:
-        data_handler.sio.connect('http://127.0.0.1:5000', wait_timeout=5)
+        data_handler.sio.connect('http://172.20.10.3:5000', wait_timeout=5)
         print("Connected to server.")
     except Exception as e:
         print(f"Connection error: {e}")
