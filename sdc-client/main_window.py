@@ -90,7 +90,11 @@ class MainWindow(QMainWindow):
         self.timer.start(updateFreq)  # Update every time_interval ms
 
     def request_data(self): # Request a new frame from the server
-        data_handler.sio.emit('request_data')  # Send request to the server for a new frame
+        if data_handler.sio.connected:
+            data_handler.sio.emit('request_data')  # Send request to the server for a new frame
+        else:
+            print("Not connected. Skipping emit.")
+       
 
     def update_data(self):
         self.update_frame()  # Update frame

@@ -22,7 +22,7 @@ def cleanup():
 
 if __name__ == "__main__":
     # Set time interval bewteen frames and graph update rate
-    time_interval = 100 #milliseconds
+    time_interval = 300 #milliseconds
     graphing_rate = 0.01 #seconds
 
     # Queue for graph windows
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     
     # Connect to the server
     try:
-        data_handler.sio.connect('http://172.20.10.3:5000', wait_timeout=5)
+        data_handler.sio.connect('http://192.168.1.168:5000', wait_timeout=5)
         print("Connected to server.")
     except Exception as e:
         print(f"Connection error: {e}")
