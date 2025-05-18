@@ -72,7 +72,11 @@ def invert():
 def cleanup():
     print("Shutting down server...")
     socketio.stop()  # Stop the SocketIO server
-    aprcapobj.cap.release()
+    if hasattr(aprcapobj, "cap"):
+        aprcapobj.cap.release()
+    elif hasattr(aprcapobj, "camera"):
+        aprcapobj.camera.stop()
+
     print("Camera released.")
 
 if __name__ == '__main__':
