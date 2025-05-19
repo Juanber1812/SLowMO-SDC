@@ -106,7 +106,7 @@ def start_stream():
 
                 jpg_b64 = base64.b64encode(buffer).decode('utf-8')
 
-                if len(jpg_b64) > 300000:
+                if len(jpg_b64) > 1000000:
                     print("⚠️ Skipping oversized frame.")
                     continue
 

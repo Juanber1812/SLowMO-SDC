@@ -17,6 +17,14 @@ RES_PRESETS = {
     "2592x1944": (2592, 1944),
 }
 
+# Camera modes: (label, (resolution tuple), max_fps)
+CAMERA_MODES = [
+    ("12MP (4608x2592) @ 10fps", (4608, 2592), 10),
+    ("1080p (1920x1080) @ 50fps", (1920, 1080), 50),
+    ("720p (1280x720) @ 100fps", (1280, 720), 100),
+    ("VGA (640x480) @ 200fps (cropped)", (640, 480), 200),
+]
+
 sio = socketio.Client()
 
 class Bridge(QObject):
@@ -45,16 +53,10 @@ class MainWindow(QWidget):
             lambda val: self.jpeg_label.setText(f"JPEG: {val}")
         )
 
-        self.fps_slider = QSlider(Qt.Orientation.Horizontal)
-        self.fps_slider.setRange(1, 120)
-        self.fps_slider.setValue(10)
-        self.fps_label = QLabel("FPS: 10")
-        self.fps_slider.valueChanged.connect(
-            lambda val: self.fps_label.setText(f"FPS: {val}")
-        )
-
-        self.res_dropdown = QComboBox()
-        self.res_dropdown.addItems(RES_PRESETS.keys())
+        # Camera mode dropdown
+        self.mode_dropdown = QComboBox()
+        for label, _, _ in CAMERA_MODES:
+            self.mode_dropdown.addItem(label)
 
         self.apply_btn = QPushButton("Apply Settings")
         self.apply_btn.clicked.connect(self.apply_config)
@@ -67,11 +69,9 @@ class MainWindow(QWidget):
         grid = QGridLayout()
         grid.addWidget(self.jpeg_label, 0, 0)
         grid.addWidget(self.jpeg_slider, 0, 1)
-        grid.addWidget(self.fps_label, 1, 0)
-        grid.addWidget(self.fps_slider, 1, 1)
-        grid.addWidget(QLabel("Resolution"), 2, 0)
-        grid.addWidget(self.res_dropdown, 2, 1)
-        grid.addWidget(self.apply_btn, 3, 0, 1, 2)
+        grid.addWidget(QLabel("Camera Mode"), 1, 0)
+        grid.addWidget(self.mode_dropdown, 1, 1)
+        grid.addWidget(self.apply_btn, 2, 0, 1, 2)
         config_group.setLayout(grid)
 
         layout.addWidget(config_group)
@@ -90,23 +90,29 @@ class MainWindow(QWidget):
                                 "Stop the stream before changing camera settings.")
             return
 
-        res_text = self.res_dropdown.currentText()
+        mode_idx = self.mode_dropdown.currentIndex()
+        _, resolution, max_fps = CAMERA_MODES[mode_idx]
         config = {
             "jpeg_quality": self.jpeg_slider.value(),
-            "fps": self.fps_slider.value(),
-            "resolution": RES_PRESETS[res_text]
+            "fps": max_fps,
+            "resolution": resolution
         }
         sio.emit("camera_config", config)
         print("📤 Sent config:", config)
 
     def update_image(self, frame):
         try:
+            print("🖼️ Updating GUI with new frame...")
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             h, w, ch = rgb.shape
-            qimg = QImage(rgb.data, w, h * ch, QImage.Format.Format_RGB888)
-            self.image_label.setPixmap(QPixmap.fromImage(qimg))
+            qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
+            pixmap = QPixmap.fromImage(qimg)
+            # Scale pixmap to fit the label
+            pixmap = pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            self.image_label.setPixmap(pixmap)
         except Exception as e:
             logging.exception("❌ GUI image update error")
+
 
 
 # Socket.IO Events
@@ -126,6 +132,7 @@ def on_frame(data):
     try:
         arr = np.frombuffer(base64.b64decode(data), np.uint8)
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        print(f"✅ Received frame: shape={frame.shape if frame is not None else 'None'}")
         if frame is not None:
             bridge.frame_received.emit(frame)
             logging.debug(f"Frame size: {len(data)} bytes")
@@ -133,6 +140,7 @@ def on_frame(data):
             logging.warning("⚠️ Frame decode returned None")
     except Exception as e:
         logging.exception("❌ Frame decode error")
+
 
 
 if __name__ == "__main__":
