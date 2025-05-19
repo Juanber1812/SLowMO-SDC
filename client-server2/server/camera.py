@@ -1,12 +1,12 @@
-# camera_stream.py
+from gevent import monkey; monkey.patch_all()
 import time, base64
 import cv2
 import socketio
 from picamera2 import Picamera2
-from gevent import monkey; monkey.patch_all()
+
 
 # Point this at your server’s IP
-SERVER_URL = "http://192.168.65.92:5000"
+SERVER_URL = "http://192.168.65.89:5000"
 
 sio = socketio.Client()
 sio.connect(SERVER_URL)
