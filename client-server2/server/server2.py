@@ -1,20 +1,24 @@
-
+# server.py
+from flask import Flask, request
 from flask_socketio import SocketIO, emit
 from gevent import monkey; monkey.patch_all()
-from flask import Flask, request
+import time
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Keep track of connected clients (optional)
-connected_clients = set()
+# Track connected clients
+connected_clients = {}
+
+@app.route('/status')
+def status():
+    return "✅ Server is up and running"
 
 @socketio.on('connect')
 def handle_connect():
     sid = request.sid
-    connected_clients.add(sid)
-    print(f"Client connected: {sid}; total = {len(connected_clients)}")
-    # Send an acknowledgment back just to that client:
+    connected_clients[sid] = time.time()
+    print(f"🟢 Client connected: {sid} | Total: {len(connected_clients)}")
     emit('server_status', {
         'status': 'connected',
         'client_id': sid,
@@ -24,34 +28,34 @@ def handle_connect():
 @socketio.on('disconnect')
 def handle_disconnect():
     sid = request.sid
-    connected_clients.discard(sid)
-    print(f"Client disconnected: {sid}; total = {len(connected_clients)}")
-    # Broadcast an update to everyone
+    connected_clients.pop(sid, None)
+    print(f"🔴 Client disconnected: {sid} | Total: {len(connected_clients)}")
     emit('server_status', {
         'status': 'disconnected',
         'client_id': sid,
         'connected_count': len(connected_clients)
     }, broadcast=True)
 
-@app.route('/status')
-def status():
-    return "Server is up"
-
 @socketio.on('frame_data')
 def on_frame(data):
+    print(f"📷 Frame received ({len(data)} bytes) → broadcasting to {len(connected_clients)} clients")
     emit('frame', data, broadcast=True)
 
 @socketio.on('sensor_data')
 def on_sensor(data):
+    print(f"🌡️ Sensor update → Temp: {data.get('temperature')} °C | CPU: {data.get('cpu_percent')} %")
     emit('sensor', data, broadcast=True)
 
 @socketio.on('imu_data')
 def on_imu(data):
+    print("🧭 IMU data received")
     emit('imu', data, broadcast=True)
 
 @socketio.on('control_data')
 def on_control(data):
+    print(f"🛞 Control data received → Wheel RPM: {data.get('wheel_speed_rpm')}")
     emit('control', data, broadcast=True)
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=5000)
+    print("🚀 Starting Socket.IO server on http://0.0.0.0:5000")
+    socketio.run(app, host="0.0.0.0", port=5000)
