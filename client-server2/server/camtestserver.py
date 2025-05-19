@@ -126,7 +126,7 @@ def index():
                 setInterval(updateStatus, 1000);
 
                 function updateChart() {
-                    fetch('/points').then r => r.json()).then(points => {
+                    fetch('/points').then(r => r.json()).then(points => {
                         // Group by JPEG quality
                         let groups = {};
                         points.forEach(pt => {
