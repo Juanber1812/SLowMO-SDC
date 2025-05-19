@@ -7,6 +7,7 @@ from flask_socketio import SocketIO, emit
 import time
 import threading
 import camera  # This is your camera module
+import sensors
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -40,7 +41,6 @@ def on_disconnect():
 
 @socketio.on('frame_data')
 def on_frame(data):
-    print(f"📷 Frame received ({len(data)} bytes) → broadcasting to {len(connected_clients)} clients")
     emit('frame', data, broadcast=True)
 
 @socketio.on('sensor_data')
@@ -73,7 +73,20 @@ def handle_stop_camera():
     print("📩 Stop camera command received from client.")
     emit('stop_camera', {}, broadcast=True)
 
+
+def start_sensors_thread():
+    sensor_thread = threading.Thread(target=sensors.start_sensors, daemon=True)
+    sensor_thread.start()
+    print("🧠 Sensor thread started.")
+    
+@socketio.on('camera_config')
+def update_camera_config(data):
+    print(f"⚙️ Camera config update: {data}")
+    emit('camera_config', data, broadcast=True)
+
 if __name__ == "__main__":
     print("🚀 Starting Socket.IO server on http://0.0.0.0:5000")
     start_camera_thread()
+    start_sensors_thread()
     socketio.run(app, host="0.0.0.0", port=5000)
+
