@@ -25,7 +25,8 @@ def main():
         _, buf = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
         b64 = base64.b64encode(buf).decode('utf-8')
         sio.emit('frame_data', b64)
-        time.sleep(0.1)  # 10 Hz
+        print("📷 Frame sent, size:", len(b64))
+
 
 if __name__ == "__main__":
     main()
