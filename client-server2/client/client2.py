@@ -1,114 +1,132 @@
-# ===== client_qt_stats.py =====
-import sys
-import cv2
-import numpy as np
-import requests
+# viewer.py
+
+import sys, base64, cv2, numpy as np, socketio
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QLabel,
-    QHBoxLayout, QVBoxLayout, QSizePolicy
+    QApplication, QWidget, QLabel, QPushButton,
+    QVBoxLayout, QHBoxLayout
 )
-from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer
-from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtGui import QPixmap, QImage
+from PyQt6.QtCore import Qt, pyqtSignal, QObject
 
-# Configuration
-PI_IP = '192.168.1.168'
-STREAM_URL = f'http://{PI_IP}:5000/video_feed'
-STATUS_URL = f'http://{PI_IP}:5000/status'
-DISPLAY_FPS = 200  # max display refresh rate
+# ─── Globals and Socket.IO setup ─────────────────────────────────────────────
+SERVER_URL = "http://192.168.65.89:5000"  # ← change this if needed
 
-class FrameReader(QThread):
-    frame_received = pyqtSignal(np.ndarray)
-    def __init__(self, stream_url):
-        super().__init__()
-        self.stream_url = stream_url
-        self._running = True
-    def run(self):
-        cap = cv2.VideoCapture(self.stream_url)
-        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-        while self._running and cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
-            self.frame_received.emit(frame)
-        cap.release()
-    def stop(self):
-        self._running = False
-        self.wait()
+sio = socketio.Client(
+    reconnection=True,
+    reconnection_attempts=5,
+    reconnection_delay=1,
+)
 
-class VideoWindow(QMainWindow):
+# A tiny QObject to carry signals safely into the Qt main thread
+class Bridge(QObject):
+    frame_received  = pyqtSignal(np.ndarray)
+    sensor_received = pyqtSignal(float, float)
+
+bridge = Bridge()
+
+
+# ─── Main Window ──────────────────────────────────────────────────────────────
+class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('Pi Stream + Stats')
-        self.last_display = cv2.getTickCount() / cv2.getTickFrequency()
+        self.setWindowTitle("Pi Live Feed & Sensors")
 
-        # Main layout
-        central = QWidget()
-        self.setCentralWidget(central)
-        layout = QHBoxLayout(central)
+        # — Widgets —
+        self.status_label  = QLabel("Status: Disconnected")
+        self.connect_btn   = QPushButton("Connect")
+        self.connect_btn.clicked.connect(self._on_connect_button)
 
-        # Video panel
-        self.video_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.video_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        # Ensure pixmap scales to label size
-        self.video_label.setScaledContents(True)
-        layout.addWidget(self.video_label, 3)
+        self.image_label   = QLabel()
+        self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_label.setFixedSize(640, 480)
 
-        # Stats panel
-        stats_widget = QWidget()
-        stats_layout = QVBoxLayout(stats_widget)
-        layout.addWidget(stats_widget, 1)
-        self.stat_labels = {}
-        for key in ['cpu_temp_c','cpu_util_percent','cpu_freq_mhz']:
-            lbl = QLabel(f'{key}: --')
-            stats_layout.addWidget(lbl)
-            self.stat_labels[key] = lbl
-        stats_layout.addStretch()
+        self.temp_label    = QLabel("Temp: N/A")
+        self.cpu_label     = QLabel("CPU: N/A")
 
-        # Start frame reader
-        self.reader = FrameReader(STREAM_URL)
-        self.reader.frame_received.connect(self.on_new_frame)
-        self.reader.start()
+        # — Layout —
+        top_bar = QHBoxLayout()
+        top_bar.addWidget(self.status_label)
+        top_bar.addStretch()
+        top_bar.addWidget(self.connect_btn)
 
-        # Poll status every second
-        self.stat_timer = QTimer(self)
-        self.stat_timer.timeout.connect(self.update_stats)
-        self.stat_timer.start(1000)
+        sensor_bar = QHBoxLayout()
+        sensor_bar.addWidget(self.temp_label)
+        sensor_bar.addStretch()
+        sensor_bar.addWidget(self.cpu_label)
 
-    def on_new_frame(self, frame):
-        now = cv2.getTickCount() / cv2.getTickFrequency()
-        if now - self.last_display < 1.0 / DISPLAY_FPS:
-            return
-        self.last_display = now
-        # Convert BGR->RGB
+        main_layout = QVBoxLayout(self)
+        main_layout.addLayout(top_bar)
+        main_layout.addWidget(self.image_label)
+        main_layout.addLayout(sensor_bar)
+        self.setLayout(main_layout)
+
+        # — Signals from Socket.IO thread —
+        bridge.frame_received.connect(self._update_image)
+        bridge.sensor_received.connect(self._update_sensor)
+
+    def _on_connect_button(self):
+        if sio.connected:
+            sio.disconnect()
+        else:
+            try:
+                sio.connect(SERVER_URL, wait_timeout=5)
+            except Exception as e:
+                self.status_label.setText(f"Status: Error")
+                print("Connection failed:", e)
+
+    def _update_image(self, frame: np.ndarray):
+        """Receive a cv2 image, convert to QImage, and display."""
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb.shape
-        qimg = QImage(rgb.data, w, h, ch * w, QImage.Format.Format_RGB888)
-        # Scale pixmap to label dimensions, maintain aspect ratio
-        pix = QPixmap.fromImage(qimg).scaled(
-            self.video_label.width(),
-            self.video_label.height(),
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation
-        )
-        self.video_label.setPixmap(pix)
+        bytes_per_line = ch * w
+        qimg = QImage(rgb.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
+        self.image_label.setPixmap(QPixmap.fromImage(qimg))
 
-    def update_stats(self):
-        try:
-            r = requests.get(STATUS_URL, timeout=0.5)
-            data = r.json()
-            self.stat_labels['cpu_temp_c'].setText(f"Temp: {data['cpu_temp_c']:.1f} °C")
-            self.stat_labels['cpu_util_percent'].setText(f"CPU Util: {data['cpu_util_percent']:.1f} %")
-            self.stat_labels['cpu_freq_mhz'].setText(f"Freq: {data['cpu_freq_mhz']:.0f} MHz")
-        except Exception:
-            pass
+    def _update_sensor(self, temp: float, cpu: float):
+        """Update sensor labels."""
+        self.temp_label.setText(f"Temp: {temp:.1f} °C")
+        self.cpu_label.setText(f"CPU: {cpu:.1f} %")
 
-    def closeEvent(self, event):
-        self.reader.stop()
-        event.accept()
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = VideoWindow()
-    win.resize(1024, 600)
-    win.show()
+# ─── Socket.IO Event Handlers ────────────────────────────────────────────────
+@sio.event
+def connect():
+    print("→ Connected to server")
+    bridge.frame_received.emit(np.zeros((480,640,3), dtype=np.uint8))  # clear
+    bridge.sensor_received.emit(0.0, 0.0)
+    app_window.status_label.setText("Status: Connected")
+    app_window.connect_btn.setText("Disconnect")
+
+@sio.event
+def disconnect():
+    print("→ Disconnected from server")
+    app_window.status_label.setText("Status: Disconnected")
+    app_window.connect_btn.setText("Connect")
+
+@sio.on('frame')
+def on_frame(data):
+    # data is a base64-encoded JPEG
+    try:
+        arr = np.frombuffer(base64.b64decode(data), np.uint8)
+        frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        bridge.frame_received.emit(frame)
+    except Exception as e:
+        print("Frame decode error:", e)
+
+@sio.on('sensor')
+def on_sensor(payload):
+    # payload is a dict: {"temperature":…, "cpu_percent":…}
+    try:
+        t = float(payload.get('temperature', 0.0))
+        c = float(payload.get('cpu_percent', 0.0))
+        bridge.sensor_received.emit(t, c)
+    except Exception as e:
+        print("Sensor parse error:", e)
+
+
+# ─── Main ────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    app       = QApplication(sys.argv)
+    app_window = MainWindow()
+    app_window.show()
     sys.exit(app.exec())
