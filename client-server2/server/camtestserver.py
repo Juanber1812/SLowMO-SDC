@@ -92,9 +92,9 @@ def index():
                     JPEG Quality: <input type="number" name="jpeg" min="10" max="100" value="{{ jpeg }}" id="jpeg">
                     <button type="submit">Apply Settings</button>
                 </form>
-                <button onclick="startCamera()">Start Camera</button>
-                <button onclick="stopCamera()">Stop Camera</button>
-                <button onclick="recordPoint()">Record Point</button>
+                <button type="button" onclick="startCamera()">Start Camera</button>
+                <button type="button" onclick="stopCamera()">Stop Camera</button>
+                <button type="button" onclick="recordPoint()">Record Point</button>
                 <h3>Live Info</h3>
                 <p id="info">Loading...</p>
                 <canvas id="fpsChart" width="600" height="300"></canvas>
