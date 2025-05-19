@@ -62,7 +62,7 @@ def response_data(data):
         frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         # Optional: undistort frame before detection
-        frame = cv2.undistort(frame, mtx, dist)
+        #frame = cv2.undistort(frame, mtx, dist)
 
         pose = detect_apriltag(frame)
         queue.put(pose if pose is not None else None)
