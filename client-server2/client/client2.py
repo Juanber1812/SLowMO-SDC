@@ -153,7 +153,7 @@ class MainWindow(QWidget):
             "resolution": resolution
         }
         sio.emit("camera_config", config)
-        logging.info(f"📤 Sent config: {config}")
+        logging.info(f"Sent config: {config}")
 
     def update_image(self, frame):
         try:
@@ -191,7 +191,7 @@ class MainWindow(QWidget):
     def timerEvent(self, event):
         self.current_fps = self.frame_counter
         self.frame_counter = 0
-        self.info_labels["fps"].setText(f"⏱ FPS: {self.current_fps}")
+        self.info_labels["fps"].setText(f"FPS: {self.current_fps}")
         self.info_labels["frame_size"].setText(f" Frame Size: {self.current_frame_size / 1024:.1f} KB")
 
 # Socket.IO events
@@ -225,7 +225,7 @@ def on_frame(data):
             bridge.frame_received.emit(frame)
             logging.debug(f"Frame size: {len(data)} bytes")
         else:
-            logging.warning("⚠️ Frame decode returned None")
+            logging.warning("Frame decode returned None")
     except Exception as e:
         logging.exception("❌ Frame decode error")
 
