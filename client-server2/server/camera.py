@@ -10,6 +10,8 @@ camera_config = {
     "fps": 10,
     "resolution": (640, 480)
 }
+sio = socketio.Client()
+streaming = False  # Controlled by client
 
 @sio.on("camera_config")
 def on_camera_config(data):
@@ -23,8 +25,7 @@ JPEG_QUALITY = camera_config["jpeg_quality"]
 STREAM_INTERVAL = 1.0 / max(camera_config["fps"], 1)
 
 
-sio = socketio.Client()
-streaming = False  # Controlled by client
+
 
 @sio.event
 def connect():
