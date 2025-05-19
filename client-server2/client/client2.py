@@ -65,13 +65,15 @@ class MainWindow(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.request_data)
 
+    
     def toggle_stream(self):
         self.streaming = not self.streaming
-        self.start_button.setText("Stop Stream" if self.streaming else "Start Stream")
         if self.streaming:
-            self.timer.start(100)
+            self.start_button.setText("Stop Stream")
+            sio.emit("start_camera")
         else:
-            self.timer.stop()
+            self.start_button.setText("Start Stream")
+            sio.emit("stop_camera")
 
     def request_data(self):
         if sio.connected:
