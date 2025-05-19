@@ -67,7 +67,7 @@ def reconfigure_camera():
         if height < 100 or height > 1944:
             height = 480
 
-        if picam.is_running():
+        if picam.started():
             picam.stop()
 
         config = picam.create_preview_configuration(
