@@ -1,21 +1,23 @@
-# server.py
+# server2.py
+
+from gevent import monkey; monkey.patch_all()  # MUST be first
+
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
-from gevent import monkey; monkey.patch_all()
 import time
+import threading
+import camera  # This is your camera module
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
-
-# Track connected clients
 connected_clients = {}
 
 @app.route('/status')
 def status():
-    return "✅ Server is up and running"
+    return "✅ Server is running"
 
 @socketio.on('connect')
-def handle_connect():
+def on_connect():
     sid = request.sid
     connected_clients[sid] = time.time()
     print(f"🟢 Client connected: {sid} | Total: {len(connected_clients)}")
@@ -26,7 +28,7 @@ def handle_connect():
     }, to=sid)
 
 @socketio.on('disconnect')
-def handle_disconnect():
+def on_disconnect():
     sid = request.sid
     connected_clients.pop(sid, None)
     print(f"🔴 Client disconnected: {sid} | Total: {len(connected_clients)}")
@@ -56,6 +58,12 @@ def on_control(data):
     print(f"🛞 Control data received → Wheel RPM: {data.get('wheel_speed_rpm')}")
     emit('control', data, broadcast=True)
 
+def start_camera_thread():
+    cam_thread = threading.Thread(target=camera.start_stream, daemon=True)
+    cam_thread.start()
+    print("📽️ Camera streaming thread started.")
+
 if __name__ == "__main__":
     print("🚀 Starting Socket.IO server on http://0.0.0.0:5000")
+    start_camera_thread()
     socketio.run(app, host="0.0.0.0", port=5000)
