@@ -63,6 +63,16 @@ def start_camera_thread():
     cam_thread.start()
     print("📽️ Camera streaming thread started.")
 
+@socketio.on('start_camera')
+def handle_start_camera():
+    print("📩 Start camera command received from client.")
+    emit('start_camera', {}, broadcast=True)
+
+@socketio.on('stop_camera')
+def handle_stop_camera():
+    print("📩 Stop camera command received from client.")
+    emit('stop_camera', {}, broadcast=True)
+
 if __name__ == "__main__":
     print("🚀 Starting Socket.IO server on http://0.0.0.0:5000")
     start_camera_thread()

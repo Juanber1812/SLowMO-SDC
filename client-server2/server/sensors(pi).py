@@ -2,7 +2,7 @@
 import time, psutil, socketio
 from gevent import monkey; monkey.patch_all()
 
-SERVER_URL = "http://192.168.65.89:5000"
+SERVER_URL = "http://192.168.1.146:5000"
 sio = socketio.Client()
 sio.connect(SERVER_URL)
 

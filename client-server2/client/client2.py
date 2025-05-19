@@ -9,7 +9,7 @@ from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject
 
 # ─── Config ─────────────────────────────────────────────────────────────
-SERVER_URL = "http://192.168.65.89:5000"
+SERVER_URL = "http://192.168.1.146:5000"
 
 sio = socketio.Client()
 
