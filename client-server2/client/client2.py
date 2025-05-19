@@ -7,13 +7,15 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QObject
 from PyQt6.QtGui import QPixmap, QImage
+import logging
+
+logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 
 SERVER_URL = "http://192.168.1.146:5000"  # ← Update to your Pi IP
 
 sio = socketio.Client()
 
 RES_PRESETS = {
-    "320x240": (320, 240),
     "640x480": (640, 480),
     "1280x720": (1280, 720),
     "1920x1080": (1920, 1080),
@@ -122,14 +124,16 @@ def disconnect():
 @sio.on('frame')
 def on_frame(data):
     try:
+        logging.debug(f"Frame received: {len(data)} bytes")
         arr = np.frombuffer(base64.b64decode(data), np.uint8)
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
         if frame is not None:
             bridge.frame_received.emit(frame)
         else:
-            print("⚠️ Frame is None after decoding.")
+            logging.warning("⚠️ Frame is None after decoding.")
     except Exception as e:
-        print("❌ Frame decode error:", e)
+        logging.exception("❌ Frame decode error")
+
 
 
 if __name__ == "__main__":

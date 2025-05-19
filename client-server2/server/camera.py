@@ -88,6 +88,11 @@ def start_stream():
                 if not success:
                     continue
                 jpg_b64 = base64.b64encode(buffer).decode('utf-8')
+                
+                if len(jpg_b64) > 300000:
+                    print("⚠️ Skipping oversized frame.")
+                    continue
+
                 sio.emit("frame_data", jpg_b64)
             time.sleep(1.0 / max(camera_config["fps"], 1))
         except Exception as e:
