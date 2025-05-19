@@ -10,7 +10,7 @@ import numpy as np
 from picamera2 import Picamera2
 
 # ─────────────────────────────────────────────
-SERVER_URL = "http://192.168.65.89:5000"  # or change to server IP if on another device
+SERVER_URL = "http://localhost:5000"  # or change to server IP if on another device
 FRAME_WIDTH, FRAME_HEIGHT = 640, 480
 JPEG_QUALITY = 70
 STREAM_INTERVAL = 0.1  # seconds (10 FPS)
