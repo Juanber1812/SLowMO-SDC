@@ -1,3 +1,4 @@
+import time
 import socketio
 import base64
 import json
@@ -5,6 +6,27 @@ import cv2
 import numpy as np
 from collections import deque
 from multiprocessing import Queue
+import pyapriltags
+
+# Load calibration (same used by server)
+calib = np.load('calibration_data.npz')
+mtx = calib['mtx']
+dist = calib['dist']
+
+# AprilTag setup
+tag_size = 0.055  # meters
+object_points = np.array([
+    [-tag_size/2, -tag_size/2, 0],
+    [ tag_size/2, -tag_size/2, 0],
+    [ tag_size/2,  tag_size/2, 0],
+    [-tag_size/2,  tag_size/2, 0]
+], dtype=np.float32)
+
+detector = pyapriltags.Detector(
+    families='tag25h9', nthreads=2,
+    quad_decimate=1.0, quad_sigma=0.0,
+    refine_edges=1, decode_sharpening=0.25
+)
 
 # Create a socketio client instance
 sio = socketio.Client()
@@ -26,44 +48,44 @@ def disconnect():
     print("Disconnected from server.")
 
 @sio.event
-def response_data(data): # Receive frames from the server
+def response_data(data):
     global frame, fps, sensor
 
-    # Parse the incoming JSON data
-    json_data = json.loads(data, object_hook=custom_decoder)  # Decode the JSON string
-
-    # Retrieve 'image' (frame_data) and 'sensors' from the parsed JSON
+    json_data = json.loads(data, object_hook=custom_decoder)
     frame_data = json_data.get('image')
-    pose_data = json_data.get('pose')
-    tag_detected_data = json_data.get('tag')
     fps_data = json_data.get('fps')
     sensor_data = json_data.get('sensors')
 
-    update_queue(pose_data, tag_detected_data)
     fps = fps_data
     sensor = sensor_data
 
     try:
-        nparr = np.frombuffer(base64.b64decode(frame_data), np.uint8)  # Decode the base64 data to NumPy array
-        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)  # Decode the frame
-        window.update_data()  # Update window data
+        nparr = np.frombuffer(base64.b64decode(frame_data), np.uint8)
+        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        pose = detect_apriltag(frame)
+        queue.put(pose if pose is not None else None)
+
+        window.update_data()
     except Exception as e:
         print(f"Error decoding frame: {e}")
-        frame = None  # If an error occurs, set frame to None
+        frame = None
 
+def detect_apriltag(frame):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    tags = detector.detect(gray)
 
+    if not tags:
+        return None
 
-# Decoder for data received from server
-def custom_decoder(obj):
-    if "__deque__" in obj:
-        return deque(obj["data"])  # Convert list back to deque
-    elif "__ndarray__" in obj:
-        return np.array(obj["data"])  # Convert list back to ndarray
-    return obj
+    tag = tags[0]
+    success, rvec, tvec = cv2.solvePnP(
+        object_points,
+        tag.corners.astype(np.float32),
+        mtx, dist
+    )
+    if not success:
+        return None
 
-# Update queue data if tag detected 
-def update_queue(pose_data, tag_detected):
-    if tag_detected:
-        queue.put(pose_data)
-    else:
-        queue.put(None)
+    timestamp = time.time()
+    return (rvec, tvec, timestamp)

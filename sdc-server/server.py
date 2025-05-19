@@ -48,15 +48,15 @@ def send_data():
     # Send video frame and sensor data
     aprcapobj.capture_frame()
 
+    @socketio.on('request_data')
+def send_data():
+    aprcapobj.capture_frame()
     if aprcapobj.latest_frame_data:
         payload = {
             "image": aprcapobj.latest_frame_data,
-            "pose": aprcapobj.pose_data_list[0],
-            "tag": aprcapobj.tag_detected,
             "fps": aprcapobj.get_fps(),
             "sensors": imu.read_sensor_data()
         }
-
         socketio.emit('response_data', json.dumps(payload, cls=CustomEncoder))
 
 @socketio.on('flip')
