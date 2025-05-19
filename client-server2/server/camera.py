@@ -61,13 +61,18 @@ def reconfigure_camera():
         jpeg_quality = int(camera_config.get("jpeg_quality", 70))
         fps = int(camera_config.get("fps", 10))
 
-
+        # Stop if already running
         if picam.started:
             picam.stop()
 
+        # Apply FrameDurationLimits for precise FPS
+        frame_duration = int(1e6 / max(fps, 1))  # in microseconds
+
         config = picam.create_preview_configuration(
-            main={"format": "XRGB8888", "size": (width, height)}
+            main={"format": "XRGB8888", "size": (width, height)},
+            controls={"FrameDurationLimits": (frame_duration, frame_duration)}
         )
+
         picam.configure(config)
         picam.start()
         print(f"✅ Camera reconfigured: {width}x{height}, JPEG: {jpeg_quality}, FPS: {fps}")
@@ -105,12 +110,9 @@ def start_stream():
                     continue
 
                 jpg_b64 = base64.b64encode(buffer).decode('utf-8')
-
-                if len(jpg_b64) > 1000000:
-                    print("⚠️ Skipping oversized frame.")
-                    continue
-
                 sio.emit("frame_data", jpg_b64)
+
+                # Optional: comment this line if too spammy
                 print(f"📤 Sent frame: {len(jpg_b64)} bytes")
 
             time.sleep(1.0 / max(camera_config["fps"], 1))
