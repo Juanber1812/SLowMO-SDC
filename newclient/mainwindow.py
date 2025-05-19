@@ -47,7 +47,7 @@ class MainWindow(QWidget):
         if latest_frame is None:
             return
 
-        frame = detection.process_frame(latest_frame.copy(), self.detection_enabled)
+        frame = detector.process_frame(latest_frame.copy(), self.detection_enabled)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb.shape
         bytes_per_line = ch * w
