@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QObject
 from PyQt6.QtGui import QPixmap, QImage
+from PyQt6.QtCore import QTimer
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 
@@ -54,12 +55,12 @@ class MainWindow(QWidget):
 
         # Info panel
         self.info_labels = {
-            "temp": QLabel("🌡️ Temp: -- °C"),
-            "cpu": QLabel("🧠 CPU: --%"),
-            "speed": QLabel("📶 Upload: -- Mbps"),
-            "max_frame": QLabel("📐 Max Frame: -- KB"),
-            "fps": QLabel("⏱️ FPS: --"),
-            "frame_size": QLabel("📦 Frame Size: -- KB"),
+            "temp": QLabel("Temp: -- °C"),
+            "cpu": QLabel("CPU: --%"),
+            "speed": QLabel("Upload: -- Mbps"),
+            "max_frame": QLabel("Max Frame: -- KB"),
+            "fps": QLabel("⏱FPS: --"),
+            "frame_size": QLabel("Frame Size: -- KB"),
         }
         for label in self.info_labels.values():
             label.setStyleSheet("font-family: monospace;")
@@ -96,10 +97,9 @@ class MainWindow(QWidget):
 
         self.apply_btn = QPushButton("Apply Settings")
         self.apply_btn.clicked.connect(self.apply_config)
-
-        self.speed_btn = QPushButton("Test Internet Speed")
-        self.speed_btn.clicked.connect(self.measure_speed)
-
+        self.speed_timer = QTimer()
+        self.speed_timer.timeout.connect(self.measure_speed)
+        self.speed_timer.start(30000)  # every 30 seconds
         # Camera config panel
         config_group = QGroupBox("Camera Settings")
         grid = QGridLayout()
@@ -113,7 +113,6 @@ class MainWindow(QWidget):
         config_group.setLayout(grid)
 
         right_layout.addWidget(config_group)
-        right_layout.addWidget(self.speed_btn)
         right_layout.addWidget(self.toggle_btn)
 
         # Signals

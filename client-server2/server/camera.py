@@ -97,6 +97,9 @@ def start_stream():
         print("❌ Initial camera setup failed:", e)
         return
 
+    frame_count = 0
+    last_time = time.time()
+
     while True:
         try:
             if streaming:
@@ -112,11 +115,16 @@ def start_stream():
                 jpg_b64 = base64.b64encode(buffer).decode('utf-8')
                 sio.emit("frame_data", jpg_b64)
 
-                # Optional: comment this line if too spammy
-                print(f"📤 Sent frame: {len(jpg_b64)} bytes")
+                frame_count += 1
+                now = time.time()
+                if now - last_time >= 1.0:
+                    print(f"📈 Camera FPS: {frame_count}", end='\r')
+                    frame_count = 0
+                    last_time = now
 
             time.sleep(1.0 / max(camera_config["fps"], 1))
 
         except Exception as e:
             print("❌ Stream error:", e)
             time.sleep(1)
+
