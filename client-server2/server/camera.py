@@ -1,18 +1,12 @@
-# camera.py
+# camera.py (clean output, no emojis)
 
 from gevent import monkey; monkey.patch_all()
-
-import time
-import base64
-import cv2
-import socketio
-import numpy as np
+import time, base64, socketio, cv2
 from picamera2 import Picamera2
 
 SERVER_URL = "http://localhost:5000"
 sio = socketio.Client()
 
-# Default config
 camera_config = {
     "jpeg_quality": 70,
     "fps": 10,
@@ -24,77 +18,69 @@ picam = None
 
 @sio.event
 def connect():
-    print("📡 Camera connected to server")
+    print("[INFO] Connected to server.")
 
 @sio.event
 def disconnect():
-    print("🔌 Camera disconnected")
+    print("[INFO] Disconnected from server.")
 
 @sio.on("start_camera")
 def on_start_camera(data):
     global streaming
     streaming = True
-    print("🎥 Camera stream STARTED")
+    print("[INFO] Stream started.")
 
 @sio.on("stop_camera")
 def on_stop_camera(data):
     global streaming
     streaming = False
-    print("🛑 Camera stream STOPPED")
+    print("[INFO] Stream stopped.")
 
 @sio.on("camera_config")
 def on_camera_config(data):
     global camera_config
-    print("⚙️ Received camera config:", data)
+    print(f"[INFO] Config received: {data}")
     camera_config.update(data)
-
     if not streaming:
         reconfigure_camera()
     else:
-        print("⚠️ Ignored config update: stream is active")
+        print("[WARN] Config ignored while streaming.")
 
 def reconfigure_camera():
     global picam
     try:
-        res = camera_config.get("resolution", (640, 480))
-        width, height = int(res[0]), int(res[1])
-        jpeg_quality = int(camera_config.get("jpeg_quality", 70))
-        fps = int(camera_config.get("fps", 10))
+        res = camera_config["resolution"]
+        jpeg_quality = camera_config["jpeg_quality"]
+        fps = camera_config["fps"]
+        duration = int(1e6 / max(fps, 1))
 
-        # Stop if already running
         if picam.started:
             picam.stop()
 
-        # Apply FrameDurationLimits for precise FPS
-        frame_duration = int(1e6 / max(fps, 1))  # in microseconds
-
         config = picam.create_preview_configuration(
-            main={"format": "XRGB8888", "size": (width, height)},
-            controls={"FrameDurationLimits": (frame_duration, frame_duration)}
+            main={"format": "XRGB8888", "size": res},
+            controls={"FrameDurationLimits": (duration, duration)}
         )
-
         picam.configure(config)
         picam.start()
-        print(f"✅ Camera reconfigured: {width}x{height}, JPEG: {jpeg_quality}, FPS: {fps}")
-
+        print(f"[INFO] Camera reconfigured: {res}, JPEG: {jpeg_quality}, FPS: {fps}")
     except Exception as e:
-        print("❌ Reconfigure failed:", e)
+        print("[ERROR] Reconfigure failed:", e)
 
 def start_stream():
     global streaming, picam
-
     try:
         sio.connect(SERVER_URL)
     except Exception as e:
-        print("❌ Could not connect to server:", e)
+        print("[ERROR] Connection failed:", e)
         return
 
     try:
         picam = Picamera2()
         reconfigure_camera()
-        print("✅ Camera ready, waiting for stream command...")
+        print("[INFO] Camera initialized.")
     except Exception as e:
-        print("❌ Initial camera setup failed:", e)
+        print("[ERROR] Camera setup failed:", e)
         return
 
     frame_count = 0
@@ -105,26 +91,23 @@ def start_stream():
             if streaming:
                 frame = picam.capture_array()
                 success, buffer = cv2.imencode(
-                    '.jpg',
-                    frame,
-                    [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]]
+                    '.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]]
                 )
                 if not success:
                     continue
 
                 jpg_b64 = base64.b64encode(buffer).decode('utf-8')
                 sio.emit("frame_data", jpg_b64)
-
                 frame_count += 1
+
                 now = time.time()
                 if now - last_time >= 1.0:
-                    print(f"📈 Camera FPS: {frame_count}", end='\r')
+                    print(f"[FPS] {frame_count} fps", end='\r')
                     frame_count = 0
                     last_time = now
 
             time.sleep(1.0 / max(camera_config["fps"], 1))
 
         except Exception as e:
-            print("❌ Stream error:", e)
+            print("[ERROR] Streaming failure:", e)
             time.sleep(1)
-

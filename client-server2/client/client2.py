@@ -167,8 +167,8 @@ class MainWindow(QWidget):
             logging.exception("❌ GUI image update error")
 
     def measure_speed(self):
-        self.info_labels["speed"].setText("📶 Upload: Testing...")
-        self.info_labels["max_frame"].setText("📐 Max Frame: ...")
+        self.info_labels["speed"].setText("Upload: Testing...")
+        self.info_labels["max_frame"].setText(" Max Frame: ...")
 
         def run_speedtest():
             try:
@@ -176,14 +176,14 @@ class MainWindow(QWidget):
                 st = speedtest.Speedtest()
                 upload = st.upload()
                 upload_mbps = upload / 1_000_000
-                self.info_labels["speed"].setText(f"📶 Upload: {upload_mbps:.2f} Mbps")
+                self.info_labels["speed"].setText(f" Upload: {upload_mbps:.2f} Mbps")
                 fps = self.fps_slider.value()
                 max_bytes_per_sec = upload / 8
                 max_frame_size = max_bytes_per_sec / fps
-                self.info_labels["max_frame"].setText(f"📐 Max Frame: {max_frame_size / 1024:.1f} KB")
+                self.info_labels["max_frame"].setText(f" Max Frame: {max_frame_size / 1024:.1f} KB")
             except Exception as e:
-                self.info_labels["speed"].setText("📶 Upload: Error")
-                self.info_labels["max_frame"].setText("📐 Max Frame: -- KB")
+                self.info_labels["speed"].setText(" Upload: Error")
+                self.info_labels["max_frame"].setText(" Max Frame: -- KB")
                 logging.exception("Speedtest failed")
 
         threading.Thread(target=run_speedtest, daemon=True).start()
@@ -191,8 +191,8 @@ class MainWindow(QWidget):
     def timerEvent(self, event):
         self.current_fps = self.frame_counter
         self.frame_counter = 0
-        self.info_labels["fps"].setText(f"⏱️ FPS: {self.current_fps}")
-        self.info_labels["frame_size"].setText(f"📦 Frame Size: {self.current_frame_size / 1024:.1f} KB")
+        self.info_labels["fps"].setText(f"⏱ FPS: {self.current_fps}")
+        self.info_labels["frame_size"].setText(f" Frame Size: {self.current_frame_size / 1024:.1f} KB")
 
 # Socket.IO events
 
@@ -201,8 +201,8 @@ def on_sensor_data(data):
     try:
         temp = data.get("temperature", 0)
         cpu = data.get("cpu_percent", 0)
-        win.info_labels["temp"].setText(f"🌡️ Temp: {temp:.1f} °C")
-        win.info_labels["cpu"].setText(f"🧠 CPU: {cpu:.1f} %")
+        win.info_labels["temp"].setText(f" Temp: {temp:.1f} °C")
+        win.info_labels["cpu"].setText(f" CPU: {cpu:.1f} %")
     except Exception as e:
         print("Sensor update failed:", e)
 
