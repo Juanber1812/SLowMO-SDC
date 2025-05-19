@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal, QObject
 from PyQt6.QtGui import QPixmap, QImage
 
-SERVER_URL = "http://192.168.65.89:5000"  # ← Update to your Pi IP
+SERVER_URL = "http://192.168.1.146:5000"  # ← Update to your Pi IP
 
 sio = socketio.Client()
 
@@ -97,12 +97,16 @@ class MainWindow(QWidget):
         }
         sio.emit("camera_config", config)
         print("📤 Sent config:", config)
-
+    
     def update_image(self, frame):
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        h, w, ch = rgb.shape
-        qimg = QImage(rgb.data, w, h * ch, QImage.Format.Format_RGB888)
-        self.image_label.setPixmap(QPixmap.fromImage(qimg))
+        try:
+            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            h, w, ch = rgb.shape
+            qimg = QImage(rgb.data, w, h * ch, QImage.Format.Format_RGB888)
+            self.image_label.setPixmap(QPixmap.fromImage(qimg))
+        except Exception as e:
+            print("❌ GUI image display error:", e)
+
 
 
 @sio.event
@@ -117,10 +121,16 @@ def disconnect():
 
 @sio.on('frame')
 def on_frame(data):
-    arr = np.frombuffer(base64.b64decode(data), np.uint8)
-    frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-    if frame is not None:
-        bridge.frame_received.emit(frame)
+    try:
+        arr = np.frombuffer(base64.b64decode(data), np.uint8)
+        frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        if frame is not None:
+            bridge.frame_received.emit(frame)
+        else:
+            print("⚠️ Frame is None after decoding.")
+    except Exception as e:
+        print("❌ Frame decode error:", e)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
