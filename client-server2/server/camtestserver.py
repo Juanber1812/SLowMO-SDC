@@ -6,7 +6,6 @@ from picamera2 import Picamera2
 app = Flask(__name__)
 picam = Picamera2()
 
-# Preset resolutions
 RES_OPTIONS = {
     "640x480": (640, 480),
     "1280x720": (1280, 720),
@@ -25,6 +24,7 @@ latest_frame = b''
 frame_count = 0
 fps_measured = 0
 csv_file = "camera_benchmark.csv"
+points = []  # List of dicts: {"fps_set": ..., "fps_measured": ..., "jpeg": ...}
 
 def get_temp():
     try:
@@ -32,6 +32,36 @@ def get_temp():
             return int(f.read()) / 1000.0
     except:
         return None
+
+def get_res_label(res):
+    for label, val in RES_OPTIONS.items():
+        if val == res:
+            return label
+    return "640x480"
+
+def camera_thread():
+    global latest_frame, frame_count, fps_measured
+    last_time = time.time()
+    while True:
+        if SETTINGS["camera_running"]:
+            try:
+                frame = picam.capture_array()
+                success, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), SETTINGS["jpeg_quality"]])
+                if not success:
+                    continue
+                latest_frame = buffer.tobytes()
+                frame_count += 1
+
+                now = time.time()
+                if now - last_time >= 1.0:
+                    fps_measured = frame_count
+                    frame_count = 0
+                    last_time = now
+            except Exception as e:
+                print("[ERROR] Camera capture:", e)
+                time.sleep(0.5)
+        else:
+            time.sleep(0.2)
 
 @app.route('/')
 def index():
@@ -47,45 +77,38 @@ def index():
         </head>
         <body>
             <h2>Live Stream</h2>
-            <img src="/video_feed" width="640">
+            <img src="/video_feed" width="640" id="liveimg">
             <div id="panel">
                 <h3>Controls</h3>
-                <form method="POST" action="/settings">
+                <form id="settingsForm">
                     Resolution:
-                    <select name="res">
+                    <select name="res" id="res">
                         {% for label in res_labels %}
                             <option value="{{ label }}" {% if current_res == label %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select><br>
-                    FPS: <input type="number" name="fps" min="1" max="120" value="{{ fps }}">
-                    JPEG Quality: <input type="number" name="jpeg" min="10" max="100" value="{{ jpeg }}">
+                    FPS: <input type="number" name="fps" min="1" max="120" value="{{ fps }}" id="fps">
+                    JPEG Quality: <input type="number" name="jpeg" min="10" max="100" value="{{ jpeg }}" id="jpeg">
                     <button type="submit">Apply Settings</button>
                 </form>
-                <form method="POST" action="/start">
-                    <button type="submit">Start Camera</button>
-                </form>
-                <form method="POST" action="/stop">
-                    <button type="submit">Stop Camera</button>
-                </form>
-                <form method="POST" action="/record">
-                    <button type="submit">Record Point</button>
-                </form>
+                <button onclick="startCamera()">Start Camera</button>
+                <button onclick="stopCamera()">Stop Camera</button>
+                <button onclick="recordPoint()">Record Point</button>
                 <h3>Live Info</h3>
                 <p id="info">Loading...</p>
-                <canvas id="fpsChart" width="600" height="200"></canvas>
+                <canvas id="fpsChart" width="600" height="300"></canvas>
             </div>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
                 let chart = new Chart(document.getElementById('fpsChart'), {
                     type: 'scatter',
                     data: {
-                        datasets: [{
-                            label: 'Set FPS vs Measured FPS',
-                            data: [],
-                            backgroundColor: 'lime'
-                        }]
+                        datasets: []
                     },
                     options: {
+                        plugins: {
+                            legend: { display: true }
+                        },
                         scales: {
                             x: { title: { display: true, text: 'Set FPS' }, min: 0, max: 130 },
                             y: { title: { display: true, text: 'Measured FPS' }, min: 0, max: 130 }
@@ -99,19 +122,45 @@ def index():
                             `Measured FPS: ${data.fps} | CPU: ${data.cpu}% | Temp: ${data.temp} °C`;
                     });
                 }
-
                 setInterval(updateStatus, 1000);
 
-                // Add new point after record
-                async function pollPoint() {
-                    const resp = await fetch('/last_point');
-                    const point = await resp.json();
-                    if (point) {
-                        chart.data.datasets[0].data.push(point);
+                function updateChart() {
+                    fetch('/points').then r => r.json()).then(points => {
+                        // Group by JPEG quality
+                        let groups = {};
+                        points.forEach(pt => {
+                            let key = "JPEG " + pt.jpeg;
+                            if (!groups[key]) groups[key] = [];
+                            groups[key].push({x: pt.fps_set, y: pt.fps_measured});
+                        });
+                        chart.data.datasets = Object.entries(groups).map(([label, data], i) => ({
+                            label,
+                            data,
+                            backgroundColor: `hsl(${(i*60)%360},80%,60%)`
+                        }));
                         chart.update();
-                    }
+                    });
                 }
-                setInterval(pollPoint, 2000);
+                setInterval(updateChart, 2000);
+
+                function recordPoint() {
+                    fetch('/record', {method: 'POST'})
+                        .then(() => updateChart());
+                }
+
+                function startCamera() {
+                    fetch('/start', {method: 'POST'});
+                }
+                function stopCamera() {
+                    fetch('/stop', {method: 'POST'});
+                }
+
+                document.getElementById('settingsForm').onsubmit = function(e) {
+                    e.preventDefault();
+                    let form = new FormData(this);
+                    fetch('/settings', {method: 'POST', body: form})
+                        .then(() => setTimeout(updateStatus, 500));
+                };
             </script>
         </body>
         </html>
@@ -121,7 +170,16 @@ def index():
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    def gen():
+        while True:
+            if latest_frame:
+                yield (
+                    b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + latest_frame + b'\r\n'
+                )
+            else:
+                time.sleep(0.1)
+    return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/settings', methods=['POST'])
 def update_settings():
@@ -130,32 +188,51 @@ def update_settings():
     label = request.form.get("res")
     if label in RES_OPTIONS:
         SETTINGS["resolution"] = RES_OPTIONS[label]
+    if SETTINGS["camera_running"]:
+        try:
+            config = picam.create_preview_configuration(
+                main={"format": "XRGB8888", "size": SETTINGS["resolution"]},
+                controls={"FrameDurationLimits": (
+                    int(1e6 / max(SETTINGS["fps"], 1)),
+                    int(1e6 / max(SETTINGS["fps"], 1))
+                )}
+            )
+            picam.configure(config)
+            picam.start()
+        except Exception as e:
+            print("[ERROR] Reconfiguring camera:", e)
     print(f"[CONFIG] New Settings: {SETTINGS}")
-    return "Settings applied. <a href='/'>Back</a>"
+    return ('', 204)
 
 @app.route('/start', methods=['POST'])
 def start_camera():
     if not SETTINGS["camera_running"]:
-        config = picam.create_preview_configuration(
-            main={"format": "XRGB8888", "size": SETTINGS["resolution"]},
-            controls={"FrameDurationLimits": (
-                int(1e6 / max(SETTINGS["fps"], 1)),
-                int(1e6 / max(SETTINGS["fps"], 1))
-            )}
-        )
-        picam.configure(config)
-        picam.start()
-        SETTINGS["camera_running"] = True
-        print("[INFO] Camera started.")
-    return "Started. <a href='/'>Back</a>"
+        try:
+            config = picam.create_preview_configuration(
+                main={"format": "XRGB8888", "size": SETTINGS["resolution"]},
+                controls={"FrameDurationLimits": (
+                    int(1e6 / max(SETTINGS["fps"], 1)),
+                    int(1e6 / max(SETTINGS["fps"], 1))
+                )}
+            )
+            picam.configure(config)
+            picam.start()
+            SETTINGS["camera_running"] = True
+            print("[INFO] Camera started.")
+        except Exception as e:
+            print("[ERROR] Starting camera:", e)
+    return ('', 204)
 
 @app.route('/stop', methods=['POST'])
 def stop_camera():
     if SETTINGS["camera_running"]:
-        picam.stop()
-        SETTINGS["camera_running"] = False
-        print("[INFO] Camera stopped.")
-    return "Stopped. <a href='/'>Back</a>"
+        try:
+            picam.stop()
+            SETTINGS["camera_running"] = False
+            print("[INFO] Camera stopped.")
+        except Exception as e:
+            print("[ERROR] Stopping camera:", e)
+    return ('', 204)
 
 @app.route('/status')
 def status():
@@ -168,53 +245,26 @@ def status():
 @app.route('/record', methods=['POST'])
 def record_point():
     width, height = SETTINGS["resolution"]
-    row = [width, height, SETTINGS["fps"], SETTINGS["jpeg_quality"], round(fps_measured, 2)]
+    row = {
+        "width": width,
+        "height": height,
+        "fps_set": SETTINGS["fps"],
+        "jpeg": SETTINGS["jpeg_quality"],
+        "fps_measured": round(fps_measured, 2)
+    }
+    points.append(row)
     with open(csv_file, "a", newline="") as f:
-        csv.writer(f).writerow(row)
-    global last_point
-    last_point = {"x": SETTINGS["fps"], "y": round(fps_measured, 2)}
+        csv.writer(f).writerow([row["width"], row["height"], row["fps_set"], row["jpeg"], row["fps_measured"]])
     print(f"[RECORD] {row}")
-    return "Recorded. <a href='/'>Back</a>"
+    return ('', 204)
 
-@app.route('/last_point')
-def last_point_data():
-    return jsonify(last_point or {})
-
-def get_res_label(res):
-    for label, val in RES_OPTIONS.items():
-        if val == res:
-            return label
-    return "640x480"
-
-def gen_frames():
-    global latest_frame, frame_count, fps_measured
-    last_time = time.time()
-
-    while True:
-        if SETTINGS["camera_running"]:
-            frame = picam.capture_array()
-            success, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), SETTINGS["jpeg_quality"]])
-            if not success:
-                continue
-            latest_frame = buffer.tobytes()
-            frame_count += 1
-
-            now = time.time()
-            if now - last_time >= 1.0:
-                fps_measured = frame_count
-                frame_count = 0
-                last_time = now
-
-            yield (
-                b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + latest_frame + b'\r\n'
-            )
-        else:
-            time.sleep(0.2)
+@app.route('/points')
+def get_points():
+    return jsonify(points)
 
 if __name__ == '__main__':
     with open(csv_file, "w", newline="") as f:
         csv.writer(f).writerow(["width", "height", "fps_set", "jpeg", "fps_measured"])
-    last_point = {}
+    threading.Thread(target=camera_thread, daemon=True).start()
     print("[INFO] Access camera dashboard at http://0.0.0.0:5001")
     app.run(host="0.0.0.0", port=5001, threaded=True)
