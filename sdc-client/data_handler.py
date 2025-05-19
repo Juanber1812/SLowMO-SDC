@@ -8,7 +8,7 @@ from collections import deque
 from multiprocessing import Queue
 import pyapriltags
 
-# Load calibration (same used by server)
+# Load calibration (used for undistortion and pose estimation)
 calib = np.load('calibration_data.npz')
 mtx = calib['mtx']
 dist = calib['dist']
@@ -16,10 +16,10 @@ dist = calib['dist']
 # AprilTag setup
 tag_size = 0.055  # meters
 object_points = np.array([
-    [-tag_size/2, -tag_size/2, 0],
-    [ tag_size/2, -tag_size/2, 0],
-    [ tag_size/2,  tag_size/2, 0],
-    [-tag_size/2,  tag_size/2, 0]
+    [-tag_size / 2, -tag_size / 2, 0],
+    [ tag_size / 2, -tag_size / 2, 0],
+    [ tag_size / 2,  tag_size / 2, 0],
+    [-tag_size / 2,  tag_size / 2, 0]
 ], dtype=np.float32)
 
 detector = pyapriltags.Detector(
@@ -28,9 +28,8 @@ detector = pyapriltags.Detector(
     refine_edges=1, decode_sharpening=0.25
 )
 
-# Create a socketio client instance
+# Socket.IO setup
 sio = socketio.Client()
-
 queue = Queue()
 window = None
 
@@ -38,7 +37,6 @@ frame = None
 fps = None
 sensor = None
 
-# Socket.IO events
 @sio.event
 def connect():
     print("Connected to server.")
@@ -51,7 +49,7 @@ def disconnect():
 def response_data(data):
     global frame, fps, sensor
 
-    json_data = json.loads(data, object_hook=custom_decoder)
+    json_data = json.loads(data)
     frame_data = json_data.get('image')
     fps_data = json_data.get('fps')
     sensor_data = json_data.get('sensors')
@@ -63,12 +61,15 @@ def response_data(data):
         nparr = np.frombuffer(base64.b64decode(frame_data), np.uint8)
         frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
+        # Optional: undistort frame before detection
+        frame = cv2.undistort(frame, mtx, dist)
+
         pose = detect_apriltag(frame)
         queue.put(pose if pose is not None else None)
 
         window.update_data()
     except Exception as e:
-        print(f"Error decoding frame: {e}")
+        print(f"Error decoding or processing frame: {e}")
         frame = None
 
 def detect_apriltag(frame):
