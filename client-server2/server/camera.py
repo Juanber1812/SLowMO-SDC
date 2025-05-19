@@ -61,13 +61,8 @@ def reconfigure_camera():
         jpeg_quality = int(camera_config.get("jpeg_quality", 70))
         fps = int(camera_config.get("fps", 10))
 
-        # Resolution safety limits
-        if width < 100 or width > 2592:
-            width = 640
-        if height < 100 or height > 1944:
-            height = 480
 
-        if picam.started():
+        if picam.started:
             picam.stop()
 
         config = picam.create_preview_configuration(
@@ -116,6 +111,7 @@ def start_stream():
                     continue
 
                 sio.emit("frame_data", jpg_b64)
+                print(f"📤 Sent frame: {len(jpg_b64)} bytes")
 
             time.sleep(1.0 / max(camera_config["fps"], 1))
 

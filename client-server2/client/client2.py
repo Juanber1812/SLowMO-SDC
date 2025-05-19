@@ -1,25 +1,28 @@
-import sys, base64, socketio, cv2, numpy as np, logging, queue
+import sys, base64, socketio, cv2, numpy as np, logging
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QLabel, QPushButton, QVBoxLayout,
     QHBoxLayout, QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox
 )
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt, pyqtSignal, QObject
 from PyQt6.QtGui import QPixmap, QImage
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 
-SERVER_URL = "http://192.168.1.146:5000"  # ← Your Pi IP
+SERVER_URL = "http://192.168.1.146:5000"
 
 RES_PRESETS = {
-    "320x240": (320, 240),
     "640x480": (640, 480),
     "1280x720": (1280, 720),
     "1920x1080": (1920, 1080),
-    "2592x1944": (2592, 1944),  # Pi Camera V3 max
+    "2592x1944": (2592, 1944),
 }
 
 sio = socketio.Client()
-frame_queue = queue.Queue()
+
+class Bridge(QObject):
+    frame_received = pyqtSignal(np.ndarray)
+
+bridge = Bridge()
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -74,10 +77,7 @@ class MainWindow(QWidget):
         layout.addWidget(config_group)
         layout.addWidget(self.toggle_btn)
 
-        # QTimer to safely update GUI from frame queue
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_from_queue)
-        self.timer.start(50)
+        bridge.frame_received.connect(self.update_image)
 
     def toggle_stream(self):
         self.streaming = not self.streaming
@@ -98,13 +98,6 @@ class MainWindow(QWidget):
         }
         sio.emit("camera_config", config)
         print("📤 Sent config:", config)
-
-    def update_from_queue(self):
-        try:
-            frame = frame_queue.get_nowait()
-            self.update_image(frame)
-        except queue.Empty:
-            pass
 
     def update_image(self, frame):
         try:
@@ -134,8 +127,8 @@ def on_frame(data):
         arr = np.frombuffer(base64.b64decode(data), np.uint8)
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
         if frame is not None:
-            frame_queue.put(frame)
-            logging.debug(f"Frame received and queued: {len(data)} bytes")
+            bridge.frame_received.emit(frame)
+            logging.debug(f"Frame size: {len(data)} bytes")
         else:
             logging.warning("⚠️ Frame decode returned None")
     except Exception as e:
