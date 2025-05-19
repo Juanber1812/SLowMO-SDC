@@ -66,6 +66,7 @@ def camera_thread():
 @app.route('/')
 def index():
     return render_template_string('''
+        <!DOCTYPE html>
         <html>
         <head>
             <title>Pi Camera Dashboard</title>
