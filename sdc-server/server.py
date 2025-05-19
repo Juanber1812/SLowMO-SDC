@@ -48,7 +48,6 @@ def send_data():
     # Send video frame and sensor data
     aprcapobj.capture_frame()
 
-    @socketio.on('request_data')
 def send_data():
     aprcapobj.capture_frame()
     if aprcapobj.latest_frame_data:
