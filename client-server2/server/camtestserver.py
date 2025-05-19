@@ -18,14 +18,27 @@ def camera_stream():
     picam.start()
 
     frame_delay = 1.0 / FPS
+    frame_count = 0
+    last_time = time.time()
+
     while True:
         frame = picam.capture_array()
         success, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), JPEG_QUALITY])
         if not success:
             continue
         frame_bytes = buffer.tobytes()
+
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+        frame_count += 1
+        now = time.time()
+        if now - last_time >= 1.0:
+            print(f"[FPS] Actual FPS: {frame_count}")
+            frame_count = 0
+            last_time = now
+
         time.sleep(frame_delay)
+
 
 @app.route('/')
 def video_feed():
