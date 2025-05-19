@@ -2,7 +2,9 @@
 
 from gevent import monkey; monkey.patch_all()
 
-import time, socketio, psutil
+import time
+import socketio
+import psutil
 
 SERVER_URL = "http://localhost:5000"
 sio = socketio.Client()
@@ -15,6 +17,10 @@ def connect():
 def disconnect():
     print("🔌 Disconnected from server")
 
+@sio.on("sensor_data")
+def handle_sensor_data(data):
+    global latest_sensor_data
+    latest_sensor_data = data
 def get_temp():
     try:
         with open('/sys/class/thermal/thermal_zone0/temp') as f:
@@ -34,4 +40,4 @@ def start_sensors():
         temp = get_temp()
         cpu = psutil.cpu_percent(interval=None)
         sio.emit('sensor_data', {"temperature": temp, "cpu_percent": cpu})
-        time.sleep(1)
+        time.sleep(3)

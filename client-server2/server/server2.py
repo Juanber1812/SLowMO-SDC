@@ -36,6 +36,11 @@ def handle_stop_camera():
 def update_camera_config(data):
     emit('camera_config', data, broadcast=True)
 
+@socketio.on("sensor_data")
+def handle_sensor_data(data):
+    socketio.emit("sensor_broadcast", data)
+
+
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
     start_camera_thread()
