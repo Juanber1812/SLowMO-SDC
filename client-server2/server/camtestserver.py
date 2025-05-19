@@ -59,7 +59,7 @@ def camera_thread():
                     last_time = now
             except Exception as e:
                 print("[ERROR] Camera capture:", e)
-                time.sleep(0.5)
+                time.sleep(0.001)  # Only a minimal sleep on error
         else:
             time.sleep(0.2)
 
@@ -120,13 +120,13 @@ def index():
                 function updateStatus() {
                     fetch('/status').then(r => r.json()).then(data => {
                         document.getElementById('info').innerText =
-                            `Measured FPS: ${data.fps} | CPU: ${data.cpu}% | Temp: ${data.temp} °C`;
+                            `Set FPS: ${data.fps_set} | Measured FPS: ${data.fps_measured} | CPU: ${data.cpu}% | Temp: ${data.temp} °C`;
                     });
                 }
                 setInterval(updateStatus, 1000);
 
                 function updateChart() {
-                    fetch('/points').then(r => r.json()).then(points => {
+                    fetch('/points').then r => r.json()).then(points => {
                         // Group by JPEG quality
                         let groups = {};
                         points.forEach(pt => {
@@ -238,7 +238,8 @@ def stop_camera():
 @app.route('/status')
 def status():
     return jsonify({
-        "fps": fps_measured,
+        "fps_set": SETTINGS["fps"],
+        "fps_measured": fps_measured,
         "cpu": psutil.cpu_percent(),
         "temp": get_temp()
     })
