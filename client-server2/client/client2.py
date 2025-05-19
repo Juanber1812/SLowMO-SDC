@@ -1,31 +1,25 @@
-# client2.py
-
-import sys, base64, socketio, cv2, numpy as np
+import sys, base64, socketio, cv2, numpy as np, logging, queue
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QLabel, QPushButton, QVBoxLayout,
-    QHBoxLayout, QComboBox, QSlider, QGroupBox, QGridLayout
+    QHBoxLayout, QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QObject
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QPixmap, QImage
-import logging
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 
-SERVER_URL = "http://192.168.1.146:5000"  # ← Update to your Pi IP
-
-sio = socketio.Client()
+SERVER_URL = "http://192.168.1.146:5000"  # ← Your Pi IP
 
 RES_PRESETS = {
+    "320x240": (320, 240),
     "640x480": (640, 480),
     "1280x720": (1280, 720),
     "1920x1080": (1920, 1080),
     "2592x1944": (2592, 1944),  # Pi Camera V3 max
 }
 
-class Bridge(QObject):
-    frame_received = pyqtSignal(np.ndarray)
-
-bridge = Bridge()
+sio = socketio.Client()
+frame_queue = queue.Queue()
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -40,12 +34,10 @@ class MainWindow(QWidget):
         self.toggle_btn = QPushButton("Start Stream")
         self.toggle_btn.clicked.connect(self.toggle_stream)
 
-        # Config controls
         self.jpeg_slider = QSlider(Qt.Orientation.Horizontal)
         self.jpeg_slider.setRange(10, 100)
         self.jpeg_slider.setValue(70)
         self.jpeg_label = QLabel("JPEG: 70")
-
         self.jpeg_slider.valueChanged.connect(
             lambda val: self.jpeg_label.setText(f"JPEG: {val}")
         )
@@ -54,7 +46,6 @@ class MainWindow(QWidget):
         self.fps_slider.setRange(1, 120)
         self.fps_slider.setValue(10)
         self.fps_label = QLabel("FPS: 10")
-
         self.fps_slider.valueChanged.connect(
             lambda val: self.fps_label.setText(f"FPS: {val}")
         )
@@ -83,7 +74,10 @@ class MainWindow(QWidget):
         layout.addWidget(config_group)
         layout.addWidget(self.toggle_btn)
 
-        bridge.frame_received.connect(self.update_image)
+        # QTimer to safely update GUI from frame queue
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_from_queue)
+        self.timer.start(50)
 
     def toggle_stream(self):
         self.streaming = not self.streaming
@@ -91,6 +85,11 @@ class MainWindow(QWidget):
         sio.emit("start_camera" if self.streaming else "stop_camera")
 
     def apply_config(self):
+        if self.streaming:
+            QMessageBox.warning(self, "Stream Active",
+                                "Stop the stream before changing camera settings.")
+            return
+
         res_text = self.res_dropdown.currentText()
         config = {
             "jpeg_quality": self.jpeg_slider.value(),
@@ -99,7 +98,14 @@ class MainWindow(QWidget):
         }
         sio.emit("camera_config", config)
         print("📤 Sent config:", config)
-    
+
+    def update_from_queue(self):
+        try:
+            frame = frame_queue.get_nowait()
+            self.update_image(frame)
+        except queue.Empty:
+            pass
+
     def update_image(self, frame):
         try:
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -107,9 +113,10 @@ class MainWindow(QWidget):
             qimg = QImage(rgb.data, w, h * ch, QImage.Format.Format_RGB888)
             self.image_label.setPixmap(QPixmap.fromImage(qimg))
         except Exception as e:
-            print("❌ GUI image display error:", e)
+            logging.exception("❌ GUI image update error")
 
 
+# Socket.IO Events
 
 @sio.event
 def connect():
@@ -121,19 +128,18 @@ def disconnect():
     print("🔌 Disconnected")
     win.status_label.setText("Status: Disconnected")
 
-@sio.on('frame')
+@sio.on("frame")
 def on_frame(data):
     try:
-        logging.debug(f"Frame received: {len(data)} bytes")
         arr = np.frombuffer(base64.b64decode(data), np.uint8)
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
         if frame is not None:
-            bridge.frame_received.emit(frame)
+            frame_queue.put(frame)
+            logging.debug(f"Frame received and queued: {len(data)} bytes")
         else:
-            logging.warning("⚠️ Frame is None after decoding.")
+            logging.warning("⚠️ Frame decode returned None")
     except Exception as e:
         logging.exception("❌ Frame decode error")
-
 
 
 if __name__ == "__main__":
@@ -141,9 +147,14 @@ if __name__ == "__main__":
     win = MainWindow()
     win.show()
 
-    try:
-        sio.connect(SERVER_URL, wait_timeout=5)
-    except Exception as e:
-        print("❌ Could not connect:", e)
+    def socket_thread():
+        try:
+            sio.connect(SERVER_URL, wait_timeout=5)
+            sio.wait()
+        except Exception as e:
+            logging.exception("❌ SocketIO connection error")
+
+    import threading
+    threading.Thread(target=socket_thread, daemon=True).start()
 
     sys.exit(app.exec())

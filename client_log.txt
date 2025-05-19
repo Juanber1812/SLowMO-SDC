@@ -1,0 +1,23 @@
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747686241.00556 HTTP/1.1" 200 97
+DEBUG:root:Frame received: 15316 bytes
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747686291.9353662 HTTP/1.1" 200 97
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.1.146
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747686302.5550537 HTTP/1.1" 200 97
+DEBUG:root:Frame received: 15328 bytes
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747686632.201217 HTTP/1.1" 200 97
+DEBUG:root:Frame received: 15176 bytes
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747686959.3595273 HTTP/1.1" 200 97
+DEBUG:root:Frame received: 9368 bytes
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747687127.3977058 HTTP/1.1" 200 97
+DEBUG:root:Frame received and queued: 9332 bytes
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747687143.702154 HTTP/1.1" 200 97
+DEBUG:root:Frame received and queued: 9336 bytes
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747687785.7353559 HTTP/1.1" 200 97
