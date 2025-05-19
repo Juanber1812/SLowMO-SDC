@@ -22,7 +22,7 @@ def cleanup():
 
 if __name__ == "__main__":
     # Set time interval bewteen frames and graph update rate
-    time_interval = 300 #milliseconds
+    time_interval = 30 #milliseconds
     graphing_rate = 0.01 #seconds
 
     # Queue for graph windows
