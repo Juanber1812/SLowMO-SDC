@@ -26,13 +26,13 @@ def connect_error(data):
     print("❌ Failed to connect to server:", data)
 
 @sio.on("start_camera")
-def on_start_camera():
+def on_start_camera(data):
     global streaming
     streaming = True
     print("🎥 Camera stream STARTED")
 
 @sio.on("stop_camera")
-def on_stop_camera():
+def on_stop_camera(data):
     global streaming
     streaming = False
     print("🛑 Camera stream STOPPED")
