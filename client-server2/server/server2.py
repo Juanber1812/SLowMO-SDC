@@ -1,3 +1,4 @@
+# server2.py
 
 from gevent import monkey; monkey.patch_all()
 
@@ -8,8 +9,7 @@ import sensors
 import threading
 
 app = Flask(__name__)
-# Use gevent async mode for WebSocket support
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 def start_camera_thread():
     cam_thread = threading.Thread(target=camera.start_stream, daemon=True)
@@ -21,17 +21,15 @@ def start_sensor_thread():
 
 @socketio.on('connect')
 def on_connect():
-    print(f"[INFO] Client connected: {request.sid}")
     emit('server_status', {'status': 'connected'}, to=request.sid)
 
 @socketio.on('disconnect')
 def on_disconnect():
-    print(f"[INFO] Client disconnected: {request.sid}")
+    emit('server_status', {'status': 'disconnected'}, to=request.sid)
 
 @socketio.on('frame_data')
-def handle_frame_data(data):
-    # Relay frame data to all connected clients
-    emit('frame_data', data, broadcast=True)
+def on_frame(data):
+    emit('frame', data, broadcast=True)
 
 @socketio.on('start_camera')
 def handle_start_camera():
@@ -45,10 +43,9 @@ def handle_stop_camera():
 def update_camera_config(data):
     emit('camera_config', data, broadcast=True)
 
-@socketio.on('sensor_data')
+@socketio.on("sensor_data")
 def handle_sensor_data(data):
-    # Broadcast sensor data under a distinct event
-    emit('sensor_broadcast', data, broadcast=True)
+    socketio.emit("sensor_broadcast", data)
 
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")

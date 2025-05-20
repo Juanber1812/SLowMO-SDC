@@ -219,7 +219,6 @@ def connect():
     win.status_label.setText("Status: Connected")
     win.toggle_btn.setEnabled(True)
     win.detector_btn.setEnabled(True)
-    sio.emit("start_camera")
 
 @sio.event
 def disconnect():
@@ -227,7 +226,7 @@ def disconnect():
     win.toggle_btn.setEnabled(False)
     win.detector_btn.setEnabled(False)
 
-@sio.on("frame_data")
+@sio.on("frame")
 def on_frame(data):
     try:
         arr = np.frombuffer(base64.b64decode(data), np.uint8)
