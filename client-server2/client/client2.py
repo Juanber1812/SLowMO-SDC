@@ -10,19 +10,27 @@ import detector4  # Make sure detector4.py is in the same folder
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.65.89:5000"
 
-RES_PRESETS = [
-    ("640x480", (640, 480)),
-    ("1280x720", (1280, 720)),
-    ("1920x1080", (1920, 1080)),
-    ("2592x1944", (2592, 1944)),
-]
-
-FPS_LIMITS = {
-    (640, 480): 200,
-    (1280, 720): 100,
-    (1920, 1080): 50,
-    (2592, 1944): 30,
-}
+# --- NEW: Get supported sensor modes from Picamera2 ---
+def get_supported_sensor_modes():
+    try:
+        from picamera2 import Picamera2
+        picam = Picamera2()
+        modes = []
+        for mode in picam.sensor_modes:
+            size = mode.get('size')
+            fps = mode.get('fps')
+            label = f"{size[0]}x{size[1]} @ {fps:.0f}fps"
+            modes.append((label, size, fps))
+        return modes
+    except Exception as e:
+        print("Could not query camera sensor modes:", e)
+        # Fallback to some defaults
+        return [
+            ("640x480 @ 90fps", (640, 480), 90),
+            ("1280x720 @ 60fps", (1280, 720), 60),
+            ("1920x1080 @ 30fps", (1920, 1080), 30),
+            ("2592x1944 @ 15fps", (2592, 1944), 15),
+        ]
 
 sio = socketio.Client()
 
@@ -84,9 +92,11 @@ class MainWindow(QWidget):
         self.jpeg_label = QLabel("JPEG: 70")
         self.jpeg_slider.valueChanged.connect(lambda val: self.jpeg_label.setText(f"JPEG: {val}"))
 
+        # --- NEW: Populate dropdown with sensor modes ---
         self.res_dropdown = QComboBox()
-        for label, _ in RES_PRESETS:
-            self.res_dropdown.addItem(label)
+        self.supported_modes = get_supported_sensor_modes()
+        for label, size, fps in self.supported_modes:
+            self.res_dropdown.addItem(label, (size, fps))
         self.res_dropdown.currentIndexChanged.connect(self.update_fps_slider)
 
         self.fps_slider = QSlider(Qt.Orientation.Horizontal)
@@ -132,11 +142,10 @@ class MainWindow(QWidget):
 
     def update_fps_slider(self):
         idx = self.res_dropdown.currentIndex()
-        _, res = RES_PRESETS[idx]
-        max_fps = FPS_LIMITS.get(res, 10)
-        self.fps_slider.setRange(1, max_fps)
+        size, max_fps = self.res_dropdown.itemData(idx)
+        self.fps_slider.setRange(1, int(max_fps))
         if self.fps_slider.value() > max_fps:
-            self.fps_slider.setValue(max_fps)
+            self.fps_slider.setValue(int(max_fps))
         self.fps_label.setText(f"FPS: {self.fps_slider.value()}")
 
     def toggle_stream(self):
@@ -151,8 +160,8 @@ class MainWindow(QWidget):
         if self.streaming:
             QMessageBox.warning(self, "Stream Active", "Stop the stream before changing settings.")
             return
-        res_idx = self.res_dropdown.currentIndex()
-        _, resolution = RES_PRESETS[res_idx]
+        idx = self.res_dropdown.currentIndex()
+        (resolution, max_fps) = self.res_dropdown.itemData(idx)
         fps = self.fps_slider.value()
         config = {
             "jpeg_quality": self.jpeg_slider.value(),

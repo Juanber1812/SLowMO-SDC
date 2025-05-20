@@ -27,7 +27,7 @@ def on_connect():
 def on_disconnect():
     emit('server_status', {'status': 'disconnected'}, to=request.sid)
 
-@socketio.on('frame_data')
+@socketio.on('frame')
 def on_frame(data):
     emit('frame', data, broadcast=True)
 
