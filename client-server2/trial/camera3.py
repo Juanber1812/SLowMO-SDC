@@ -1,4 +1,4 @@
-# camera.py
+# camera3.py
 from picamera2 import Picamera2
 import threading
 import time
@@ -18,17 +18,15 @@ class MJPEGCamera:
         }
 
     def configure(self):
-        """Apply camera configuration settings."""
         try:
             self.jpeg_quality = self.config["jpeg_quality"]
             frame_interval = int(1e6 / max(self.config["fps"], 1))
-
             cam_config = self.picam.create_preview_configuration(
                 main={"format": "XRGB8888", "size": self.config["resolution"]},
                 controls={"FrameDurationLimits": (frame_interval, frame_interval)}
             )
             self.picam.configure(cam_config)
-            print(f"[CAMERA] Configured with {self.config}")
+            print(f"[CAMERA] Configured: {self.config}")
         except Exception as e:
             print("[CAMERA ERROR] Configuration failed:", e)
 
@@ -38,18 +36,17 @@ class MJPEGCamera:
             self.picam.start()
             self.streaming = True
             threading.Thread(target=self._capture_loop, daemon=True).start()
-            print("[CAMERA] Started streaming.")
+            print("[CAMERA] Streaming started.")
 
     def stop(self):
         if self.streaming:
             self.streaming = False
             self.picam.stop()
-            print("[CAMERA] Stopped streaming.")
+            print("[CAMERA] Streaming stopped.")
 
     def update_config(self, new_config):
-        """Update resolution, fps, jpeg quality. Applies immediately if streaming."""
         self.config.update(new_config)
-        print(f"[CAMERA] Updating config: {self.config}")
+        print(f"[CAMERA] New config received: {self.config}")
         if self.streaming:
             self.configure()
 
@@ -62,10 +59,9 @@ class MJPEGCamera:
                     with self.frame_lock:
                         self.latest_frame = buffer.tobytes()
             except Exception as e:
-                print("[CAMERA ERROR] Frame capture failed:", e)
-            time.sleep(0.001)  # adjust for performance
+                print("[CAMERA ERROR] Capture loop failed:", e)
+            time.sleep(0.001)
 
     def get_jpeg_frame(self):
-        """Get the latest encoded JPEG frame."""
         with self.frame_lock:
             return self.latest_frame
