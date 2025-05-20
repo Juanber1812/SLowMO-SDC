@@ -1,4 +1,4 @@
-
+```python
 from gevent import monkey; monkey.patch_all()
 import time, base64, socketio
 from picamera2 import Picamera2
@@ -56,16 +56,15 @@ def reconfigure_camera():
         if picam.started:
             picam.stop()
 
+        # Use hardware MJPEG pipeline for video
         config = picam.create_video_configuration(
             encode={"format": "MJPEG", "size": res},
-            main=None,
             controls={"FrameDurationLimits": (duration, duration)},
             buffer_count=6,
             queue=False
         )
         picam.configure(config)
 
-        # Show the applied configuration and controls
         print("[DEBUG] Camera configuration:", picam.camera_configuration())
         print("[DEBUG] Camera controls:", picam.camera_controls())
 
@@ -98,7 +97,7 @@ def start_stream():
     while True:
         try:
             if streaming:
-                # Time the hardware JPEG capture
+                # Capture an MJPEG buffer (hardware encoded)
                 t0 = time.perf_counter()
                 jpeg = picam.capture_buffer("encode")
                 dt = time.perf_counter() - t0
@@ -106,13 +105,10 @@ def start_stream():
 
                 jpg_b64 = base64.b64encode(jpeg).decode('utf-8')
                 sio.emit("frame_data", jpg_b64)
-
-            # blocking capture buffers at sensor rate, no manual sleep
         except Exception as e:
             print("[ERROR] Streaming failure:", e)
             time.sleep(1)
 
-
 if __name__ == "__main__":
     start_stream()
-
+```
