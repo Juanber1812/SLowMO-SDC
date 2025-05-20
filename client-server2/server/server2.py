@@ -4,11 +4,16 @@ from gevent import monkey; monkey.patch_all()
 
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
+import camera
 import sensors
 import threading
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+def start_camera_thread():
+    cam_thread = threading.Thread(target=camera.start_stream, daemon=True)
+    cam_thread.start()
 
 def start_sensor_thread():
     sensor_thread = threading.Thread(target=sensors.start_sensors, daemon=True)
@@ -22,7 +27,7 @@ def on_connect():
 def on_disconnect():
     emit('server_status', {'status': 'disconnected'}, to=request.sid)
 
-@socketio.on('frame')
+@socketio.on('frame_data')
 def on_frame(data):
     emit('frame', data, broadcast=True)
 
@@ -42,17 +47,8 @@ def update_camera_config(data):
 def handle_sensor_data(data):
     socketio.emit("sensor_broadcast", data)
 
-@socketio.on("get_sensor_modes")
-def handle_get_sensor_modes():
-    # Forward the request to the camera process
-    socketio.emit("get_sensor_modes")
-
-@socketio.on("sensor_modes")
-def handle_sensor_modes(modes):
-    # Broadcast the modes to all clients (or to the requesting client)
-    socketio.emit("sensor_modes", modes)
-
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
+    start_camera_thread()
     start_sensor_thread()
     socketio.run(app, host="0.0.0.0", port=5000)

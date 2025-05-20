@@ -19761,3 +19761,5 @@ INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (640, 480)}
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (640, 480)}
 DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
 DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747743770.8314316 HTTP/1.1" 200 97
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747743876.8773258 HTTP/1.1" 200 97

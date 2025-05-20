@@ -39,6 +39,7 @@ class MainWindow(QWidget):
         self.streaming = False
         self.detector_active = False
         self.frame_queue = queue.Queue()
+        self.last_frame = None
 
         # Layouts
         main_layout = QHBoxLayout(self)
@@ -99,6 +100,7 @@ class MainWindow(QWidget):
         self.apply_btn.clicked.connect(self.apply_config)
 
         self.toggle_btn = QPushButton("Start Stream")
+        self.toggle_btn.setEnabled(False)
         self.toggle_btn.clicked.connect(self.toggle_stream)
 
         config_group = QGroupBox("Camera Settings")
@@ -181,12 +183,19 @@ class MainWindow(QWidget):
                 logging.exception("Detector error")
 
     def update_image(self, frame):
+        self.last_frame = frame.copy()
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb.shape
         qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
         pixmap = QPixmap.fromImage(qimg)
         pixmap = pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
         self.image_label.setPixmap(pixmap)
+        # If detector is active, put the frame in the queue for analysis
+        if self.detector_active:
+            # Clear the queue to always process the latest frame
+            with self.frame_queue.mutex:
+                self.frame_queue.queue.clear()
+            self.frame_queue.put(self.last_frame)
 
     def update_analysed_image(self, frame):
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -253,6 +262,7 @@ def on_frame(data):
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
         if frame is not None:
             win.current_frame_size = len(data)
+            win.frame_counter += 1
             bridge.frame_received.emit(frame)
         else:
             logging.warning("Frame decode returned None")

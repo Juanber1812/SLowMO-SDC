@@ -1,4 +1,4 @@
-# camera.py (manual resolution and FPS configuration)
+# camera.py (clean output, no emojis)
 
 from gevent import monkey; monkey.patch_all()
 import time, base64, socketio, cv2
@@ -49,7 +49,7 @@ def on_camera_config(data):
 def reconfigure_camera():
     global picam
     try:
-        res = tuple(camera_config["resolution"])
+        res = camera_config["resolution"]
         jpeg_quality = camera_config["jpeg_quality"]
         fps = camera_config["fps"]
         duration = int(1e6 / max(fps, 1))
@@ -57,15 +57,13 @@ def reconfigure_camera():
         if picam.started:
             picam.stop()
 
-        # Enforce manually selected resolution and FPS
-        config = picam.create_video_configuration(
-            main={"format": "YUV420", "size": res},
+        config = picam.create_preview_configuration(
+            main={"format": "XRGB8888", "size": res},
             controls={"FrameDurationLimits": (duration, duration)}
         )
-
         picam.configure(config)
         picam.start()
-        print(f"[INFO] Camera reconfigured to resolution: {res}, JPEG: {jpeg_quality}, FPS: {fps}")
+        print(f"[INFO] Camera reconfigured: {res}, JPEG: {jpeg_quality}, FPS: {fps}")
     except Exception as e:
         print("[ERROR] Reconfigure failed:", e)
 
@@ -91,8 +89,7 @@ def start_stream():
     while True:
         try:
             if streaming:
-                frame = picam.capture_array("main")
-                frame = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
+                frame = picam.capture_array()
                 success, buffer = cv2.imencode(
                     '.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]]
                 )
@@ -105,9 +102,7 @@ def start_stream():
 
                 now = time.time()
                 if now - last_time >= 1.0:
-                    elapsed = now - last_time
-                    actual_capture_fps = frame_count / elapsed
-                    print(f"[FPS] Processed: {frame_count} fps | Capture-only: {actual_capture_fps:.1f} fps", end='\r')
+                    print(f"[FPS] {frame_count} fps", end='\r')
                     frame_count = 0
                     last_time = now
 
