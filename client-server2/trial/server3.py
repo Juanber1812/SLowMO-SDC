@@ -7,6 +7,8 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 @socketio.on('connect')
 def on_connect():
     print(f"[SERVER] Client connected: {request.sid}")
+    # Automatically start camera for every new client
+    emit('start_camera', broadcast=True)
 
 @socketio.on('disconnect')
 def on_disconnect():

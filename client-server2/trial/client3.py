@@ -53,6 +53,11 @@ class MainWindow(QWidget):
         self.apply_btn = QPushButton("Apply Settings")
         self.apply_btn.clicked.connect(self.apply_config)
 
+        # Start/Stop Stream Button
+        self.streaming = False
+        self.toggle_btn = QPushButton("Start Stream")
+        self.toggle_btn.clicked.connect(self.toggle_stream)
+
         grid = QGridLayout()
         grid.addWidget(QLabel("Resolution"), 0, 0)
         grid.addWidget(self.res_dropdown, 0, 1)
@@ -61,6 +66,7 @@ class MainWindow(QWidget):
         grid.addWidget(self.fps_label, 2, 0)
         grid.addWidget(self.fps_slider, 2, 1)
         grid.addWidget(self.apply_btn, 3, 0, 1, 2)
+        grid.addWidget(self.toggle_btn, 4, 0, 1, 2)
 
         group = QGroupBox("Camera Settings")
         group.setLayout(grid)
@@ -82,6 +88,15 @@ class MainWindow(QWidget):
             "jpeg_quality": self.jpeg_slider.value()
         }
         sio.emit("camera_config", config)
+
+    def toggle_stream(self):
+        self.streaming = not self.streaming
+        if self.streaming:
+            sio.emit("start_camera")
+            self.toggle_btn.setText("Stop Stream")
+        else:
+            sio.emit("stop_camera")
+            self.toggle_btn.setText("Start Stream")
 
 @sio.on("frame_data")
 def on_frame_data(data):

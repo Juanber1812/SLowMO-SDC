@@ -1,5 +1,5 @@
 from picamera2 import Picamera2
-import time, socketio, cv2, base64
+import time, socketio, cv2, base64, threading
 
 SERVER_URL = "http://localhost:5000"
 sio = socketio.Client()
@@ -11,6 +11,7 @@ camera_config = {
 }
 
 picam = Picamera2()
+streaming = False
 
 def reconfigure_camera():
     try:
@@ -44,21 +45,32 @@ def on_camera_config(data):
     camera_config.update(data)
     reconfigure_camera()
 
-def start_stream():
-    try:
-        sio.connect(SERVER_URL)
-    except Exception as e:
-        print("❌ Could not connect:", e)
-        return
+@sio.on("start_camera")
+def on_start_camera():
+    global streaming
+    print("[CAMERA] Start streaming")
+    streaming = True
 
+@sio.on("stop_camera")
+def on_stop_camera():
+    global streaming
+    print("[CAMERA] Stop streaming")
+    streaming = False
+
+def stream_loop():
     while True:
-        frame = picam.capture_array()
-        success, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]])
-        if not success:
-            continue
-        jpg_b64 = base64.b64encode(buffer).decode('utf-8')
-        sio.emit("frame_data", jpg_b64)
-        time.sleep(1.0 / max(camera_config["fps"], 1))
+        if streaming:
+            frame = picam.capture_array()
+            success, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]])
+            if not success:
+                continue
+            jpg_b64 = base64.b64encode(buffer).decode('utf-8')
+            sio.emit("frame_data", jpg_b64)
+            time.sleep(1.0 / max(camera_config["fps"], 1))
+        else:
+            time.sleep(0.1)
 
 if __name__ == "__main__":
-    start_stream()
+    sio.connect(SERVER_URL)
+    threading.Thread(target=stream_loop, daemon=True).start()
+    sio.wait()
