@@ -5,24 +5,18 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage
-import detector4  # Make sure detector4.py is in the same folder
+import detector4
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.65.89:5000"
 
-RES_PRESETS = [
-    ("640x480", (640, 480)),
-    ("1280x720", (1280, 720)),
-    ("1920x1080", (1920, 1080)),
-    ("2592x1944", (2592, 1944)),
+RES_FPS_PRESETS = [
+    ("1332x990 @ 120 FPS", (300, 300), 120),
+    ("2028x1080 @ 50 FPS", (2028, 1080), 50),
+    ("2028x1520 @ 40 FPS", (2028, 1520), 40),
+    ("4056x3040 @ 10 FPS", (4056, 3040), 10),
 ]
 
-FPS_LIMITS = {
-    (640, 480): 200,
-    (1280, 720): 100,
-    (1920, 1080): 50,
-    (2592, 1944): 30,
-}
 
 sio = socketio.Client()
 
@@ -85,16 +79,8 @@ class MainWindow(QWidget):
         self.jpeg_slider.valueChanged.connect(lambda val: self.jpeg_label.setText(f"JPEG: {val}"))
 
         self.res_dropdown = QComboBox()
-        for label, _ in RES_PRESETS:
+        for label, _, _ in RES_FPS_PRESETS:
             self.res_dropdown.addItem(label)
-        self.res_dropdown.currentIndexChanged.connect(self.update_fps_slider)
-
-        self.fps_slider = QSlider(Qt.Orientation.Horizontal)
-        self.fps_slider.setRange(1, 10)
-        self.fps_slider.setValue(10)
-        self.fps_label = QLabel("FPS: 10")
-        self.fps_slider.valueChanged.connect(lambda val: self.fps_label.setText(f"FPS: {val}"))
-        self.update_fps_slider()
 
         self.apply_btn = QPushButton("Apply Settings")
         self.apply_btn.clicked.connect(self.apply_config)
@@ -109,9 +95,7 @@ class MainWindow(QWidget):
         grid.addWidget(self.jpeg_slider, 0, 1)
         grid.addWidget(QLabel("Resolution"), 1, 0)
         grid.addWidget(self.res_dropdown, 1, 1)
-        grid.addWidget(self.fps_label, 2, 0)
-        grid.addWidget(self.fps_slider, 2, 1)
-        grid.addWidget(self.apply_btn, 3, 0, 1, 2)
+        grid.addWidget(self.apply_btn, 2, 0, 1, 2)
         config_group.setLayout(grid)
 
         right_layout.addWidget(config_group)
@@ -130,15 +114,6 @@ class MainWindow(QWidget):
         self.speed_timer.timeout.connect(self.measure_speed)
         self.speed_timer.start(30000)
 
-    def update_fps_slider(self):
-        idx = self.res_dropdown.currentIndex()
-        _, res = RES_PRESETS[idx]
-        max_fps = FPS_LIMITS.get(res, 10)
-        self.fps_slider.setRange(1, max_fps)
-        if self.fps_slider.value() > max_fps:
-            self.fps_slider.setValue(max_fps)
-        self.fps_label.setText(f"FPS: {self.fps_slider.value()}")
-
     def toggle_stream(self):
         if not sio.connected:
             QMessageBox.warning(self, "Not Connected", "Not connected to server yet.")
@@ -152,8 +127,7 @@ class MainWindow(QWidget):
             QMessageBox.warning(self, "Stream Active", "Stop the stream before changing settings.")
             return
         res_idx = self.res_dropdown.currentIndex()
-        _, resolution = RES_PRESETS[res_idx]
-        fps = self.fps_slider.value()
+        _, resolution, fps = RES_FPS_PRESETS[res_idx]
         config = {
             "jpeg_quality": self.jpeg_slider.value(),
             "fps": fps,
@@ -190,9 +164,7 @@ class MainWindow(QWidget):
         pixmap = QPixmap.fromImage(qimg)
         pixmap = pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
         self.image_label.setPixmap(pixmap)
-        # If detector is active, put the frame in the queue for analysis
         if self.detector_active:
-            # Clear the queue to always process the latest frame
             with self.frame_queue.mutex:
                 self.frame_queue.queue.clear()
             self.frame_queue.put(self.last_frame)
@@ -216,7 +188,8 @@ class MainWindow(QWidget):
                 upload = st.upload()
                 upload_mbps = upload / 1_000_000
                 self.info_labels["speed"].setText(f" Upload: {upload_mbps:.2f} Mbps")
-                fps = self.fps_slider.value()
+                res_idx = self.res_dropdown.currentIndex()
+                _, _, fps = RES_FPS_PRESETS[res_idx]
                 max_bytes_per_sec = upload / 8
                 max_frame_size = max_bytes_per_sec / fps
                 self.info_labels["max_frame"].setText(f" Max Frame: {max_frame_size / 1024:.1f} KB")
@@ -232,7 +205,6 @@ class MainWindow(QWidget):
         self.info_labels["fps"].setText(f"FPS: {self.current_fps}")
         self.info_labels["frame_size"].setText(f" Frame Size: {self.current_frame_size / 1024:.1f} KB")
 
-# Socket.IO Events
 @sio.on("sensor_broadcast")
 def on_sensor_data(data):
     try:
