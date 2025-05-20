@@ -1,52 +1,64 @@
-from flask import Flask, Response
 from picamera2 import Picamera2
-import threading, time, cv2
+import time, socketio, cv2, base64
 
-app = Flask(__name__)
-picam = Picamera2()
-picam_config = picam.create_preview_configuration(main={"format": "XRGB8888", "size": (640, 480)})
-picam.configure(picam_config)
-picam.start()
+SERVER_URL = "http://localhost:5000"
+sio = socketio.Client()
 
-current_config = {
+camera_config = {
     "resolution": (640, 480),
     "fps": 10,
     "jpeg_quality": 70
 }
 
-def apply_camera_config():
+picam = Picamera2()
+
+def reconfigure_camera():
     try:
-        res = current_config["resolution"]
-        fps = current_config["fps"]
+        res = camera_config["resolution"]
+        fps = camera_config["fps"]
         config = picam.create_preview_configuration(
             main={"format": "XRGB8888", "size": res},
             controls={"FrameDurationLimits": (
-                int(1e6 / fps),
-                int(1e6 / fps)
+                int(1e6 / max(fps, 1)),
+                int(1e6 / max(fps, 1))
             )}
         )
         picam.stop()
         picam.configure(config)
         picam.start()
-        print(f"[CAMERA] Reconfigured: {res[0]}x{res[1]} @ {fps} FPS")
+        print(f"[CAMERA] Reconfigured: {res} at {fps} FPS")
     except Exception as e:
         print("[CAMERA ERROR]", e)
 
-def generate_frames():
-    while True:
-        frame = picam.capture_array()
-        success, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), current_config["jpeg_quality"]])
-        if not success:
-            continue
-        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+@sio.event
+def connect():
+    print("📡 Camera connected to server")
+    reconfigure_camera()
 
-@app.route('/video')
-def video_feed():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+@sio.event
+def disconnect():
+    print("🔌 Camera disconnected")
+
+@sio.on("camera_config")
+def on_camera_config(data):
+    camera_config.update(data)
+    reconfigure_camera()
 
 def start_stream():
-    threading.Thread(target=lambda: app.run(host="0.0.0.0", port=8000, debug=False, use_reloader=False), daemon=True).start()
+    try:
+        sio.connect(SERVER_URL)
+    except Exception as e:
+        print("❌ Could not connect:", e)
+        return
 
-def update_config(new_config):
-    current_config.update(new_config)
-    apply_camera_config()
+    while True:
+        frame = picam.capture_array()
+        success, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]])
+        if not success:
+            continue
+        jpg_b64 = base64.b64encode(buffer).decode('utf-8')
+        sio.emit("frame_data", jpg_b64)
+        time.sleep(1.0 / max(camera_config["fps"], 1))
+
+if __name__ == "__main__":
+    start_stream()

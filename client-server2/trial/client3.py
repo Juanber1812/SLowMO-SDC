@@ -1,50 +1,41 @@
-import sys, socketio, logging
+import sys, socketio, base64, numpy as np, cv2
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QLabel, QPushButton, QVBoxLayout,
-    QComboBox, QSlider, QGroupBox, QGridLayout
+    QApplication, QWidget, QLabel, QVBoxLayout, QSlider, QPushButton,
+    QGroupBox, QComboBox, QGridLayout
 )
-from PyQt6.QtMultimedia import QMediaPlayer
-from PyQt6.QtMultimediaWidgets import QVideoWidget
-from PyQt6.QtCore import QUrl, Qt
+from PyQt6.QtGui import QPixmap, QImage
+from PyQt6.QtCore import Qt
 
-SERVER_URL = "http://192.168.1.146:5000"
-VIDEO_URL = "http://192.168.1.146:8000/video"  # <-- Update to your Pi's IP
-
+SERVER_URL = "http://192.168.1.146:5000"  # Replace with your Pi IP
 sio = socketio.Client()
+
 RES_PRESETS = [
     ("640x480", (640, 480)),
     ("1280x720", (1280, 720)),
     ("1920x1080", (1920, 1080)),
-    ("2592x1944", (2592, 1944)),
 ]
 FPS_LIMITS = {
     (640, 480): 120,
     (1280, 720): 60,
     (1920, 1080): 30,
-    (2592, 1944): 15,
 }
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("SLowMO Native Video Client")
+        self.setWindowTitle("SLowMO Client (OpenCV QLabel)")
+        self.image_label = QLabel()
+        self.image_label.setFixedSize(640, 480)
+        self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         layout = QVBoxLayout(self)
+        layout.addWidget(self.image_label)
 
-        self.video_widget = QVideoWidget()
-        self.player = QMediaPlayer()
-        self.player.setVideoOutput(self.video_widget)
-        self.player.setSource(QUrl(VIDEO_URL))
-
-        layout.addWidget(QLabel("Live Video Stream:"))
-        layout.addWidget(self.video_widget)
-
-        config_group = QGroupBox("Camera Settings")
-        grid = QGridLayout()
-
+        # Controls
         self.res_dropdown = QComboBox()
         for label, _ in RES_PRESETS:
             self.res_dropdown.addItem(label)
-        self.res_dropdown.currentIndexChanged.connect(self.update_fps_range)
+        self.res_dropdown.currentIndexChanged.connect(self.update_fps_slider)
 
         self.jpeg_slider = QSlider(Qt.Orientation.Horizontal)
         self.jpeg_slider.setRange(10, 100)
@@ -57,11 +48,12 @@ class MainWindow(QWidget):
         self.fps_label = QLabel("FPS: 10")
         self.fps_slider.valueChanged.connect(lambda v: self.fps_label.setText(f"FPS: {v}"))
 
-        self.update_fps_range()
+        self.update_fps_slider()
 
         self.apply_btn = QPushButton("Apply Settings")
         self.apply_btn.clicked.connect(self.apply_config)
 
+        grid = QGridLayout()
         grid.addWidget(QLabel("Resolution"), 0, 0)
         grid.addWidget(self.res_dropdown, 0, 1)
         grid.addWidget(self.jpeg_label, 1, 0)
@@ -70,49 +62,36 @@ class MainWindow(QWidget):
         grid.addWidget(self.fps_slider, 2, 1)
         grid.addWidget(self.apply_btn, 3, 0, 1, 2)
 
-        config_group.setLayout(grid)
-        layout.addWidget(config_group)
+        group = QGroupBox("Camera Settings")
+        group.setLayout(grid)
+        layout.addWidget(group)
 
-        self.sensor_label = QLabel("Sensor Info: (waiting...)")
-        layout.addWidget(self.sensor_label)
-
-        self.toggle_btn = QPushButton("Start Stream")
-        self.toggle_btn.clicked.connect(self.toggle_stream)
-        layout.addWidget(self.toggle_btn)
-
-    def update_fps_range(self):
+    def update_fps_slider(self):
         _, res = RES_PRESETS[self.res_dropdown.currentIndex()]
         max_fps = FPS_LIMITS.get(res, 30)
         self.fps_slider.setRange(1, max_fps)
         self.fps_slider.setValue(min(self.fps_slider.value(), max_fps))
         self.fps_label.setText(f"FPS: {self.fps_slider.value()}")
 
-    def toggle_stream(self):
-        if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
-            self.player.stop()
-            self.toggle_btn.setText("Start Stream")
-        else:
-            self.player.play()
-            self.toggle_btn.setText("Stop Stream")
-
     def apply_config(self):
-        res_idx = self.res_dropdown.currentIndex()
-        _, resolution = RES_PRESETS[res_idx]
+        idx = self.res_dropdown.currentIndex()
+        _, res = RES_PRESETS[idx]
         config = {
-            "jpeg_quality": self.jpeg_slider.value(),
+            "resolution": res,
             "fps": self.fps_slider.value(),
-            "resolution": resolution
+            "jpeg_quality": self.jpeg_slider.value()
         }
         sio.emit("camera_config", config)
 
-@sio.on("sensor_broadcast")
-def on_sensor_data(data):
-    try:
-        temp = data.get("temperature", "N/A")
-        cpu = data.get("cpu_percent", "N/A")
-        win.sensor_label.setText(f"🌡️ {temp:.1f}°C | 🧠 CPU: {cpu:.1f}%")
-    except Exception as e:
-        print("Sensor update failed:", e)
+@sio.on("frame_data")
+def on_frame_data(data):
+    arr = np.frombuffer(base64.b64decode(data), np.uint8)
+    frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    h, w, ch = rgb.shape
+    qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
+    pixmap = QPixmap.fromImage(qimg).scaled(win.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
+    win.image_label.setPixmap(pixmap)
 
 @sio.event
 def connect():
@@ -126,8 +105,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = MainWindow()
     win.show()
-
     import threading
     threading.Thread(target=lambda: sio.connect(SERVER_URL), daemon=True).start()
-
     sys.exit(app.exec())

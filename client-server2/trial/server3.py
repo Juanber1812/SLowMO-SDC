@@ -1,29 +1,25 @@
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
-import camera3
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-camera3.start_stream()
-
 @socketio.on('connect')
 def on_connect():
-    emit('server_status', {'status': 'connected'}, to=request.sid)
+    print(f"[SERVER] Client connected: {request.sid}")
 
 @socketio.on('disconnect')
 def on_disconnect():
-    emit('server_status', {'status': 'disconnected'}, to=request.sid)
+    print(f"[SERVER] Client disconnected: {request.sid}")
+
+@socketio.on('frame_data')
+def on_frame_data(data):
+    emit('frame_data', data, broadcast=True)
 
 @socketio.on('camera_config')
-def handle_camera_config(data):
-    print("[CONFIG] Received:", data)
-    camera3.update_config(data)
-
-@socketio.on("sensor_data")
-def handle_sensor_data(data):
-    socketio.emit("sensor_broadcast", data)
+def on_camera_config(data):
+    emit('camera_config', data, broadcast=True)
 
 if __name__ == "__main__":
-    print("🚀 Server running at http://0.0.0.0:5000")
+    print("[SERVER] Running at http://0.0.0.0:5000")
     socketio.run(app, host="0.0.0.0", port=5000)
