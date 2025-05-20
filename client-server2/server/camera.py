@@ -1,5 +1,6 @@
 
 from gevent import monkey; monkey.patch_all()
+
 import time, base64, socketio
 from picamera2 import Picamera2
 
@@ -56,8 +57,9 @@ def reconfigure_camera():
         if picam.started:
             picam.stop()
 
-        # Use hardware MJPEG pipeline for video
+        # Use hardware MJPEG pipeline for high-speed video
         config = picam.create_video_configuration(
+            main={"format": "XRGB8888", "size": res},
             encode={"format": "MJPEG", "size": res},
             controls={"FrameDurationLimits": (duration, duration)},
             buffer_count=6,
@@ -97,7 +99,7 @@ def start_stream():
     while True:
         try:
             if streaming:
-                # Capture an MJPEG buffer (hardware encoded)
+                # Capture MJPEG buffer (hardware accelerated)
                 t0 = time.perf_counter()
                 jpeg = picam.capture_buffer("encode")
                 dt = time.perf_counter() - t0
