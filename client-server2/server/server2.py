@@ -4,16 +4,11 @@ from gevent import monkey; monkey.patch_all()
 
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
-import camera
 import sensors
 import threading
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
-
-def start_camera_thread():
-    cam_thread = threading.Thread(target=camera.start_stream, daemon=True)
-    cam_thread.start()
 
 def start_sensor_thread():
     sensor_thread = threading.Thread(target=sensors.start_sensors, daemon=True)
@@ -49,6 +44,5 @@ def handle_sensor_data(data):
 
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
-    start_camera_thread()
     start_sensor_thread()
     socketio.run(app, host="0.0.0.0", port=5000)

@@ -19742,3 +19742,12 @@ Traceback (most recent call last):
     bridge.frame_received.emit(frame)
     ^^^^^^^^^^^^^^^^^^^^^
 RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+ERROR:root:\u274c SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 288, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.65.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747743224.7999778 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000215862E0050>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
