@@ -1,4 +1,4 @@
-```python
+
 from gevent import monkey; monkey.patch_all()
 import time, base64, socketio
 from picamera2 import Picamera2
@@ -111,4 +111,3 @@ def start_stream():
 
 if __name__ == "__main__":
     start_stream()
-```
