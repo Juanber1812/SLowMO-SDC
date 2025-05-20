@@ -1,4 +1,3 @@
-
 from gevent import monkey; monkey.patch_all()
 
 import time, base64, socketio
@@ -67,6 +66,7 @@ def reconfigure_camera():
         )
         picam.configure(config)
 
+        # Log the applied camera configuration and controls
         print("[DEBUG] Camera configuration:", picam.camera_configuration())
         print("[DEBUG] Camera controls:", picam.camera_controls())
 
@@ -99,13 +99,13 @@ def start_stream():
     while True:
         try:
             if streaming:
-                # Capture MJPEG buffer (hardware accelerated)
+                # Capture hardware-encoded MJPEG buffer
                 t0 = time.perf_counter()
-                jpeg = picam.capture_buffer("encode")
+                jpeg_buffer = picam.capture_buffer("encode")
                 dt = time.perf_counter() - t0
                 print(f"[DEBUG] Capture-only FPS: {1/dt:.1f}", end='\r')
 
-                jpg_b64 = base64.b64encode(jpeg).decode('utf-8')
+                jpg_b64 = base64.b64encode(jpeg_buffer).decode('utf-8')
                 sio.emit("frame_data", jpg_b64)
         except Exception as e:
             print("[ERROR] Streaming failure:", e)

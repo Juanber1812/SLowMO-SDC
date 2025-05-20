@@ -19871,3 +19871,4 @@ Traceback (most recent call last):
 socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.65.89', port=5000): Read timed out. (read timeout=5)
 DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
 DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
