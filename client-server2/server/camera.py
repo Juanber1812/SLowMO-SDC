@@ -1,7 +1,5 @@
-# camera.py (clean output, no emojis)
-
 from gevent import monkey; monkey.patch_all()
-import time, base64, socketio, cv2
+import time, base64, socketio, cv2, threading, queue
 from picamera2 import Picamera2
 
 SERVER_URL = "http://localhost:5000"
@@ -15,6 +13,7 @@ camera_config = {
 
 streaming = False
 picam = None
+frame_queue = queue.Queue(maxsize=5)
 
 @sio.event
 def connect():
@@ -67,8 +66,47 @@ def reconfigure_camera():
     except Exception as e:
         print("[ERROR] Reconfigure failed:", e)
 
+def capture_loop():
+    while True:
+        if streaming:
+            try:
+                frame = picam.capture_array()
+                if not frame_queue.full():
+                    frame_queue.put(frame)
+            except Exception as e:
+                print("[ERROR] Capture failed:", e)
+        time.sleep(0.001)
+
+def encode_and_send_loop():
+    frame_count = 0
+    last_time = time.time()
+
+    while True:
+        try:
+            frame = frame_queue.get(timeout=1)
+            success, buffer = cv2.imencode(
+                '.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]]
+            )
+            if not success:
+                continue
+
+            jpg_b64 = base64.b64encode(buffer).decode('utf-8')
+            sio.emit("frame_data", jpg_b64)
+            frame_count += 1
+
+            now = time.time()
+            if now - last_time >= 1.0:
+                print(f"[FPS] {frame_count} fps", end='\r')
+                frame_count = 0
+                last_time = now
+
+        except queue.Empty:
+            continue
+        except Exception as e:
+            print("[ERROR] Encode/send failed:", e)
+
 def start_stream():
-    global streaming, picam
+    global picam
     try:
         sio.connect(SERVER_URL)
     except Exception as e:
@@ -78,7 +116,6 @@ def start_stream():
     try:
         picam = Picamera2()
 
-        # ✅ Print available sensor modes
         print("[INFO] Available sensor modes:")
         for i, mode in enumerate(picam.sensor_modes):
             size = mode.get("size", "N/A")
@@ -93,31 +130,9 @@ def start_stream():
         print("[ERROR] Camera setup failed:", e)
         return
 
-    frame_count = 0
-    last_time = time.time()
+    # Start processing threads
+    threading.Thread(target=capture_loop, daemon=True).start()
+    threading.Thread(target=encode_and_send_loop, daemon=True).start()
 
     while True:
-        try:
-            if streaming:
-                frame = picam.capture_array()
-                success, buffer = cv2.imencode(
-                    '.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]]
-                )
-                if not success:
-                    continue
-
-                jpg_b64 = base64.b64encode(buffer).decode('utf-8')
-                sio.emit("frame_data", jpg_b64)
-                frame_count += 1
-
-                now = time.time()
-                if now - last_time >= 1.0:
-                    print(f"[FPS] {frame_count} fps", end='\r')
-                    frame_count = 0
-                    last_time = now
-
-            time.sleep(1.0 / max(camera_config["fps"], 1))
-
-        except Exception as e:
-            print("[ERROR] Streaming failure:", e)
-            time.sleep(1)
+        time.sleep(1)
