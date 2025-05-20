@@ -1,42 +1,113 @@
-from flask import Flask, request
-from flask_socketio import SocketIO, emit
+# mjpeg_server.py
+from flask import Flask, Response, request
+from picamera2 import Picamera2
 import threading
-import camera3  # ensure camera3.py is in same folder
+import time
+import cv2
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Start MJPEG video server
-def start_camera_http_server():
-    threading.Thread(target=camera3.run_flask_video_server, daemon=True).start()
+# Initialize camera
+picam = Picamera2()
+streaming = False
+jpeg_quality = 80
+frame_lock = threading.Lock()
+latest_frame = b''
 
-@socketio.on('connect')
-def on_connect():
-    print(f"[SERVER] Client connected: {request.sid}")
+# Default camera config
+camera_config = {
+    "resolution": (640, 480),
+    "fps": 30,
+    "jpeg_quality": 80
+}
 
-@socketio.on('disconnect')
-def on_disconnect():
-    print(f"[SERVER] Client disconnected: {request.sid}")
+def configure_camera():
+    global jpeg_quality
+    config = picam.create_preview_configuration(
+        main={"format": "XRGB8888", "size": camera_config["resolution"]},
+        controls={"FrameDurationLimits": (
+            int(1e6 / max(camera_config["fps"], 1)),
+            int(1e6 / max(camera_config["fps"], 1))
+        )}
+    )
+    picam.configure(config)
+    jpeg_quality = camera_config["jpeg_quality"]
 
-@socketio.on('camera_config')
-def handle_camera_config(data):
-    print("[CONFIG] Received:", data)
-    camera3.update_camera_settings(data)
-    emit('camera_config', data, broadcast=True)
+def camera_loop():
+    global latest_frame
+    while streaming:
+        try:
+            frame = picam.capture_array()
+            success, buffer = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality])
+            if success:
+                with frame_lock:
+                    latest_frame = buffer.tobytes()
+        except Exception as e:
+            print("[ERROR] MJPEG frame capture failed:", e)
+        time.sleep(0.001)
 
-@socketio.on('start_camera')
-def handle_start():
-    camera3.start_camera()
+@app.route('/video_feed')
+def video_feed():
+    def generate():
+        while True:
+            with frame_lock:
+                frame = latest_frame
+            if frame:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            time.sleep(0.01)
+    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@socketio.on('stop_camera')
-def handle_stop():
-    camera3.stop_camera()
+@app.route('/start', methods=['POST'])
+def start_stream():
+    global streaming
+    if not streaming:
+        configure_camera()
+        picam.start()
+        streaming = True
+        threading.Thread(target=camera_loop, daemon=True).start()
+        print("[INFO] Camera started.")
+    return "Stream started", 200
 
-@socketio.on("sensor_data")
-def handle_sensor_data(data):
-    socketio.emit("sensor_broadcast", data)
+@app.route('/stop', methods=['POST'])
+def stop_stream():
+    global streaming
+    if streaming:
+        streaming = False
+        picam.stop()
+        print("[INFO] Camera stopped.")
+    return "Stream stopped", 200
 
-if __name__ == "__main__":
-    print("🚀 Socket.IO Server running at http://0.0.0.0:5000")
-    start_camera_http_server()
-    socketio.run(app, host="0.0.0.0", port=5000)
+@app.route('/config', methods=['POST'])
+def update_config():
+    try:
+        data = request.json
+        if "resolution" in data:
+            camera_config["resolution"] = tuple(data["resolution"])
+        if "fps" in data:
+            camera_config["fps"] = int(data["fps"])
+        if "jpeg_quality" in data:
+            camera_config["jpeg_quality"] = int(data["jpeg_quality"])
+        print("[CONFIG] Updated settings:", camera_config)
+        if streaming:
+            configure_camera()
+        return "Config updated", 200
+    except Exception as e:
+        print("[ERROR] Config update failed:", e)
+        return "Error", 400
+
+@app.route('/')
+def index():
+    return '''<html>
+        <head><title>MJPEG Stream</title></head>
+        <body>
+            <h2>MJPEG Stream</h2>
+            <img src="/video_feed" width="640">
+            <form action="/start" method="post"><button>Start Camera</button></form>
+            <form action="/stop" method="post"><button>Stop Camera</button></form>
+        </body>
+    </html>'''
+
+if __name__ == '__main__':
+    print("[INFO] MJPEG camera server running at http://0.0.0.0:8080")
+    app.run(host='0.0.0.0', port=8080, threaded=True)
