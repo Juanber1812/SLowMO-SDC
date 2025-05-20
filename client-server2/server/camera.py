@@ -91,7 +91,8 @@ def start_stream():
     while True:
         try:
             if streaming:
-                frame = picam.capture_array()
+                frame = picam.capture_array("main")
+                frame = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
                 success, buffer = cv2.imencode(
                     '.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]]
                 )
