@@ -1,4 +1,4 @@
-# camera.py (clean output, no emojis)
+# camera.py (manual resolution and FPS configuration)
 
 from gevent import monkey; monkey.patch_all()
 import time, base64, socketio, cv2
@@ -49,7 +49,7 @@ def on_camera_config(data):
 def reconfigure_camera():
     global picam
     try:
-        res = camera_config["resolution"]
+        res = tuple(camera_config["resolution"])
         jpeg_quality = camera_config["jpeg_quality"]
         fps = camera_config["fps"]
         duration = int(1e6 / max(fps, 1))
@@ -57,13 +57,15 @@ def reconfigure_camera():
         if picam.started:
             picam.stop()
 
-        config = picam.create_preview_configuration(
-            main={"format": "XRGB8888", "size": res},
+        # Enforce manually selected resolution and FPS
+        config = picam.create_video_configuration(
+            main={"format": "YUV420", "size": res},
             controls={"FrameDurationLimits": (duration, duration)}
         )
+
         picam.configure(config)
         picam.start()
-        print(f"[INFO] Camera reconfigured: {res}, JPEG: {jpeg_quality}, FPS: {fps}")
+        print(f"[INFO] Camera reconfigured to resolution: {res}, JPEG: {jpeg_quality}, FPS: {fps}")
     except Exception as e:
         print("[ERROR] Reconfigure failed:", e)
 
@@ -107,7 +109,6 @@ def start_stream():
                     print(f"[FPS] Processed: {frame_count} fps | Capture-only: {actual_capture_fps:.1f} fps", end='\r')
                     frame_count = 0
                     last_time = now
-
 
             time.sleep(1.0 / max(camera_config["fps"], 1))
 
