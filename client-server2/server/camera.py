@@ -102,9 +102,12 @@ def start_stream():
 
                 now = time.time()
                 if now - last_time >= 1.0:
-                    print(f"[FPS] {frame_count} fps", end='\r')
+                    elapsed = now - last_time
+                    actual_capture_fps = frame_count / elapsed
+                    print(f"[FPS] Processed: {frame_count} fps | Capture-only: {actual_capture_fps:.1f} fps", end='\r')
                     frame_count = 0
                     last_time = now
+
 
             time.sleep(1.0 / max(camera_config["fps"], 1))
 

@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox
 )
 from PyQt6.QtCore import Qt, QTimer, QUrl
-from PyQt6.QtMultimedia import QMediaPlayer, QMediaFormat, QMediaContent
+from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)

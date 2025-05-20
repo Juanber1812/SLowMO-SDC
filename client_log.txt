@@ -15516,3 +15516,4060 @@ Traceback (most recent call last):
     bridge.frame_received.emit(frame)
     ^^^^^^^^^^^^^^^^^^^^^
 RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:\u274c SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\trial\client3.py", line 201, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747701397.272231 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024C28097CB0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747701446.8213887 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 57, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 200, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 113, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 47, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 29, 'resolution': (640, 480)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:\u274c SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 239, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747733580.4127693 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000020FFF48B620>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:\u274c SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 244, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747734030.4930751 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000167FF1F78C0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747734081.7835734 HTTP/1.1" 200 97
+DEBUG:root:Frame size: 28728 bytes
+DEBUG:root:Frame size: 28288 bytes
+DEBUG:root:Frame size: 28288 bytes
+DEBUG:root:Frame size: 28440 bytes
+DEBUG:root:Frame size: 28552 bytes
+DEBUG:root:Frame size: 28180 bytes
+DEBUG:root:Frame size: 28064 bytes
+DEBUG:root:Frame size: 27988 bytes
+DEBUG:root:Frame size: 25376 bytes
+DEBUG:root:Frame size: 22788 bytes
+DEBUG:root:Frame size: 27744 bytes
+DEBUG:root:Frame size: 25984 bytes
+DEBUG:root:Frame size: 27004 bytes
+DEBUG:root:Frame size: 28192 bytes
+DEBUG:root:Frame size: 27304 bytes
+DEBUG:root:Frame size: 28372 bytes
+DEBUG:root:Frame size: 26616 bytes
+DEBUG:root:Frame size: 28248 bytes
+DEBUG:root:Frame size: 26436 bytes
+DEBUG:root:Frame size: 25788 bytes
+DEBUG:root:Frame size: 25820 bytes
+DEBUG:root:Frame size: 28252 bytes
+DEBUG:root:Frame size: 27444 bytes
+DEBUG:root:Frame size: 28236 bytes
+DEBUG:root:Frame size: 26868 bytes
+DEBUG:root:Frame size: 27596 bytes
+DEBUG:root:Frame size: 28192 bytes
+DEBUG:root:Frame size: 27956 bytes
+DEBUG:root:Frame size: 27776 bytes
+DEBUG:root:Frame size: 27692 bytes
+DEBUG:root:Frame size: 26944 bytes
+DEBUG:root:Frame size: 27032 bytes
+DEBUG:root:Frame size: 28052 bytes
+DEBUG:root:Frame size: 27080 bytes
+DEBUG:root:Frame size: 28544 bytes
+DEBUG:root:Frame size: 28100 bytes
+DEBUG:root:Frame size: 28244 bytes
+DEBUG:root:Frame size: 27504 bytes
+DEBUG:root:Frame size: 28240 bytes
+DEBUG:root:Frame size: 27936 bytes
+DEBUG:root:Frame size: 27168 bytes
+DEBUG:root:Frame size: 28348 bytes
+DEBUG:root:Frame size: 23176 bytes
+DEBUG:root:Frame size: 25940 bytes
+DEBUG:root:Frame size: 26476 bytes
+DEBUG:root:Frame size: 27468 bytes
+DEBUG:root:Frame size: 24620 bytes
+DEBUG:root:Frame size: 26876 bytes
+DEBUG:root:Frame size: 28272 bytes
+DEBUG:root:Frame size: 27184 bytes
+DEBUG:root:Frame size: 27100 bytes
+DEBUG:root:Frame size: 25840 bytes
+DEBUG:root:Frame size: 24512 bytes
+DEBUG:root:Frame size: 26812 bytes
+DEBUG:root:Frame size: 26332 bytes
+DEBUG:root:Frame size: 26976 bytes
+DEBUG:root:Frame size: 25852 bytes
+DEBUG:root:Frame size: 28192 bytes
+DEBUG:root:Frame size: 27068 bytes
+DEBUG:root:Frame size: 26120 bytes
+DEBUG:root:Frame size: 26180 bytes
+DEBUG:root:Frame size: 28172 bytes
+DEBUG:root:Frame size: 28512 bytes
+DEBUG:root:Frame size: 27608 bytes
+DEBUG:root:Frame size: 26460 bytes
+DEBUG:root:Frame size: 27884 bytes
+DEBUG:root:Frame size: 28140 bytes
+DEBUG:root:Frame size: 28384 bytes
+DEBUG:root:Frame size: 28388 bytes
+DEBUG:root:Frame size: 28128 bytes
+DEBUG:root:Frame size: 28184 bytes
+DEBUG:root:Frame size: 28460 bytes
+DEBUG:root:Frame size: 28292 bytes
+DEBUG:root:Frame size: 28312 bytes
+DEBUG:root:Frame size: 28256 bytes
+DEBUG:root:Frame size: 28328 bytes
+DEBUG:root:Frame size: 28368 bytes
+DEBUG:root:Frame size: 28324 bytes
+DEBUG:root:Frame size: 28340 bytes
+DEBUG:root:Frame size: 28208 bytes
+DEBUG:root:Frame size: 28160 bytes
+DEBUG:root:Frame size: 28308 bytes
+DEBUG:root:Frame size: 28508 bytes
+DEBUG:root:Frame size: 28420 bytes
+DEBUG:root:Frame size: 28244 bytes
+DEBUG:root:Frame size: 28364 bytes
+DEBUG:root:Frame size: 28292 bytes
+DEBUG:root:Frame size: 28088 bytes
+DEBUG:root:Frame size: 28296 bytes
+DEBUG:root:Frame size: 28108 bytes
+DEBUG:root:Frame size: 27788 bytes
+DEBUG:root:Frame size: 28048 bytes
+DEBUG:root:Frame size: 25944 bytes
+DEBUG:root:Frame size: 28124 bytes
+DEBUG:root:Frame size: 26116 bytes
+DEBUG:root:Frame size: 27872 bytes
+DEBUG:root:Frame size: 26900 bytes
+DEBUG:root:Frame size: 27076 bytes
+DEBUG:root:Frame size: 27420 bytes
+DEBUG:root:Frame size: 28556 bytes
+DEBUG:root:Frame size: 28436 bytes
+DEBUG:root:Frame size: 28504 bytes
+DEBUG:root:Frame size: 28712 bytes
+DEBUG:root:Frame size: 28592 bytes
+DEBUG:root:Frame size: 28612 bytes
+DEBUG:root:Frame size: 28528 bytes
+DEBUG:root:Frame size: 28700 bytes
+DEBUG:root:Frame size: 28216 bytes
+DEBUG:root:Frame size: 28760 bytes
+DEBUG:root:Frame size: 23376 bytes
+DEBUG:root:Frame size: 23824 bytes
+DEBUG:root:Frame size: 20472 bytes
+DEBUG:root:Frame size: 19404 bytes
+DEBUG:root:Frame size: 18184 bytes
+DEBUG:root:Frame size: 19960 bytes
+DEBUG:root:Frame size: 14748 bytes
+DEBUG:root:Frame size: 16340 bytes
+DEBUG:root:Frame size: 15108 bytes
+DEBUG:root:Frame size: 16904 bytes
+DEBUG:root:Frame size: 14448 bytes
+DEBUG:root:Frame size: 20472 bytes
+DEBUG:root:Frame size: 18868 bytes
+DEBUG:root:Frame size: 18672 bytes
+DEBUG:root:Frame size: 15832 bytes
+DEBUG:root:Frame size: 20776 bytes
+DEBUG:root:Frame size: 18900 bytes
+DEBUG:root:Frame size: 15292 bytes
+DEBUG:root:Frame size: 11516 bytes
+DEBUG:root:Frame size: 13028 bytes
+DEBUG:root:Frame size: 12804 bytes
+DEBUG:root:Frame size: 16952 bytes
+DEBUG:root:Frame size: 19088 bytes
+DEBUG:root:Frame size: 14500 bytes
+DEBUG:root:Frame size: 12336 bytes
+DEBUG:root:Frame size: 14700 bytes
+DEBUG:root:Frame size: 12204 bytes
+DEBUG:root:Frame size: 15036 bytes
+DEBUG:root:Frame size: 16700 bytes
+DEBUG:root:Frame size: 16816 bytes
+DEBUG:root:Frame size: 22844 bytes
+DEBUG:root:Frame size: 22596 bytes
+DEBUG:root:Frame size: 25132 bytes
+DEBUG:root:Frame size: 24840 bytes
+DEBUG:root:Frame size: 25028 bytes
+DEBUG:root:Frame size: 25652 bytes
+DEBUG:root:Frame size: 21788 bytes
+DEBUG:root:Frame size: 22968 bytes
+DEBUG:root:Frame size: 21968 bytes
+DEBUG:root:Frame size: 21548 bytes
+DEBUG:root:Frame size: 21828 bytes
+DEBUG:root:Frame size: 22272 bytes
+DEBUG:root:Frame size: 22244 bytes
+DEBUG:root:Frame size: 22024 bytes
+DEBUG:root:Frame size: 15764 bytes
+DEBUG:root:Frame size: 13032 bytes
+DEBUG:root:Frame size: 11796 bytes
+DEBUG:root:Frame size: 12516 bytes
+DEBUG:root:Frame size: 11976 bytes
+DEBUG:root:Frame size: 15580 bytes
+DEBUG:root:Frame size: 11972 bytes
+DEBUG:root:Frame size: 14276 bytes
+DEBUG:root:Frame size: 12416 bytes
+DEBUG:root:Frame size: 14468 bytes
+DEBUG:root:Frame size: 14272 bytes
+DEBUG:root:Frame size: 17412 bytes
+DEBUG:root:Frame size: 22784 bytes
+DEBUG:root:Frame size: 20740 bytes
+DEBUG:root:Frame size: 19728 bytes
+DEBUG:root:Frame size: 15316 bytes
+DEBUG:root:Frame size: 15128 bytes
+DEBUG:root:Frame size: 15752 bytes
+DEBUG:root:Frame size: 16316 bytes
+DEBUG:root:Frame size: 21904 bytes
+DEBUG:root:Frame size: 16880 bytes
+DEBUG:root:Frame size: 23180 bytes
+DEBUG:root:Frame size: 21260 bytes
+DEBUG:root:Frame size: 24644 bytes
+DEBUG:root:Frame size: 22708 bytes
+DEBUG:root:Frame size: 23984 bytes
+DEBUG:root:Frame size: 24012 bytes
+DEBUG:root:Frame size: 24288 bytes
+DEBUG:root:Frame size: 24112 bytes
+DEBUG:root:Frame size: 21336 bytes
+DEBUG:root:Frame size: 24708 bytes
+DEBUG:root:Frame size: 22628 bytes
+DEBUG:root:Frame size: 24228 bytes
+DEBUG:root:Frame size: 23092 bytes
+DEBUG:root:Frame size: 24572 bytes
+DEBUG:root:Frame size: 21712 bytes
+DEBUG:root:Frame size: 18884 bytes
+DEBUG:root:Frame size: 24796 bytes
+DEBUG:root:Frame size: 22944 bytes
+DEBUG:root:Frame size: 15500 bytes
+DEBUG:root:Frame size: 14772 bytes
+DEBUG:root:Frame size: 15724 bytes
+DEBUG:root:Frame size: 19004 bytes
+DEBUG:root:Frame size: 17184 bytes
+DEBUG:root:Frame size: 17612 bytes
+DEBUG:root:Frame size: 16488 bytes
+DEBUG:root:Frame size: 18380 bytes
+DEBUG:root:Frame size: 14704 bytes
+DEBUG:root:Frame size: 16456 bytes
+DEBUG:root:Frame size: 14880 bytes
+DEBUG:root:Frame size: 14020 bytes
+DEBUG:root:Frame size: 15748 bytes
+DEBUG:root:Frame size: 17264 bytes
+DEBUG:root:Frame size: 18572 bytes
+DEBUG:root:Frame size: 16432 bytes
+DEBUG:root:Frame size: 14148 bytes
+DEBUG:root:Frame size: 19432 bytes
+DEBUG:root:Frame size: 26016 bytes
+DEBUG:root:Frame size: 30704 bytes
+DEBUG:root:Frame size: 26004 bytes
+DEBUG:root:Frame size: 29396 bytes
+DEBUG:root:Frame size: 27484 bytes
+DEBUG:root:Frame size: 32168 bytes
+DEBUG:root:Frame size: 30056 bytes
+DEBUG:root:Frame size: 26336 bytes
+DEBUG:root:Frame size: 25564 bytes
+DEBUG:root:Frame size: 29100 bytes
+DEBUG:root:Frame size: 27888 bytes
+DEBUG:root:Frame size: 29064 bytes
+DEBUG:root:Frame size: 30972 bytes
+DEBUG:root:Frame size: 30732 bytes
+DEBUG:root:Frame size: 32672 bytes
+DEBUG:root:Frame size: 34580 bytes
+DEBUG:root:Frame size: 35696 bytes
+DEBUG:root:Frame size: 36940 bytes
+DEBUG:root:Frame size: 38472 bytes
+DEBUG:root:Frame size: 39792 bytes
+DEBUG:root:Frame size: 48076 bytes
+DEBUG:root:Frame size: 50244 bytes
+DEBUG:root:Frame size: 54760 bytes
+DEBUG:root:Frame size: 53340 bytes
+DEBUG:root:Frame size: 47400 bytes
+DEBUG:root:Frame size: 43080 bytes
+DEBUG:root:Frame size: 32772 bytes
+DEBUG:root:Frame size: 27372 bytes
+DEBUG:root:Frame size: 29204 bytes
+DEBUG:root:Frame size: 28820 bytes
+DEBUG:root:Frame size: 29856 bytes
+DEBUG:root:Frame size: 29776 bytes
+DEBUG:root:Frame size: 33440 bytes
+DEBUG:root:Frame size: 34320 bytes
+DEBUG:root:Frame size: 33944 bytes
+DEBUG:root:Frame size: 34224 bytes
+DEBUG:root:Frame size: 34476 bytes
+DEBUG:root:Frame size: 33592 bytes
+DEBUG:root:Frame size: 32716 bytes
+DEBUG:root:Frame size: 33140 bytes
+DEBUG:root:Frame size: 33836 bytes
+DEBUG:root:Frame size: 32596 bytes
+DEBUG:root:Frame size: 31400 bytes
+DEBUG:root:Frame size: 30340 bytes
+DEBUG:root:Frame size: 28416 bytes
+DEBUG:root:Frame size: 26840 bytes
+DEBUG:root:Frame size: 27760 bytes
+DEBUG:root:Frame size: 28548 bytes
+DEBUG:root:Frame size: 29116 bytes
+DEBUG:root:Frame size: 29940 bytes
+DEBUG:root:Frame size: 30064 bytes
+DEBUG:root:Frame size: 30580 bytes
+DEBUG:root:Frame size: 31744 bytes
+DEBUG:root:Frame size: 31276 bytes
+DEBUG:root:Frame size: 30772 bytes
+DEBUG:root:Frame size: 29588 bytes
+DEBUG:root:Frame size: 26984 bytes
+DEBUG:root:Frame size: 26116 bytes
+DEBUG:root:Frame size: 26596 bytes
+DEBUG:root:Frame size: 26732 bytes
+DEBUG:root:Frame size: 27200 bytes
+DEBUG:root:Frame size: 27912 bytes
+DEBUG:root:Frame size: 28360 bytes
+DEBUG:root:Frame size: 28600 bytes
+DEBUG:root:Frame size: 27356 bytes
+DEBUG:root:Frame size: 25720 bytes
+DEBUG:root:Frame size: 24888 bytes
+DEBUG:root:Frame size: 24516 bytes
+DEBUG:root:Frame size: 24872 bytes
+DEBUG:root:Frame size: 25028 bytes
+DEBUG:root:Frame size: 26260 bytes
+DEBUG:root:Frame size: 25068 bytes
+DEBUG:root:Frame size: 25336 bytes
+DEBUG:root:Frame size: 25548 bytes
+DEBUG:root:Frame size: 25664 bytes
+DEBUG:root:Frame size: 19692 bytes
+DEBUG:root:Frame size: 26536 bytes
+DEBUG:root:Frame size: 27536 bytes
+DEBUG:root:Frame size: 34560 bytes
+DEBUG:root:Frame size: 39640 bytes
+DEBUG:root:Frame size: 42196 bytes
+DEBUG:root:Frame size: 43232 bytes
+DEBUG:root:Frame size: 42940 bytes
+DEBUG:root:Frame size: 44048 bytes
+DEBUG:root:Frame size: 44388 bytes
+DEBUG:root:Frame size: 44468 bytes
+DEBUG:root:Frame size: 45660 bytes
+DEBUG:root:Frame size: 42844 bytes
+DEBUG:root:Frame size: 41060 bytes
+DEBUG:root:Frame size: 40444 bytes
+DEBUG:root:Frame size: 40616 bytes
+DEBUG:root:Frame size: 39128 bytes
+DEBUG:root:Frame size: 41112 bytes
+DEBUG:root:Frame size: 40744 bytes
+DEBUG:root:Frame size: 38076 bytes
+DEBUG:root:Frame size: 35916 bytes
+DEBUG:root:Frame size: 35848 bytes
+DEBUG:root:Frame size: 35976 bytes
+DEBUG:root:Frame size: 38544 bytes
+DEBUG:root:Frame size: 44552 bytes
+DEBUG:root:Frame size: 46156 bytes
+DEBUG:root:Frame size: 47196 bytes
+DEBUG:root:Frame size: 47340 bytes
+DEBUG:root:Frame size: 48572 bytes
+DEBUG:root:Frame size: 47964 bytes
+DEBUG:root:Frame size: 49908 bytes
+DEBUG:root:Frame size: 50052 bytes
+DEBUG:root:Frame size: 49564 bytes
+DEBUG:root:Frame size: 44436 bytes
+DEBUG:root:Frame size: 16012 bytes
+DEBUG:root:Frame size: 30752 bytes
+DEBUG:root:Frame size: 20244 bytes
+DEBUG:root:Frame size: 18568 bytes
+DEBUG:root:Frame size: 13148 bytes
+DEBUG:root:Frame size: 14420 bytes
+DEBUG:root:Frame size: 15984 bytes
+DEBUG:root:Frame size: 17520 bytes
+DEBUG:root:Frame size: 18144 bytes
+DEBUG:root:Frame size: 18760 bytes
+DEBUG:root:Frame size: 20436 bytes
+DEBUG:root:Frame size: 20752 bytes
+DEBUG:root:Frame size: 21528 bytes
+DEBUG:root:Frame size: 24764 bytes
+DEBUG:root:Frame size: 23828 bytes
+DEBUG:root:Frame size: 26620 bytes
+DEBUG:root:Frame size: 26576 bytes
+DEBUG:root:Frame size: 27468 bytes
+DEBUG:root:Frame size: 26892 bytes
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 42, 'resolution': (640, 480)}
+DEBUG:root:Frame size: 23392 bytes
+DEBUG:root:Frame size: 24128 bytes
+DEBUG:root:Frame size: 23780 bytes
+DEBUG:root:Frame size: 23564 bytes
+DEBUG:root:Frame size: 23988 bytes
+DEBUG:root:Frame size: 24248 bytes
+DEBUG:root:Frame size: 24164 bytes
+DEBUG:root:Frame size: 24288 bytes
+DEBUG:root:Frame size: 24080 bytes
+DEBUG:root:Frame size: 23808 bytes
+DEBUG:root:Frame size: 23800 bytes
+DEBUG:root:Frame size: 23468 bytes
+DEBUG:root:Frame size: 23348 bytes
+DEBUG:root:Frame size: 23248 bytes
+DEBUG:root:Frame size: 23216 bytes
+DEBUG:root:Frame size: 23184 bytes
+DEBUG:root:Frame size: 23296 bytes
+DEBUG:root:Frame size: 23280 bytes
+DEBUG:root:Frame size: 23288 bytes
+DEBUG:root:Frame size: 23180 bytes
+DEBUG:root:Frame size: 23040 bytes
+DEBUG:root:Frame size: 23048 bytes
+DEBUG:root:Frame size: 22956 bytes
+DEBUG:root:Frame size: 23084 bytes
+DEBUG:root:Frame size: 23060 bytes
+DEBUG:root:Frame size: 23052 bytes
+DEBUG:root:Frame size: 23080 bytes
+DEBUG:root:Frame size: 23028 bytes
+DEBUG:root:Frame size: 23104 bytes
+DEBUG:root:Frame size: 23128 bytes
+DEBUG:root:Frame size: 23204 bytes
+DEBUG:root:Frame size: 23168 bytes
+DEBUG:root:Frame size: 23060 bytes
+DEBUG:root:Frame size: 23236 bytes
+DEBUG:root:Frame size: 22996 bytes
+DEBUG:root:Frame size: 22892 bytes
+DEBUG:root:Frame size: 23004 bytes
+DEBUG:root:Frame size: 22888 bytes
+DEBUG:root:Frame size: 22972 bytes
+DEBUG:root:Frame size: 22920 bytes
+DEBUG:root:Frame size: 22872 bytes
+DEBUG:root:Frame size: 22836 bytes
+DEBUG:root:Frame size: 23064 bytes
+DEBUG:root:Frame size: 22976 bytes
+DEBUG:root:Frame size: 23012 bytes
+DEBUG:root:Frame size: 22836 bytes
+DEBUG:root:Frame size: 22708 bytes
+DEBUG:root:Frame size: 22684 bytes
+DEBUG:root:Frame size: 22716 bytes
+DEBUG:root:Frame size: 22692 bytes
+DEBUG:root:Frame size: 22852 bytes
+DEBUG:root:Frame size: 22636 bytes
+DEBUG:root:Frame size: 22732 bytes
+DEBUG:root:Frame size: 22732 bytes
+DEBUG:root:Frame size: 22772 bytes
+DEBUG:root:Frame size: 22676 bytes
+DEBUG:root:Frame size: 22784 bytes
+DEBUG:root:Frame size: 22760 bytes
+DEBUG:root:Frame size: 22608 bytes
+DEBUG:root:Frame size: 22760 bytes
+DEBUG:root:Frame size: 22652 bytes
+DEBUG:root:Frame size: 22760 bytes
+DEBUG:root:Frame size: 22692 bytes
+DEBUG:root:Frame size: 22656 bytes
+DEBUG:root:Frame size: 22744 bytes
+DEBUG:root:Frame size: 22760 bytes
+DEBUG:root:Frame size: 22796 bytes
+DEBUG:root:Frame size: 22780 bytes
+DEBUG:root:Frame size: 22884 bytes
+DEBUG:root:Frame size: 22756 bytes
+DEBUG:root:Frame size: 22760 bytes
+DEBUG:root:Frame size: 22836 bytes
+DEBUG:root:Frame size: 22680 bytes
+DEBUG:root:Frame size: 22816 bytes
+DEBUG:root:Frame size: 22812 bytes
+DEBUG:root:Frame size: 22996 bytes
+DEBUG:root:Frame size: 22980 bytes
+DEBUG:root:Frame size: 22944 bytes
+DEBUG:root:Frame size: 22776 bytes
+DEBUG:root:Frame size: 22812 bytes
+DEBUG:root:Frame size: 22624 bytes
+DEBUG:root:Frame size: 22588 bytes
+DEBUG:root:Frame size: 22776 bytes
+DEBUG:root:Frame size: 22832 bytes
+DEBUG:root:Frame size: 22724 bytes
+DEBUG:root:Frame size: 22904 bytes
+DEBUG:root:Frame size: 22900 bytes
+DEBUG:root:Frame size: 23108 bytes
+DEBUG:root:Frame size: 23104 bytes
+DEBUG:root:Frame size: 23368 bytes
+DEBUG:root:Frame size: 23276 bytes
+DEBUG:root:Frame size: 23328 bytes
+DEBUG:root:Frame size: 23408 bytes
+DEBUG:root:Frame size: 23428 bytes
+DEBUG:root:Frame size: 23440 bytes
+DEBUG:root:Frame size: 23264 bytes
+DEBUG:root:Frame size: 22960 bytes
+DEBUG:root:Frame size: 23008 bytes
+DEBUG:root:Frame size: 23108 bytes
+DEBUG:root:Frame size: 23196 bytes
+DEBUG:root:Frame size: 22944 bytes
+DEBUG:root:Frame size: 22740 bytes
+DEBUG:root:Frame size: 22336 bytes
+DEBUG:root:Frame size: 22416 bytes
+DEBUG:root:Frame size: 22868 bytes
+DEBUG:root:Frame size: 22720 bytes
+DEBUG:root:Frame size: 22768 bytes
+DEBUG:root:Frame size: 22876 bytes
+DEBUG:root:Frame size: 22956 bytes
+DEBUG:root:Frame size: 22672 bytes
+DEBUG:root:Frame size: 22104 bytes
+DEBUG:root:Frame size: 20732 bytes
+DEBUG:root:Frame size: 20660 bytes
+DEBUG:root:Frame size: 20200 bytes
+DEBUG:root:Frame size: 19892 bytes
+DEBUG:root:Frame size: 20576 bytes
+DEBUG:root:Frame size: 20428 bytes
+DEBUG:root:Frame size: 21508 bytes
+DEBUG:root:Frame size: 20056 bytes
+DEBUG:root:Frame size: 20608 bytes
+DEBUG:root:Frame size: 21532 bytes
+DEBUG:root:Frame size: 24188 bytes
+DEBUG:root:Frame size: 24164 bytes
+DEBUG:root:Frame size: 23420 bytes
+DEBUG:root:Frame size: 26108 bytes
+DEBUG:root:Frame size: 28152 bytes
+DEBUG:root:Frame size: 25308 bytes
+DEBUG:root:Frame size: 21828 bytes
+DEBUG:root:Frame size: 20356 bytes
+DEBUG:root:Frame size: 20480 bytes
+DEBUG:root:Frame size: 19744 bytes
+DEBUG:root:Frame size: 19120 bytes
+DEBUG:root:Frame size: 17728 bytes
+DEBUG:root:Frame size: 18716 bytes
+DEBUG:root:Frame size: 20676 bytes
+DEBUG:root:Frame size: 21780 bytes
+DEBUG:root:Frame size: 23496 bytes
+DEBUG:root:Frame size: 25828 bytes
+DEBUG:root:Frame size: 22656 bytes
+DEBUG:root:Frame size: 22832 bytes
+DEBUG:root:Frame size: 23384 bytes
+DEBUG:root:Frame size: 22132 bytes
+DEBUG:root:Frame size: 20776 bytes
+DEBUG:root:Frame size: 23056 bytes
+DEBUG:root:Frame size: 25444 bytes
+DEBUG:root:Frame size: 20976 bytes
+DEBUG:root:Frame size: 23356 bytes
+DEBUG:root:Frame size: 22308 bytes
+DEBUG:root:Frame size: 18216 bytes
+DEBUG:root:Frame size: 17472 bytes
+DEBUG:root:Frame size: 16208 bytes
+DEBUG:root:Frame size: 16996 bytes
+DEBUG:root:Frame size: 16612 bytes
+DEBUG:root:Frame size: 18352 bytes
+DEBUG:root:Frame size: 16176 bytes
+DEBUG:root:Frame size: 20188 bytes
+DEBUG:root:Frame size: 20200 bytes
+DEBUG:root:Frame size: 22424 bytes
+DEBUG:root:Frame size: 23824 bytes
+DEBUG:root:Frame size: 21880 bytes
+DEBUG:root:Frame size: 24884 bytes
+DEBUG:root:Frame size: 23556 bytes
+DEBUG:root:Frame size: 22264 bytes
+DEBUG:root:Frame size: 29004 bytes
+DEBUG:root:Frame size: 22312 bytes
+DEBUG:root:Frame size: 18976 bytes
+DEBUG:root:Frame size: 15160 bytes
+DEBUG:root:Frame size: 11468 bytes
+DEBUG:root:Frame size: 13584 bytes
+DEBUG:root:Frame size: 12728 bytes
+DEBUG:root:Frame size: 13088 bytes
+DEBUG:root:Frame size: 15040 bytes
+DEBUG:root:Frame size: 20560 bytes
+DEBUG:root:Frame size: 30904 bytes
+DEBUG:root:Frame size: 26364 bytes
+DEBUG:root:Frame size: 30172 bytes
+DEBUG:root:Frame size: 30944 bytes
+DEBUG:root:Frame size: 37640 bytes
+DEBUG:root:Frame size: 32556 bytes
+DEBUG:root:Frame size: 32972 bytes
+DEBUG:root:Frame size: 27300 bytes
+DEBUG:root:Frame size: 32508 bytes
+DEBUG:root:Frame size: 31676 bytes
+DEBUG:root:Frame size: 26868 bytes
+DEBUG:root:Frame size: 32656 bytes
+DEBUG:root:Frame size: 29784 bytes
+DEBUG:root:Frame size: 33984 bytes
+DEBUG:root:Frame size: 38740 bytes
+DEBUG:root:Frame size: 40156 bytes
+DEBUG:root:Frame size: 38952 bytes
+DEBUG:root:Frame size: 43076 bytes
+DEBUG:root:Frame size: 36856 bytes
+DEBUG:root:Frame size: 36464 bytes
+DEBUG:root:Frame size: 33032 bytes
+DEBUG:root:Frame size: 33380 bytes
+DEBUG:root:Frame size: 35400 bytes
+DEBUG:root:Frame size: 34844 bytes
+DEBUG:root:Frame size: 34996 bytes
+DEBUG:root:Frame size: 33572 bytes
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 4, 'resolution': (640, 480)}
+DEBUG:root:Frame size: 54056 bytes
+DEBUG:root:Frame size: 53640 bytes
+DEBUG:root:Frame size: 50832 bytes
+DEBUG:root:Frame size: 58180 bytes
+DEBUG:root:Frame size: 51272 bytes
+DEBUG:root:Frame size: 50572 bytes
+DEBUG:root:Frame size: 55248 bytes
+DEBUG:root:Frame size: 34632 bytes
+DEBUG:root:Frame size: 25584 bytes
+DEBUG:root:Frame size: 21180 bytes
+DEBUG:root:Frame size: 7692 bytes
+DEBUG:root:Frame size: 7932 bytes
+DEBUG:root:Frame size: 9716 bytes
+DEBUG:root:Frame size: 8000 bytes
+DEBUG:root:Frame size: 12288 bytes
+DEBUG:root:Frame size: 14304 bytes
+DEBUG:root:Frame size: 12956 bytes
+DEBUG:root:Frame size: 19516 bytes
+DEBUG:root:Frame size: 19064 bytes
+DEBUG:root:Frame size: 20152 bytes
+DEBUG:root:Frame size: 13264 bytes
+DEBUG:root:Frame size: 22940 bytes
+DEBUG:root:Frame size: 15668 bytes
+DEBUG:root:Frame size: 14124 bytes
+DEBUG:root:Frame size: 15988 bytes
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 27, 'resolution': (1280, 720)}
+DEBUG:root:Frame size: 51128 bytes
+DEBUG:root:Frame size: 59328 bytes
+DEBUG:root:Frame size: 61980 bytes
+DEBUG:root:Frame size: 58928 bytes
+DEBUG:root:Frame size: 61500 bytes
+DEBUG:root:Frame size: 59980 bytes
+DEBUG:root:Frame size: 56564 bytes
+DEBUG:root:Frame size: 64376 bytes
+DEBUG:root:Frame size: 66516 bytes
+DEBUG:root:Frame size: 71224 bytes
+DEBUG:root:Frame size: 71888 bytes
+DEBUG:root:Frame size: 53916 bytes
+DEBUG:root:Frame size: 56700 bytes
+DEBUG:root:Frame size: 58532 bytes
+DEBUG:root:Frame size: 57080 bytes
+DEBUG:root:Frame size: 54916 bytes
+DEBUG:root:Frame size: 48352 bytes
+DEBUG:root:Frame size: 51864 bytes
+DEBUG:root:Frame size: 52272 bytes
+DEBUG:root:Frame size: 47072 bytes
+DEBUG:root:Frame size: 61264 bytes
+DEBUG:root:Frame size: 65256 bytes
+DEBUG:root:Frame size: 57536 bytes
+DEBUG:root:Frame size: 60228 bytes
+DEBUG:root:Frame size: 60292 bytes
+DEBUG:root:Frame size: 60608 bytes
+DEBUG:root:Frame size: 68660 bytes
+DEBUG:root:Frame size: 54192 bytes
+DEBUG:root:Frame size: 56784 bytes
+DEBUG:root:Frame size: 74816 bytes
+DEBUG:root:Frame size: 58504 bytes
+DEBUG:root:Frame size: 71488 bytes
+DEBUG:root:Frame size: 76632 bytes
+DEBUG:root:Frame size: 61284 bytes
+DEBUG:root:Frame size: 65348 bytes
+DEBUG:root:Frame size: 64944 bytes
+DEBUG:root:Frame size: 63000 bytes
+DEBUG:root:Frame size: 65028 bytes
+DEBUG:root:Frame size: 62772 bytes
+DEBUG:root:Frame size: 75768 bytes
+DEBUG:root:Frame size: 65548 bytes
+DEBUG:root:Frame size: 67724 bytes
+DEBUG:root:Frame size: 67336 bytes
+DEBUG:root:Frame size: 69480 bytes
+DEBUG:root:Frame size: 70560 bytes
+DEBUG:root:Frame size: 62944 bytes
+DEBUG:root:Frame size: 69860 bytes
+DEBUG:root:Frame size: 66512 bytes
+DEBUG:root:Frame size: 60460 bytes
+DEBUG:root:Frame size: 48504 bytes
+DEBUG:root:Frame size: 52568 bytes
+DEBUG:root:Frame size: 56284 bytes
+DEBUG:root:Frame size: 51492 bytes
+DEBUG:root:Frame size: 68352 bytes
+DEBUG:root:Frame size: 60888 bytes
+DEBUG:root:Frame size: 59860 bytes
+DEBUG:root:Frame size: 62964 bytes
+DEBUG:root:Frame size: 63936 bytes
+DEBUG:root:Frame size: 62468 bytes
+DEBUG:root:Frame size: 58776 bytes
+DEBUG:root:Frame size: 61184 bytes
+DEBUG:root:Frame size: 59280 bytes
+DEBUG:root:Frame size: 59292 bytes
+DEBUG:root:Frame size: 58976 bytes
+DEBUG:root:Frame size: 59404 bytes
+DEBUG:root:Frame size: 58728 bytes
+DEBUG:root:Frame size: 58352 bytes
+DEBUG:root:Frame size: 58944 bytes
+DEBUG:root:Frame size: 58188 bytes
+DEBUG:root:Frame size: 56280 bytes
+DEBUG:root:Frame size: 59324 bytes
+DEBUG:root:Frame size: 59196 bytes
+DEBUG:root:Frame size: 59440 bytes
+DEBUG:root:Frame size: 59008 bytes
+DEBUG:root:Frame size: 59460 bytes
+DEBUG:root:Frame size: 59224 bytes
+DEBUG:root:Frame size: 58196 bytes
+DEBUG:root:Frame size: 58420 bytes
+DEBUG:root:Frame size: 58044 bytes
+DEBUG:root:Frame size: 57476 bytes
+DEBUG:root:Frame size: 58636 bytes
+DEBUG:root:Frame size: 57016 bytes
+DEBUG:root:Frame size: 57228 bytes
+DEBUG:root:Frame size: 57888 bytes
+DEBUG:root:Frame size: 58864 bytes
+DEBUG:root:Frame size: 58512 bytes
+DEBUG:root:Frame size: 58528 bytes
+DEBUG:root:Frame size: 58196 bytes
+DEBUG:root:Frame size: 57720 bytes
+DEBUG:root:Frame size: 55736 bytes
+DEBUG:root:Frame size: 57004 bytes
+DEBUG:root:Frame size: 57560 bytes
+DEBUG:root:Frame size: 56864 bytes
+DEBUG:root:Frame size: 57824 bytes
+DEBUG:root:Frame size: 56500 bytes
+DEBUG:root:Frame size: 58224 bytes
+DEBUG:root:Frame size: 56892 bytes
+DEBUG:root:Frame size: 58716 bytes
+DEBUG:root:Frame size: 58660 bytes
+DEBUG:root:Frame size: 58932 bytes
+DEBUG:root:Frame size: 58884 bytes
+DEBUG:root:Frame size: 60124 bytes
+DEBUG:root:Frame size: 61112 bytes
+DEBUG:root:Frame size: 60284 bytes
+DEBUG:root:Frame size: 60156 bytes
+DEBUG:root:Frame size: 58956 bytes
+DEBUG:root:Frame size: 58932 bytes
+DEBUG:root:Frame size: 58704 bytes
+DEBUG:root:Frame size: 57820 bytes
+DEBUG:root:Frame size: 56448 bytes
+DEBUG:root:Frame size: 54728 bytes
+DEBUG:root:Frame size: 51320 bytes
+DEBUG:root:Frame size: 48796 bytes
+DEBUG:root:Frame size: 50164 bytes
+DEBUG:root:Frame size: 52720 bytes
+DEBUG:root:Frame size: 52776 bytes
+DEBUG:root:Frame size: 48784 bytes
+DEBUG:root:Frame size: 47700 bytes
+DEBUG:root:Frame size: 47812 bytes
+DEBUG:root:Frame size: 37592 bytes
+DEBUG:root:Frame size: 34848 bytes
+DEBUG:root:Frame size: 32696 bytes
+DEBUG:root:Frame size: 29428 bytes
+DEBUG:root:Frame size: 38852 bytes
+DEBUG:root:Frame size: 35008 bytes
+DEBUG:root:Frame size: 38028 bytes
+DEBUG:root:Frame size: 38700 bytes
+DEBUG:root:Frame size: 40572 bytes
+DEBUG:root:Frame size: 42500 bytes
+DEBUG:root:Frame size: 40524 bytes
+DEBUG:root:Frame size: 49556 bytes
+DEBUG:root:Frame size: 44500 bytes
+DEBUG:root:Frame size: 51644 bytes
+DEBUG:root:Frame size: 36320 bytes
+DEBUG:root:Frame size: 42188 bytes
+DEBUG:root:Frame size: 41628 bytes
+DEBUG:root:Frame size: 33560 bytes
+DEBUG:root:Frame size: 40320 bytes
+DEBUG:root:Frame size: 43596 bytes
+DEBUG:root:Frame size: 48780 bytes
+DEBUG:root:Frame size: 39644 bytes
+DEBUG:root:Frame size: 44864 bytes
+DEBUG:root:Frame size: 39592 bytes
+DEBUG:root:Frame size: 49492 bytes
+DEBUG:root:Frame size: 55140 bytes
+DEBUG:root:Frame size: 44328 bytes
+DEBUG:root:Frame size: 48116 bytes
+DEBUG:root:Frame size: 34304 bytes
+DEBUG:root:Frame size: 40224 bytes
+DEBUG:root:Frame size: 25384 bytes
+DEBUG:root:Frame size: 26820 bytes
+DEBUG:root:Frame size: 31268 bytes
+DEBUG:root:Frame size: 33284 bytes
+DEBUG:root:Frame size: 33324 bytes
+DEBUG:root:Frame size: 34952 bytes
+DEBUG:root:Frame size: 34520 bytes
+DEBUG:root:Frame size: 34608 bytes
+DEBUG:root:Frame size: 37824 bytes
+DEBUG:root:Frame size: 38112 bytes
+DEBUG:root:Frame size: 33196 bytes
+DEBUG:root:Frame size: 32096 bytes
+DEBUG:root:Frame size: 37116 bytes
+DEBUG:root:Frame size: 43960 bytes
+DEBUG:root:Frame size: 42676 bytes
+DEBUG:root:Frame size: 48020 bytes
+DEBUG:root:Frame size: 54756 bytes
+DEBUG:root:Frame size: 58496 bytes
+DEBUG:root:Frame size: 59768 bytes
+DEBUG:root:Frame size: 59832 bytes
+DEBUG:root:Frame size: 58292 bytes
+DEBUG:root:Frame size: 64472 bytes
+DEBUG:root:Frame size: 64556 bytes
+DEBUG:root:Frame size: 64916 bytes
+DEBUG:root:Frame size: 61732 bytes
+DEBUG:root:Frame size: 62056 bytes
+DEBUG:root:Frame size: 60640 bytes
+DEBUG:root:Frame size: 51104 bytes
+DEBUG:root:Frame size: 63340 bytes
+DEBUG:root:Frame size: 60264 bytes
+DEBUG:root:Frame size: 58624 bytes
+DEBUG:root:Frame size: 58808 bytes
+DEBUG:root:Frame size: 58308 bytes
+DEBUG:root:Frame size: 62052 bytes
+DEBUG:root:Frame size: 62604 bytes
+DEBUG:root:Frame size: 60676 bytes
+DEBUG:root:Frame size: 62620 bytes
+DEBUG:root:Frame size: 64656 bytes
+DEBUG:root:Frame size: 64552 bytes
+DEBUG:root:Frame size: 64172 bytes
+DEBUG:root:Frame size: 64088 bytes
+DEBUG:root:Frame size: 64356 bytes
+DEBUG:root:Frame size: 65228 bytes
+DEBUG:root:Frame size: 63652 bytes
+DEBUG:root:Frame size: 63004 bytes
+DEBUG:root:Frame size: 64008 bytes
+DEBUG:root:Frame size: 61444 bytes
+DEBUG:root:Frame size: 63732 bytes
+DEBUG:root:Frame size: 64364 bytes
+DEBUG:root:Frame size: 61660 bytes
+DEBUG:root:Frame size: 61632 bytes
+DEBUG:root:Frame size: 63908 bytes
+DEBUG:root:Frame size: 61428 bytes
+DEBUG:root:Frame size: 64136 bytes
+DEBUG:root:Frame size: 64472 bytes
+DEBUG:root:Frame size: 64296 bytes
+DEBUG:root:Frame size: 64420 bytes
+DEBUG:root:Frame size: 63332 bytes
+DEBUG:root:Frame size: 64300 bytes
+DEBUG:root:Frame size: 64344 bytes
+DEBUG:root:Frame size: 64364 bytes
+DEBUG:root:Frame size: 64160 bytes
+DEBUG:root:Frame size: 64284 bytes
+DEBUG:root:Frame size: 64392 bytes
+DEBUG:root:Frame size: 63740 bytes
+DEBUG:root:Frame size: 54504 bytes
+DEBUG:root:Frame size: 54560 bytes
+DEBUG:root:Frame size: 56656 bytes
+DEBUG:root:Frame size: 50576 bytes
+DEBUG:root:Frame size: 50404 bytes
+DEBUG:root:Frame size: 60036 bytes
+DEBUG:root:Frame size: 63736 bytes
+DEBUG:root:Frame size: 59000 bytes
+DEBUG:root:Frame size: 56676 bytes
+DEBUG:root:Frame size: 63548 bytes
+DEBUG:root:Frame size: 57692 bytes
+DEBUG:root:Frame size: 59504 bytes
+DEBUG:root:Frame size: 59708 bytes
+DEBUG:root:Frame size: 60244 bytes
+DEBUG:root:Frame size: 63836 bytes
+DEBUG:root:Frame size: 63936 bytes
+DEBUG:root:Frame size: 58576 bytes
+DEBUG:root:Frame size: 53776 bytes
+DEBUG:root:Frame size: 47600 bytes
+DEBUG:root:Frame size: 42648 bytes
+DEBUG:root:Frame size: 50828 bytes
+DEBUG:root:Frame size: 49616 bytes
+DEBUG:root:Frame size: 45060 bytes
+DEBUG:root:Frame size: 47020 bytes
+DEBUG:root:Frame size: 45100 bytes
+DEBUG:root:Frame size: 44612 bytes
+DEBUG:root:Frame size: 58688 bytes
+DEBUG:root:Frame size: 45524 bytes
+DEBUG:root:Frame size: 47456 bytes
+DEBUG:root:Frame size: 59680 bytes
+DEBUG:root:Frame size: 50144 bytes
+DEBUG:root:Frame size: 54140 bytes
+DEBUG:root:Frame size: 57312 bytes
+DEBUG:root:Frame size: 55608 bytes
+DEBUG:root:Frame size: 60952 bytes
+DEBUG:root:Frame size: 63724 bytes
+DEBUG:root:Frame size: 58868 bytes
+DEBUG:root:Frame size: 61672 bytes
+DEBUG:root:Frame size: 64844 bytes
+DEBUG:root:Frame size: 63896 bytes
+DEBUG:root:Frame size: 64516 bytes
+DEBUG:root:Frame size: 64032 bytes
+DEBUG:root:Frame size: 64804 bytes
+DEBUG:root:Frame size: 64824 bytes
+DEBUG:root:Frame size: 64272 bytes
+DEBUG:root:Frame size: 64648 bytes
+DEBUG:root:Frame size: 64644 bytes
+DEBUG:root:Frame size: 64612 bytes
+DEBUG:root:Frame size: 64580 bytes
+DEBUG:root:Frame size: 64328 bytes
+DEBUG:root:Frame size: 64672 bytes
+DEBUG:root:Frame size: 64516 bytes
+DEBUG:root:Frame size: 64756 bytes
+DEBUG:root:Frame size: 64812 bytes
+DEBUG:root:Frame size: 64476 bytes
+DEBUG:root:Frame size: 64632 bytes
+DEBUG:root:Frame size: 64560 bytes
+DEBUG:root:Frame size: 64108 bytes
+DEBUG:root:Frame size: 64552 bytes
+DEBUG:root:Frame size: 64532 bytes
+DEBUG:root:Frame size: 57308 bytes
+DEBUG:root:Frame size: 64896 bytes
+DEBUG:root:Frame size: 61828 bytes
+DEBUG:root:Frame size: 59980 bytes
+DEBUG:root:Frame size: 63692 bytes
+DEBUG:root:Frame size: 63572 bytes
+DEBUG:root:Frame size: 60196 bytes
+DEBUG:root:Frame size: 63784 bytes
+DEBUG:root:Frame size: 64300 bytes
+DEBUG:root:Frame size: 61652 bytes
+DEBUG:root:Frame size: 63368 bytes
+DEBUG:root:Frame size: 62580 bytes
+DEBUG:root:Frame size: 62468 bytes
+DEBUG:root:Frame size: 63808 bytes
+DEBUG:root:Frame size: 64140 bytes
+DEBUG:root:Frame size: 63672 bytes
+DEBUG:root:Frame size: 64372 bytes
+DEBUG:root:Frame size: 64608 bytes
+DEBUG:root:Frame size: 63608 bytes
+DEBUG:root:Frame size: 63716 bytes
+DEBUG:root:Frame size: 64588 bytes
+DEBUG:root:Frame size: 64764 bytes
+DEBUG:root:Frame size: 64652 bytes
+DEBUG:root:Frame size: 64208 bytes
+DEBUG:root:Frame size: 63748 bytes
+DEBUG:root:Frame size: 61464 bytes
+DEBUG:root:Frame size: 61324 bytes
+DEBUG:root:Frame size: 64464 bytes
+DEBUG:root:Frame size: 62260 bytes
+DEBUG:root:Frame size: 64268 bytes
+DEBUG:root:Frame size: 64332 bytes
+DEBUG:root:Frame size: 64028 bytes
+DEBUG:root:Frame size: 63064 bytes
+DEBUG:root:Frame size: 62192 bytes
+DEBUG:root:Frame size: 65080 bytes
+DEBUG:root:Frame size: 61768 bytes
+DEBUG:root:Frame size: 62988 bytes
+DEBUG:root:Frame size: 64976 bytes
+DEBUG:root:Frame size: 63840 bytes
+DEBUG:root:Frame size: 64552 bytes
+DEBUG:root:Frame size: 64112 bytes
+DEBUG:root:Frame size: 64780 bytes
+DEBUG:root:Frame size: 64776 bytes
+DEBUG:root:Frame size: 62452 bytes
+DEBUG:root:Frame size: 64168 bytes
+DEBUG:root:Frame size: 62180 bytes
+DEBUG:root:Frame size: 64760 bytes
+DEBUG:root:Frame size: 63376 bytes
+DEBUG:root:Frame size: 64296 bytes
+DEBUG:root:Frame size: 63912 bytes
+DEBUG:root:Frame size: 64344 bytes
+DEBUG:root:Frame size: 64820 bytes
+DEBUG:root:Frame size: 64788 bytes
+DEBUG:root:Frame size: 64920 bytes
+DEBUG:root:Frame size: 64660 bytes
+DEBUG:root:Frame size: 63360 bytes
+DEBUG:root:Frame size: 64832 bytes
+DEBUG:root:Frame size: 63816 bytes
+DEBUG:root:Frame size: 63032 bytes
+DEBUG:root:Frame size: 64524 bytes
+DEBUG:root:Frame size: 60956 bytes
+DEBUG:root:Frame size: 64888 bytes
+DEBUG:root:Frame size: 64976 bytes
+DEBUG:root:Frame size: 53936 bytes
+DEBUG:root:Frame size: 58260 bytes
+DEBUG:root:Frame size: 58760 bytes
+DEBUG:root:Frame size: 65352 bytes
+DEBUG:root:Frame size: 64716 bytes
+DEBUG:root:Frame size: 55564 bytes
+DEBUG:root:Frame size: 45128 bytes
+DEBUG:root:Frame size: 59764 bytes
+DEBUG:root:Frame size: 59748 bytes
+DEBUG:root:Frame size: 57816 bytes
+DEBUG:root:Frame size: 59040 bytes
+DEBUG:root:Frame size: 49316 bytes
+DEBUG:root:Frame size: 53736 bytes
+DEBUG:root:Frame size: 52804 bytes
+DEBUG:root:Frame size: 46196 bytes
+DEBUG:root:Frame size: 47240 bytes
+DEBUG:root:Frame size: 43936 bytes
+DEBUG:root:Frame size: 51204 bytes
+DEBUG:root:Frame size: 50632 bytes
+DEBUG:root:Frame size: 53832 bytes
+DEBUG:root:Frame size: 54388 bytes
+DEBUG:root:Frame size: 50732 bytes
+DEBUG:root:Frame size: 45896 bytes
+DEBUG:root:Frame size: 46672 bytes
+DEBUG:root:Frame size: 47480 bytes
+DEBUG:root:Frame size: 48444 bytes
+DEBUG:root:Frame size: 46740 bytes
+DEBUG:root:Frame size: 47460 bytes
+DEBUG:root:Frame size: 48292 bytes
+DEBUG:root:Frame size: 46648 bytes
+DEBUG:root:Frame size: 45164 bytes
+DEBUG:root:Frame size: 48252 bytes
+DEBUG:root:Frame size: 44112 bytes
+DEBUG:root:Frame size: 47632 bytes
+DEBUG:root:Frame size: 46100 bytes
+DEBUG:root:Frame size: 43484 bytes
+DEBUG:root:Frame size: 48688 bytes
+DEBUG:root:Frame size: 41572 bytes
+DEBUG:root:Frame size: 41600 bytes
+DEBUG:root:Frame size: 44972 bytes
+DEBUG:root:Frame size: 48504 bytes
+DEBUG:root:Frame size: 30372 bytes
+DEBUG:root:Frame size: 31360 bytes
+DEBUG:root:Frame size: 37288 bytes
+DEBUG:root:Frame size: 37840 bytes
+DEBUG:root:Frame size: 33432 bytes
+DEBUG:root:Frame size: 35852 bytes
+DEBUG:root:Frame size: 30540 bytes
+DEBUG:root:Frame size: 34368 bytes
+DEBUG:root:Frame size: 37956 bytes
+DEBUG:root:Frame size: 35636 bytes
+DEBUG:root:Frame size: 41352 bytes
+DEBUG:root:Frame size: 33992 bytes
+DEBUG:root:Frame size: 43332 bytes
+DEBUG:root:Frame size: 39500 bytes
+DEBUG:root:Frame size: 32516 bytes
+DEBUG:root:Frame size: 42116 bytes
+DEBUG:root:Frame size: 41456 bytes
+DEBUG:root:Frame size: 45620 bytes
+DEBUG:root:Frame size: 42420 bytes
+DEBUG:root:Frame size: 40256 bytes
+DEBUG:root:Frame size: 42540 bytes
+DEBUG:root:Frame size: 37412 bytes
+DEBUG:root:Frame size: 38260 bytes
+DEBUG:root:Frame size: 55024 bytes
+DEBUG:root:Frame size: 45316 bytes
+DEBUG:root:Frame size: 57188 bytes
+DEBUG:root:Frame size: 64064 bytes
+DEBUG:root:Frame size: 75240 bytes
+DEBUG:root:Frame size: 59952 bytes
+DEBUG:root:Frame size: 70156 bytes
+DEBUG:root:Frame size: 48744 bytes
+DEBUG:root:Frame size: 52580 bytes
+DEBUG:root:Frame size: 51316 bytes
+DEBUG:root:Frame size: 51960 bytes
+DEBUG:root:Frame size: 55360 bytes
+DEBUG:root:Frame size: 56032 bytes
+DEBUG:root:Frame size: 57268 bytes
+DEBUG:root:Frame size: 58796 bytes
+DEBUG:root:Frame size: 58588 bytes
+DEBUG:root:Frame size: 57812 bytes
+DEBUG:root:Frame size: 59348 bytes
+DEBUG:root:Frame size: 56952 bytes
+DEBUG:root:Frame size: 60160 bytes
+DEBUG:root:Frame size: 62272 bytes
+DEBUG:root:Frame size: 62088 bytes
+DEBUG:root:Frame size: 63740 bytes
+DEBUG:root:Frame size: 64096 bytes
+DEBUG:root:Frame size: 64572 bytes
+DEBUG:root:Frame size: 63548 bytes
+DEBUG:root:Frame size: 63408 bytes
+DEBUG:root:Frame size: 64388 bytes
+DEBUG:root:Frame size: 64256 bytes
+DEBUG:root:Frame size: 64660 bytes
+DEBUG:root:Frame size: 64640 bytes
+DEBUG:root:Frame size: 65112 bytes
+DEBUG:root:Frame size: 65016 bytes
+DEBUG:root:Frame size: 64320 bytes
+DEBUG:root:Frame size: 65312 bytes
+DEBUG:root:Frame size: 65420 bytes
+DEBUG:root:Frame size: 66060 bytes
+DEBUG:root:Frame size: 67724 bytes
+DEBUG:root:Frame size: 68296 bytes
+DEBUG:root:Frame size: 68388 bytes
+DEBUG:root:Frame size: 68864 bytes
+DEBUG:root:Frame size: 69112 bytes
+DEBUG:root:Frame size: 70140 bytes
+DEBUG:root:Frame size: 70692 bytes
+DEBUG:root:Frame size: 70372 bytes
+DEBUG:root:Frame size: 69832 bytes
+DEBUG:root:Frame size: 69756 bytes
+DEBUG:root:Frame size: 68196 bytes
+DEBUG:root:Frame size: 70160 bytes
+DEBUG:root:Frame size: 70272 bytes
+DEBUG:root:Frame size: 71184 bytes
+DEBUG:root:Frame size: 68960 bytes
+DEBUG:root:Frame size: 69044 bytes
+DEBUG:root:Frame size: 69504 bytes
+DEBUG:root:Frame size: 72632 bytes
+DEBUG:root:Frame size: 70056 bytes
+DEBUG:root:Frame size: 70852 bytes
+DEBUG:root:Frame size: 71808 bytes
+DEBUG:root:Frame size: 73472 bytes
+DEBUG:root:Frame size: 72240 bytes
+DEBUG:root:Frame size: 74228 bytes
+DEBUG:root:Frame size: 73000 bytes
+DEBUG:root:Frame size: 68240 bytes
+DEBUG:root:Frame size: 68856 bytes
+DEBUG:root:Frame size: 72916 bytes
+DEBUG:root:Frame size: 74432 bytes
+DEBUG:root:Frame size: 72416 bytes
+DEBUG:root:Frame size: 75000 bytes
+DEBUG:root:Frame size: 75692 bytes
+DEBUG:root:Frame size: 76800 bytes
+DEBUG:root:Frame size: 77288 bytes
+DEBUG:root:Frame size: 78532 bytes
+DEBUG:root:Frame size: 76564 bytes
+DEBUG:root:Frame size: 77144 bytes
+DEBUG:root:Frame size: 66372 bytes
+DEBUG:root:Frame size: 62448 bytes
+DEBUG:root:Frame size: 77088 bytes
+DEBUG:root:Frame size: 67720 bytes
+DEBUG:root:Frame size: 69292 bytes
+DEBUG:root:Frame size: 71228 bytes
+DEBUG:root:Frame size: 77540 bytes
+DEBUG:root:Frame size: 76364 bytes
+DEBUG:root:Frame size: 72756 bytes
+DEBUG:root:Frame size: 73100 bytes
+DEBUG:root:Frame size: 68988 bytes
+DEBUG:root:Frame size: 72612 bytes
+DEBUG:root:Frame size: 67300 bytes
+DEBUG:root:Frame size: 69648 bytes
+DEBUG:root:Frame size: 74300 bytes
+DEBUG:root:Frame size: 74360 bytes
+DEBUG:root:Frame size: 75132 bytes
+DEBUG:root:Frame size: 74800 bytes
+DEBUG:root:Frame size: 73728 bytes
+DEBUG:root:Frame size: 75336 bytes
+DEBUG:root:Frame size: 77064 bytes
+DEBUG:root:Frame size: 72940 bytes
+DEBUG:root:Frame size: 74636 bytes
+DEBUG:root:Frame size: 76476 bytes
+DEBUG:root:Frame size: 74064 bytes
+DEBUG:root:Frame size: 75796 bytes
+DEBUG:root:Frame size: 74692 bytes
+DEBUG:root:Frame size: 74908 bytes
+DEBUG:root:Frame size: 72208 bytes
+DEBUG:root:Frame size: 74476 bytes
+DEBUG:root:Frame size: 73980 bytes
+DEBUG:root:Frame size: 72732 bytes
+DEBUG:root:Frame size: 73324 bytes
+DEBUG:root:Frame size: 72960 bytes
+DEBUG:root:Frame size: 71636 bytes
+DEBUG:root:Frame size: 71752 bytes
+DEBUG:root:Frame size: 71564 bytes
+DEBUG:root:Frame size: 72688 bytes
+DEBUG:root:Frame size: 72968 bytes
+DEBUG:root:Frame size: 73068 bytes
+DEBUG:root:Frame size: 73252 bytes
+DEBUG:root:Frame size: 71636 bytes
+DEBUG:root:Frame size: 72112 bytes
+DEBUG:root:Frame size: 71520 bytes
+DEBUG:root:Frame size: 73100 bytes
+DEBUG:root:Frame size: 72520 bytes
+DEBUG:root:Frame size: 71576 bytes
+DEBUG:root:Frame size: 71876 bytes
+DEBUG:root:Frame size: 72704 bytes
+DEBUG:root:Frame size: 73072 bytes
+DEBUG:root:Frame size: 72012 bytes
+DEBUG:root:Frame size: 72580 bytes
+DEBUG:root:Frame size: 73652 bytes
+DEBUG:root:Frame size: 73148 bytes
+DEBUG:root:Frame size: 74524 bytes
+DEBUG:root:Frame size: 74360 bytes
+DEBUG:root:Frame size: 73944 bytes
+DEBUG:root:Frame size: 73932 bytes
+DEBUG:root:Frame size: 75044 bytes
+DEBUG:root:Frame size: 74596 bytes
+DEBUG:root:Frame size: 72752 bytes
+DEBUG:root:Frame size: 72708 bytes
+DEBUG:root:Frame size: 73072 bytes
+DEBUG:root:Frame size: 72920 bytes
+DEBUG:root:Frame size: 73148 bytes
+DEBUG:root:Frame size: 72148 bytes
+DEBUG:root:Frame size: 72592 bytes
+DEBUG:root:Frame size: 73104 bytes
+DEBUG:root:Frame size: 72716 bytes
+DEBUG:root:Frame size: 72720 bytes
+DEBUG:root:Frame size: 72812 bytes
+DEBUG:root:Frame size: 72232 bytes
+DEBUG:root:Frame size: 71948 bytes
+DEBUG:root:Frame size: 72812 bytes
+DEBUG:root:Frame size: 72404 bytes
+DEBUG:root:Frame size: 71548 bytes
+DEBUG:root:Frame size: 70904 bytes
+DEBUG:root:Frame size: 71660 bytes
+DEBUG:root:Frame size: 71936 bytes
+DEBUG:root:Frame size: 71836 bytes
+DEBUG:root:Frame size: 71604 bytes
+DEBUG:root:Frame size: 71072 bytes
+DEBUG:root:Frame size: 72056 bytes
+DEBUG:root:Frame size: 72332 bytes
+DEBUG:root:Frame size: 71696 bytes
+DEBUG:root:Frame size: 71308 bytes
+DEBUG:root:Frame size: 72092 bytes
+DEBUG:root:Frame size: 71736 bytes
+DEBUG:root:Frame size: 71580 bytes
+DEBUG:root:Frame size: 71124 bytes
+DEBUG:root:Frame size: 71444 bytes
+DEBUG:root:Frame size: 70056 bytes
+DEBUG:root:Frame size: 63340 bytes
+DEBUG:root:Frame size: 57644 bytes
+DEBUG:root:Frame size: 40856 bytes
+DEBUG:root:Frame size: 34720 bytes
+DEBUG:root:Frame size: 34524 bytes
+DEBUG:root:Frame size: 34884 bytes
+DEBUG:root:Frame size: 38904 bytes
+DEBUG:root:Frame size: 39892 bytes
+DEBUG:root:Frame size: 44208 bytes
+DEBUG:root:Frame size: 43924 bytes
+DEBUG:root:Frame size: 46988 bytes
+DEBUG:root:Frame size: 49024 bytes
+DEBUG:root:Frame size: 58040 bytes
+DEBUG:root:Frame size: 44816 bytes
+DEBUG:root:Frame size: 42240 bytes
+DEBUG:root:Frame size: 35412 bytes
+DEBUG:root:Frame size: 36928 bytes
+DEBUG:root:Frame size: 37928 bytes
+DEBUG:root:Frame size: 52716 bytes
+DEBUG:root:Frame size: 56788 bytes
+DEBUG:root:Frame size: 51752 bytes
+DEBUG:root:Frame size: 46172 bytes
+DEBUG:root:Frame size: 40596 bytes
+DEBUG:root:Frame size: 45660 bytes
+DEBUG:root:Frame size: 46260 bytes
+DEBUG:root:Frame size: 50212 bytes
+DEBUG:root:Frame size: 44324 bytes
+DEBUG:root:Frame size: 40420 bytes
+DEBUG:root:Frame size: 36444 bytes
+DEBUG:root:Frame size: 33992 bytes
+DEBUG:root:Frame size: 40232 bytes
+DEBUG:root:Frame size: 37680 bytes
+DEBUG:root:Frame size: 35760 bytes
+DEBUG:root:Frame size: 42420 bytes
+DEBUG:root:Frame size: 36176 bytes
+DEBUG:root:Frame size: 37828 bytes
+DEBUG:root:Frame size: 40444 bytes
+DEBUG:root:Frame size: 36480 bytes
+DEBUG:root:Frame size: 37140 bytes
+DEBUG:root:Frame size: 41932 bytes
+DEBUG:root:Frame size: 37128 bytes
+DEBUG:root:Frame size: 38008 bytes
+DEBUG:root:Frame size: 36784 bytes
+DEBUG:root:Frame size: 37760 bytes
+DEBUG:root:Frame size: 47480 bytes
+DEBUG:root:Frame size: 38680 bytes
+DEBUG:root:Frame size: 39192 bytes
+DEBUG:root:Frame size: 39704 bytes
+DEBUG:root:Frame size: 39908 bytes
+DEBUG:root:Frame size: 49280 bytes
+DEBUG:root:Frame size: 54572 bytes
+DEBUG:root:Frame size: 39160 bytes
+DEBUG:root:Frame size: 39772 bytes
+DEBUG:root:Frame size: 42288 bytes
+DEBUG:root:Frame size: 42008 bytes
+DEBUG:root:Frame size: 42716 bytes
+DEBUG:root:Frame size: 40876 bytes
+DEBUG:root:Frame size: 41336 bytes
+DEBUG:root:Frame size: 50540 bytes
+DEBUG:root:Frame size: 56120 bytes
+DEBUG:root:Frame size: 41436 bytes
+DEBUG:root:Frame size: 60316 bytes
+DEBUG:root:Frame size: 56944 bytes
+DEBUG:root:Frame size: 42572 bytes
+DEBUG:root:Frame size: 43328 bytes
+DEBUG:root:Frame size: 50248 bytes
+DEBUG:root:Frame size: 50464 bytes
+DEBUG:root:Frame size: 46840 bytes
+DEBUG:root:Frame size: 47968 bytes
+DEBUG:root:Frame size: 47120 bytes
+DEBUG:root:Frame size: 56860 bytes
+DEBUG:root:Frame size: 58740 bytes
+DEBUG:root:Frame size: 47816 bytes
+DEBUG:root:Frame size: 47204 bytes
+DEBUG:root:Frame size: 63528 bytes
+DEBUG:root:Frame size: 49276 bytes
+DEBUG:root:Frame size: 48616 bytes
+DEBUG:root:Frame size: 55360 bytes
+DEBUG:root:Frame size: 57648 bytes
+DEBUG:root:Frame size: 51500 bytes
+DEBUG:root:Frame size: 57572 bytes
+DEBUG:root:Frame size: 54548 bytes
+DEBUG:root:Frame size: 50800 bytes
+DEBUG:root:Frame size: 63888 bytes
+DEBUG:root:Frame size: 64364 bytes
+DEBUG:root:Frame size: 52780 bytes
+DEBUG:root:Frame size: 55248 bytes
+DEBUG:root:Frame size: 63432 bytes
+DEBUG:root:Frame size: 54652 bytes
+DEBUG:root:Frame size: 58376 bytes
+DEBUG:root:Frame size: 59020 bytes
+DEBUG:root:Frame size: 56804 bytes
+DEBUG:root:Frame size: 64044 bytes
+DEBUG:root:Frame size: 62648 bytes
+DEBUG:root:Frame size: 57692 bytes
+DEBUG:root:Frame size: 56908 bytes
+DEBUG:root:Frame size: 64644 bytes
+DEBUG:root:Frame size: 64460 bytes
+DEBUG:root:Frame size: 58912 bytes
+DEBUG:root:Frame size: 60904 bytes
+DEBUG:root:Frame size: 63716 bytes
+DEBUG:root:Frame size: 62144 bytes
+DEBUG:root:Frame size: 64388 bytes
+DEBUG:root:Frame size: 61976 bytes
+DEBUG:root:Frame size: 62844 bytes
+DEBUG:root:Frame size: 64080 bytes
+DEBUG:root:Frame size: 64316 bytes
+DEBUG:root:Frame size: 64860 bytes
+DEBUG:root:Frame size: 64196 bytes
+DEBUG:root:Frame size: 64216 bytes
+DEBUG:root:Frame size: 64816 bytes
+DEBUG:root:Frame size: 64732 bytes
+DEBUG:root:Frame size: 64204 bytes
+DEBUG:root:Frame size: 64024 bytes
+DEBUG:root:Frame size: 64356 bytes
+DEBUG:root:Frame size: 64860 bytes
+DEBUG:root:Frame size: 64332 bytes
+DEBUG:root:Frame size: 65004 bytes
+DEBUG:root:Frame size: 64680 bytes
+DEBUG:root:Frame size: 64720 bytes
+DEBUG:root:Frame size: 64772 bytes
+DEBUG:root:Frame size: 64504 bytes
+DEBUG:root:Frame size: 64848 bytes
+DEBUG:root:Frame size: 65012 bytes
+DEBUG:root:Frame size: 64188 bytes
+DEBUG:root:Frame size: 64952 bytes
+DEBUG:root:Frame size: 64776 bytes
+DEBUG:root:Frame size: 64816 bytes
+DEBUG:root:Frame size: 64444 bytes
+DEBUG:root:Frame size: 64856 bytes
+DEBUG:root:Frame size: 64700 bytes
+DEBUG:root:Frame size: 64448 bytes
+DEBUG:root:Frame size: 64184 bytes
+DEBUG:root:Frame size: 64076 bytes
+DEBUG:root:Frame size: 64572 bytes
+DEBUG:root:Frame size: 64516 bytes
+DEBUG:root:Frame size: 64824 bytes
+DEBUG:root:Frame size: 64464 bytes
+DEBUG:root:Frame size: 64552 bytes
+DEBUG:root:Frame size: 64688 bytes
+DEBUG:root:Frame size: 64916 bytes
+DEBUG:root:Frame size: 64016 bytes
+DEBUG:root:Frame size: 64556 bytes
+DEBUG:root:Frame size: 64288 bytes
+DEBUG:root:Frame size: 64508 bytes
+DEBUG:root:Frame size: 64532 bytes
+DEBUG:root:Frame size: 64728 bytes
+DEBUG:root:Frame size: 64764 bytes
+DEBUG:root:Frame size: 64544 bytes
+DEBUG:root:Frame size: 64444 bytes
+DEBUG:root:Frame size: 64856 bytes
+DEBUG:root:Frame size: 64832 bytes
+DEBUG:root:Frame size: 64444 bytes
+DEBUG:root:Frame size: 64800 bytes
+DEBUG:root:Frame size: 64944 bytes
+DEBUG:root:Frame size: 64648 bytes
+DEBUG:root:Frame size: 64864 bytes
+DEBUG:root:Frame size: 64776 bytes
+DEBUG:root:Frame size: 64668 bytes
+DEBUG:root:Frame size: 64832 bytes
+DEBUG:root:Frame size: 64764 bytes
+DEBUG:root:Frame size: 64684 bytes
+DEBUG:root:Frame size: 64888 bytes
+DEBUG:root:Frame size: 64660 bytes
+DEBUG:root:Frame size: 64696 bytes
+DEBUG:root:Frame size: 64780 bytes
+DEBUG:root:Frame size: 64840 bytes
+DEBUG:root:Frame size: 64772 bytes
+DEBUG:root:Frame size: 64884 bytes
+DEBUG:root:Frame size: 64708 bytes
+DEBUG:root:Frame size: 64316 bytes
+DEBUG:root:Frame size: 64084 bytes
+DEBUG:root:Frame size: 63744 bytes
+DEBUG:root:Frame size: 64540 bytes
+DEBUG:root:Frame size: 64808 bytes
+DEBUG:root:Frame size: 64208 bytes
+DEBUG:root:Frame size: 64868 bytes
+DEBUG:root:Frame size: 64784 bytes
+DEBUG:root:Frame size: 64832 bytes
+DEBUG:root:Frame size: 64720 bytes
+DEBUG:root:Frame size: 64800 bytes
+DEBUG:root:Frame size: 64716 bytes
+DEBUG:root:Frame size: 64672 bytes
+DEBUG:root:Frame size: 64828 bytes
+DEBUG:root:Frame size: 64860 bytes
+DEBUG:root:Frame size: 64540 bytes
+DEBUG:root:Frame size: 64720 bytes
+DEBUG:root:Frame size: 64352 bytes
+DEBUG:root:Frame size: 64732 bytes
+DEBUG:root:Frame size: 64264 bytes
+DEBUG:root:Frame size: 64372 bytes
+DEBUG:root:Frame size: 64664 bytes
+DEBUG:root:Frame size: 64272 bytes
+DEBUG:root:Frame size: 64100 bytes
+DEBUG:root:Frame size: 61612 bytes
+DEBUG:root:Frame size: 63000 bytes
+DEBUG:root:Frame size: 63820 bytes
+DEBUG:root:Frame size: 64560 bytes
+DEBUG:root:Frame size: 62184 bytes
+DEBUG:root:Frame size: 62544 bytes
+DEBUG:root:Frame size: 52340 bytes
+DEBUG:root:Frame size: 57256 bytes
+DEBUG:root:Frame size: 49356 bytes
+DEBUG:root:Frame size: 52772 bytes
+DEBUG:root:Frame size: 56848 bytes
+DEBUG:root:Frame size: 58248 bytes
+DEBUG:root:Frame size: 54436 bytes
+DEBUG:root:Frame size: 56344 bytes
+DEBUG:root:Frame size: 54232 bytes
+DEBUG:root:Frame size: 54528 bytes
+DEBUG:root:Frame size: 51780 bytes
+DEBUG:root:Frame size: 59268 bytes
+DEBUG:root:Frame size: 55832 bytes
+DEBUG:root:Frame size: 54724 bytes
+DEBUG:root:Frame size: 62480 bytes
+DEBUG:root:Frame size: 61420 bytes
+DEBUG:root:Frame size: 64156 bytes
+DEBUG:root:Frame size: 63936 bytes
+DEBUG:root:Frame size: 64212 bytes
+DEBUG:root:Frame size: 63988 bytes
+DEBUG:root:Frame size: 63880 bytes
+DEBUG:root:Frame size: 64732 bytes
+DEBUG:root:Frame size: 62924 bytes
+DEBUG:root:Frame size: 62708 bytes
+DEBUG:root:Frame size: 64708 bytes
+DEBUG:root:Frame size: 64464 bytes
+DEBUG:root:Frame size: 63844 bytes
+DEBUG:root:Frame size: 64620 bytes
+DEBUG:root:Frame size: 64700 bytes
+DEBUG:root:Frame size: 64604 bytes
+DEBUG:root:Frame size: 64584 bytes
+DEBUG:root:Frame size: 64324 bytes
+DEBUG:root:Frame size: 64660 bytes
+DEBUG:root:Frame size: 64636 bytes
+DEBUG:root:Frame size: 64772 bytes
+DEBUG:root:Frame size: 64524 bytes
+DEBUG:root:Frame size: 64172 bytes
+DEBUG:root:Frame size: 64516 bytes
+DEBUG:root:Frame size: 64520 bytes
+DEBUG:root:Frame size: 64316 bytes
+DEBUG:root:Frame size: 64572 bytes
+DEBUG:root:Frame size: 64472 bytes
+DEBUG:root:Frame size: 64364 bytes
+DEBUG:root:Frame size: 64560 bytes
+DEBUG:root:Frame size: 64548 bytes
+DEBUG:root:Frame size: 64324 bytes
+DEBUG:root:Frame size: 64260 bytes
+DEBUG:root:Frame size: 64500 bytes
+DEBUG:root:Frame size: 64496 bytes
+DEBUG:root:Frame size: 62552 bytes
+DEBUG:root:Frame size: 64004 bytes
+DEBUG:root:Frame size: 63576 bytes
+DEBUG:root:Frame size: 61848 bytes
+DEBUG:root:Frame size: 62672 bytes
+DEBUG:root:Frame size: 64016 bytes
+DEBUG:root:Frame size: 63300 bytes
+DEBUG:root:Frame size: 64084 bytes
+DEBUG:root:Frame size: 62968 bytes
+DEBUG:root:Frame size: 63600 bytes
+DEBUG:root:Frame size: 64180 bytes
+DEBUG:root:Frame size: 64212 bytes
+DEBUG:root:Frame size: 64656 bytes
+DEBUG:root:Frame size: 64416 bytes
+DEBUG:root:Frame size: 63908 bytes
+DEBUG:root:Frame size: 63996 bytes
+DEBUG:root:Frame size: 64292 bytes
+DEBUG:root:Frame size: 63316 bytes
+DEBUG:root:Frame size: 64484 bytes
+DEBUG:root:Frame size: 64480 bytes
+DEBUG:root:Frame size: 63596 bytes
+DEBUG:root:Frame size: 63644 bytes
+DEBUG:root:Frame size: 64524 bytes
+DEBUG:root:Frame size: 64208 bytes
+DEBUG:root:Frame size: 63500 bytes
+DEBUG:root:Frame size: 64332 bytes
+DEBUG:root:Frame size: 63964 bytes
+DEBUG:root:Frame size: 62828 bytes
+DEBUG:root:Frame size: 64152 bytes
+DEBUG:root:Frame size: 64432 bytes
+DEBUG:root:Frame size: 63504 bytes
+DEBUG:root:Frame size: 64496 bytes
+DEBUG:root:Frame size: 64464 bytes
+DEBUG:root:Frame size: 63720 bytes
+DEBUG:root:Frame size: 64340 bytes
+DEBUG:root:Frame size: 64144 bytes
+DEBUG:root:Frame size: 64268 bytes
+DEBUG:root:Frame size: 64280 bytes
+DEBUG:root:Frame size: 64284 bytes
+DEBUG:root:Frame size: 64480 bytes
+DEBUG:root:Frame size: 64428 bytes
+DEBUG:root:Frame size: 63836 bytes
+DEBUG:root:Frame size: 63976 bytes
+DEBUG:root:Frame size: 64396 bytes
+DEBUG:root:Frame size: 64348 bytes
+DEBUG:root:Frame size: 64440 bytes
+DEBUG:root:Frame size: 62756 bytes
+DEBUG:root:Frame size: 63460 bytes
+DEBUG:root:Frame size: 63904 bytes
+DEBUG:root:Frame size: 64340 bytes
+DEBUG:root:Frame size: 64288 bytes
+DEBUG:root:Frame size: 64008 bytes
+DEBUG:root:Frame size: 63788 bytes
+DEBUG:root:Frame size: 64312 bytes
+DEBUG:root:Frame size: 64572 bytes
+DEBUG:root:Frame size: 63944 bytes
+DEBUG:root:Frame size: 63536 bytes
+DEBUG:root:Frame size: 64452 bytes
+DEBUG:root:Frame size: 62956 bytes
+DEBUG:root:Frame size: 64568 bytes
+DEBUG:root:Frame size: 64300 bytes
+DEBUG:root:Frame size: 64260 bytes
+DEBUG:root:Frame size: 64404 bytes
+DEBUG:root:Frame size: 63852 bytes
+DEBUG:root:Frame size: 64420 bytes
+DEBUG:root:Frame size: 63408 bytes
+DEBUG:root:Frame size: 63996 bytes
+DEBUG:root:Frame size: 64112 bytes
+DEBUG:root:Frame size: 64052 bytes
+DEBUG:root:Frame size: 62836 bytes
+DEBUG:root:Frame size: 64240 bytes
+DEBUG:root:Frame size: 64412 bytes
+DEBUG:root:Frame size: 63072 bytes
+DEBUG:root:Frame size: 64364 bytes
+DEBUG:root:Frame size: 64356 bytes
+DEBUG:root:Frame size: 64176 bytes
+DEBUG:root:Frame size: 64496 bytes
+DEBUG:root:Frame size: 64320 bytes
+DEBUG:root:Frame size: 63928 bytes
+DEBUG:root:Frame size: 63944 bytes
+DEBUG:root:Frame size: 64316 bytes
+DEBUG:root:Frame size: 64368 bytes
+DEBUG:root:Frame size: 64420 bytes
+DEBUG:root:Frame size: 64476 bytes
+DEBUG:root:Frame size: 64432 bytes
+DEBUG:root:Frame size: 64392 bytes
+DEBUG:root:Frame size: 64476 bytes
+DEBUG:root:Frame size: 64516 bytes
+DEBUG:root:Frame size: 64368 bytes
+DEBUG:root:Frame size: 64456 bytes
+DEBUG:root:Frame size: 64604 bytes
+DEBUG:root:Frame size: 64512 bytes
+DEBUG:root:Frame size: 64556 bytes
+DEBUG:root:Frame size: 64488 bytes
+DEBUG:root:Frame size: 64584 bytes
+DEBUG:root:Frame size: 64432 bytes
+DEBUG:root:Frame size: 64452 bytes
+DEBUG:root:Frame size: 64496 bytes
+DEBUG:root:Frame size: 64444 bytes
+DEBUG:root:Frame size: 64424 bytes
+DEBUG:root:Frame size: 64468 bytes
+DEBUG:root:Frame size: 64452 bytes
+DEBUG:root:Frame size: 64496 bytes
+DEBUG:root:Frame size: 64184 bytes
+DEBUG:root:Frame size: 64360 bytes
+DEBUG:root:Frame size: 64412 bytes
+DEBUG:root:Frame size: 64496 bytes
+DEBUG:root:Frame size: 64216 bytes
+DEBUG:root:Frame size: 63812 bytes
+DEBUG:root:Frame size: 63556 bytes
+DEBUG:root:Frame size: 64108 bytes
+DEBUG:root:Frame size: 64120 bytes
+DEBUG:root:Frame size: 64428 bytes
+DEBUG:root:Frame size: 64580 bytes
+DEBUG:root:Frame size: 64280 bytes
+DEBUG:root:Frame size: 64564 bytes
+DEBUG:root:Frame size: 64104 bytes
+DEBUG:root:Frame size: 64256 bytes
+DEBUG:root:Frame size: 64504 bytes
+DEBUG:root:Frame size: 64344 bytes
+DEBUG:root:Frame size: 64164 bytes
+DEBUG:root:Frame size: 64420 bytes
+DEBUG:root:Frame size: 64240 bytes
+DEBUG:root:Frame size: 64500 bytes
+DEBUG:root:Frame size: 64456 bytes
+DEBUG:root:Frame size: 64336 bytes
+DEBUG:root:Frame size: 64412 bytes
+DEBUG:root:Frame size: 64556 bytes
+DEBUG:root:Frame size: 64508 bytes
+DEBUG:root:Frame size: 64244 bytes
+DEBUG:root:Frame size: 64080 bytes
+DEBUG:root:Frame size: 64408 bytes
+DEBUG:root:Frame size: 64592 bytes
+DEBUG:root:Frame size: 64184 bytes
+DEBUG:root:Frame size: 64420 bytes
+DEBUG:root:Frame size: 63904 bytes
+DEBUG:root:Frame size: 64356 bytes
+DEBUG:root:Frame size: 64456 bytes
+DEBUG:root:Frame size: 62380 bytes
+DEBUG:root:Frame size: 64436 bytes
+DEBUG:root:Frame size: 64556 bytes
+DEBUG:root:Frame size: 64212 bytes
+DEBUG:root:Frame size: 64328 bytes
+DEBUG:root:Frame size: 64476 bytes
+DEBUG:root:Frame size: 64280 bytes
+DEBUG:root:Frame size: 64468 bytes
+DEBUG:root:Frame size: 64108 bytes
+DEBUG:root:Frame size: 64448 bytes
+DEBUG:root:Frame size: 64276 bytes
+DEBUG:root:Frame size: 64448 bytes
+DEBUG:root:Frame size: 64272 bytes
+DEBUG:root:Frame size: 64388 bytes
+DEBUG:root:Frame size: 64332 bytes
+DEBUG:root:Frame size: 64516 bytes
+DEBUG:root:Frame size: 64036 bytes
+DEBUG:root:Frame size: 64348 bytes
+DEBUG:root:Frame size: 64360 bytes
+DEBUG:root:Frame size: 64220 bytes
+DEBUG:root:Frame size: 64500 bytes
+DEBUG:root:Frame size: 64528 bytes
+DEBUG:root:Frame size: 64168 bytes
+DEBUG:root:Frame size: 64460 bytes
+DEBUG:root:Frame size: 64380 bytes
+DEBUG:root:Frame size: 64332 bytes
+DEBUG:root:Frame size: 64368 bytes
+DEBUG:root:Frame size: 64384 bytes
+DEBUG:root:Frame size: 64448 bytes
+DEBUG:root:Frame size: 64264 bytes
+DEBUG:root:Frame size: 64524 bytes
+DEBUG:root:Frame size: 64376 bytes
+DEBUG:root:Frame size: 64380 bytes
+DEBUG:root:Frame size: 64244 bytes
+DEBUG:root:Frame size: 64284 bytes
+DEBUG:root:Frame size: 64412 bytes
+DEBUG:root:Frame size: 63956 bytes
+DEBUG:root:Frame size: 64504 bytes
+DEBUG:root:Frame size: 64336 bytes
+DEBUG:root:Frame size: 63128 bytes
+DEBUG:root:Frame size: 64152 bytes
+DEBUG:root:Frame size: 64400 bytes
+DEBUG:root:Frame size: 64108 bytes
+DEBUG:root:Frame size: 64164 bytes
+DEBUG:root:Frame size: 64008 bytes
+DEBUG:root:Frame size: 64468 bytes
+DEBUG:root:Frame size: 64208 bytes
+DEBUG:root:Frame size: 64480 bytes
+DEBUG:root:Frame size: 64336 bytes
+DEBUG:root:Frame size: 64336 bytes
+DEBUG:root:Frame size: 64316 bytes
+DEBUG:root:Frame size: 64388 bytes
+DEBUG:root:Frame size: 64372 bytes
+DEBUG:root:Frame size: 64364 bytes
+DEBUG:root:Frame size: 64132 bytes
+DEBUG:root:Frame size: 64360 bytes
+DEBUG:root:Frame size: 64236 bytes
+DEBUG:root:Frame size: 63748 bytes
+DEBUG:root:Frame size: 64424 bytes
+DEBUG:root:Frame size: 64188 bytes
+DEBUG:root:Frame size: 63976 bytes
+DEBUG:root:Frame size: 64364 bytes
+DEBUG:root:Frame size: 64336 bytes
+DEBUG:root:Frame size: 64216 bytes
+DEBUG:root:Frame size: 64416 bytes
+DEBUG:root:Frame size: 64400 bytes
+DEBUG:root:Frame size: 63888 bytes
+DEBUG:root:Frame size: 63912 bytes
+DEBUG:root:Frame size: 64308 bytes
+DEBUG:root:Frame size: 64368 bytes
+DEBUG:root:Frame size: 64484 bytes
+DEBUG:root:Frame size: 64328 bytes
+DEBUG:root:Frame size: 64468 bytes
+DEBUG:root:Frame size: 64312 bytes
+DEBUG:root:Frame size: 64508 bytes
+DEBUG:root:Frame size: 64392 bytes
+DEBUG:root:Frame size: 64572 bytes
+DEBUG:root:Frame size: 63932 bytes
+DEBUG:root:Frame size: 64540 bytes
+DEBUG:root:Frame size: 64632 bytes
+DEBUG:root:Frame size: 64176 bytes
+DEBUG:root:Frame size: 64464 bytes
+DEBUG:root:Frame size: 64508 bytes
+DEBUG:root:Frame size: 64444 bytes
+DEBUG:root:Frame size: 64504 bytes
+DEBUG:root:Frame size: 63364 bytes
+DEBUG:root:Frame size: 63404 bytes
+DEBUG:root:Frame size: 64588 bytes
+DEBUG:root:Frame size: 64340 bytes
+DEBUG:root:Frame size: 64332 bytes
+DEBUG:root:Frame size: 63900 bytes
+DEBUG:root:Frame size: 64120 bytes
+DEBUG:root:Frame size: 64536 bytes
+DEBUG:root:Frame size: 64052 bytes
+DEBUG:root:Frame size: 63536 bytes
+DEBUG:root:Frame size: 64264 bytes
+DEBUG:root:Frame size: 64276 bytes
+DEBUG:root:Frame size: 63748 bytes
+DEBUG:root:Frame size: 62588 bytes
+DEBUG:root:Frame size: 63744 bytes
+DEBUG:root:Frame size: 64532 bytes
+DEBUG:root:Frame size: 64264 bytes
+DEBUG:root:Frame size: 63356 bytes
+DEBUG:root:Frame size: 64284 bytes
+DEBUG:root:Frame size: 64056 bytes
+DEBUG:root:Frame size: 62516 bytes
+DEBUG:root:Frame size: 63820 bytes
+DEBUG:root:Frame size: 64260 bytes
+DEBUG:root:Frame size: 62720 bytes
+DEBUG:root:Frame size: 59868 bytes
+DEBUG:root:Frame size: 59464 bytes
+DEBUG:root:Frame size: 63696 bytes
+DEBUG:root:Frame size: 64356 bytes
+DEBUG:root:Frame size: 64036 bytes
+DEBUG:root:Frame size: 64024 bytes
+DEBUG:root:Frame size: 58756 bytes
+DEBUG:root:Frame size: 63540 bytes
+DEBUG:root:Frame size: 60100 bytes
+DEBUG:root:Frame size: 63016 bytes
+DEBUG:root:Frame size: 64236 bytes
+DEBUG:root:Frame size: 63988 bytes
+DEBUG:root:Frame size: 59636 bytes
+DEBUG:root:Frame size: 61544 bytes
+DEBUG:root:Frame size: 54188 bytes
+DEBUG:root:Frame size: 63716 bytes
+DEBUG:root:Frame size: 63932 bytes
+DEBUG:root:Frame size: 54948 bytes
+DEBUG:root:Frame size: 64268 bytes
+DEBUG:root:Frame size: 64628 bytes
+DEBUG:root:Frame size: 58992 bytes
+DEBUG:root:Frame size: 64592 bytes
+DEBUG:root:Frame size: 64428 bytes
+DEBUG:root:Frame size: 63220 bytes
+DEBUG:root:Frame size: 64252 bytes
+DEBUG:root:Frame size: 64240 bytes
+DEBUG:root:Frame size: 64168 bytes
+DEBUG:root:Frame size: 62496 bytes
+DEBUG:root:Frame size: 64376 bytes
+DEBUG:root:Frame size: 63636 bytes
+DEBUG:root:Frame size: 60136 bytes
+DEBUG:root:Frame size: 62792 bytes
+DEBUG:root:Frame size: 45604 bytes
+DEBUG:root:Frame size: 41648 bytes
+DEBUG:root:Frame size: 50024 bytes
+DEBUG:root:Frame size: 49336 bytes
+DEBUG:root:Frame size: 50136 bytes
+DEBUG:root:Frame size: 61744 bytes
+DEBUG:root:Frame size: 64180 bytes
+DEBUG:root:Frame size: 63260 bytes
+DEBUG:root:Frame size: 57248 bytes
+DEBUG:root:Frame size: 64104 bytes
+DEBUG:root:Frame size: 64452 bytes
+DEBUG:root:Frame size: 59300 bytes
+DEBUG:root:Frame size: 64028 bytes
+DEBUG:root:Frame size: 64228 bytes
+DEBUG:root:Frame size: 63560 bytes
+DEBUG:root:Frame size: 64024 bytes
+DEBUG:root:Frame size: 63936 bytes
+DEBUG:root:Frame size: 63088 bytes
+DEBUG:root:Frame size: 63108 bytes
+DEBUG:root:Frame size: 64076 bytes
+DEBUG:root:Frame size: 64360 bytes
+DEBUG:root:Frame size: 62752 bytes
+DEBUG:root:Frame size: 64432 bytes
+DEBUG:root:Frame size: 64612 bytes
+DEBUG:root:Frame size: 63924 bytes
+DEBUG:root:Frame size: 64044 bytes
+DEBUG:root:Frame size: 64360 bytes
+DEBUG:root:Frame size: 64132 bytes
+DEBUG:root:Frame size: 63576 bytes
+DEBUG:root:Frame size: 64536 bytes
+DEBUG:root:Frame size: 64496 bytes
+DEBUG:root:Frame size: 64156 bytes
+DEBUG:root:Frame size: 64584 bytes
+DEBUG:root:Frame size: 64664 bytes
+DEBUG:root:Frame size: 63980 bytes
+DEBUG:root:Frame size: 64668 bytes
+DEBUG:root:Frame size: 64528 bytes
+DEBUG:root:Frame size: 64728 bytes
+DEBUG:root:Frame size: 64408 bytes
+DEBUG:root:Frame size: 64132 bytes
+DEBUG:root:Frame size: 64544 bytes
+DEBUG:root:Frame size: 64568 bytes
+DEBUG:root:Frame size: 64512 bytes
+DEBUG:root:Frame size: 64672 bytes
+DEBUG:root:Frame size: 64656 bytes
+DEBUG:root:Frame size: 64460 bytes
+DEBUG:root:Frame size: 64568 bytes
+DEBUG:root:Frame size: 64804 bytes
+DEBUG:root:Frame size: 64700 bytes
+DEBUG:root:Frame size: 64588 bytes
+DEBUG:root:Frame size: 64648 bytes
+DEBUG:root:Frame size: 64836 bytes
+DEBUG:root:Frame size: 64744 bytes
+DEBUG:root:Frame size: 64592 bytes
+DEBUG:root:Frame size: 64660 bytes
+DEBUG:root:Frame size: 64860 bytes
+DEBUG:root:Frame size: 64752 bytes
+DEBUG:root:Frame size: 64812 bytes
+DEBUG:root:Frame size: 64740 bytes
+DEBUG:root:Frame size: 64548 bytes
+DEBUG:root:Frame size: 64736 bytes
+DEBUG:root:Frame size: 64772 bytes
+DEBUG:root:Frame size: 64820 bytes
+DEBUG:root:Frame size: 64832 bytes
+DEBUG:root:Frame size: 64696 bytes
+DEBUG:root:Frame size: 64556 bytes
+DEBUG:root:Frame size: 64840 bytes
+DEBUG:root:Frame size: 64888 bytes
+DEBUG:root:Frame size: 64736 bytes
+DEBUG:root:Frame size: 64796 bytes
+DEBUG:root:Frame size: 64812 bytes
+DEBUG:root:Frame size: 64804 bytes
+DEBUG:root:Frame size: 64724 bytes
+DEBUG:root:Frame size: 64812 bytes
+DEBUG:root:Frame size: 64788 bytes
+DEBUG:root:Frame size: 64888 bytes
+DEBUG:root:Frame size: 64188 bytes
+DEBUG:root:Frame size: 64680 bytes
+DEBUG:root:Frame size: 64964 bytes
+DEBUG:root:Frame size: 64604 bytes
+DEBUG:root:Frame size: 64888 bytes
+DEBUG:root:Frame size: 64920 bytes
+DEBUG:root:Frame size: 64836 bytes
+DEBUG:root:Frame size: 64924 bytes
+DEBUG:root:Frame size: 64864 bytes
+DEBUG:root:Frame size: 65084 bytes
+DEBUG:root:Frame size: 65044 bytes
+DEBUG:root:Frame size: 64876 bytes
+DEBUG:root:Frame size: 64952 bytes
+DEBUG:root:Frame size: 64960 bytes
+DEBUG:root:Frame size: 65016 bytes
+DEBUG:root:Frame size: 64992 bytes
+DEBUG:root:Frame size: 64912 bytes
+DEBUG:root:Frame size: 65076 bytes
+DEBUG:root:Frame size: 65028 bytes
+DEBUG:root:Frame size: 65096 bytes
+DEBUG:root:Frame size: 64964 bytes
+DEBUG:root:Frame size: 65076 bytes
+DEBUG:root:Frame size: 64820 bytes
+DEBUG:root:Frame size: 64968 bytes
+DEBUG:root:Frame size: 58948 bytes
+DEBUG:root:Frame size: 52036 bytes
+DEBUG:root:Frame size: 62704 bytes
+DEBUG:root:Frame size: 65184 bytes
+DEBUG:root:Frame size: 61612 bytes
+DEBUG:root:Frame size: 61592 bytes
+DEBUG:root:Frame size: 61400 bytes
+DEBUG:root:Frame size: 60172 bytes
+DEBUG:root:Frame size: 60756 bytes
+DEBUG:root:Frame size: 64616 bytes
+DEBUG:root:Frame size: 50308 bytes
+DEBUG:root:Frame size: 57672 bytes
+DEBUG:root:Frame size: 57136 bytes
+DEBUG:root:Frame size: 60356 bytes
+DEBUG:root:Frame size: 54360 bytes
+DEBUG:root:Frame size: 56088 bytes
+DEBUG:root:Frame size: 65112 bytes
+DEBUG:root:Frame size: 63712 bytes
+DEBUG:root:Frame size: 62076 bytes
+DEBUG:root:Frame size: 64812 bytes
+DEBUG:root:Frame size: 63972 bytes
+DEBUG:root:Frame size: 64088 bytes
+DEBUG:root:Frame size: 63888 bytes
+DEBUG:root:Frame size: 64904 bytes
+DEBUG:root:Frame size: 64904 bytes
+DEBUG:root:Frame size: 64496 bytes
+DEBUG:root:Frame size: 64656 bytes
+DEBUG:root:Frame size: 64936 bytes
+DEBUG:root:Frame size: 64212 bytes
+DEBUG:root:Frame size: 64432 bytes
+DEBUG:root:Frame size: 65068 bytes
+DEBUG:root:Frame size: 65048 bytes
+DEBUG:root:Frame size: 63776 bytes
+DEBUG:root:Frame size: 64640 bytes
+DEBUG:root:Frame size: 65028 bytes
+DEBUG:root:Frame size: 65064 bytes
+DEBUG:root:Frame size: 64992 bytes
+DEBUG:root:Frame size: 65084 bytes
+DEBUG:root:Frame size: 65052 bytes
+DEBUG:root:Frame size: 64988 bytes
+DEBUG:root:Frame size: 65076 bytes
+DEBUG:root:Frame size: 63392 bytes
+DEBUG:root:Frame size: 64144 bytes
+DEBUG:root:Frame size: 64896 bytes
+DEBUG:root:Frame size: 64408 bytes
+DEBUG:root:Frame size: 64188 bytes
+DEBUG:root:Frame size: 64804 bytes
+DEBUG:root:Frame size: 64112 bytes
+DEBUG:root:Frame size: 50512 bytes
+DEBUG:root:Frame size: 48100 bytes
+DEBUG:root:Frame size: 61684 bytes
+DEBUG:root:Frame size: 62872 bytes
+DEBUG:root:Frame size: 59720 bytes
+DEBUG:root:Frame size: 56816 bytes
+DEBUG:root:Frame size: 63216 bytes
+DEBUG:root:Frame size: 58240 bytes
+DEBUG:root:Frame size: 56904 bytes
+DEBUG:root:Frame size: 64836 bytes
+DEBUG:root:Frame size: 63916 bytes
+DEBUG:root:Frame size: 59956 bytes
+DEBUG:root:Frame size: 62104 bytes
+DEBUG:root:Frame size: 62128 bytes
+DEBUG:root:Frame size: 60508 bytes
+DEBUG:root:Frame size: 64460 bytes
+DEBUG:root:Frame size: 65084 bytes
+DEBUG:root:Frame size: 62396 bytes
+DEBUG:root:Frame size: 63380 bytes
+DEBUG:root:Frame size: 64320 bytes
+DEBUG:root:Frame size: 64336 bytes
+DEBUG:root:Frame size: 64532 bytes
+DEBUG:root:Frame size: 62468 bytes
+DEBUG:root:Frame size: 64660 bytes
+DEBUG:root:Frame size: 62384 bytes
+DEBUG:root:Frame size: 57932 bytes
+DEBUG:root:Frame size: 61224 bytes
+DEBUG:root:Frame size: 60480 bytes
+DEBUG:root:Frame size: 62344 bytes
+DEBUG:root:Frame size: 64904 bytes
+DEBUG:root:Frame size: 63300 bytes
+DEBUG:root:Frame size: 61984 bytes
+DEBUG:root:Frame size: 64680 bytes
+DEBUG:root:Frame size: 63780 bytes
+DEBUG:root:Frame size: 64732 bytes
+DEBUG:root:Frame size: 64180 bytes
+DEBUG:root:Frame size: 64020 bytes
+DEBUG:root:Frame size: 64376 bytes
+DEBUG:root:Frame size: 64012 bytes
+DEBUG:root:Frame size: 64388 bytes
+DEBUG:root:Frame size: 64244 bytes
+DEBUG:root:Frame size: 64332 bytes
+DEBUG:root:Frame size: 64548 bytes
+DEBUG:root:Frame size: 63608 bytes
+DEBUG:root:Frame size: 63208 bytes
+DEBUG:root:Frame size: 64704 bytes
+DEBUG:root:Frame size: 65040 bytes
+DEBUG:root:Frame size: 62940 bytes
+DEBUG:root:Frame size: 63024 bytes
+DEBUG:root:Frame size: 64244 bytes
+DEBUG:root:Frame size: 64324 bytes
+DEBUG:root:Frame size: 63988 bytes
+DEBUG:root:Frame size: 64768 bytes
+DEBUG:root:Frame size: 64520 bytes
+DEBUG:root:Frame size: 61988 bytes
+DEBUG:root:Frame size: 65048 bytes
+DEBUG:root:Frame size: 65000 bytes
+DEBUG:root:Frame size: 63692 bytes
+DEBUG:root:Frame size: 64208 bytes
+DEBUG:root:Frame size: 64528 bytes
+DEBUG:root:Frame size: 64324 bytes
+DEBUG:root:Frame size: 64840 bytes
+DEBUG:root:Frame size: 64484 bytes
+DEBUG:root:Frame size: 64788 bytes
+DEBUG:root:Frame size: 64468 bytes
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747735929.57706 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1280, 720)}
+DEBUG:root:Frame size: 66472 bytes
+DEBUG:root:Frame size: 66068 bytes
+DEBUG:root:Frame size: 66140 bytes
+DEBUG:root:Frame size: 66184 bytes
+DEBUG:root:Frame size: 66316 bytes
+DEBUG:root:Frame size: 66144 bytes
+DEBUG:root:Frame size: 65696 bytes
+DEBUG:root:Frame size: 66344 bytes
+DEBUG:root:Frame size: 66308 bytes
+DEBUG:root:Frame size: 66064 bytes
+DEBUG:root:Frame size: 66304 bytes
+DEBUG:root:Frame size: 66360 bytes
+DEBUG:root:Frame size: 66148 bytes
+DEBUG:root:Frame size: 66068 bytes
+DEBUG:root:Frame size: 66020 bytes
+DEBUG:root:Frame size: 65992 bytes
+DEBUG:root:Frame size: 66116 bytes
+DEBUG:root:Frame size: 66432 bytes
+DEBUG:root:Frame size: 65852 bytes
+DEBUG:root:Frame size: 66224 bytes
+DEBUG:root:Frame size: 66188 bytes
+DEBUG:root:Frame size: 65988 bytes
+DEBUG:root:Frame size: 66040 bytes
+DEBUG:root:Frame size: 66116 bytes
+DEBUG:root:Frame size: 66336 bytes
+DEBUG:root:Frame size: 66240 bytes
+DEBUG:root:Frame size: 65868 bytes
+DEBUG:root:Frame size: 66084 bytes
+DEBUG:root:Frame size: 65760 bytes
+DEBUG:root:Frame size: 66228 bytes
+DEBUG:root:Frame size: 66140 bytes
+DEBUG:root:Frame size: 65832 bytes
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 64, 'resolution': (1280, 720)}
+DEBUG:root:Frame size: 66184 bytes
+DEBUG:root:Frame size: 66132 bytes
+DEBUG:root:Frame size: 66160 bytes
+DEBUG:root:Frame size: 66148 bytes
+DEBUG:root:Frame size: 66224 bytes
+DEBUG:root:Frame size: 66192 bytes
+DEBUG:root:Frame size: 66308 bytes
+DEBUG:root:Frame size: 65892 bytes
+DEBUG:root:Frame size: 66016 bytes
+DEBUG:root:Frame size: 66292 bytes
+DEBUG:root:Frame size: 66248 bytes
+DEBUG:root:Frame size: 66188 bytes
+DEBUG:root:Frame size: 66144 bytes
+DEBUG:root:Frame size: 66320 bytes
+DEBUG:root:Frame size: 66192 bytes
+DEBUG:root:Frame size: 66140 bytes
+DEBUG:root:Frame size: 66288 bytes
+DEBUG:root:Frame size: 66340 bytes
+DEBUG:root:Frame size: 66312 bytes
+DEBUG:root:Frame size: 66108 bytes
+DEBUG:root:Frame size: 66260 bytes
+DEBUG:root:Frame size: 66356 bytes
+DEBUG:root:Frame size: 66248 bytes
+DEBUG:root:Frame size: 66168 bytes
+DEBUG:root:Frame size: 65980 bytes
+DEBUG:root:Frame size: 66196 bytes
+DEBUG:root:Frame size: 66268 bytes
+DEBUG:root:Frame size: 66208 bytes
+DEBUG:root:Frame size: 66380 bytes
+DEBUG:root:Frame size: 66236 bytes
+DEBUG:root:Frame size: 66280 bytes
+DEBUG:root:Frame size: 66172 bytes
+DEBUG:root:Frame size: 66220 bytes
+DEBUG:root:Frame size: 66308 bytes
+DEBUG:root:Frame size: 65952 bytes
+DEBUG:root:Frame size: 66268 bytes
+DEBUG:root:Frame size: 66292 bytes
+DEBUG:root:Frame size: 66036 bytes
+DEBUG:root:Frame size: 66204 bytes
+DEBUG:root:Frame size: 66172 bytes
+DEBUG:root:Frame size: 66188 bytes
+DEBUG:root:Frame size: 66280 bytes
+DEBUG:root:Frame size: 66276 bytes
+DEBUG:root:Frame size: 66328 bytes
+DEBUG:root:Frame size: 66368 bytes
+DEBUG:root:Frame size: 66060 bytes
+DEBUG:root:Frame size: 66280 bytes
+DEBUG:root:Frame size: 66256 bytes
+DEBUG:root:Frame size: 66100 bytes
+DEBUG:root:Frame size: 66216 bytes
+DEBUG:root:Frame size: 66224 bytes
+DEBUG:root:Frame size: 66256 bytes
+DEBUG:root:Frame size: 66292 bytes
+DEBUG:root:Frame size: 66204 bytes
+DEBUG:root:Frame size: 66132 bytes
+DEBUG:root:Frame size: 66372 bytes
+DEBUG:root:Frame size: 66140 bytes
+DEBUG:root:Frame size: 66152 bytes
+DEBUG:root:Frame size: 66144 bytes
+DEBUG:root:Frame size: 66104 bytes
+DEBUG:root:Frame size: 66144 bytes
+DEBUG:root:Frame size: 66016 bytes
+DEBUG:root:Frame size: 66200 bytes
+DEBUG:root:Frame size: 66308 bytes
+DEBUG:root:Frame size: 66344 bytes
+DEBUG:root:Frame size: 66296 bytes
+DEBUG:root:Frame size: 66248 bytes
+DEBUG:root:Frame size: 66328 bytes
+DEBUG:root:Frame size: 66260 bytes
+DEBUG:root:Frame size: 66436 bytes
+DEBUG:root:Frame size: 66288 bytes
+DEBUG:root:Frame size: 66388 bytes
+DEBUG:root:Frame size: 66432 bytes
+DEBUG:root:Frame size: 66280 bytes
+DEBUG:root:Frame size: 66260 bytes
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 64, 'resolution': (1280, 720)}
+DEBUG:root:Frame size: 66608 bytes
+DEBUG:root:Frame size: 66608 bytes
+DEBUG:root:Frame size: 66532 bytes
+DEBUG:root:Frame size: 66604 bytes
+DEBUG:root:Frame size: 66552 bytes
+DEBUG:root:Frame size: 66372 bytes
+DEBUG:root:Frame size: 66488 bytes
+DEBUG:root:Frame size: 66600 bytes
+DEBUG:root:Frame size: 66300 bytes
+DEBUG:root:Frame size: 66488 bytes
+DEBUG:root:Frame size: 66448 bytes
+DEBUG:root:Frame size: 66340 bytes
+DEBUG:root:Frame size: 66524 bytes
+DEBUG:root:Frame size: 66432 bytes
+DEBUG:root:Frame size: 66468 bytes
+DEBUG:root:Frame size: 66668 bytes
+DEBUG:root:Frame size: 66352 bytes
+DEBUG:root:Frame size: 66740 bytes
+DEBUG:root:Frame size: 66496 bytes
+DEBUG:root:Frame size: 66660 bytes
+DEBUG:root:Frame size: 66624 bytes
+DEBUG:root:Frame size: 66332 bytes
+DEBUG:root:Frame size: 66476 bytes
+DEBUG:root:Frame size: 66528 bytes
+DEBUG:root:Frame size: 66628 bytes
+DEBUG:root:Frame size: 66732 bytes
+DEBUG:root:Frame size: 66500 bytes
+DEBUG:root:Frame size: 66636 bytes
+DEBUG:root:Frame size: 66568 bytes
+DEBUG:root:Frame size: 66516 bytes
+DEBUG:root:Frame size: 66680 bytes
+DEBUG:root:Frame size: 66508 bytes
+DEBUG:root:Frame size: 66688 bytes
+DEBUG:root:Frame size: 66568 bytes
+DEBUG:root:Frame size: 66548 bytes
+DEBUG:root:Frame size: 66984 bytes
+DEBUG:root:Frame size: 66744 bytes
+DEBUG:root:Frame size: 66792 bytes
+DEBUG:root:Frame size: 66688 bytes
+DEBUG:root:Frame size: 66744 bytes
+DEBUG:root:Frame size: 66804 bytes
+DEBUG:root:Frame size: 66764 bytes
+DEBUG:root:Frame size: 66812 bytes
+DEBUG:root:Frame size: 66772 bytes
+DEBUG:root:Frame size: 66864 bytes
+DEBUG:root:Frame size: 66824 bytes
+DEBUG:root:Frame size: 66796 bytes
+DEBUG:root:Frame size: 66660 bytes
+DEBUG:root:Frame size: 66792 bytes
+DEBUG:root:Frame size: 66712 bytes
+DEBUG:root:Frame size: 66736 bytes
+DEBUG:root:Frame size: 66852 bytes
+DEBUG:root:Frame size: 66668 bytes
+DEBUG:root:Frame size: 66924 bytes
+DEBUG:root:Frame size: 66848 bytes
+DEBUG:root:Frame size: 66852 bytes
+DEBUG:root:Frame size: 66528 bytes
+DEBUG:root:Frame size: 66816 bytes
+DEBUG:root:Frame size: 66596 bytes
+DEBUG:root:Frame size: 66592 bytes
+DEBUG:root:Frame size: 66640 bytes
+DEBUG:root:Frame size: 66624 bytes
+DEBUG:root:Frame size: 66616 bytes
+DEBUG:root:Frame size: 66512 bytes
+DEBUG:root:Frame size: 66148 bytes
+DEBUG:root:Frame size: 66464 bytes
+DEBUG:root:Frame size: 66472 bytes
+DEBUG:root:Frame size: 66672 bytes
+DEBUG:root:Frame size: 66728 bytes
+DEBUG:root:Frame size: 66716 bytes
+DEBUG:root:Frame size: 66564 bytes
+DEBUG:root:Frame size: 66716 bytes
+DEBUG:root:Frame size: 66416 bytes
+DEBUG:root:Frame size: 66568 bytes
+DEBUG:root:Frame size: 66712 bytes
+DEBUG:root:Frame size: 66500 bytes
+DEBUG:root:Frame size: 66712 bytes
+DEBUG:root:Frame size: 66584 bytes
+DEBUG:root:Frame size: 66532 bytes
+DEBUG:root:Frame size: 66680 bytes
+DEBUG:root:Frame size: 66368 bytes
+DEBUG:root:Frame size: 66464 bytes
+DEBUG:root:Frame size: 66528 bytes
+DEBUG:root:Frame size: 66540 bytes
+DEBUG:root:Frame size: 66620 bytes
+DEBUG:root:Frame size: 66696 bytes
+DEBUG:root:Frame size: 66616 bytes
+DEBUG:root:Frame size: 66496 bytes
+DEBUG:root:Frame size: 66564 bytes
+DEBUG:root:Frame size: 66596 bytes
+DEBUG:root:Frame size: 66344 bytes
+DEBUG:root:Frame size: 66484 bytes
+DEBUG:root:Frame size: 66816 bytes
+DEBUG:root:Frame size: 66756 bytes
+DEBUG:root:Frame size: 66720 bytes
+DEBUG:root:Frame size: 66572 bytes
+DEBUG:root:Frame size: 66864 bytes
+DEBUG:root:Frame size: 66832 bytes
+DEBUG:root:Frame size: 66764 bytes
+DEBUG:root:Frame size: 66792 bytes
+DEBUG:root:Frame size: 66908 bytes
+DEBUG:root:Frame size: 66808 bytes
+DEBUG:root:Frame size: 66748 bytes
+DEBUG:root:Frame size: 66716 bytes
+DEBUG:root:Frame size: 66676 bytes
+DEBUG:root:Frame size: 66676 bytes
+DEBUG:root:Frame size: 66868 bytes
+DEBUG:root:Frame size: 66844 bytes
+DEBUG:root:Frame size: 66832 bytes
+DEBUG:root:Frame size: 66824 bytes
+DEBUG:root:Frame size: 66932 bytes
+DEBUG:root:Frame size: 66612 bytes
+DEBUG:root:Frame size: 66816 bytes
+DEBUG:root:Frame size: 66800 bytes
+DEBUG:root:Frame size: 66624 bytes
+DEBUG:root:Frame size: 66456 bytes
+DEBUG:root:Frame size: 66540 bytes
+DEBUG:root:Frame size: 66516 bytes
+DEBUG:root:Frame size: 66780 bytes
+DEBUG:root:Frame size: 66568 bytes
+DEBUG:root:Frame size: 66588 bytes
+DEBUG:root:Frame size: 66644 bytes
+DEBUG:root:Frame size: 66884 bytes
+DEBUG:root:Frame size: 66608 bytes
+DEBUG:root:Frame size: 66756 bytes
+DEBUG:root:Frame size: 66776 bytes
+DEBUG:root:Frame size: 66776 bytes
+DEBUG:root:Frame size: 66820 bytes
+DEBUG:root:Frame size: 66828 bytes
+DEBUG:root:Frame size: 66748 bytes
+DEBUG:root:Frame size: 66832 bytes
+DEBUG:root:Frame size: 66460 bytes
+DEBUG:root:Frame size: 66464 bytes
+DEBUG:root:Frame size: 66388 bytes
+DEBUG:root:Frame size: 66464 bytes
+DEBUG:root:Frame size: 66304 bytes
+DEBUG:root:Frame size: 66724 bytes
+DEBUG:root:Frame size: 65612 bytes
+DEBUG:root:Frame size: 66624 bytes
+DEBUG:root:Frame size: 66252 bytes
+DEBUG:root:Frame size: 66216 bytes
+DEBUG:root:Frame size: 66728 bytes
+DEBUG:root:Frame size: 66780 bytes
+DEBUG:root:Frame size: 66732 bytes
+DEBUG:root:Frame size: 66464 bytes
+DEBUG:root:Frame size: 66608 bytes
+DEBUG:root:Frame size: 62948 bytes
+DEBUG:root:Frame size: 66544 bytes
+DEBUG:root:Frame size: 64896 bytes
+DEBUG:root:Frame size: 66668 bytes
+DEBUG:root:Frame size: 64944 bytes
+DEBUG:root:Frame size: 66508 bytes
+DEBUG:root:Frame size: 65520 bytes
+DEBUG:root:Frame size: 66568 bytes
+DEBUG:root:Frame size: 66592 bytes
+DEBUG:root:Frame size: 66300 bytes
+DEBUG:root:Frame size: 66524 bytes
+DEBUG:root:Frame size: 65708 bytes
+DEBUG:root:Frame size: 66584 bytes
+DEBUG:root:Frame size: 66420 bytes
+DEBUG:root:Frame size: 66620 bytes
+DEBUG:root:Frame size: 65932 bytes
+DEBUG:root:Frame size: 66044 bytes
+DEBUG:root:Frame size: 66100 bytes
+DEBUG:root:Frame size: 66304 bytes
+DEBUG:root:Frame size: 66636 bytes
+DEBUG:root:Frame size: 66316 bytes
+DEBUG:root:Frame size: 66476 bytes
+DEBUG:root:Frame size: 66516 bytes
+DEBUG:root:Frame size: 66588 bytes
+DEBUG:root:Frame size: 66196 bytes
+DEBUG:root:Frame size: 66504 bytes
+DEBUG:root:Frame size: 66400 bytes
+DEBUG:root:Frame size: 66468 bytes
+DEBUG:root:Frame size: 66152 bytes
+DEBUG:root:Frame size: 53172 bytes
+DEBUG:root:Frame size: 61828 bytes
+DEBUG:root:Frame size: 66364 bytes
+DEBUG:root:Frame size: 64504 bytes
+DEBUG:root:Frame size: 64504 bytes
+DEBUG:root:Frame size: 66460 bytes
+DEBUG:root:Frame size: 66136 bytes
+DEBUG:root:Frame size: 65176 bytes
+DEBUG:root:Frame size: 66488 bytes
+DEBUG:root:Frame size: 66572 bytes
+DEBUG:root:Frame size: 66372 bytes
+DEBUG:root:Frame size: 65960 bytes
+DEBUG:root:Frame size: 66260 bytes
+DEBUG:root:Frame size: 66396 bytes
+DEBUG:root:Frame size: 66504 bytes
+DEBUG:root:Frame size: 66444 bytes
+DEBUG:root:Frame size: 66416 bytes
+DEBUG:root:Frame size: 66264 bytes
+DEBUG:root:Frame size: 66252 bytes
+DEBUG:root:Frame size: 65640 bytes
+DEBUG:root:Frame size: 65264 bytes
+DEBUG:root:Frame size: 66348 bytes
+DEBUG:root:Frame size: 66336 bytes
+DEBUG:root:Frame size: 66548 bytes
+DEBUG:root:Frame size: 66452 bytes
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 100, 'resolution': (1280, 720)}
+DEBUG:root:Frame size: 67516 bytes
+DEBUG:root:Frame size: 67708 bytes
+DEBUG:root:Frame size: 67472 bytes
+DEBUG:root:Frame size: 67624 bytes
+DEBUG:root:Frame size: 67820 bytes
+DEBUG:root:Frame size: 67692 bytes
+DEBUG:root:Frame size: 67812 bytes
+DEBUG:root:Frame size: 67804 bytes
+DEBUG:root:Frame size: 67728 bytes
+DEBUG:root:Frame size: 67552 bytes
+DEBUG:root:Frame size: 67876 bytes
+DEBUG:root:Frame size: 67788 bytes
+DEBUG:root:Frame size: 67660 bytes
+DEBUG:root:Frame size: 67756 bytes
+DEBUG:root:Frame size: 67588 bytes
+DEBUG:root:Frame size: 67784 bytes
+DEBUG:root:Frame size: 67388 bytes
+DEBUG:root:Frame size: 67848 bytes
+DEBUG:root:Frame size: 67712 bytes
+DEBUG:root:Frame size: 67824 bytes
+DEBUG:root:Frame size: 67780 bytes
+DEBUG:root:Frame size: 67764 bytes
+DEBUG:root:Frame size: 67840 bytes
+DEBUG:root:Frame size: 67592 bytes
+DEBUG:root:Frame size: 67924 bytes
+DEBUG:root:Frame size: 67944 bytes
+DEBUG:root:Frame size: 67876 bytes
+DEBUG:root:Frame size: 67820 bytes
+DEBUG:root:Frame size: 67848 bytes
+DEBUG:root:Frame size: 67788 bytes
+DEBUG:root:Frame size: 68032 bytes
+DEBUG:root:Frame size: 68092 bytes
+DEBUG:root:Frame size: 68008 bytes
+DEBUG:root:Frame size: 68008 bytes
+DEBUG:root:Frame size: 67992 bytes
+DEBUG:root:Frame size: 67908 bytes
+DEBUG:root:Frame size: 67964 bytes
+DEBUG:root:Frame size: 67948 bytes
+DEBUG:root:Frame size: 68092 bytes
+DEBUG:root:Frame size: 67968 bytes
+DEBUG:root:Frame size: 68144 bytes
+DEBUG:root:Frame size: 68036 bytes
+DEBUG:root:Frame size: 67900 bytes
+DEBUG:root:Frame size: 68164 bytes
+DEBUG:root:Frame size: 68168 bytes
+DEBUG:root:Frame size: 68152 bytes
+DEBUG:root:Frame size: 68100 bytes
+DEBUG:root:Frame size: 68020 bytes
+DEBUG:root:Frame size: 68168 bytes
+DEBUG:root:Frame size: 68016 bytes
+DEBUG:root:Frame size: 68064 bytes
+DEBUG:root:Frame size: 68128 bytes
+DEBUG:root:Frame size: 68056 bytes
+DEBUG:root:Frame size: 67880 bytes
+DEBUG:root:Frame size: 68016 bytes
+DEBUG:root:Frame size: 67624 bytes
+DEBUG:root:Frame size: 67468 bytes
+DEBUG:root:Frame size: 68028 bytes
+DEBUG:root:Frame size: 67808 bytes
+DEBUG:root:Frame size: 68080 bytes
+DEBUG:root:Frame size: 67744 bytes
+DEBUG:root:Frame size: 67308 bytes
+DEBUG:root:Frame size: 67008 bytes
+DEBUG:root:Frame size: 67688 bytes
+DEBUG:root:Frame size: 67984 bytes
+DEBUG:root:Frame size: 66000 bytes
+DEBUG:root:Frame size: 68152 bytes
+DEBUG:root:Frame size: 67732 bytes
+DEBUG:root:Frame size: 67688 bytes
+DEBUG:root:Frame size: 68084 bytes
+DEBUG:root:Frame size: 68004 bytes
+DEBUG:root:Frame size: 67912 bytes
+DEBUG:root:Frame size: 67852 bytes
+DEBUG:root:Frame size: 68192 bytes
+DEBUG:root:Frame size: 67904 bytes
+DEBUG:root:Frame size: 67992 bytes
+DEBUG:root:Frame size: 67840 bytes
+DEBUG:root:Frame size: 67768 bytes
+DEBUG:root:Frame size: 67564 bytes
+DEBUG:root:Frame size: 67868 bytes
+DEBUG:root:Frame size: 68236 bytes
+DEBUG:root:Frame size: 68244 bytes
+DEBUG:root:Frame size: 67880 bytes
+DEBUG:root:Frame size: 68096 bytes
+DEBUG:root:Frame size: 68160 bytes
+DEBUG:root:Frame size: 68124 bytes
+DEBUG:root:Frame size: 68204 bytes
+DEBUG:root:Frame size: 68088 bytes
+DEBUG:root:Frame size: 68080 bytes
+DEBUG:root:Frame size: 68216 bytes
+DEBUG:root:Frame size: 68192 bytes
+DEBUG:root:Frame size: 67988 bytes
+DEBUG:root:Frame size: 68144 bytes
+DEBUG:root:Frame size: 68268 bytes
+DEBUG:root:Frame size: 68136 bytes
+DEBUG:root:Frame size: 68156 bytes
+DEBUG:root:Frame size: 68028 bytes
+DEBUG:root:Frame size: 68164 bytes
+DEBUG:root:Frame size: 68280 bytes
+DEBUG:root:Frame size: 68088 bytes
+DEBUG:root:Frame size: 68224 bytes
+DEBUG:root:Frame size: 68116 bytes
+DEBUG:root:Frame size: 68076 bytes
+DEBUG:root:Frame size: 67804 bytes
+DEBUG:root:Frame size: 68008 bytes
+DEBUG:root:Frame size: 68224 bytes
+DEBUG:root:Frame size: 67840 bytes
+DEBUG:root:Frame size: 67856 bytes
+DEBUG:root:Frame size: 68260 bytes
+DEBUG:root:Frame size: 67888 bytes
+DEBUG:root:Frame size: 68188 bytes
+DEBUG:root:Frame size: 67728 bytes
+DEBUG:root:Frame size: 68236 bytes
+DEBUG:root:Frame size: 68188 bytes
+DEBUG:root:Frame size: 68040 bytes
+DEBUG:root:Frame size: 68136 bytes
+DEBUG:root:Frame size: 68096 bytes
+DEBUG:root:Frame size: 68036 bytes
+DEBUG:root:Frame size: 68144 bytes
+DEBUG:root:Frame size: 68164 bytes
+DEBUG:root:Frame size: 68064 bytes
+DEBUG:root:Frame size: 68008 bytes
+DEBUG:root:Frame size: 68228 bytes
+DEBUG:root:Frame size: 68156 bytes
+DEBUG:root:Frame size: 67992 bytes
+DEBUG:root:Frame size: 68040 bytes
+DEBUG:root:Frame size: 68052 bytes
+DEBUG:root:Frame size: 68068 bytes
+DEBUG:root:Frame size: 68068 bytes
+DEBUG:root:Frame size: 68200 bytes
+DEBUG:root:Frame size: 68008 bytes
+DEBUG:root:Frame size: 67984 bytes
+DEBUG:root:Frame size: 67980 bytes
+DEBUG:root:Frame size: 68080 bytes
+DEBUG:root:Frame size: 68228 bytes
+DEBUG:root:Frame size: 68036 bytes
+DEBUG:root:Frame size: 68068 bytes
+DEBUG:root:Frame size: 68040 bytes
+DEBUG:root:Frame size: 68020 bytes
+DEBUG:root:Frame size: 68180 bytes
+DEBUG:root:Frame size: 67964 bytes
+DEBUG:root:Frame size: 68112 bytes
+DEBUG:root:Frame size: 68188 bytes
+DEBUG:root:Frame size: 68264 bytes
+DEBUG:root:Frame size: 68096 bytes
+DEBUG:root:Frame size: 68140 bytes
+DEBUG:root:Frame size: 67968 bytes
+DEBUG:root:Frame size: 68000 bytes
+DEBUG:root:Frame size: 68044 bytes
+DEBUG:root:Frame size: 67988 bytes
+DEBUG:root:Frame size: 68064 bytes
+DEBUG:root:Frame size: 68036 bytes
+DEBUG:root:Frame size: 68116 bytes
+DEBUG:root:Frame size: 68000 bytes
+DEBUG:root:Frame size: 68060 bytes
+DEBUG:root:Frame size: 68200 bytes
+DEBUG:root:Frame size: 68076 bytes
+DEBUG:root:Frame size: 68120 bytes
+DEBUG:root:Frame size: 68068 bytes
+DEBUG:root:Frame size: 68040 bytes
+DEBUG:root:Frame size: 67892 bytes
+DEBUG:root:Frame size: 68060 bytes
+DEBUG:root:Frame size: 68020 bytes
+DEBUG:root:Frame size: 68048 bytes
+DEBUG:root:Frame size: 68172 bytes
+DEBUG:root:Frame size: 68264 bytes
+DEBUG:root:Frame size: 67908 bytes
+DEBUG:root:Frame size: 68156 bytes
+DEBUG:root:Frame size: 67892 bytes
+DEBUG:root:Frame size: 68200 bytes
+DEBUG:root:Frame size: 67960 bytes
+DEBUG:root:Frame size: 67880 bytes
+DEBUG:root:Frame size: 68188 bytes
+DEBUG:root:Frame size: 67924 bytes
+DEBUG:root:Frame size: 67912 bytes
+DEBUG:root:Frame size: 68136 bytes
+DEBUG:root:Frame size: 67888 bytes
+DEBUG:root:Frame size: 68028 bytes
+DEBUG:root:Frame size: 68204 bytes
+DEBUG:root:Frame size: 67644 bytes
+DEBUG:root:Frame size: 67980 bytes
+DEBUG:root:Frame size: 67820 bytes
+DEBUG:root:Frame size: 68032 bytes
+DEBUG:root:Frame size: 67992 bytes
+DEBUG:root:Frame size: 68140 bytes
+DEBUG:root:Frame size: 68116 bytes
+DEBUG:root:Frame size: 67944 bytes
+DEBUG:root:Frame size: 68180 bytes
+DEBUG:root:Frame size: 68036 bytes
+DEBUG:root:Frame size: 67884 bytes
+DEBUG:root:Frame size: 68224 bytes
+DEBUG:root:Frame size: 68328 bytes
+DEBUG:root:Frame size: 68136 bytes
+DEBUG:root:Frame size: 68244 bytes
+DEBUG:root:Frame size: 68264 bytes
+DEBUG:root:Frame size: 68212 bytes
+DEBUG:root:Frame size: 68144 bytes
+DEBUG:root:Frame size: 68060 bytes
+DEBUG:root:Frame size: 68112 bytes
+DEBUG:root:Frame size: 68168 bytes
+DEBUG:root:Frame size: 68100 bytes
+DEBUG:root:Frame size: 68108 bytes
+DEBUG:root:Frame size: 67904 bytes
+DEBUG:root:Frame size: 68112 bytes
+DEBUG:root:Frame size: 68212 bytes
+DEBUG:root:Frame size: 68152 bytes
+DEBUG:root:Frame size: 67872 bytes
+DEBUG:root:Frame size: 67948 bytes
+DEBUG:root:Frame size: 67984 bytes
+DEBUG:root:Frame size: 67968 bytes
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 100, 'resolution': (1280, 720)}
+DEBUG:root:Frame size: 629468 bytes
+DEBUG:root:Frame size: 630460 bytes
+DEBUG:root:Frame size: 630612 bytes
+DEBUG:root:Frame size: 629588 bytes
+DEBUG:root:Frame size: 631624 bytes
+DEBUG:root:Frame size: 630292 bytes
+DEBUG:root:Frame size: 631928 bytes
+DEBUG:root:Frame size: 631580 bytes
+DEBUG:root:Frame size: 631636 bytes
+DEBUG:root:Frame size: 631140 bytes
+DEBUG:root:Frame size: 631020 bytes
+DEBUG:root:Frame size: 631244 bytes
+DEBUG:root:Frame size: 631624 bytes
+DEBUG:root:Frame size: 631416 bytes
+DEBUG:root:Frame size: 630892 bytes
+DEBUG:root:Frame size: 631408 bytes
+DEBUG:root:Frame size: 631472 bytes
+DEBUG:root:Frame size: 630992 bytes
+DEBUG:root:Frame size: 630440 bytes
+DEBUG:root:Frame size: 627956 bytes
+DEBUG:root:Frame size: 629928 bytes
+DEBUG:root:Frame size: 631128 bytes
+DEBUG:root:Frame size: 630868 bytes
+DEBUG:root:Frame size: 630928 bytes
+DEBUG:root:Frame size: 631432 bytes
+DEBUG:root:Frame size: 629828 bytes
+DEBUG:root:Frame size: 629380 bytes
+DEBUG:root:Frame size: 630020 bytes
+DEBUG:root:Frame size: 621724 bytes
+DEBUG:root:Frame size: 617636 bytes
+DEBUG:root:Frame size: 630132 bytes
+DEBUG:root:Frame size: 621920 bytes
+DEBUG:root:Frame size: 604284 bytes
+DEBUG:root:Frame size: 583748 bytes
+DEBUG:root:Frame size: 582156 bytes
+DEBUG:root:Frame size: 547908 bytes
+DEBUG:root:Frame size: 599644 bytes
+DEBUG:root:Frame size: 575964 bytes
+DEBUG:root:Frame size: 591952 bytes
+DEBUG:root:Frame size: 579888 bytes
+DEBUG:root:Frame size: 584348 bytes
+DEBUG:root:Frame size: 564720 bytes
+DEBUG:root:Frame size: 571180 bytes
+DEBUG:root:Frame size: 575584 bytes
+DEBUG:root:Frame size: 557716 bytes
+DEBUG:root:Frame size: 575488 bytes
+DEBUG:root:Frame size: 581696 bytes
+DEBUG:root:Frame size: 580748 bytes
+DEBUG:root:Frame size: 585664 bytes
+DEBUG:root:Frame size: 598564 bytes
+DEBUG:root:Frame size: 583964 bytes
+DEBUG:root:Frame size: 579648 bytes
+DEBUG:root:Frame size: 593328 bytes
+DEBUG:root:Frame size: 626496 bytes
+DEBUG:root:Frame size: 603488 bytes
+DEBUG:root:Frame size: 622996 bytes
+DEBUG:root:Frame size: 640252 bytes
+DEBUG:root:Frame size: 606660 bytes
+DEBUG:root:Frame size: 631692 bytes
+DEBUG:root:Frame size: 619136 bytes
+DEBUG:root:Frame size: 643412 bytes
+DEBUG:root:Frame size: 627856 bytes
+DEBUG:root:Frame size: 631016 bytes
+DEBUG:root:Frame size: 629900 bytes
+DEBUG:root:Frame size: 639948 bytes
+DEBUG:root:Frame size: 641104 bytes
+DEBUG:root:Frame size: 642200 bytes
+DEBUG:root:Frame size: 641856 bytes
+DEBUG:root:Frame size: 642760 bytes
+DEBUG:root:Frame size: 643100 bytes
+DEBUG:root:Frame size: 642820 bytes
+DEBUG:root:Frame size: 642632 bytes
+DEBUG:root:Frame size: 640324 bytes
+DEBUG:root:Frame size: 642636 bytes
+DEBUG:root:Frame size: 638772 bytes
+DEBUG:root:Frame size: 640528 bytes
+DEBUG:root:Frame size: 638048 bytes
+DEBUG:root:Frame size: 642904 bytes
+DEBUG:root:Frame size: 640060 bytes
+DEBUG:root:Frame size: 641176 bytes
+DEBUG:root:Frame size: 639832 bytes
+DEBUG:root:Frame size: 642952 bytes
+DEBUG:root:Frame size: 639956 bytes
+DEBUG:root:Frame size: 641656 bytes
+DEBUG:root:Frame size: 641344 bytes
+DEBUG:root:Frame size: 640748 bytes
+DEBUG:root:Frame size: 641340 bytes
+DEBUG:root:Frame size: 641248 bytes
+DEBUG:root:Frame size: 641156 bytes
+DEBUG:root:Frame size: 640996 bytes
+DEBUG:root:Frame size: 642308 bytes
+DEBUG:root:Frame size: 639672 bytes
+DEBUG:root:Frame size: 639764 bytes
+DEBUG:root:Frame size: 640872 bytes
+DEBUG:root:Frame size: 637112 bytes
+DEBUG:root:Frame size: 639936 bytes
+DEBUG:root:Frame size: 640436 bytes
+DEBUG:root:Frame size: 640616 bytes
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 100, 'resolution': (1280, 720)}
+INFO:root:Sent config: {'jpeg_quality': 87, 'fps': 16, 'resolution': (1280, 720)}
+DEBUG:root:Frame size: 126556 bytes
+DEBUG:root:Frame size: 126616 bytes
+DEBUG:root:Frame size: 125980 bytes
+DEBUG:root:Frame size: 125936 bytes
+DEBUG:root:Frame size: 125996 bytes
+DEBUG:root:Frame size: 126368 bytes
+DEBUG:root:Frame size: 126000 bytes
+DEBUG:root:Frame size: 126460 bytes
+DEBUG:root:Frame size: 126300 bytes
+DEBUG:root:Frame size: 125316 bytes
+DEBUG:root:Frame size: 125908 bytes
+DEBUG:root:Frame size: 126024 bytes
+DEBUG:root:Frame size: 125804 bytes
+DEBUG:root:Frame size: 125932 bytes
+DEBUG:root:Frame size: 126320 bytes
+DEBUG:root:Frame size: 125804 bytes
+DEBUG:root:Frame size: 125904 bytes
+DEBUG:root:Frame size: 125492 bytes
+DEBUG:root:Frame size: 125740 bytes
+DEBUG:root:Frame size: 125588 bytes
+DEBUG:root:Frame size: 125960 bytes
+DEBUG:root:Frame size: 126440 bytes
+DEBUG:root:Frame size: 126184 bytes
+DEBUG:root:Frame size: 125764 bytes
+DEBUG:root:Frame size: 126332 bytes
+DEBUG:root:Frame size: 126200 bytes
+DEBUG:root:Frame size: 125892 bytes
+DEBUG:root:Frame size: 125908 bytes
+DEBUG:root:Frame size: 126076 bytes
+DEBUG:root:Frame size: 126356 bytes
+DEBUG:root:Frame size: 125968 bytes
+DEBUG:root:Frame size: 126204 bytes
+DEBUG:root:Frame size: 126200 bytes
+DEBUG:root:Frame size: 125568 bytes
+DEBUG:root:Frame size: 125960 bytes
+DEBUG:root:Frame size: 123656 bytes
+DEBUG:root:Frame size: 124680 bytes
+DEBUG:root:Frame size: 105732 bytes
+DEBUG:root:Frame size: 108632 bytes
+DEBUG:root:Frame size: 113944 bytes
+DEBUG:root:Frame size: 119028 bytes
+DEBUG:root:Frame size: 112280 bytes
+DEBUG:root:Frame size: 113464 bytes
+DEBUG:root:Frame size: 110872 bytes
+DEBUG:root:Frame size: 107056 bytes
+DEBUG:root:Frame size: 104884 bytes
+DEBUG:root:Frame size: 104460 bytes
+DEBUG:root:Frame size: 107132 bytes
+DEBUG:root:Frame size: 106952 bytes
+DEBUG:root:Frame size: 110852 bytes
+DEBUG:root:Frame size: 111492 bytes
+DEBUG:root:Frame size: 110184 bytes
+DEBUG:root:Frame size: 110880 bytes
+DEBUG:root:Frame size: 110408 bytes
+DEBUG:root:Frame size: 110936 bytes
+DEBUG:root:Frame size: 111808 bytes
+DEBUG:root:Frame size: 112972 bytes
+DEBUG:root:Frame size: 121440 bytes
+DEBUG:root:Frame size: 120600 bytes
+DEBUG:root:Frame size: 124132 bytes
+DEBUG:root:Frame size: 124688 bytes
+DEBUG:root:Frame size: 119740 bytes
+DEBUG:root:Frame size: 118016 bytes
+DEBUG:root:Frame size: 116704 bytes
+DEBUG:root:Frame size: 118140 bytes
+DEBUG:root:Frame size: 120524 bytes
+DEBUG:root:Frame size: 121096 bytes
+DEBUG:root:Frame size: 122884 bytes
+DEBUG:root:Frame size: 124748 bytes
+DEBUG:root:Frame size: 125708 bytes
+DEBUG:root:Frame size: 125772 bytes
+DEBUG:root:Frame size: 124956 bytes
+DEBUG:root:Frame size: 125344 bytes
+DEBUG:root:Frame size: 125036 bytes
+DEBUG:root:Frame size: 124580 bytes
+DEBUG:root:Frame size: 124980 bytes
+DEBUG:root:Frame size: 125612 bytes
+DEBUG:root:Frame size: 125564 bytes
+DEBUG:root:Frame size: 125872 bytes
+DEBUG:root:Frame size: 126568 bytes
+DEBUG:root:Frame size: 126200 bytes
+DEBUG:root:Frame size: 126376 bytes
+DEBUG:root:Frame size: 127096 bytes
+DEBUG:root:Frame size: 127284 bytes
+DEBUG:root:Frame size: 127300 bytes
+DEBUG:root:Frame size: 128132 bytes
+DEBUG:root:Frame size: 128436 bytes
+DEBUG:root:Frame size: 128408 bytes
+DEBUG:root:Frame size: 129060 bytes
+DEBUG:root:Frame size: 129068 bytes
+DEBUG:root:Frame size: 128852 bytes
+DEBUG:root:Frame size: 128972 bytes
+DEBUG:root:Frame size: 127636 bytes
+DEBUG:root:Frame size: 121516 bytes
+DEBUG:root:Frame size: 111708 bytes
+DEBUG:root:Frame size: 102360 bytes
+DEBUG:root:Frame size: 94548 bytes
+DEBUG:root:Frame size: 96144 bytes
+DEBUG:root:Frame size: 99300 bytes
+DEBUG:root:Frame size: 104848 bytes
+DEBUG:root:Frame size: 107848 bytes
+DEBUG:root:Frame size: 111428 bytes
+DEBUG:root:Frame size: 114356 bytes
+DEBUG:root:Frame size: 121112 bytes
+DEBUG:root:Frame size: 124000 bytes
+DEBUG:root:Frame size: 125356 bytes
+DEBUG:root:Frame size: 126764 bytes
+DEBUG:root:Frame size: 127044 bytes
+DEBUG:root:Frame size: 127076 bytes
+DEBUG:root:Frame size: 127200 bytes
+DEBUG:root:Frame size: 126128 bytes
+DEBUG:root:Frame size: 125032 bytes
+DEBUG:root:Frame size: 124600 bytes
+DEBUG:root:Frame size: 123312 bytes
+DEBUG:root:Frame size: 122824 bytes
+DEBUG:root:Frame size: 121856 bytes
+DEBUG:root:Frame size: 120808 bytes
+DEBUG:root:Frame size: 119932 bytes
+DEBUG:root:Frame size: 119576 bytes
+DEBUG:root:Frame size: 119424 bytes
+DEBUG:root:Frame size: 119216 bytes
+DEBUG:root:Frame size: 119440 bytes
+DEBUG:root:Frame size: 119240 bytes
+DEBUG:root:Frame size: 119604 bytes
+DEBUG:root:Frame size: 119124 bytes
+DEBUG:root:Frame size: 123428 bytes
+DEBUG:root:Frame size: 127072 bytes
+DEBUG:root:Frame size: 126688 bytes
+DEBUG:root:Frame size: 126128 bytes
+DEBUG:root:Frame size: 126184 bytes
+DEBUG:root:Frame size: 125892 bytes
+DEBUG:root:Frame size: 126176 bytes
+DEBUG:root:Frame size: 126428 bytes
+DEBUG:root:Frame size: 113900 bytes
+DEBUG:root:Frame size: 110724 bytes
+DEBUG:root:Frame size: 124208 bytes
+DEBUG:root:Frame size: 117260 bytes
+DEBUG:root:Frame size: 117444 bytes
+DEBUG:root:Frame size: 111672 bytes
+DEBUG:root:Frame size: 112588 bytes
+DEBUG:root:Frame size: 114236 bytes
+DEBUG:root:Frame size: 120044 bytes
+DEBUG:root:Frame size: 120784 bytes
+DEBUG:root:Frame size: 125592 bytes
+DEBUG:root:Frame size: 125108 bytes
+DEBUG:root:Frame size: 120732 bytes
+DEBUG:root:Frame size: 120308 bytes
+DEBUG:root:Frame size: 120612 bytes
+DEBUG:root:Frame size: 118920 bytes
+DEBUG:root:Frame size: 120408 bytes
+DEBUG:root:Frame size: 121396 bytes
+DEBUG:root:Frame size: 121992 bytes
+DEBUG:root:Frame size: 123704 bytes
+DEBUG:root:Frame size: 124264 bytes
+DEBUG:root:Frame size: 122960 bytes
+DEBUG:root:Frame size: 123996 bytes
+DEBUG:root:Frame size: 121356 bytes
+DEBUG:root:Frame size: 123868 bytes
+DEBUG:root:Frame size: 123808 bytes
+DEBUG:root:Frame size: 123808 bytes
+DEBUG:root:Frame size: 124088 bytes
+DEBUG:root:Frame size: 124412 bytes
+DEBUG:root:Frame size: 124048 bytes
+DEBUG:root:Frame size: 124388 bytes
+DEBUG:root:Frame size: 124240 bytes
+DEBUG:root:Frame size: 124320 bytes
+DEBUG:root:Frame size: 124656 bytes
+DEBUG:root:Frame size: 124476 bytes
+DEBUG:root:Frame size: 124432 bytes
+DEBUG:root:Frame size: 124436 bytes
+DEBUG:root:Frame size: 124360 bytes
+DEBUG:root:Frame size: 124096 bytes
+DEBUG:root:Frame size: 124656 bytes
+DEBUG:root:Frame size: 124400 bytes
+DEBUG:root:Frame size: 124084 bytes
+DEBUG:root:Frame size: 124244 bytes
+DEBUG:root:Frame size: 124580 bytes
+DEBUG:root:Frame size: 124296 bytes
+DEBUG:root:Frame size: 124236 bytes
+DEBUG:root:Frame size: 124236 bytes
+DEBUG:root:Frame size: 124224 bytes
+DEBUG:root:Frame size: 124228 bytes
+DEBUG:root:Frame size: 124112 bytes
+DEBUG:root:Frame size: 123980 bytes
+DEBUG:root:Frame size: 124072 bytes
+DEBUG:root:Frame size: 123800 bytes
+DEBUG:root:Frame size: 123992 bytes
+DEBUG:root:Frame size: 124076 bytes
+DEBUG:root:Frame size: 124316 bytes
+DEBUG:root:Frame size: 123976 bytes
+DEBUG:root:Frame size: 123760 bytes
+DEBUG:root:Frame size: 124292 bytes
+DEBUG:root:Frame size: 123804 bytes
+DEBUG:root:Frame size: 123392 bytes
+DEBUG:root:Frame size: 124032 bytes
+DEBUG:root:Frame size: 123892 bytes
+DEBUG:root:Frame size: 123372 bytes
+DEBUG:root:Frame size: 123632 bytes
+DEBUG:root:Frame size: 122824 bytes
+DEBUG:root:Frame size: 123096 bytes
+DEBUG:root:Frame size: 123708 bytes
+DEBUG:root:Frame size: 123932 bytes
+DEBUG:root:Frame size: 123368 bytes
+DEBUG:root:Frame size: 124004 bytes
+DEBUG:root:Frame size: 123664 bytes
+DEBUG:root:Frame size: 123280 bytes
+DEBUG:root:Frame size: 123288 bytes
+DEBUG:root:Frame size: 122960 bytes
+DEBUG:root:Frame size: 123140 bytes
+DEBUG:root:Frame size: 122864 bytes
+DEBUG:root:Frame size: 123168 bytes
+DEBUG:root:Frame size: 123548 bytes
+DEBUG:root:Frame size: 123256 bytes
+DEBUG:root:Frame size: 123868 bytes
+DEBUG:root:Frame size: 123564 bytes
+DEBUG:root:Frame size: 123336 bytes
+DEBUG:root:Frame size: 123280 bytes
+DEBUG:root:Frame size: 123732 bytes
+DEBUG:root:Frame size: 123656 bytes
+DEBUG:root:Frame size: 123296 bytes
+DEBUG:root:Frame size: 123688 bytes
+DEBUG:root:Frame size: 122476 bytes
+DEBUG:root:Frame size: 123644 bytes
+DEBUG:root:Frame size: 123408 bytes
+DEBUG:root:Frame size: 123896 bytes
+DEBUG:root:Frame size: 123916 bytes
+DEBUG:root:Frame size: 123712 bytes
+DEBUG:root:Frame size: 123824 bytes
+DEBUG:root:Frame size: 123908 bytes
+DEBUG:root:Frame size: 123564 bytes
+DEBUG:root:Frame size: 123784 bytes
+DEBUG:root:Frame size: 123624 bytes
+DEBUG:root:Frame size: 123788 bytes
+DEBUG:root:Frame size: 123572 bytes
+DEBUG:root:Frame size: 123772 bytes
+DEBUG:root:Frame size: 123272 bytes
+DEBUG:root:Frame size: 122704 bytes
+DEBUG:root:Frame size: 123124 bytes
+DEBUG:root:Frame size: 122308 bytes
+DEBUG:root:Frame size: 123684 bytes
+DEBUG:root:Frame size: 123324 bytes
+DEBUG:root:Frame size: 123776 bytes
+DEBUG:root:Frame size: 123268 bytes
+DEBUG:root:Frame size: 123600 bytes
+DEBUG:root:Frame size: 123228 bytes
+DEBUG:root:Frame size: 123348 bytes
+DEBUG:root:Frame size: 123828 bytes
+DEBUG:root:Frame size: 123372 bytes
+DEBUG:root:Frame size: 123412 bytes
+DEBUG:root:Frame size: 123468 bytes
+DEBUG:root:Frame size: 123268 bytes
+DEBUG:root:Frame size: 123260 bytes
+DEBUG:root:Frame size: 123528 bytes
+DEBUG:root:Frame size: 123092 bytes
+DEBUG:root:Frame size: 123528 bytes
+DEBUG:root:Frame size: 123188 bytes
+DEBUG:root:Frame size: 123700 bytes
+DEBUG:root:Frame size: 123132 bytes
+DEBUG:root:Frame size: 123160 bytes
+DEBUG:root:Frame size: 123504 bytes
+DEBUG:root:Frame size: 123332 bytes
+DEBUG:root:Frame size: 122736 bytes
+DEBUG:root:Frame size: 122564 bytes
+DEBUG:root:Frame size: 123092 bytes
+DEBUG:root:Frame size: 123300 bytes
+DEBUG:root:Frame size: 123212 bytes
+DEBUG:root:Frame size: 123176 bytes
+DEBUG:root:Frame size: 123308 bytes
+DEBUG:root:Frame size: 123280 bytes
+DEBUG:root:Frame size: 123464 bytes
+DEBUG:root:Frame size: 123584 bytes
+DEBUG:root:Frame size: 123332 bytes
+DEBUG:root:Frame size: 123552 bytes
+DEBUG:root:Frame size: 123656 bytes
+DEBUG:root:Frame size: 123600 bytes
+DEBUG:root:Frame size: 123348 bytes
+DEBUG:root:Frame size: 123504 bytes
+DEBUG:root:Frame size: 122968 bytes
+DEBUG:root:Frame size: 122608 bytes
+DEBUG:root:Frame size: 122856 bytes
+DEBUG:root:Frame size: 123468 bytes
+DEBUG:root:Frame size: 123392 bytes
+DEBUG:root:Frame size: 123756 bytes
+DEBUG:root:Frame size: 122660 bytes
+DEBUG:root:Frame size: 123168 bytes
+DEBUG:root:Frame size: 123492 bytes
+DEBUG:root:Frame size: 123492 bytes
+DEBUG:root:Frame size: 123088 bytes
+DEBUG:root:Frame size: 123204 bytes
+DEBUG:root:Frame size: 123056 bytes
+DEBUG:root:Frame size: 123148 bytes
+DEBUG:root:Frame size: 122892 bytes
+DEBUG:root:Frame size: 123308 bytes
+DEBUG:root:Frame size: 122920 bytes
+DEBUG:root:Frame size: 122768 bytes
+DEBUG:root:Frame size: 123036 bytes
+DEBUG:root:Frame size: 123076 bytes
+DEBUG:root:Frame size: 123240 bytes
+DEBUG:root:Frame size: 123184 bytes
+DEBUG:root:Frame size: 122884 bytes
+DEBUG:root:Frame size: 123064 bytes
+DEBUG:root:Frame size: 123184 bytes
+DEBUG:root:Frame size: 122480 bytes
+DEBUG:root:Frame size: 122792 bytes
+DEBUG:root:Frame size: 123316 bytes
+DEBUG:root:Frame size: 123036 bytes
+DEBUG:root:Frame size: 123600 bytes
+DEBUG:root:Frame size: 123276 bytes
+DEBUG:root:Frame size: 119688 bytes
+DEBUG:root:Frame size: 119972 bytes
+DEBUG:root:Frame size: 122460 bytes
+DEBUG:root:Frame size: 120332 bytes
+DEBUG:root:Frame size: 116952 bytes
+DEBUG:root:Frame size: 122508 bytes
+DEBUG:root:Frame size: 120412 bytes
+DEBUG:root:Frame size: 121920 bytes
+DEBUG:root:Frame size: 121868 bytes
+DEBUG:root:Frame size: 123280 bytes
+DEBUG:root:Frame size: 122044 bytes
+DEBUG:root:Frame size: 117644 bytes
+DEBUG:root:Frame size: 118856 bytes
+DEBUG:root:Frame size: 119272 bytes
+DEBUG:root:Frame size: 120120 bytes
+DEBUG:root:Frame size: 119984 bytes
+DEBUG:root:Frame size: 121316 bytes
+DEBUG:root:Frame size: 122592 bytes
+DEBUG:root:Frame size: 122592 bytes
+DEBUG:root:Frame size: 122576 bytes
+DEBUG:root:Frame size: 121500 bytes
+DEBUG:root:Frame size: 121496 bytes
+DEBUG:root:Frame size: 119188 bytes
+DEBUG:root:Frame size: 119556 bytes
+DEBUG:root:Frame size: 120480 bytes
+DEBUG:root:Frame size: 121924 bytes
+DEBUG:root:Frame size: 122280 bytes
+DEBUG:root:Frame size: 122404 bytes
+DEBUG:root:Frame size: 122664 bytes
+DEBUG:root:Frame size: 122924 bytes
+DEBUG:root:Frame size: 122796 bytes
+DEBUG:root:Frame size: 122408 bytes
+DEBUG:root:Frame size: 122564 bytes
+ERROR:root:\u274c Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 230, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747737242.0242875 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 80, 'fps': 30, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 80, 'fps': 30, 'resolution': (640, 480)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+ERROR:root:\u274c SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 276, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.65.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747737699.3673477 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000279FFD67620>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747737716.5948946 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (640, 480)}
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 176, in run_detector
+    analysed = detector4.detect_and_draw(frame)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'detector4' has no attribute 'detect_and_draw'
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747738152.5577738 HTTP/1.1" 200 97
+ERROR:root:\u274c Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 266, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747740361.8202693 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 80, 'resolution': (1280, 720)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 80, 'resolution': (1280, 720)}
+INFO:root:Sent config: {'jpeg_quality': 86, 'fps': 80, 'resolution': (1280, 720)}
+INFO:root:Sent config: {'jpeg_quality': 86, 'fps': 80, 'resolution': (1280, 720)}
+INFO:root:Sent config: {'jpeg_quality': 86, 'fps': 80, 'resolution': (640, 480)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747740564.6146276 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1280, 720)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 100, 'resolution': (1280, 720)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 50, 'resolution': (1920, 1080)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 30, 'resolution': (2592, 1944)}
+INFO:root:Sent config: {'jpeg_quality': 83, 'fps': 30, 'resolution': (2592, 1944)}
