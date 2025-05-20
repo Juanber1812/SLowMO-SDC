@@ -19751,3 +19751,7 @@ Traceback (most recent call last):
   File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
     raise exceptions.ConnectionError(exc.args[0]) from None
 socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.65.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747743224.7999778 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000215862E0050>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747743336.1186862 HTTP/1.1" 200 97
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747743380.7125716 HTTP/1.1" 200 97

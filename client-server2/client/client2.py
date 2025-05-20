@@ -10,28 +10,6 @@ import detector4  # Make sure detector4.py is in the same folder
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.65.89:5000"
 
-# --- NEW: Get supported sensor modes from Picamera2 ---
-def get_supported_sensor_modes():
-    try:
-        from picamera2 import Picamera2
-        picam = Picamera2()
-        modes = []
-        for mode in picam.sensor_modes:
-            size = mode.get('size')
-            fps = mode.get('fps')
-            label = f"{size[0]}x{size[1]} @ {fps:.0f}fps"
-            modes.append((label, size, fps))
-        return modes
-    except Exception as e:
-        print("Could not query camera sensor modes:", e)
-        # Fallback to some defaults
-        return [
-            ("640x480 @ 90fps", (640, 480), 90),
-            ("1280x720 @ 60fps", (1280, 720), 60),
-            ("1920x1080 @ 30fps", (1920, 1080), 30),
-            ("2592x1944 @ 15fps", (2592, 1944), 15),
-        ]
-
 sio = socketio.Client()
 
 class Bridge(QObject):
@@ -94,9 +72,6 @@ class MainWindow(QWidget):
 
         # --- NEW: Populate dropdown with sensor modes ---
         self.res_dropdown = QComboBox()
-        self.supported_modes = get_supported_sensor_modes()
-        for label, size, fps in self.supported_modes:
-            self.res_dropdown.addItem(label, (size, fps))
         self.res_dropdown.currentIndexChanged.connect(self.update_fps_slider)
 
         self.fps_slider = QSlider(Qt.Orientation.Horizontal)
@@ -139,6 +114,24 @@ class MainWindow(QWidget):
         self.speed_timer = QTimer()
         self.speed_timer.timeout.connect(self.measure_speed)
         self.speed_timer.start(30000)
+
+        self.request_sensor_modes()
+
+    def request_sensor_modes(self):
+        sio.emit("get_sensor_modes")
+
+    @sio.on("sensor_modes")
+    def on_sensor_modes(modes):
+        # This runs in the socket thread, so use Qt signals or call via QMetaObject.invokeMethod
+        def update_dropdown():
+            self.res_dropdown.clear()
+            for mode in modes:
+                label = mode["label"]
+                size = tuple(mode["size"])
+                fps = mode["fps"]
+                self.res_dropdown.addItem(label, (size, fps))
+            self.update_fps_slider()
+        QTimer.singleShot(0, update_dropdown)
 
     def update_fps_slider(self):
         idx = self.res_dropdown.currentIndex()

@@ -42,6 +42,16 @@ def update_camera_config(data):
 def handle_sensor_data(data):
     socketio.emit("sensor_broadcast", data)
 
+@socketio.on("get_sensor_modes")
+def handle_get_sensor_modes():
+    # Forward the request to the camera process
+    socketio.emit("get_sensor_modes")
+
+@socketio.on("sensor_modes")
+def handle_sensor_modes(modes):
+    # Broadcast the modes to all clients (or to the requesting client)
+    socketio.emit("sensor_modes", modes)
+
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
     start_sensor_thread()

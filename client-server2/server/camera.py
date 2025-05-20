@@ -82,6 +82,16 @@ def on_camera_config(data):
     camera_config.update(data)
     reconfigure_camera()
 
+@sio.on("get_sensor_modes")
+def on_get_sensor_modes():
+    modes = []
+    for mode in picam.sensor_modes:
+        size = mode.get('size')
+        fps = mode.get('fps')
+        label = f"{size[0]}x{size[1]} @ {fps:.0f}fps"
+        modes.append({"label": label, "size": size, "fps": fps})
+    sio.emit("sensor_modes", modes)
+
 def stream_loop():
     global streaming
     while True:
