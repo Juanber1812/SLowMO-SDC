@@ -1,5 +1,6 @@
+
 from gevent import monkey; monkey.patch_all()
-import time, base64, socketio, cv2
+import time, base64, socketio
 from picamera2 import Picamera2
 
 SERVER_URL = "http://localhost:5000"
@@ -49,24 +50,27 @@ def reconfigure_camera():
     global picam
     try:
         res = tuple(camera_config["resolution"])
-        jpeg_quality = camera_config["jpeg_quality"]
         fps = camera_config["fps"]
         duration = int(1e6 / max(fps, 1))
 
         if picam.started:
             picam.stop()
 
-        config = picam.create_preview_configuration(
-            main={"format": "XRGB8888", "size": res},
-            controls={"FrameDurationLimits": (duration, duration)}
+        config = picam.create_video_configuration(
+            encode={"format": "MJPEG", "size": res},
+            main=None,
+            controls={"FrameDurationLimits": (duration, duration)},
+            buffer_count=6,
+            queue=False
         )
         picam.configure(config)
-        # Debug: show the actual config applied
-        applied = picam.camera_configuration()
-        print(f"[DEBUG] Applied config: {applied}")
+
+        # Show the applied configuration and controls
+        print("[DEBUG] Camera configuration:", picam.camera_configuration())
+        print("[DEBUG] Camera controls:", picam.camera_controls())
 
         picam.start()
-        print(f"[INFO] Camera reconfigured: {res}, JPEG: {jpeg_quality}, FPS: {fps}")
+        print(f"[INFO] Camera reconfigured: {res}, FPS: {fps}")
     except Exception as e:
         print("[ERROR] Reconfigure failed:", e)
 
@@ -83,11 +87,7 @@ def start_stream():
         picam = Picamera2()
         print("[INFO] Available sensor modes:")
         for i, mode in enumerate(picam.sensor_modes):
-            size = mode.get("size", "N/A")
-            bit_depth = mode.get("bit_depth", "N/A")
-            fmt = mode.get("format", "N/A")
-            fps = mode.get("fps", "N/A")
-            print(f"  Mode {i}: {size}, {bit_depth}-bit, format={fmt}, max_fps={fps}")
+            print(f"  Mode {i}: {mode['size']}, max_fps={mode['fps']}")
 
         reconfigure_camera()
         print("[INFO] Camera initialized.")
@@ -95,39 +95,24 @@ def start_stream():
         print("[ERROR] Camera setup failed:", e)
         return
 
-    frame_count = 0
-    last_time = time.time()
-
     while True:
         try:
             if streaming:
-                # Time the raw capture only
+                # Time the hardware JPEG capture
                 t0 = time.perf_counter()
-                frame = picam.capture_array()
+                jpeg = picam.capture_buffer("encode")
                 dt = time.perf_counter() - t0
                 print(f"[DEBUG] Capture-only FPS: {1/dt:.1f}", end='\r')
 
-                success, buffer = cv2.imencode(
-                    '.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]]
-                )
-                if not success:
-                    continue
-
-                jpg_b64 = base64.b64encode(buffer).decode('utf-8')
+                jpg_b64 = base64.b64encode(jpeg).decode('utf-8')
                 sio.emit("frame_data", jpg_b64)
-                frame_count += 1
 
-                now = time.time()
-                if now - last_time >= 1.0:
-                    print(f"[FPS] {frame_count} fps", end='\r')
-                    frame_count = 0
-                    last_time = now
-
-            time.sleep(1.0 / max(camera_config["fps"], 1))
-
+            # blocking capture buffers at sensor rate, no manual sleep
         except Exception as e:
             print("[ERROR] Streaming failure:", e)
             time.sleep(1)
 
+
 if __name__ == "__main__":
     start_stream()
+

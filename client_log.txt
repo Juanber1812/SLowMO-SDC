@@ -19832,3 +19832,22 @@ INFO:root:Sent config: {'jpeg_quality': 10, 'fps': 50, 'resolution': (2304, 1296
 DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
 DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747751018.0629942 HTTP/1.1" 200 97
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 120, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747751271.5040815 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 120, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 50, 'resolution': (2304, 1296)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 14, 'resolution': (4608, 2592)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 120, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 50, 'resolution': (2304, 1296)}
+ERROR:root:\u274c Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 237, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 152, in run_detector
+    bridge.analysed_frame.emit(analysed)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
