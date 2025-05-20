@@ -19869,3 +19869,4 @@ Traceback (most recent call last):
   File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
     raise exceptions.ConnectionError(exc.args[0]) from None
 socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.65.89', port=5000): Read timed out. (read timeout=5)
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
