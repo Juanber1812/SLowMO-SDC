@@ -19815,3 +19815,17 @@ INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 120, 'resolution': (1536, 864
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 120, 'resolution': (1536, 864)}
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 50, 'resolution': (2304, 1296)}
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 14, 'resolution': (4608, 2592)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747747832.1027544 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 120, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 14, 'resolution': (4608, 2592)}
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.65.89
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747747893.2010212 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 14, 'resolution': (4608, 2592)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747747954.5156057 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 37, 'fps': 120, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 10, 'fps': 120, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 10, 'fps': 14, 'resolution': (4608, 2592)}
+INFO:root:Sent config: {'jpeg_quality': 10, 'fps': 50, 'resolution': (2304, 1296)}

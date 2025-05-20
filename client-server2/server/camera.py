@@ -98,7 +98,6 @@ def start_stream():
 
     while True:
         try:
-            loop_start = time.time()
             if streaming:
                 frame = picam.capture_array()
                 success, buffer = cv2.imencode(
@@ -117,9 +116,7 @@ def start_stream():
                     frame_count = 0
                     last_time = now
 
-            elapsed = time.time() - loop_start
-            delay = max(0, (1.0 / max(camera_config["fps"], 1)) - elapsed)
-            time.sleep(delay)
+            time.sleep(1.0 / max(camera_config["fps"], 1))
 
         except Exception as e:
             print("[ERROR] Streaming failure:", e)
