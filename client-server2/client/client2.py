@@ -10,6 +10,20 @@ import detector4  # Make sure detector4.py is in the same folder
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.65.89:5000"
 
+RES_PRESETS = [
+    ("640x480", (640, 480)),
+    ("1280x720", (1280, 720)),
+    ("1920x1080", (1920, 1080)),
+    ("2592x1944", (2592, 1944)),
+]
+
+FPS_LIMITS = {
+    (640, 480): 200,
+    (1280, 720): 100,
+    (1920, 1080): 50,
+    (2592, 1944): 30,
+}
+
 sio = socketio.Client()
 
 class Bridge(QObject):
@@ -25,7 +39,6 @@ class MainWindow(QWidget):
         self.streaming = False
         self.detector_active = False
         self.frame_queue = queue.Queue()
-        self.last_frame = None
 
         # Layouts
         main_layout = QHBoxLayout(self)
@@ -70,8 +83,9 @@ class MainWindow(QWidget):
         self.jpeg_label = QLabel("JPEG: 70")
         self.jpeg_slider.valueChanged.connect(lambda val: self.jpeg_label.setText(f"JPEG: {val}"))
 
-        # --- NEW: Populate dropdown with sensor modes ---
         self.res_dropdown = QComboBox()
+        for label, _ in RES_PRESETS:
+            self.res_dropdown.addItem(label)
         self.res_dropdown.currentIndexChanged.connect(self.update_fps_slider)
 
         self.fps_slider = QSlider(Qt.Orientation.Horizontal)
@@ -85,7 +99,6 @@ class MainWindow(QWidget):
         self.apply_btn.clicked.connect(self.apply_config)
 
         self.toggle_btn = QPushButton("Start Stream")
-        self.toggle_btn.setEnabled(False)
         self.toggle_btn.clicked.connect(self.toggle_stream)
 
         config_group = QGroupBox("Camera Settings")
@@ -115,30 +128,13 @@ class MainWindow(QWidget):
         self.speed_timer.timeout.connect(self.measure_speed)
         self.speed_timer.start(30000)
 
-        self.request_sensor_modes()
-
-    def request_sensor_modes(self):
-        sio.emit("get_sensor_modes")
-
-    @sio.on("sensor_modes")
-    def on_sensor_modes(modes):
-        # This runs in the socket thread, so use Qt signals or call via QMetaObject.invokeMethod
-        def update_dropdown():
-            self.res_dropdown.clear()
-            for mode in modes:
-                label = mode["label"]
-                size = tuple(mode["size"])
-                fps = mode["fps"]
-                self.res_dropdown.addItem(label, (size, fps))
-            self.update_fps_slider()
-        QTimer.singleShot(0, update_dropdown)
-
     def update_fps_slider(self):
         idx = self.res_dropdown.currentIndex()
-        size, max_fps = self.res_dropdown.itemData(idx)
-        self.fps_slider.setRange(1, int(max_fps))
+        _, res = RES_PRESETS[idx]
+        max_fps = FPS_LIMITS.get(res, 10)
+        self.fps_slider.setRange(1, max_fps)
         if self.fps_slider.value() > max_fps:
-            self.fps_slider.setValue(int(max_fps))
+            self.fps_slider.setValue(max_fps)
         self.fps_label.setText(f"FPS: {self.fps_slider.value()}")
 
     def toggle_stream(self):
@@ -153,8 +149,8 @@ class MainWindow(QWidget):
         if self.streaming:
             QMessageBox.warning(self, "Stream Active", "Stop the stream before changing settings.")
             return
-        idx = self.res_dropdown.currentIndex()
-        (resolution, max_fps) = self.res_dropdown.itemData(idx)
+        res_idx = self.res_dropdown.currentIndex()
+        _, resolution = RES_PRESETS[res_idx]
         fps = self.fps_slider.value()
         config = {
             "jpeg_quality": self.jpeg_slider.value(),
@@ -185,19 +181,12 @@ class MainWindow(QWidget):
                 logging.exception("Detector error")
 
     def update_image(self, frame):
-        self.last_frame = frame.copy()
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb.shape
         qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
         pixmap = QPixmap.fromImage(qimg)
         pixmap = pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
         self.image_label.setPixmap(pixmap)
-        # If detector is active, put the frame in the queue for analysis
-        if self.detector_active:
-            # Clear the queue to always process the latest frame
-            with self.frame_queue.mutex:
-                self.frame_queue.queue.clear()
-            self.frame_queue.put(self.last_frame)
 
     def update_analysed_image(self, frame):
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -264,7 +253,6 @@ def on_frame(data):
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
         if frame is not None:
             win.current_frame_size = len(data)
-            win.frame_counter += 1
             bridge.frame_received.emit(frame)
         else:
             logging.warning("Frame decode returned None")
