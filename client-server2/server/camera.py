@@ -77,16 +77,6 @@ def start_stream():
 
     try:
         picam = Picamera2()
-
-        # ✅ Print available sensor modes
-        print("[INFO] Available sensor modes:")
-        for i, mode in enumerate(picam.sensor_modes):
-            size = mode.get("size", "N/A")
-            bit_depth = mode.get("bit_depth", "N/A")
-            fmt = mode.get("format", "N/A")
-            fps = mode.get("fps", "N/A")
-            print(f"  Mode {i}: {size}, {bit_depth}-bit, format={fmt}, max_fps={fps}")
-
         reconfigure_camera()
         print("[INFO] Camera initialized.")
     except Exception as e:
@@ -112,9 +102,12 @@ def start_stream():
 
                 now = time.time()
                 if now - last_time >= 1.0:
-                    print(f"[FPS] {frame_count} fps", end='\r')
+                    elapsed = now - last_time
+                    actual_capture_fps = frame_count / elapsed
+                    print(f"[FPS] Processed: {frame_count} fps | Capture-only: {actual_capture_fps:.1f} fps", end='\r')
                     frame_count = 0
                     last_time = now
+
 
             time.sleep(1.0 / max(camera_config["fps"], 1))
 
