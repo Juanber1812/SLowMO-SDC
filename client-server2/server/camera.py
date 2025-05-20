@@ -97,7 +97,7 @@ def start_stream():
                     continue
 
                 jpg_b64 = base64.b64encode(buffer).decode('utf-8')
-                sio.emit("frame_data", jpg_b64)
+                sio.emit("frame", jpg_b64)  # <-- Change "frame_data" to "frame"
                 frame_count += 1
 
                 now = time.time()

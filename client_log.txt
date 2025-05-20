@@ -19906,3 +19906,5 @@ DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:500
 DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747760124.0655756 HTTP/1.1" 200 97
 DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
 DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747760172.6140904 HTTP/1.1" 200 97
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747760327.2753837 HTTP/1.1" 200 97
