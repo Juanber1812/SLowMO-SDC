@@ -46,26 +46,33 @@ def on_camera_config(data):
     else:
         print("[WARN] Config ignored while streaming.")
 
+
 def reconfigure_camera():
     global picam
     try:
         res = camera_config["resolution"]
         jpeg_quality = camera_config["jpeg_quality"]
         fps = camera_config["fps"]
-        duration = int(1e6 / max(fps, 1))
+        # Enforce exact FPS via FrameDurationLimits (in microseconds)
+        us = int(1e6 / max(fps, 1))
 
         if picam.started:
             picam.stop()
 
         config = picam.create_preview_configuration(
             main={"format": "XRGB8888", "size": res},
-            controls={"FrameDurationLimits": (duration, duration)}
+            controls={"FrameDurationLimits": (us, us)}
         )
         picam.configure(config)
+        # Log applied configuration and controls
+        print("[DEBUG] Applied config:", picam.camera_configuration())
+        print("[DEBUG] Camera controls:", picam.camera_controls())
+
         picam.start()
         print(f"[INFO] Camera reconfigured: {res}, JPEG: {jpeg_quality}, FPS: {fps}")
     except Exception as e:
         print("[ERROR] Reconfigure failed:", e)
+
 
 def start_stream():
     global streaming, picam
@@ -77,8 +84,7 @@ def start_stream():
 
     try:
         picam = Picamera2()
-
-        # ✅ Print available sensor modes
+        # Dump supported modes
         print("[INFO] Available sensor modes:")
         for i, mode in enumerate(picam.sensor_modes):
             size = mode.get("size", "N/A")
@@ -99,7 +105,18 @@ def start_stream():
     while True:
         try:
             if streaming:
-                frame = picam.capture_array()
+                # Capture using request to get metadata and raw timing
+                req = picam.capture_request()
+                t0 = time.perf_counter()
+                frame = req.make_array("main")
+                dt = time.perf_counter() - t0
+                # Metadata FrameDuration (μs)
+                meta = req.get_metadata()
+                fd = meta.get("FrameDuration", None)
+                # Release request
+                req.release()
+
+                # Encode and emit
                 success, buffer = cv2.imencode(
                     '.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), camera_config["jpeg_quality"]]
                 )
@@ -110,12 +127,21 @@ def start_stream():
                 sio.emit("frame_data", jpg_b64)
                 frame_count += 1
 
+                # Print measured camera-only FPS
+                print(f"[RAW] capture dt={dt:.3f}s ({1/dt:.1f} FPS)", end=' | ')
+                if fd:
+                    print(f"[META] FrameDuration={fd}μs ({1e6/fd:.1f} FPS)")
+                else:
+                    print()
+
+                # Print end-to-end FPS once per second
                 now = time.time()
                 if now - last_time >= 1.0:
                     print(f"[FPS] {frame_count} fps", end='\r')
                     frame_count = 0
                     last_time = now
 
+            # Maintain client-side throttle
             time.sleep(1.0 / max(camera_config["fps"], 1))
 
         except Exception as e:
