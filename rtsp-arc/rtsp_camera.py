@@ -20,18 +20,28 @@ picam2.start()
 
 # Step 3: FFmpeg command to stream to RTSP server
 ffmpeg_cmd = [
-    "ffmpeg",
-    "-f", "rawvideo",
-    "-pix_fmt", "yuv420p",              # H.264 expects YUV, not RGB
-    "-s", "1280x720",
-    "-r", "30",
-    "-i", "-",
-    "-c:v", "libx264",
-    "-preset", "ultrafast",
-    "-tune", "zerolatency",
-    "-f", "rtsp",
-    "rtsp://localhost:8554/mystream"
+    'ffmpeg',
+    '-f', 'rawvideo',
+    '-pix_fmt', 'rgb24',
+    '-s', '1280x720',
+    '-r', '30',
+    '-i', 'pipe:',
+    '-f', 'rtsp',
+    '-rtsp_transport', 'tcp',
+    '-fflags', 'nobuffer',
+    '-flags', 'low_delay',
+    '-an',
+    '-vcodec', 'libx264',
+    '-preset', 'ultrafast',
+    '-tune', 'zerolatency',
+    '-pix_fmt', 'yuv420p',
+    '-g', '30',  # GOP size
+    '-keyint_min', '30',
+    '-b:v', '1M',
+    '-bufsize', '1M',
+    'rtsp://localhost:8554/mystream'
 ]
+
 
 process = subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE)
 
