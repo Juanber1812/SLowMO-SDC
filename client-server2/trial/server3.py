@@ -7,14 +7,14 @@ import cv2
 
 app = Flask(__name__)
 
-# Initialize camera
+# Global state
 picam = Picamera2()
 streaming = False
 jpeg_quality = 80
 frame_lock = threading.Lock()
 latest_frame = b''
 
-# Default camera config
+# Default settings
 camera_config = {
     "resolution": (640, 480),
     "fps": 30,
@@ -23,17 +23,21 @@ camera_config = {
 
 def configure_camera():
     global jpeg_quality
-    config = picam.create_preview_configuration(
-        main={"format": "XRGB8888", "size": camera_config["resolution"]},
-        controls={"FrameDurationLimits": (
-            int(1e6 / max(camera_config["fps"], 1)),
-            int(1e6 / max(camera_config["fps"], 1))
-        )}
-    )
-    picam.configure(config)
-    jpeg_quality = camera_config["jpeg_quality"]
+    try:
+        config = picam.create_preview_configuration(
+            main={"format": "XRGB8888", "size": camera_config["resolution"]},
+            controls={"FrameDurationLimits": (
+                int(1e6 / max(camera_config["fps"], 1)),
+                int(1e6 / max(camera_config["fps"], 1))
+            )}
+        )
+        picam.configure(config)
+        jpeg_quality = camera_config["jpeg_quality"]
+        print(f"[INFO] Camera configured: {camera_config}")
+    except Exception as e:
+        print("[ERROR] Camera configuration failed:", e)
 
-def camera_loop():
+def capture_loop():
     global latest_frame
     while streaming:
         try:
@@ -43,8 +47,8 @@ def camera_loop():
                 with frame_lock:
                     latest_frame = buffer.tobytes()
         except Exception as e:
-            print("[ERROR] MJPEG frame capture failed:", e)
-        time.sleep(0.001)
+            print("[ERROR] Frame capture failed:", e)
+        time.sleep(0.001)  # minimal delay for high FPS
 
 @app.route('/video_feed')
 def video_feed():
@@ -62,52 +66,65 @@ def video_feed():
 def start_stream():
     global streaming
     if not streaming:
-        configure_camera()
-        picam.start()
-        streaming = True
-        threading.Thread(target=camera_loop, daemon=True).start()
-        print("[INFO] Camera started.")
-    return "Stream started", 200
+        try:
+            configure_camera()
+            picam.start()
+            streaming = True
+            threading.Thread(target=capture_loop, daemon=True).start()
+            print("[INFO] Streaming started.")
+            return "Stream started", 200
+        except Exception as e:
+            print("[ERROR] Start failed:", e)
+            return "Failed to start stream", 500
+    return "Already streaming", 200
 
 @app.route('/stop', methods=['POST'])
 def stop_stream():
     global streaming
     if streaming:
-        streaming = False
-        picam.stop()
-        print("[INFO] Camera stopped.")
-    return "Stream stopped", 200
+        try:
+            streaming = False
+            picam.stop()
+            print("[INFO] Streaming stopped.")
+            return "Stream stopped", 200
+        except Exception as e:
+            print("[ERROR] Stop failed:", e)
+            return "Failed to stop stream", 500
+    return "Already stopped", 200
 
 @app.route('/config', methods=['POST'])
 def update_config():
+    global camera_config
     try:
-        data = request.json
+        data = request.get_json()
         if "resolution" in data:
             camera_config["resolution"] = tuple(data["resolution"])
         if "fps" in data:
             camera_config["fps"] = int(data["fps"])
         if "jpeg_quality" in data:
             camera_config["jpeg_quality"] = int(data["jpeg_quality"])
-        print("[CONFIG] Updated settings:", camera_config)
+        print(f"[CONFIG] Updated config: {camera_config}")
         if streaming:
-            configure_camera()
+            configure_camera()  # live reconfig
         return "Config updated", 200
     except Exception as e:
         print("[ERROR] Config update failed:", e)
-        return "Error", 400
+        return "Invalid config", 400
 
 @app.route('/')
 def index():
-    return '''<html>
-        <head><title>MJPEG Stream</title></head>
-        <body>
-            <h2>MJPEG Stream</h2>
-            <img src="/video_feed" width="640">
-            <form action="/start" method="post"><button>Start Camera</button></form>
-            <form action="/stop" method="post"><button>Stop Camera</button></form>
-        </body>
-    </html>'''
+    return '''
+    <html>
+      <head><title>MJPEG Stream</title></head>
+      <body>
+        <h2>MJPEG Stream</h2>
+        <img src="/video_feed" width="640"><br>
+        <form action="/start" method="post"><button>Start Camera</button></form>
+        <form action="/stop" method="post"><button>Stop Camera</button></form>
+      </body>
+    </html>
+    '''
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("[INFO] MJPEG camera server running at http://0.0.0.0:8080")
     app.run(host='0.0.0.0', port=8080, threaded=True)
