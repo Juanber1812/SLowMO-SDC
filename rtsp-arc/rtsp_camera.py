@@ -22,7 +22,7 @@ picam2.start()
 ffmpeg_cmd = [
     'ffmpeg',
     '-f', 'rawvideo',
-    '-pix_fmt', 'rgb24',
+    '-pix_fmt', 'yuv420p',
     '-s', '1280x720',
     '-r', '30',
     '-i', 'pipe:',
