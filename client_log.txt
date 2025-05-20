@@ -19573,3 +19573,9 @@ INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 100, 'resolution': (1280, 720
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 50, 'resolution': (1920, 1080)}
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 30, 'resolution': (2592, 1944)}
 INFO:root:Sent config: {'jpeg_quality': 83, 'fps': 30, 'resolution': (2592, 1944)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747741379.665092 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 32, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 106, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 106, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 129, 'resolution': (640, 480)}

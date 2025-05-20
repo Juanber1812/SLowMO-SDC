@@ -52,20 +52,28 @@ def reconfigure_camera():
         res = camera_config["resolution"]
         jpeg_quality = camera_config["jpeg_quality"]
         fps = camera_config["fps"]
-        duration = int(1e6 / max(fps, 1))
+        duration = int(1e6 / max(fps, 1))  # microseconds per frame
 
         if picam.started:
             picam.stop()
 
-        config = picam.create_preview_configuration(
-            main={"format": "XRGB8888", "size": res},
+        # Use lightweight format and optimized video pipeline
+        config = picam.create_video_configuration(
+            main={"format": "YUV420", "size": res},
             controls={"FrameDurationLimits": (duration, duration)}
         )
+
+        # Optional: log supported sensor modes for debugging
+        print("[DEBUG] Supported sensor modes:")
+        for mode in picam.sensor_modes:
+            print(mode)
+
         picam.configure(config)
         picam.start()
         print(f"[INFO] Camera reconfigured: {res}, JPEG: {jpeg_quality}, FPS: {fps}")
     except Exception as e:
         print("[ERROR] Reconfigure failed:", e)
+
 
 def start_stream():
     global streaming, picam
