@@ -74,17 +74,6 @@ class CameraStreamer:
         while True:
             try:
                 if self.streaming:
-                    if last_streaming != True:
-                        # Only print when streaming state changes
-                        print_status_line(
-                            "Streaming",
-                            self.config.get("resolution"),
-                            self.config.get("jpeg_quality"),
-                            self.config.get("fps"),
-                            fps_value=0
-                        )
-                        last_streaming = True
-
                     frame = self.picam.capture_array()
                     ok, buf = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), self.config["jpeg_quality"]])
                     if not ok:
@@ -105,6 +94,7 @@ class CameraStreamer:
                         )
                         frame_count = 0
                         last_time = now
+                    last_streaming = True
                 else:
                     if last_streaming != False:
                         print_status_line(
@@ -126,7 +116,6 @@ streamer = CameraStreamer()
 @sio.event
 def connect():
     streamer.connected = True
-    print_status_line("Connected to server")
 
 @sio.event
 def disconnect():
@@ -134,32 +123,22 @@ def disconnect():
     streamer.streaming = False
     if hasattr(streamer, "picam") and getattr(streamer.picam, "started", False):
         streamer.picam.stop()
-    print_status_line("Disconnected from server")
-
 
 @sio.on("start_camera")
 def on_start_camera(_):
     streamer.streaming = True
     if not streamer.picam.started:
         streamer.picam.start()
-    print_status_line("Streaming started", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"))
-
 
 @sio.on("stop_camera")
 def on_stop_camera(_):
     streamer.streaming = False
-    print_status_line("Idle", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"), fps_value=0)
-
 
 @sio.on("camera_config")
 def on_camera_config(data):
     streamer.config.update(data)
     if not streamer.streaming:
         streamer.apply_config()
-        print_status_line("Configured", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"))
-    else:
-        print_status_line("Can't apply config while streaming", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"))
-
 
 def start_stream():
     streamer.connect_socket()
