@@ -93,23 +93,24 @@ def print_status_line(status, resolution=None, jpeg_quality=None, fps=None, fps_
         msg += f" | Streaming: {fps_value} fps"
     print(msg.ljust(100), end='\r', flush=True)
 
+def print_camera_status(status):
+    print(f"[CAMERA STATUS] {status}".ljust(80), end='\r', flush=True)
+
 streamer = CameraStreamer()
 
 
 @sio.event
 def connect():
-    print("[INFO] Connected to server.")
     streamer.connected = True
-
+    print_camera_status("Connected to server")
 
 @sio.event
 def disconnect():
-    print("[INFO] Disconnected from server.")
     streamer.connected = False
     streamer.streaming = False
     if hasattr(streamer, "picam") and getattr(streamer.picam, "started", False):
         streamer.picam.stop()
-        print("[INFO] Camera stopped due to disconnect.")
+    print_camera_status("Disconnected from server")
 
 
 @sio.on("start_camera")

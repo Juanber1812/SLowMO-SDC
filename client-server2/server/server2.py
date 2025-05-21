@@ -10,6 +10,9 @@ import threading
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+connected_clients = set()
+CAMERA_SID = None  # Store the camera's session id
+
 
 def start_background_tasks():
     threading.Thread(target=camera.start_stream, daemon=True).start()
@@ -18,20 +21,30 @@ def start_background_tasks():
 
 @socketio.on('connect')
 def handle_connect():
-    try:
-        emit('server_status', {'status': 'connected'}, to=request.sid)
+    global CAMERA_SID
+    sid = request.sid
+    # Identify the camera by a special handshake or first connection
+    if CAMERA_SID is None:
+        CAMERA_SID = sid
+        print("[SERVER STATUS] Camera connected".ljust(80), end='\r', flush=True)
+    else:
+        connected_clients.add(sid)
         print(f"[INFO] Client connected: {request.sid}")
-    except Exception as e:
-        print(f"[ERROR] connect: {e}")
 
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    try:
-        emit('server_status', {'status': 'disconnected'}, to=request.sid)
+    global CAMERA_SID
+    sid = request.sid
+    if sid == CAMERA_SID:
+        print("[SERVER STATUS] Camera disconnected".ljust(80), end='\r', flush=True)
+        CAMERA_SID = None
+    else:
+        connected_clients.discard(sid)
+        if not connected_clients:
+            # No more clients, stop the camera
+            socketio.emit('stop_camera', {}, broadcast=True)
         print(f"[INFO] Client disconnected: {request.sid}")
-    except Exception as e:
-        print(f"[ERROR] disconnect: {e}")
 
 
 @socketio.on('frame')
