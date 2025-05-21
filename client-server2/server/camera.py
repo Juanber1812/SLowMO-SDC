@@ -77,15 +77,7 @@ class CameraStreamer:
                 print("[ERROR] Stream loop exception:", e)
                 sio.sleep(1)
 
-def print_status_line(status, resolution=None, jpeg_quality=None, fps=None):
-    msg = f"[STATUS] {status}"
-    if resolution is not None:
-        msg += f" | Res: {resolution}"
-    if jpeg_quality is not None:
-        msg += f" | JPEG: {jpeg_quality}"
-    if fps is not None:
-        msg += f" | FPS: {fps}"
-    print(msg.ljust(80), end='\r', flush=True)
+
 
 streamer = CameraStreamer()
 
@@ -111,9 +103,7 @@ def on_start_camera(_):
     streamer.streaming = True
     if not streamer.picam.started:
         streamer.picam.start()
-    # Use current config for display
-    cfg = streamer.config
-    print_status_line("Streaming started", cfg.get("resolution"), cfg.get("jpeg_quality"), cfg.get("fps"))
+    print("[INFO] Streaming started.")
 
 
 @sio.on("stop_camera")
@@ -121,19 +111,17 @@ def on_stop_camera(_):
     streamer.streaming = False
     if streamer.picam.started:
         streamer.picam.stop()
-    cfg = streamer.config
-    print_status_line("Streaming stopped", cfg.get("resolution"), cfg.get("jpeg_quality"), cfg.get("fps"))
+    print("[INFO] Streaming stopped.")
 
 
 @sio.on("camera_config")
 def on_camera_config(data):
+    print(f"[INFO] New camera config: {data}")
     streamer.config.update(data)
-    cfg = streamer.config
     if not streamer.streaming:
         streamer.apply_config()
-        print_status_line("Configured", cfg.get("resolution"), cfg.get("jpeg_quality"), cfg.get("fps"))
     else:
-        print_status_line("Can't apply config while streaming", cfg.get("resolution"), cfg.get("jpeg_quality"), cfg.get("fps"))
+        print("[WARN] Can't apply config while streaming.")
 
 
 def start_stream():
