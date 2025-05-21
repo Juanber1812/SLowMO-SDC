@@ -11,12 +11,12 @@ logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.1.146:5000"
 
 RES_PRESETS = [
-    ("160x120", (160, 120)),
-    ("320x240", (320, 240)),
-    ("640x480", (640, 480)),
-    ("960x720", (960, 720)),
-    ("1280x960", (1280, 960)),
-    ("1440x1080", (1440, 1080)),
+    ("192x108", (192, 108)),
+    ("256x144", (256, 144)),
+    ("384x216", (384, 216)),
+    ("768x432", (768, 432)),
+    ("1024x576", (1024, 576)),
+    ("1536x864", (1536, 864)),
 ]
 
 
@@ -173,7 +173,7 @@ class MainWindow(QWidget):
                 logging.exception("Sensor update failed")
 
     def update_fps_slider(self):
-        self.fps_slider.setRange(1, 200)
+        self.fps_slider.setRange(1, 120)
         self.fps_label.setText(f"FPS: {self.fps_slider.value()}")
 
     def toggle_stream(self):

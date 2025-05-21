@@ -30,7 +30,7 @@ class CameraStreamer:
         self.config = {
             "jpeg_quality": 70,
             "fps": 10,
-            "resolution": [640, 480]
+            "resolution": [1536, 864]
         }
         self.picam = Picamera2()
 
