@@ -20851,3 +20851,32 @@ Traceback (most recent call last):
     bridge.frame_received.emit(frame)
     ^^^^^^^^^^^^^^^^^^^^^
 RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747824275.2536075 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (160, 120)}
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747824295.0244722 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (160, 120)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (160, 120)}
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747824301.2958546 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (160, 120)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (160, 120)}
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747824302.5096323 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (160, 120)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (160, 120)}
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747824309.498378 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (960, 720)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (960, 720)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (960, 720)}
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747824321.7846963 HTTP/1.1" 200 97
+ERROR:root:Reconnect failed
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 297, in reconnect_socket
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 168, in connect
+    raise exceptions.ConnectionError(
+        'One or more namespaces failed to connect')
+socketio.exceptions.ConnectionError: One or more namespaces failed to connect
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747824326.9659393 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (960, 720)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (960, 720)}

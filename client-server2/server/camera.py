@@ -9,25 +9,19 @@ from picamera2 import Picamera2
 SERVER_URL = "http://localhost:5000"
 sio = socketio.Client()
 
-last_status_line = ""
+last_status = None
 last_fps_value = None
 
-def print_status_line(status, resolution=None, jpeg_quality=None, fps=None, fps_value=None):
-    global last_status_line, last_fps_value
-    msg = f"[CAMERA STATUS] {status}"
-    if resolution is not None:
-        msg += f" | Res: {resolution}"
-    if jpeg_quality is not None:
-        msg += f" | JPEG: {jpeg_quality}"
-    if fps is not None:
-        msg += f" | FPS: {fps}"
-    if fps_value is not None:
-        msg += f" | Streaming: {fps_value} fps"
-    # Only print if the message or fps_value changes
-    if msg != last_status_line or fps_value != last_fps_value:
-        print(msg.ljust(100), end='\r', flush=True)
-        last_status_line = msg
-        last_fps_value = fps_value
+def print_status_line(status, resolution, jpeg_quality, fps, fps_value):
+    global last_status, last_fps_value
+    msg = f"[CAMERA] {status} | Res:{resolution} | Q:{jpeg_quality} | FPS:{fps} | {fps_value}fps"
+    # Only print a new line if status (Idle/Streaming) changes
+    if last_status != status:
+        print()  # Move to a new line if status changes (optional, can remove for always-in-place)
+        last_status = status
+    # Always update the line in place
+    print(msg.ljust(80), end='\r', flush=True)
+    last_fps_value = fps_value
 
 class CameraStreamer:
     def __init__(self):
@@ -83,28 +77,29 @@ class CameraStreamer:
                     frame_count += 1
                     now = time.time()
                     if now - last_time >= 1.0:
-                        # Update FPS once per second
+                        # Always update the same line with current status and FPS
                         cfg = self.config
                         print_status_line(
                             "Streaming",
                             cfg.get("resolution"),
                             cfg.get("jpeg_quality"),
                             cfg.get("fps"),
-                            fps_value=frame_count
+                            frame_count
                         )
                         frame_count = 0
                         last_time = now
                     last_streaming = True
                 else:
-                    if last_streaming != False:
-                        print_status_line(
-                            "Idle",
-                            self.config.get("resolution"),
-                            self.config.get("jpeg_quality"),
-                            self.config.get("fps"),
-                            fps_value=0
-                        )
-                        last_streaming = False
+                    # Always update the same line with Idle status and FPS 0
+                    cfg = self.config
+                    print_status_line(
+                        "Idle",
+                        cfg.get("resolution"),
+                        cfg.get("jpeg_quality"),
+                        cfg.get("fps"),
+                        0
+                    )
+                    last_streaming = False
                     time.sleep(0.5)
             except Exception as e:
                 print("[ERROR] Stream loop exception:", e)
