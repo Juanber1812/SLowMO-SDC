@@ -92,41 +92,40 @@ def connect():
 def disconnect():
     print("[INFO] Disconnected from server.")
     streamer.connected = False
-    # Stop streaming and camera on disconnect
     streamer.streaming = False
     if hasattr(streamer, "picam") and getattr(streamer.picam, "started", False):
         streamer.picam.stop()
         print("[INFO] Camera stopped due to disconnect.")
 
 
-@sio.on("start_camera")
+@sio.on("start_camera")@sio.on("start_camera")
 def on_start_camera(_):
-    streamer.streaming = True
-    if not streamer.picam.started:
+    streamer.streaming = True= True
+    if not streamer.picam.started:rted:
         streamer.picam.start()
-    print("[INFO] Streaming started.")
+    print("[INFO] Streaming started.")arted.")
 
 
-@sio.on("stop_camera")
+@sio.on("stop_camera")@sio.on("stop_camera")
 def on_stop_camera(_):
-    streamer.streaming = False
+    streamer.streaming = False = False
     if streamer.picam.started:
         streamer.picam.stop()
-    print("[INFO] Streaming stopped.")
+    print("[INFO] Streaming stopped.")topped.")
 
 
-@sio.on("camera_config")
-def on_camera_config(data):
-    print(f"[INFO] New camera config: {data}")
+@sio.on("camera_config")@sio.on("camera_config")
+def on_camera_config(data):a):
+    print(f"[INFO] New camera config: {data}")ra config: {data}")
     streamer.config.update(data)
     if not streamer.streaming:
-        streamer.apply_config()
+        streamer.apply_config())
     else:
-        print("[WARN] Can't apply config while streaming.")
+        print("[WARN] Can't apply config while streaming.")rint("[WARN] Can't apply config while streaming.")
 
 
-def start_stream():
-    streamer.connect_socket()
+def start_stream():def start_stream():
+    streamer.connect_socket()t_socket()
     streamer.apply_config()
-    print("[INFO] Camera ready.")
+    print("[INFO] Camera ready.")ady."
     streamer.stream_loop()
