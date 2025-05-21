@@ -63,18 +63,27 @@ class CameraStreamer:
             )
             self.picam.configure(stream_cfg)
             self.picam.start()
-            print(f"[INFO] Camera configured: {res}, JPEG: {jpeg_quality}, FPS: {fps}")
         except Exception as e:
             print("[ERROR] Failed to configure camera:", e)
 
     def stream_loop(self):
         frame_count = 0
         last_time = time.time()
+        last_streaming = None  # Track last streaming state
 
         while True:
             try:
                 if self.streaming:
-                    start_time = time.time()
+                    if last_streaming != True:
+                        # Only print when streaming state changes
+                        print_status_line(
+                            "Streaming",
+                            self.config.get("resolution"),
+                            self.config.get("jpeg_quality"),
+                            self.config.get("fps"),
+                            fps_value=0
+                        )
+                        last_streaming = True
 
                     frame = self.picam.capture_array()
                     ok, buf = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), self.config["jpeg_quality"]])
@@ -85,7 +94,7 @@ class CameraStreamer:
                     frame_count += 1
                     now = time.time()
                     if now - last_time >= 1.0:
-                        # Use current config for display
+                        # Update FPS once per second
                         cfg = self.config
                         print_status_line(
                             "Streaming",
@@ -97,13 +106,15 @@ class CameraStreamer:
                         frame_count = 0
                         last_time = now
                 else:
-                    print_status_line(
-                        "Idle",
-                        self.config.get("resolution"),
-                        self.config.get("jpeg_quality"),
-                        self.config.get("fps"),
-                        fps_value=0
-                    )
+                    if last_streaming != False:
+                        print_status_line(
+                            "Idle",
+                            self.config.get("resolution"),
+                            self.config.get("jpeg_quality"),
+                            self.config.get("fps"),
+                            fps_value=0
+                        )
+                        last_streaming = False
                     time.sleep(0.5)
             except Exception as e:
                 print("[ERROR] Stream loop exception:", e)
