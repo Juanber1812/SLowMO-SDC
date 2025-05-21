@@ -21,7 +21,6 @@ def handle_connect():
     try:
         emit('server_status', {'status': 'connected'}, to=request.sid)
         print(f"[INFO] Client connected: {request.sid}")
-        # No automatic camera start here
     except Exception as e:
         print(f"[ERROR] connect: {e}")
 
@@ -31,7 +30,6 @@ def handle_disconnect():
     try:
         emit('server_status', {'status': 'disconnected'}, to=request.sid)
         print(f"[INFO] Client disconnected: {request.sid}")
-        # No automatic camera stop here
     except Exception as e:
         print(f"[ERROR] disconnect: {e}")
 
@@ -48,7 +46,7 @@ def handle_frame(data):
 def handle_start_camera():
     try:
         emit('start_camera', {}, broadcast=True)
-        print("[INFO] start_camera triggered")
+        # print("[INFO] start_camera triggered")  # Commented to reduce log spam
     except Exception as e:
         print(f"[ERROR] start_camera: {e}")
 
@@ -57,7 +55,7 @@ def handle_start_camera():
 def handle_stop_camera():
     try:
         emit('stop_camera', {}, broadcast=True)
-        print("[INFO] stop_camera triggered")
+        # print("[INFO] stop_camera triggered")  # Commented to reduce log spam
     except Exception as e:
         print(f"[ERROR] stop_camera: {e}")
 
@@ -66,7 +64,7 @@ def handle_stop_camera():
 def handle_camera_config(data):
     try:
         emit('camera_config', data, broadcast=True)
-        print(f"[INFO] camera_config updated: {data}")
+        # print(f"[INFO] camera_config updated: {data}")  # Commented to reduce log spam
     except Exception as e:
         print(f"[ERROR] camera_config: {e}")
 

@@ -62,22 +62,26 @@ class CameraStreamer:
 
                     sio.emit("frame", buf.tobytes())
                     frame_count += 1
-
-                    # Update FPS display every second
                     now = time.time()
                     if now - last_time >= 1.0:
-                        print(f"[FPS] {frame_count} fps", end='\r')
+                        # Use current config for display
+                        cfg = self.config
+                        print_status_line(
+                            "Streaming",
+                            cfg.get("resolution"),
+                            cfg.get("jpeg_quality"),
+                            cfg.get("fps"),
+                            fps_value=frame_count
+                        )
                         frame_count = 0
                         last_time = now
-
                 else:
-                    sio.sleep(0.1)  # prevent busy waiting when not streaming
-
+                    time.sleep(0.1)
             except Exception as e:
                 print("[ERROR] Stream loop exception:", e)
-                sio.sleep(1)
+                time.sleep(1)
 
-def print_status_line(status, resolution=None, jpeg_quality=None, fps=None):
+def print_status_line(status, resolution=None, jpeg_quality=None, fps=None, fps_value=None):
     msg = f"[STATUS] {status}"
     if resolution is not None:
         msg += f" | Res: {resolution}"
@@ -85,7 +89,9 @@ def print_status_line(status, resolution=None, jpeg_quality=None, fps=None):
         msg += f" | JPEG: {jpeg_quality}"
     if fps is not None:
         msg += f" | FPS: {fps}"
-    print(msg.ljust(80), end='\r', flush=True)
+    if fps_value is not None:
+        msg += f" | Streaming: {fps_value} fps"
+    print(msg.ljust(100), end='\r', flush=True)
 
 streamer = CameraStreamer()
 
