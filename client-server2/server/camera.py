@@ -9,8 +9,11 @@ from picamera2 import Picamera2
 SERVER_URL = "http://localhost:5000"
 sio = socketio.Client()
 
+last_status_line = ""  # Initialize global variable
+
 
 def print_status_line(status, resolution=None, jpeg_quality=None, fps=None, fps_value=None):
+    global last_status_line
     msg = f"[CAMERA STATUS] {status}"
     if resolution is not None:
         msg += f" | Res: {resolution}"
@@ -20,7 +23,10 @@ def print_status_line(status, resolution=None, jpeg_quality=None, fps=None, fps_
         msg += f" | FPS: {fps}"
     if fps_value is not None:
         msg += f" | Streaming: {fps_value} fps"
-    print(msg.ljust(100), end='\r', flush=True)
+    # Only print if the message is different from the last one
+    if msg != last_status_line:
+        print(msg.ljust(100), end='\r', flush=True)
+        last_status_line = msg
 
 class CameraStreamer:
     def __init__(self):
