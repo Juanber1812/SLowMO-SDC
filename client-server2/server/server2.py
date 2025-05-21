@@ -83,5 +83,27 @@ def handle_sensor_data(data):
 
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
+    print("Press Ctrl+C to stop the server and clean up resources.")
     start_background_tasks()
-    socketio.run(app, host="0.0.0.0", port=5000)
+    try:
+        socketio.run(app, host="0.0.0.0", port=5000)
+    except KeyboardInterrupt:
+        print("\n[INFO] Shutting down server...")
+
+        # Attempt to stop camera and sensors gracefully
+        try:
+            camera.streamer.streaming = False
+            if hasattr(camera.streamer, "picam") and getattr(camera.streamer.picam, "started", False):
+                camera.streamer.picam.stop()
+                print("[INFO] Camera stopped.")
+        except Exception as e:
+            print(f"[WARN] Could not stop camera: {e}")
+
+        try:
+            sensors.stop_sensors()  # If you have a stop_sensors function
+            print("[INFO] Sensors stopped.")
+        except Exception as e:
+            print(f"[WARN] Could not stop sensors: {e}")
+
+        print("[INFO] Server exited cleanly.")
+        exit(0)
