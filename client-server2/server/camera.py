@@ -73,7 +73,7 @@ class CameraStreamer:
                     if not ok:
                         continue
 
-                    sio.emit("frame", buf.tobytes())
+                    sio.emit("frame", buf.tobytes(),binary=True)
                     frame_count += 1
                     now = time.time()
                     if now - last_time >= 1.0:

@@ -21305,3 +21305,95 @@ DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:500
 DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747830461.4287367 HTTP/1.1" 200 97
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747830532.5294363 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.1.146
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747830971.193281 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (256, 144)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (384, 216)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (768, 432)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1024, 576)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1024, 576)}
+INFO:root:Sent config: {'jpeg_quality': 86, 'fps': 10, 'resolution': (1024, 576)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 10, 'resolution': (1024, 576)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 36, 'resolution': (1024, 576)}
+INFO:root:Sent config: {'jpeg_quality': 62, 'fps': 36, 'resolution': (1024, 576)}
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 159, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 159, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747831471.7886236 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 51, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 11, 'fps': 118, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 4, 'fps': 118, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 1, 'fps': 118, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 1, 'fps': 120, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 1, 'fps': 120, 'resolution': (256, 144)}
+INFO:root:Sent config: {'jpeg_quality': 1, 'fps': 120, 'resolution': (384, 216)}
+INFO:root:Sent config: {'jpeg_quality': 1, 'fps': 120, 'resolution': (768, 432)}
+INFO:root:Sent config: {'jpeg_quality': 1, 'fps': 120, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 1, 'fps': 120, 'resolution': (768, 432)}
+INFO:root:Sent config: {'jpeg_quality': 43, 'fps': 120, 'resolution': (768, 432)}
+INFO:root:Sent config: {'jpeg_quality': 43, 'fps': 120, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 43, 'fps': 120, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 43, 'fps': 120, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 120, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 76, 'resolution': (256, 144)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 76, 'resolution': (768, 432)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 76, 'resolution': (384, 216)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 76, 'resolution': (1024, 576)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 14, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747832376.7249205 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 26, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 26, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 14, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 81, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 1, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 1, 'resolution': (1024, 576)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 1, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 120, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 120, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 9, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 80, 'fps': 9, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 9, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 100, 'fps': 4, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 57, 'fps': 4, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 80, 'fps': 40, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 80, 'fps': 8, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747832841.0648365 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 4, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747833242.539372 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 80, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 80, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 80, 'fps': 4, 'resolution': (1536, 864)}
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 159, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
