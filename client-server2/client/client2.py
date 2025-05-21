@@ -152,7 +152,7 @@ class MainWindow(QWidget):
         @sio.on("frame")
         def on_frame(data):
             try:
-                arr = np.frombuffer(base64.b64decode(data), np.uint8)
+                arr = np.frombuffer(data, np.uint8)
                 frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
                 if frame is not None:
                     self.current_frame_size = len(data)
