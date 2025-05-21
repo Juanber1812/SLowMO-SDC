@@ -24,11 +24,14 @@ FPS_LIMITS = {
 
 sio = socketio.Client()
 
+
 class Bridge(QObject):
     frame_received = pyqtSignal(np.ndarray)
     analysed_frame = pyqtSignal(np.ndarray)
 
+
 bridge = Bridge()
+
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -39,7 +42,23 @@ class MainWindow(QWidget):
         self.frame_queue = queue.Queue()
         self.last_frame = None
 
-        # Layouts
+        self.setup_ui()
+        self.setup_socket_events()
+
+        bridge.frame_received.connect(self.update_image)
+        bridge.analysed_frame.connect(self.update_analysed_image)
+
+        self.last_frame_time = time.time()
+        self.frame_counter = 0
+        self.current_fps = 0
+        self.current_frame_size = 0
+        self.fps_timer = self.startTimer(1000)
+
+        self.speed_timer = QTimer()
+        self.speed_timer.timeout.connect(self.measure_speed)
+        self.speed_timer.start(30000)
+
+    def setup_ui(self):
         main_layout = QHBoxLayout(self)
         left_layout = QVBoxLayout()
         right_layout = QVBoxLayout()
@@ -62,7 +81,6 @@ class MainWindow(QWidget):
         self.detector_btn.clicked.connect(self.toggle_detector)
         left_layout.addWidget(self.detector_btn)
 
-        # Info panel
         self.info_labels = {
             "temp": QLabel("Temp: -- °C"),
             "cpu": QLabel("CPU: --%"),
@@ -75,7 +93,6 @@ class MainWindow(QWidget):
             label.setStyleSheet("font-family: monospace;")
             right_layout.addWidget(label)
 
-        # Camera settings
         self.jpeg_slider = QSlider(Qt.Orientation.Horizontal)
         self.jpeg_slider.setRange(10, 100)
         self.jpeg_slider.setValue(70)
@@ -101,6 +118,9 @@ class MainWindow(QWidget):
         self.toggle_btn.setEnabled(False)
         self.toggle_btn.clicked.connect(self.toggle_stream)
 
+        self.reconnect_btn = QPushButton("Reconnect")
+        self.reconnect_btn.clicked.connect(self.try_reconnect)
+
         config_group = QGroupBox("Camera Settings")
         grid = QGridLayout()
         grid.addWidget(self.jpeg_label, 0, 0)
@@ -114,19 +134,44 @@ class MainWindow(QWidget):
 
         right_layout.addWidget(config_group)
         right_layout.addWidget(self.toggle_btn)
+        right_layout.addWidget(self.reconnect_btn)
 
-        bridge.frame_received.connect(self.update_image)
-        bridge.analysed_frame.connect(self.update_analysed_image)
+    def setup_socket_events(self):
+        @sio.event
+        def connect():
+            self.status_label.setText("Status: Connected")
+            self.toggle_btn.setEnabled(True)
+            self.detector_btn.setEnabled(True)
 
-        self.last_frame_time = time.time()
-        self.frame_counter = 0
-        self.current_fps = 0
-        self.current_frame_size = 0
-        self.fps_timer = self.startTimer(1000)
+        @sio.event
+        def disconnect():
+            self.status_label.setText("Status: Disconnected")
+            self.toggle_btn.setEnabled(False)
+            self.detector_btn.setEnabled(False)
 
-        self.speed_timer = QTimer()
-        self.speed_timer.timeout.connect(self.measure_speed)
-        self.speed_timer.start(30000)
+        @sio.on("frame")
+        def on_frame(data):
+            try:
+                arr = np.frombuffer(base64.b64decode(data), np.uint8)
+                frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+                if frame is not None:
+                    self.current_frame_size = len(data)
+                    self.frame_counter += 1
+                    bridge.frame_received.emit(frame)
+                else:
+                    logging.warning("Frame decode returned None")
+            except Exception as e:
+                logging.exception("Frame decode error")
+
+        @sio.on("sensor_broadcast")
+        def on_sensor_data(data):
+            try:
+                temp = data.get("temperature", 0)
+                cpu = data.get("cpu_percent", 0)
+                self.info_labels["temp"].setText(f" Temp: {temp:.1f} °C")
+                self.info_labels["cpu"].setText(f" CPU: {cpu:.1f} %")
+            except Exception as e:
+                logging.exception("Sensor update failed")
 
     def update_fps_slider(self):
         idx = self.res_dropdown.currentIndex()
@@ -166,8 +211,7 @@ class MainWindow(QWidget):
         if self.detector_active:
             threading.Thread(target=self.run_detector, daemon=True).start()
         else:
-            with self.frame_queue.mutex:
-                self.frame_queue.queue.clear()
+            self.clear_queue()
 
     def run_detector(self):
         while self.detector_active:
@@ -188,11 +232,8 @@ class MainWindow(QWidget):
         pixmap = QPixmap.fromImage(qimg)
         pixmap = pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
         self.image_label.setPixmap(pixmap)
-        # If detector is active, put the frame in the queue for analysis
         if self.detector_active:
-            # Clear the queue to always process the latest frame
-            with self.frame_queue.mutex:
-                self.frame_queue.queue.clear()
+            self.clear_queue()
             self.frame_queue.put(self.last_frame)
 
     def update_analysed_image(self, frame):
@@ -202,6 +243,13 @@ class MainWindow(QWidget):
         pixmap = QPixmap.fromImage(qimg)
         pixmap = pixmap.scaled(self.analysed_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
         self.analysed_label.setPixmap(pixmap)
+
+    def clear_queue(self):
+        while not self.frame_queue.empty():
+            try:
+                self.frame_queue.get_nowait()
+            except queue.Empty:
+                break
 
     def measure_speed(self):
         self.info_labels["speed"].setText("Upload: Testing...")
@@ -230,42 +278,19 @@ class MainWindow(QWidget):
         self.info_labels["fps"].setText(f"FPS: {self.current_fps}")
         self.info_labels["frame_size"].setText(f" Frame Size: {self.current_frame_size / 1024:.1f} KB")
 
-# Socket.IO Events
-@sio.on("sensor_broadcast")
-def on_sensor_data(data):
-    try:
-        temp = data.get("temperature", 0)
-        cpu = data.get("cpu_percent", 0)
-        win.info_labels["temp"].setText(f" Temp: {temp:.1f} °C")
-        win.info_labels["cpu"].setText(f" CPU: {cpu:.1f} %")
-    except Exception as e:
-        print("Sensor update failed:", e)
+    def try_reconnect(self):
+        threading.Thread(target=self.reconnect_socket, daemon=True).start()
 
-@sio.event
-def connect():
-    win.status_label.setText("Status: Connected")
-    win.toggle_btn.setEnabled(True)
-    win.detector_btn.setEnabled(True)
+    def reconnect_socket(self):
+        try:
+            sio.disconnect()
+        except:
+            pass
+        try:
+            sio.connect(SERVER_URL, wait_timeout=5)
+        except Exception as e:
+            logging.exception("Reconnect failed")
 
-@sio.event
-def disconnect():
-    win.status_label.setText("Status: Disconnected")
-    win.toggle_btn.setEnabled(False)
-    win.detector_btn.setEnabled(False)
-
-@sio.on("frame")
-def on_frame(data):
-    try:
-        arr = np.frombuffer(base64.b64decode(data), np.uint8)
-        frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-        if frame is not None:
-            win.current_frame_size = len(data)
-            win.frame_counter += 1
-            bridge.frame_received.emit(frame)
-        else:
-            logging.warning("Frame decode returned None")
-    except Exception as e:
-        logging.exception("❌ Frame decode error")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -273,11 +298,13 @@ if __name__ == "__main__":
     win.show()
 
     def socket_thread():
-        try:
-            sio.connect(SERVER_URL, wait_timeout=5)
-            sio.wait()
-        except Exception as e:
-            logging.exception("❌ SocketIO connection error")
+        while True:
+            try:
+                sio.connect(SERVER_URL, wait_timeout=5)
+                sio.wait()
+            except Exception as e:
+                logging.exception("SocketIO connection error")
+                time.sleep(5)
 
     threading.Thread(target=socket_thread, daemon=True).start()
     sys.exit(app.exec())
