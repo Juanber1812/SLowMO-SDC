@@ -1,11 +1,14 @@
 import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
-    QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox
-)
+    QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox)
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage
 import detector4  # Make sure detector4.py is in the same folder
+
+from distance import RelativeDistancePlotter
+from relative_angle import RelativeAnglePlotter
+from spin import AngularPositionPlotter
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.1.146:5000"
@@ -38,6 +41,9 @@ class MainWindow(QWidget):
         self.frame_queue = queue.Queue()
         self.last_frame = None
 
+        self.shared_start_time = None
+
+
         self.setup_ui()
         self.setup_socket_events()
 
@@ -53,6 +59,8 @@ class MainWindow(QWidget):
         self.speed_timer = QTimer()
         self.speed_timer.timeout.connect(self.measure_speed)
         self.speed_timer.start(10000)
+
+        self.graph_window = None
 
     def setup_ui(self):
         main_layout = QHBoxLayout(self)
@@ -202,14 +210,15 @@ class MainWindow(QWidget):
         right_layout.addWidget(record_group)
 
         # --- Graph Display Placeholder ---
+
         graph_display_group = QGroupBox("Graph Display")
-        graph_display_layout = QVBoxLayout()
-        self.graph_display_label = QLabel("Graph will appear here.")
+        self.graph_display_layout = QVBoxLayout()
+        self.graph_display_label = QLabel("Select payload mode")
         self.graph_display_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.graph_display_label.setMinimumSize(384, 216)
-        self.graph_display_label.setStyleSheet("background: #eee; border: 1px dashed #aaa; color: #888;")
-        graph_display_layout.addWidget(self.graph_display_label)
-        graph_display_group.setLayout(graph_display_layout)
+        self.graph_display_label.setMinimumSize(384, 230)
+        self.graph_display_label.setStyleSheet("background: #eee; border: 1px solid #888; color: #888;")
+        self.graph_display_layout.addWidget(self.graph_display_label)
+        graph_display_group.setLayout(self.graph_display_layout)
         right_layout.addWidget(graph_display_group)
 
         right_layout.addStretch()
@@ -217,15 +226,50 @@ class MainWindow(QWidget):
     def launch_graph(self):
         mode = self.graph_dropdown.currentText()
         print(f"[DEBUG] Launch Graph clicked - Mode selected: {mode}")
-        # We'll wire this up to graph classes later
+
+        # Remove all widgets from the graph display layout
+        while self.graph_display_layout.count():
+            item = self.graph_display_layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.setParent(None)
+
+        self.graph_widget = None
+
+        # If "None" is selected, show the original placeholder label
+        if mode == "None":
+            self.graph_display_layout.addWidget(self.graph_display_label)
+            return
+
+        # Create new graph widget
+        if mode == "Relative Distance":
+            from distance import RelativeDistancePlotter
+            self.graph_widget = RelativeDistancePlotter()
+        elif mode == "Relative Angle":
+            from relative_angle import RelativeAnglePlotter
+            self.graph_widget = RelativeAnglePlotter()
+        elif mode == "Angular Position":
+            from spin import AngularPositionPlotter
+            self.graph_widget = AngularPositionPlotter()
+        else:
+            QMessageBox.warning(self, "Invalid Selection", "Please choose a valid mode.")
+            return
+
+        self.shared_start_time = time.time()
+        self.graph_widget.start_time = self.shared_start_time
+
+        # Add the new graph widget into the placeholder layout
+        self.graph_display_layout.addWidget(self.graph_widget)
+
 
     def setup_socket_events(self):
         @sio.event
         def connect():
+            print("Connected event fired")
             self.status_label.setText("Status: Connected")
             self.toggle_btn.setEnabled(True)
             self.detector_btn.setEnabled(True)
-            self.apply_config()  # <-- Automatically apply current settings on connect
+            self.apply_config()
 
         @sio.event
         def disconnect():
@@ -248,6 +292,7 @@ class MainWindow(QWidget):
                 logging.exception("Frame decode error")
 
         @sio.on("sensor_broadcast")
+
         def on_sensor_data(data):
             try:
                 temp = data.get("temperature", 0)
@@ -260,14 +305,14 @@ class MainWindow(QWidget):
     def update_fps_slider(self):
         self.fps_slider.setRange(1, 120)
         self.fps_label.setText(f"FPS: {self.fps_slider.value()}")
-
+    
     def toggle_stream(self):
         if not sio.connected:
             return
         self.streaming = not self.streaming
         self.toggle_btn.setText("Stop Stream" if self.streaming else "Start Stream")
         sio.emit("start_camera" if self.streaming else "stop_camera")
-
+    
     def apply_config(self):
         was_streaming = self.streaming
         if was_streaming:
@@ -303,8 +348,17 @@ class MainWindow(QWidget):
         while self.detector_active:
             try:
                 frame = self.frame_queue.get(timeout=0.1)
-                analysed = detector4.detect_and_draw(frame)
+            
+                # Get both the analysed frame and pose (if available)
+                analysed, pose = detector4.detect_and_draw(frame, return_pose=True)
                 bridge.analysed_frame.emit(analysed)
+
+                # Feed pose data to graph if graph is active
+                if hasattr(self, "graph_widget") and self.graph_widget and pose:
+                    rvec, tvec = pose
+                    timestamp = time.time()
+                    self.graph_widget.update(rvec, tvec, timestamp)
+
             except queue.Empty:
                 continue
             except Exception as e:

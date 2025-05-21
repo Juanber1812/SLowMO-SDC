@@ -27,6 +27,7 @@ detector = pyapriltags.Detector(
 )
 
 line_color = (0, 255, 0)
+line_thickness = 8  # <--- Define thickness variable here
 
 def draw_cube_manual(img, rvec, tvec, size, offset, mtx, dist):
     cube_points = np.array([
@@ -45,22 +46,22 @@ def draw_cube_manual(img, rvec, tvec, size, offset, mtx, dist):
     pts = img_points.reshape(-1, 2).astype(int)
 
     # Manually draw all cube edges
-    cv2.line(img, tuple(pts[0]), tuple(pts[1]), line_color, 2)
-    cv2.line(img, tuple(pts[1]), tuple(pts[2]), line_color, 2)
-    cv2.line(img, tuple(pts[2]), tuple(pts[3]), line_color, 2)
-    cv2.line(img, tuple(pts[3]), tuple(pts[0]), line_color, 2)
+    cv2.line(img, tuple(pts[0]), tuple(pts[1]), line_color, line_thickness)
+    cv2.line(img, tuple(pts[1]), tuple(pts[2]), line_color, line_thickness)
+    cv2.line(img, tuple(pts[2]), tuple(pts[3]), line_color, line_thickness)
+    cv2.line(img, tuple(pts[3]), tuple(pts[0]), line_color, line_thickness)
 
-    cv2.line(img, tuple(pts[4]), tuple(pts[5]), line_color, 2)
-    cv2.line(img, tuple(pts[5]), tuple(pts[6]), line_color, 2)
-    cv2.line(img, tuple(pts[6]), tuple(pts[7]), line_color, 2)
-    cv2.line(img, tuple(pts[7]), tuple(pts[4]), line_color, 2)
+    cv2.line(img, tuple(pts[4]), tuple(pts[5]), line_color, line_thickness)
+    cv2.line(img, tuple(pts[5]), tuple(pts[6]), line_color, line_thickness)
+    cv2.line(img, tuple(pts[6]), tuple(pts[7]), line_color, line_thickness)
+    cv2.line(img, tuple(pts[7]), tuple(pts[4]), line_color, line_thickness)
 
-    cv2.line(img, tuple(pts[0]), tuple(pts[4]), line_color, 2)
-    cv2.line(img, tuple(pts[1]), tuple(pts[5]), line_color, 2)
-    cv2.line(img, tuple(pts[2]), tuple(pts[6]), line_color, 2)
-    cv2.line(img, tuple(pts[3]), tuple(pts[7]), line_color, 2)
+    cv2.line(img, tuple(pts[0]), tuple(pts[4]), line_color, line_thickness)
+    cv2.line(img, tuple(pts[1]), tuple(pts[5]), line_color, line_thickness)
+    cv2.line(img, tuple(pts[2]), tuple(pts[6]), line_color, line_thickness)
+    cv2.line(img, tuple(pts[3]), tuple(pts[7]), line_color, line_thickness)
 
-def detect_and_draw(frame: np.ndarray) -> np.ndarray:
+def detect_and_draw(frame: np.ndarray, return_pose=False):
     frame = cv2.undistort(frame, mtx, dist)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     tags = detector.detect(gray, estimate_tag_pose=True,
@@ -82,4 +83,10 @@ def detect_and_draw(frame: np.ndarray) -> np.ndarray:
         draw_cube_manual(frame, rvec, tvec, cube_size, offset=np.array([0, -cube_size, 0], dtype=np.float32), mtx=mtx, dist=dist)  # Top cube
         draw_cube_manual(frame, rvec, tvec, cube_size, offset=np.array([0, cube_size, 0], dtype=np.float32), mtx=mtx, dist=dist)  # Bottom cube
 
-    return frame
+    if return_pose and tags:
+        rvec, _ = cv2.Rodrigues(tags[0].pose_R)
+        tvec = tags[0].pose_t.reshape(3, 1)
+        return frame, (rvec, tvec)
+
+    return frame, None if return_pose else frame
+
