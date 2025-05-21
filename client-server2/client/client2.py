@@ -11,16 +11,14 @@ logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.1.146:5000"
 
 RES_PRESETS = [
-    ("1536x864", (1536, 864)),
-    ("2304x1296", (2304, 1296)),
-    ("4608x2592", (4608, 2592)),
+    ("160x120", (160, 120)),
+    ("320x240", (320, 240)),
+    ("640x480", (640, 480)),
+    ("960x720", (960, 720)),
+    ("1280x960", (1280, 960)),
+    ("1440x1080", (1440, 1080)),
 ]
 
-FPS_LIMITS = {
-    (1536, 864): 120,
-    (2304, 1296): 50,
-    (4608, 2592): 15,
-}
 
 sio = socketio.Client()
 
@@ -142,6 +140,7 @@ class MainWindow(QWidget):
             self.status_label.setText("Status: Connected")
             self.toggle_btn.setEnabled(True)
             self.detector_btn.setEnabled(True)
+            self.apply_config()  # <-- Automatically apply current settings on connect
 
         @sio.event
         def disconnect():
@@ -174,12 +173,7 @@ class MainWindow(QWidget):
                 logging.exception("Sensor update failed")
 
     def update_fps_slider(self):
-        idx = self.res_dropdown.currentIndex()
-        _, res = RES_PRESETS[idx]
-        max_fps = FPS_LIMITS.get(res, 10)
-        self.fps_slider.setRange(1, max_fps)
-        if self.fps_slider.value() > max_fps:
-            self.fps_slider.setValue(max_fps)
+        self.fps_slider.setRange(1, 200)
         self.fps_label.setText(f"FPS: {self.fps_slider.value()}")
 
     def toggle_stream(self):

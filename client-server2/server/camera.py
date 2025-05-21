@@ -70,12 +70,6 @@ class CameraStreamer:
                         frame_count = 0
                         last_time = now
 
-                    # Adaptive sleep based on target FPS
-                    elapsed = time.time() - start_time
-                    target_frame_time = 1.0 / max(self.config["fps"], 1)
-                    if elapsed < target_frame_time:
-                        sio.sleep(target_frame_time - elapsed)
-
                 else:
                     sio.sleep(0.1)  # prevent busy waiting when not streaming
 
