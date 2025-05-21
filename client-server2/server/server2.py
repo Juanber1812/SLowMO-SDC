@@ -10,9 +10,6 @@ import threading
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-connected_clients = set()
-CAMERA_SID = None  # Store the camera's session id
-
 
 def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
@@ -25,31 +22,12 @@ def start_background_tasks():
 
 @socketio.on('connect')
 def handle_connect():
-    global CAMERA_SID
-    sid = request.sid
-    # Identify the camera by a special handshake or first connection
-    if CAMERA_SID is None:
-        CAMERA_SID = sid
-        print_server_status("Camera connected")
-    else:
-        # Only add non-camera clients
-        connected_clients.add(sid)
-        print(f"[INFO] Client connected: {request.sid}")
+    print(f"[INFO] Client connected: {request.sid}")
 
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    global CAMERA_SID
-    sid = request.sid
-    if sid == CAMERA_SID:
-        print_server_status("Camera disconnected")
-        CAMERA_SID = None
-    else:
-        connected_clients.discard(sid)
-        if len(connected_clients) == 0:
-            print("[SERVER] No more user clients, stopping camera...")
-            socketio.emit('stop_camera', {}, broadcast=True)
-        print(f"[INFO] Client disconnected: {request.sid}")
+    print(f"[INFO] Client disconnected: {request.sid}")
 
 
 @socketio.on('frame')
@@ -64,7 +42,6 @@ def handle_frame(data):
 def handle_start_camera():
     try:
         emit('start_camera', {}, broadcast=True)
-        # print("[INFO] start_camera triggered")  # Commented to reduce log spam
     except Exception as e:
         print(f"[ERROR] start_camera: {e}")
 
@@ -73,7 +50,6 @@ def handle_start_camera():
 def handle_stop_camera():
     try:
         emit('stop_camera', {}, broadcast=True)
-        # print("[INFO] stop_camera triggered")  # Commented to reduce log spam
     except Exception as e:
         print(f"[ERROR] stop_camera: {e}")
 
@@ -82,7 +58,6 @@ def handle_stop_camera():
 def handle_camera_config(data):
     try:
         emit('camera_config', data, broadcast=True)
-        # print(f"[INFO] camera_config updated: {data}")  # Commented to reduce log spam
     except Exception as e:
         print(f"[ERROR] camera_config: {e}")
 
