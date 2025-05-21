@@ -56,7 +56,7 @@ class MainWindow(QWidget):
 
         self.speed_timer = QTimer()
         self.speed_timer.timeout.connect(self.measure_speed)
-        self.speed_timer.start(30000)
+        self.speed_timer.start(10000)
 
     def setup_ui(self):
         main_layout = QHBoxLayout(self)
@@ -94,7 +94,7 @@ class MainWindow(QWidget):
             right_layout.addWidget(label)
 
         self.jpeg_slider = QSlider(Qt.Orientation.Horizontal)
-        self.jpeg_slider.setRange(10, 100)
+        self.jpeg_slider.setRange(1, 100)
         self.jpeg_slider.setValue(70)
         self.jpeg_label = QLabel("JPEG: 70")
         self.jpeg_slider.valueChanged.connect(lambda val: self.jpeg_label.setText(f"JPEG: {val}"))
@@ -105,7 +105,7 @@ class MainWindow(QWidget):
         self.res_dropdown.currentIndexChanged.connect(self.update_fps_slider)
 
         self.fps_slider = QSlider(Qt.Orientation.Horizontal)
-        self.fps_slider.setRange(1, 10)
+        self.fps_slider.setRange(1, 100)
         self.fps_slider.setValue(10)
         self.fps_label = QLabel("FPS: 10")
         self.fps_slider.valueChanged.connect(lambda val: self.fps_label.setText(f"FPS: {val}"))
