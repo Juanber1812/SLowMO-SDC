@@ -178,16 +178,19 @@ class MainWindow(QWidget):
 
     def toggle_stream(self):
         if not sio.connected:
-            QMessageBox.warning(self, "Not Connected", "Not connected to server yet.")
             return
         self.streaming = not self.streaming
         self.toggle_btn.setText("Stop Stream" if self.streaming else "Start Stream")
         sio.emit("start_camera" if self.streaming else "stop_camera")
 
     def apply_config(self):
-        if self.streaming:
-            QMessageBox.warning(self, "Stream Active", "Stop the stream before changing settings.")
-            return
+        was_streaming = self.streaming
+        if was_streaming:
+            # Stop stream before applying config
+            self.streaming = False
+            self.toggle_btn.setText("Start Stream")
+            sio.emit("stop_camera")
+            time.sleep(0.5)
         res_idx = self.res_dropdown.currentIndex()
         _, resolution = RES_PRESETS[res_idx]
         fps = self.fps_slider.value()
@@ -198,6 +201,10 @@ class MainWindow(QWidget):
         }
         sio.emit("camera_config", config)
         logging.info(f"Sent config: {config}")
+        if was_streaming:
+            sio.emit("start_camera")
+            self.streaming = True
+            self.toggle_btn.setText("Stop Stream")
 
     def toggle_detector(self):
         self.detector_active = not self.detector_active
@@ -276,12 +283,24 @@ class MainWindow(QWidget):
         threading.Thread(target=self.reconnect_socket, daemon=True).start()
 
     def reconnect_socket(self):
+        was_streaming = self.streaming
         try:
+            if was_streaming:
+                self.streaming = False
+                self.toggle_btn.setText("Start Stream")
+                sio.emit("stop_camera")
+                time.sleep(0.5)
             sio.disconnect()
         except:
             pass
         try:
             sio.connect(SERVER_URL, wait_timeout=5)
+            # Apply config after reconnect
+            self.apply_config()
+            if was_streaming:
+                sio.emit("start_camera")
+                self.streaming = True
+                self.toggle_btn.setText("Stop Stream")
         except Exception as e:
             logging.exception("Reconnect failed")
 

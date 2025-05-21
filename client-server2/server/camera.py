@@ -97,12 +97,16 @@ def disconnect():
 @sio.on("start_camera")
 def on_start_camera(_):
     streamer.streaming = True
+    if not streamer.picam.started:
+        streamer.picam.start()
     print("[INFO] Streaming started.")
 
 
 @sio.on("stop_camera")
 def on_stop_camera(_):
     streamer.streaming = False
+    if streamer.picam.started:
+        streamer.picam.stop()
     print("[INFO] Streaming stopped.")
 
 

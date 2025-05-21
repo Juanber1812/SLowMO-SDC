@@ -21,6 +21,8 @@ def handle_connect():
     try:
         emit('server_status', {'status': 'connected'}, to=request.sid)
         print(f"[INFO] Client connected: {request.sid}")
+        emit('start_camera', {}, broadcast=True)  # Start camera when client connects
+        print("[INFO] start_camera triggered (on connect)")
     except Exception as e:
         print(f"[ERROR] connect: {e}")
 
@@ -30,6 +32,8 @@ def handle_disconnect():
     try:
         emit('server_status', {'status': 'disconnected'}, to=request.sid)
         print(f"[INFO] Client disconnected: {request.sid}")
+        emit('stop_camera', {}, broadcast=True)  # Stop camera when client disconnects
+        print("[INFO] stop_camera triggered (on disconnect)")
     except Exception as e:
         print(f"[ERROR] disconnect: {e}")
 
