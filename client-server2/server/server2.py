@@ -32,6 +32,7 @@ def handle_connect():
         CAMERA_SID = sid
         print_server_status("Camera connected")
     else:
+        # Only add non-camera clients
         connected_clients.add(sid)
         print(f"[INFO] Client connected: {request.sid}")
 
@@ -45,8 +46,8 @@ def handle_disconnect():
         CAMERA_SID = None
     else:
         connected_clients.discard(sid)
-        if not connected_clients:
-            # No more clients, stop the camera
+        if len(connected_clients) == 0:
+            print("[SERVER] No more user clients, stopping camera...")
             socketio.emit('stop_camera', {}, broadcast=True)
         print(f"[INFO] Client disconnected: {request.sid}")
 
