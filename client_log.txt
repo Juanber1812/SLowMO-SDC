@@ -19908,3 +19908,41 @@ DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:500
 DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747760172.6140904 HTTP/1.1" 200 97
 DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
 DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747760327.2753837 HTTP/1.1" 200 97
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747760377.658162 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 75, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 139, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 30, 'resolution': (2592, 1944)}
+INFO:root:Sent config: {'jpeg_quality': 33, 'fps': 30, 'resolution': (2592, 1944)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:http://192.168.65.89:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747760513.467872 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 10, 'fps': 10, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 10, 'fps': 55, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 38, 'fps': 154, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 68, 'fps': 154, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 68, 'fps': 100, 'resolution': (1280, 720)}
+INFO:root:Sent config: {'jpeg_quality': 68, 'fps': 50, 'resolution': (1920, 1080)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+ERROR:root:\u274c SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 279, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.65.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747764807.3912973 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000152CDB241A0>, 'Connection to 192.168.65.89 timed out. (connect timeout=5)'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.65.89:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.142:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747764848.0654948 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 1, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 29, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 29, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 200, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 200, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 200, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 200, 'resolution': (640, 480)}
+INFO:root:Sent config: {'jpeg_quality': 10, 'fps': 200, 'resolution': (640, 480)}
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.1.146
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000

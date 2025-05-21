@@ -8,20 +8,18 @@ from PyQt6.QtGui import QPixmap, QImage
 import detector4  # Make sure detector4.py is in the same folder
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
-SERVER_URL = "http://192.168.65.89:5000"
+SERVER_URL = "http://192.168.1.146:5000"
 
 RES_PRESETS = [
-    ("640x480", (640, 480)),
-    ("1280x720", (1280, 720)),
-    ("1920x1080", (1920, 1080)),
-    ("2592x1944", (2592, 1944)),
+    ("1536x864", (1536, 864)),
+    ("2304x1296", (2304, 1296)),
+    ("4608x2592", (4608, 2592)),
 ]
 
 FPS_LIMITS = {
-    (640, 480): 200,
-    (1280, 720): 100,
-    (1920, 1080): 50,
-    (2592, 1944): 30,
+    (1536, 864): 120,
+    (2304, 1296): 50,
+    (4608, 2592): 15,
 }
 
 sio = socketio.Client()

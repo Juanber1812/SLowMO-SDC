@@ -1,7 +1,6 @@
 # server2.py
 
 from gevent import monkey; monkey.patch_all()
-
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
 import camera
@@ -11,44 +10,74 @@ import threading
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-def start_camera_thread():
-    cam_thread = threading.Thread(target=camera.start_stream, daemon=True)
-    cam_thread.start()
 
-def start_sensor_thread():
-    sensor_thread = threading.Thread(target=sensors.start_sensors, daemon=True)
-    sensor_thread.start()
+def start_background_tasks():
+    threading.Thread(target=camera.start_stream, daemon=True).start()
+    threading.Thread(target=sensors.start_sensors, daemon=True).start()
+
 
 @socketio.on('connect')
-def on_connect():
-    emit('server_status', {'status': 'connected'}, to=request.sid)
+def handle_connect():
+    try:
+        emit('server_status', {'status': 'connected'}, to=request.sid)
+        print(f"[INFO] Client connected: {request.sid}")
+    except Exception as e:
+        print(f"[ERROR] connect: {e}")
+
 
 @socketio.on('disconnect')
-def on_disconnect():
-    emit('server_status', {'status': 'disconnected'}, to=request.sid)
+def handle_disconnect():
+    try:
+        emit('server_status', {'status': 'disconnected'}, to=request.sid)
+        print(f"[INFO] Client disconnected: {request.sid}")
+    except Exception as e:
+        print(f"[ERROR] disconnect: {e}")
+
 
 @socketio.on('frame')
-def on_frame(data):
-    emit('frame', data, broadcast=True)
+def handle_frame(data):
+    try:
+        emit('frame', data, broadcast=True)
+    except Exception as e:
+        print(f"[ERROR] frame broadcast: {e}")
+
 
 @socketio.on('start_camera')
 def handle_start_camera():
-    emit('start_camera', {}, broadcast=True)
+    try:
+        emit('start_camera', {}, broadcast=True)
+        print("[INFO] start_camera triggered")
+    except Exception as e:
+        print(f"[ERROR] start_camera: {e}")
+
 
 @socketio.on('stop_camera')
 def handle_stop_camera():
-    emit('stop_camera', {}, broadcast=True)
+    try:
+        emit('stop_camera', {}, broadcast=True)
+        print("[INFO] stop_camera triggered")
+    except Exception as e:
+        print(f"[ERROR] stop_camera: {e}")
+
 
 @socketio.on('camera_config')
-def update_camera_config(data):
-    emit('camera_config', data, broadcast=True)
+def handle_camera_config(data):
+    try:
+        emit('camera_config', data, broadcast=True)
+        print(f"[INFO] camera_config updated: {data}")
+    except Exception as e:
+        print(f"[ERROR] camera_config: {e}")
+
 
 @socketio.on("sensor_data")
 def handle_sensor_data(data):
-    socketio.emit("sensor_broadcast", data)
+    try:
+        emit("sensor_broadcast", data, broadcast=True)
+    except Exception as e:
+        print(f"[ERROR] sensor_data: {e}")
+
 
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
-    start_camera_thread()
-    start_sensor_thread()
+    start_background_tasks()
     socketio.run(app, host="0.0.0.0", port=5000)
