@@ -30,7 +30,7 @@ def handle_connect():
 def handle_disconnect():
     try:
         emit('server_status', {'status': 'disconnected'}, to=request.sid)
-        print(f"[INFO] Client disconnected: {request.sid}")yyy
+        print(f"[INFO] Client disconnected: {request.sid}")
         # No automatic camera stop here
     except Exception as e:
         print(f"[ERROR] disconnect: {e}")
