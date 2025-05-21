@@ -14,6 +14,10 @@ connected_clients = set()
 CAMERA_SID = None  # Store the camera's session id
 
 
+def print_server_status(status):
+    print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
+
+
 def start_background_tasks():
     threading.Thread(target=camera.start_stream, daemon=True).start()
     threading.Thread(target=sensors.start_sensors, daemon=True).start()
@@ -26,7 +30,7 @@ def handle_connect():
     # Identify the camera by a special handshake or first connection
     if CAMERA_SID is None:
         CAMERA_SID = sid
-        print("[SERVER STATUS] Camera connected".ljust(80), end='\r', flush=True)
+        print_server_status("Camera connected")
     else:
         connected_clients.add(sid)
         print(f"[INFO] Client connected: {request.sid}")
@@ -37,7 +41,7 @@ def handle_disconnect():
     global CAMERA_SID
     sid = request.sid
     if sid == CAMERA_SID:
-        print("[SERVER STATUS] Camera disconnected".ljust(80), end='\r', flush=True)
+        print_server_status("Camera disconnected")
         CAMERA_SID = None
     else:
         connected_clients.discard(sid)

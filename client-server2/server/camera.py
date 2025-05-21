@@ -1,23 +1,37 @@
 # camera.py (refactored)
 
 from gevent import monkey; monkey.patch_all()
-import time, base64, socketio, cv2
+import time
+import socketio
+import cv2
 from picamera2 import Picamera2
 
 SERVER_URL = "http://localhost:5000"
 sio = socketio.Client()
 
 
+def print_status_line(status, resolution=None, jpeg_quality=None, fps=None, fps_value=None):
+    msg = f"[CAMERA STATUS] {status}"
+    if resolution is not None:
+        msg += f" | Res: {resolution}"
+    if jpeg_quality is not None:
+        msg += f" | JPEG: {jpeg_quality}"
+    if fps is not None:
+        msg += f" | FPS: {fps}"
+    if fps_value is not None:
+        msg += f" | Streaming: {fps_value} fps"
+    print(msg.ljust(100), end='\r', flush=True)
+
 class CameraStreamer:
     def __init__(self):
+        self.streaming = False
+        self.connected = False
         self.config = {
             "jpeg_quality": 70,
             "fps": 10,
-            "resolution": (640, 480)
+            "resolution": [640, 480]
         }
-        self.streaming = False
         self.picam = Picamera2()
-        self.connected = False
 
     def connect_socket(self):
         try:
@@ -76,25 +90,17 @@ class CameraStreamer:
                         frame_count = 0
                         last_time = now
                 else:
-                    time.sleep(0.1)
+                    print_status_line(
+                        "Idle",
+                        self.config.get("resolution"),
+                        self.config.get("jpeg_quality"),
+                        self.config.get("fps"),
+                        fps_value=0
+                    )
+                    time.sleep(0.5)
             except Exception as e:
                 print("[ERROR] Stream loop exception:", e)
                 time.sleep(1)
-
-def print_status_line(status, resolution=None, jpeg_quality=None, fps=None, fps_value=None):
-    msg = f"[STATUS] {status}"
-    if resolution is not None:
-        msg += f" | Res: {resolution}"
-    if jpeg_quality is not None:
-        msg += f" | JPEG: {jpeg_quality}"
-    if fps is not None:
-        msg += f" | FPS: {fps}"
-    if fps_value is not None:
-        msg += f" | Streaming: {fps_value} fps"
-    print(msg.ljust(100), end='\r', flush=True)
-
-def print_camera_status(status):
-    print(f"[CAMERA STATUS] {status}".ljust(80), end='\r', flush=True)
 
 streamer = CameraStreamer()
 
@@ -102,7 +108,7 @@ streamer = CameraStreamer()
 @sio.event
 def connect():
     streamer.connected = True
-    print_camera_status("Connected to server")
+    print_status_line("Connected to server")
 
 @sio.event
 def disconnect():
@@ -110,7 +116,7 @@ def disconnect():
     streamer.streaming = False
     if hasattr(streamer, "picam") and getattr(streamer.picam, "started", False):
         streamer.picam.stop()
-    print_camera_status("Disconnected from server")
+    print_status_line("Disconnected from server")
 
 
 @sio.on("start_camera")
@@ -118,9 +124,7 @@ def on_start_camera(_):
     streamer.streaming = True
     if not streamer.picam.started:
         streamer.picam.start()
-    # Use current config for display
-    cfg = streamer.config
-    print_status_line("Streaming started", cfg.get("resolution"), cfg.get("jpeg_quality"), cfg.get("fps"))
+    print_status_line("Streaming started", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"))
 
 
 @sio.on("stop_camera")
@@ -128,23 +132,25 @@ def on_stop_camera(_):
     streamer.streaming = False
     if streamer.picam.started:
         streamer.picam.stop()
-    cfg = streamer.config
-    print_status_line("Streaming stopped", cfg.get("resolution"), cfg.get("jpeg_quality"), cfg.get("fps"))
+    print_status_line("Streaming stopped", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"))
 
 
 @sio.on("camera_config")
 def on_camera_config(data):
     streamer.config.update(data)
-    cfg = streamer.config
     if not streamer.streaming:
         streamer.apply_config()
-        print_status_line("Configured", cfg.get("resolution"), cfg.get("jpeg_quality"), cfg.get("fps"))
+        print_status_line("Configured", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"))
     else:
-        print_status_line("Can't apply config while streaming", cfg.get("resolution"), cfg.get("jpeg_quality"), cfg.get("fps"))
+        print_status_line("Can't apply config while streaming", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"))
 
 
 def start_stream():
     streamer.connect_socket()
     streamer.apply_config()
     print("[INFO] Camera ready.")
+    streamer.stream_loop()
+
+if __name__ == "__main__":
+    sio.connect("http://localhost:5000")  # Change to your server address
     streamer.stream_loop()
