@@ -9,11 +9,11 @@ from picamera2 import Picamera2
 SERVER_URL = "http://localhost:5000"
 sio = socketio.Client()
 
-last_status_line = ""  # Initialize global variable
-
+last_status_line = ""
+last_fps_value = None
 
 def print_status_line(status, resolution=None, jpeg_quality=None, fps=None, fps_value=None):
-    global last_status_line
+    global last_status_line, last_fps_value
     msg = f"[CAMERA STATUS] {status}"
     if resolution is not None:
         msg += f" | Res: {resolution}"
@@ -23,10 +23,11 @@ def print_status_line(status, resolution=None, jpeg_quality=None, fps=None, fps_
         msg += f" | FPS: {fps}"
     if fps_value is not None:
         msg += f" | Streaming: {fps_value} fps"
-    # Only print if the message is different from the last one
-    if msg != last_status_line:
+    # Only print if the message or fps_value changes
+    if msg != last_status_line or fps_value != last_fps_value:
         print(msg.ljust(100), end='\r', flush=True)
         last_status_line = msg
+        last_fps_value = fps_value
 
 class CameraStreamer:
     def __init__(self):
@@ -136,9 +137,7 @@ def on_start_camera(_):
 @sio.on("stop_camera")
 def on_stop_camera(_):
     streamer.streaming = False
-    if streamer.picam.started:
-        streamer.picam.stop()
-    print_status_line("Streaming stopped", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"))
+    print_status_line("Idle", streamer.config.get("resolution"), streamer.config.get("jpeg_quality"), streamer.config.get("fps"), fps_value=0)
 
 
 @sio.on("camera_config")
