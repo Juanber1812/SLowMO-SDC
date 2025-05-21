@@ -19,9 +19,7 @@ RES_PRESETS = [
     ("1536x864", (1536, 864)),
 ]
 
-
 sio = socketio.Client()
-
 
 class Bridge(QObject):
     frame_received = pyqtSignal(np.ndarray)
@@ -63,22 +61,79 @@ class MainWindow(QWidget):
         main_layout.addLayout(left_layout)
         main_layout.addLayout(right_layout)
 
+        # --- Status Section ---
+        status_group = QGroupBox("Connection Status")
+        status_layout = QVBoxLayout()
         self.status_label = QLabel("Status: Disconnected")
-        left_layout.addWidget(self.status_label)
+        status_layout.addWidget(self.status_label)
+        status_group.setLayout(status_layout)
+        left_layout.addWidget(status_group)
 
+        # --- Live Stream Section ---
+        stream_group = QGroupBox("Live Stream")
+        stream_layout = QVBoxLayout()
         self.image_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.image_label.setFixedSize(320, 240)
-        left_layout.addWidget(self.image_label)
+        self.image_label.setFixedSize(384, 216)  # 16:9 aspect ratio
+        self.image_label.setStyleSheet("background: #222; border: 1px solid #888;")
+        stream_layout.addWidget(self.image_label)
+        stream_group.setLayout(stream_layout)
+        left_layout.addWidget(stream_group)
 
-        self.analysed_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.analysed_label.setFixedSize(320, 240)
-        left_layout.addWidget(self.analysed_label)
+        # --- Stream Control Section ---
+        control_group = QGroupBox("Stream Controls")
+        control_layout = QVBoxLayout()
+        self.toggle_btn = QPushButton("Start Stream")
+        self.toggle_btn.setEnabled(False)
+        self.toggle_btn.clicked.connect(self.toggle_stream)
+        self.reconnect_btn = QPushButton("Reconnect")
+        self.reconnect_btn.clicked.connect(self.try_reconnect)
+        control_layout.addWidget(self.toggle_btn)
+        control_layout.addWidget(self.reconnect_btn)
+        control_group.setLayout(control_layout)
+        left_layout.addWidget(control_group)
 
-        self.detector_btn = QPushButton("Start Detector")
-        self.detector_btn.setEnabled(False)
-        self.detector_btn.clicked.connect(self.toggle_detector)
-        left_layout.addWidget(self.detector_btn)
+        # --- Capture Image Button ---
+        capture_btn_group = QGroupBox("Image Capture")
+        capture_btn_layout = QVBoxLayout()
+        self.capture_btn = QPushButton("Capture Image")
+        self.capture_btn.setEnabled(False)  # Dead button for now
+        capture_btn_layout.addWidget(self.capture_btn)
+        capture_btn_group.setLayout(capture_btn_layout)
+        left_layout.addWidget(capture_btn_group)
 
+        # --- Camera Settings Section ---
+        config_group = QGroupBox("Camera Settings")
+        grid = QGridLayout()
+        self.jpeg_slider = QSlider(Qt.Orientation.Horizontal)
+        self.jpeg_slider.setRange(1, 100)
+        self.jpeg_slider.setValue(70)
+        self.jpeg_label = QLabel("JPEG: 70")
+        self.jpeg_slider.valueChanged.connect(lambda val: self.jpeg_label.setText(f"JPEG: {val}"))
+        self.res_dropdown = QComboBox()
+        for label, _ in RES_PRESETS:
+            self.res_dropdown.addItem(label)
+        self.res_dropdown.currentIndexChanged.connect(self.update_fps_slider)
+        self.fps_slider = QSlider(Qt.Orientation.Horizontal)
+        self.fps_slider.setRange(1, 120)
+        self.fps_slider.setValue(10)
+        self.fps_label = QLabel("FPS: 10")
+        self.fps_slider.valueChanged.connect(lambda val: self.fps_label.setText(f"FPS: {val}"))
+        self.update_fps_slider()
+        grid.addWidget(self.jpeg_label, 0, 0)
+        grid.addWidget(self.jpeg_slider, 0, 1)
+        grid.addWidget(QLabel("Resolution"), 1, 0)
+        grid.addWidget(self.res_dropdown, 1, 1)
+        grid.addWidget(self.fps_label, 2, 0)
+        grid.addWidget(self.fps_slider, 2, 1)
+        self.apply_btn = QPushButton("Apply Settings")
+        self.apply_btn.clicked.connect(self.apply_config)
+        grid.addWidget(self.apply_btn, 3, 0, 1, 2)
+        config_group.setLayout(grid)
+        left_layout.addWidget(config_group)
+
+        # --- System Info Section (moved to left column, bottom) ---
+        info_group = QGroupBox("System Info")
+        info_layout = QVBoxLayout()
         self.info_labels = {
             "temp": QLabel("Temp: -- °C"),
             "cpu": QLabel("CPU: --%"),
@@ -89,50 +144,80 @@ class MainWindow(QWidget):
         }
         for label in self.info_labels.values():
             label.setStyleSheet("font-family: monospace;")
-            right_layout.addWidget(label)
+            info_layout.addWidget(label)
+        info_group.setLayout(info_layout)
+        left_layout.addWidget(info_group)
 
-        self.jpeg_slider = QSlider(Qt.Orientation.Horizontal)
-        self.jpeg_slider.setRange(1, 100)
-        self.jpeg_slider.setValue(70)
-        self.jpeg_label = QLabel("JPEG: 70")
-        self.jpeg_slider.valueChanged.connect(lambda val: self.jpeg_label.setText(f"JPEG: {val}"))
+        left_layout.addStretch()
 
-        self.res_dropdown = QComboBox()
-        for label, _ in RES_PRESETS:
-            self.res_dropdown.addItem(label)
-        self.res_dropdown.currentIndexChanged.connect(self.update_fps_slider)
+        # --- Detector Output Section (right column) ---
+        detector_group = QGroupBox("Detector Output")
+        detector_layout = QVBoxLayout()
+        self.analysed_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
+        self.analysed_label.setFixedSize(384, 216)  # 16:9 aspect ratio
+        self.analysed_label.setStyleSheet("background: #222; border: 1px solid #888;")
+        detector_layout.addWidget(self.analysed_label)
+        detector_group.setLayout(detector_layout)
+        right_layout.addWidget(detector_group)
 
-        self.fps_slider = QSlider(Qt.Orientation.Horizontal)
-        self.fps_slider.setRange(1, 100)
-        self.fps_slider.setValue(10)
-        self.fps_label = QLabel("FPS: 10")
-        self.fps_slider.valueChanged.connect(lambda val: self.fps_label.setText(f"FPS: {val}"))
-        self.update_fps_slider()
+        # --- Detection Control ---
+        detector_btn_group = QGroupBox("Detection Control")
+        detector_btn_layout = QVBoxLayout()
+        self.detector_btn = QPushButton("Start Detector")
+        self.detector_btn.setEnabled(False)
+        self.detector_btn.clicked.connect(self.toggle_detector)
+        detector_btn_layout.addWidget(self.detector_btn)
+        detector_btn_group.setLayout(detector_btn_layout)
+        right_layout.addWidget(detector_btn_group)
 
-        self.apply_btn = QPushButton("Apply Settings")
-        self.apply_btn.clicked.connect(self.apply_config)
+        # --- Payload Mode Section ---
+        payload_group = QGroupBox("Payload Mode")
+        payload_layout = QVBoxLayout()
+        self.graph_mode_label = QLabel("Payload Mode:")
+        self.graph_dropdown = QComboBox()
+        self.graph_dropdown.addItems([
+            "None",
+            "Relative Distance",
+            "Relative Angle",
+            "Angular Position"
+        ])
+        self.launch_graph_btn = QPushButton("Launch Payload")
+        self.launch_graph_btn.clicked.connect(self.launch_graph)
+        payload_layout.addWidget(self.graph_mode_label)
+        payload_layout.addWidget(self.graph_dropdown)
+        payload_layout.addWidget(self.launch_graph_btn)
+        payload_group.setLayout(payload_layout)
+        right_layout.addWidget(payload_group)
 
-        self.toggle_btn = QPushButton("Start Stream")
-        self.toggle_btn.setEnabled(False)
-        self.toggle_btn.clicked.connect(self.toggle_stream)
+        # --- Record Button with Duration Selection ---
+        record_group = QGroupBox("Record Payload")
+        record_layout = QHBoxLayout()
+        self.record_btn = QPushButton("Record")
+        self.record_btn.setEnabled(False)  # Dead button for now
+        self.duration_dropdown = QComboBox()
+        self.duration_dropdown.addItems(["5s", "10s", "30s", "60s"])
+        record_layout.addWidget(self.record_btn)
+        record_layout.addWidget(self.duration_dropdown)
+        record_group.setLayout(record_layout)
+        right_layout.addWidget(record_group)
 
-        self.reconnect_btn = QPushButton("Reconnect")
-        self.reconnect_btn.clicked.connect(self.try_reconnect)
+        # --- Graph Display Placeholder ---
+        graph_display_group = QGroupBox("Graph Display")
+        graph_display_layout = QVBoxLayout()
+        self.graph_display_label = QLabel("Graph will appear here.")
+        self.graph_display_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.graph_display_label.setMinimumSize(384, 216)
+        self.graph_display_label.setStyleSheet("background: #eee; border: 1px dashed #aaa; color: #888;")
+        graph_display_layout.addWidget(self.graph_display_label)
+        graph_display_group.setLayout(graph_display_layout)
+        right_layout.addWidget(graph_display_group)
 
-        config_group = QGroupBox("Camera Settings")
-        grid = QGridLayout()
-        grid.addWidget(self.jpeg_label, 0, 0)
-        grid.addWidget(self.jpeg_slider, 0, 1)
-        grid.addWidget(QLabel("Resolution"), 1, 0)
-        grid.addWidget(self.res_dropdown, 1, 1)
-        grid.addWidget(self.fps_label, 2, 0)
-        grid.addWidget(self.fps_slider, 2, 1)
-        grid.addWidget(self.apply_btn, 3, 0, 1, 2)
-        config_group.setLayout(grid)
+        right_layout.addStretch()
 
-        right_layout.addWidget(config_group)
-        right_layout.addWidget(self.toggle_btn)
-        right_layout.addWidget(self.reconnect_btn)
+    def launch_graph(self):
+        mode = self.graph_dropdown.currentText()
+        print(f"[DEBUG] Launch Graph clicked - Mode selected: {mode}")
+        # We'll wire this up to graph classes later
 
     def setup_socket_events(self):
         @sio.event
@@ -167,8 +252,8 @@ class MainWindow(QWidget):
             try:
                 temp = data.get("temperature", 0)
                 cpu = data.get("cpu_percent", 0)
-                self.info_labels["temp"].setText(f" Temp: {temp:.1f} °C")
-                self.info_labels["cpu"].setText(f" CPU: {cpu:.1f} %")
+                self.info_labels["temp"].setText(f"Temp: {temp:.1f} °C")
+                self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
             except Exception as e:
                 logging.exception("Sensor update failed")
 
@@ -254,7 +339,7 @@ class MainWindow(QWidget):
 
     def measure_speed(self):
         self.info_labels["speed"].setText("Upload: Testing...")
-        self.info_labels["max_frame"].setText(" Max Frame: ...")
+        self.info_labels["max_frame"].setText("Max Frame: ...")
 
         def run_speedtest():
             try:
@@ -262,14 +347,14 @@ class MainWindow(QWidget):
                 st = speedtest.Speedtest()
                 upload = st.upload()
                 upload_mbps = upload / 1_000_000
-                self.info_labels["speed"].setText(f" Upload: {upload_mbps:.2f} Mbps")
+                self.info_labels["speed"].setText(f"Upload: {upload_mbps:.2f} Mbps")
                 fps = self.fps_slider.value()
                 max_bytes_per_sec = upload / 8
                 max_frame_size = max_bytes_per_sec / fps
-                self.info_labels["max_frame"].setText(f" Max Frame: {max_frame_size / 1024:.1f} KB")
+                self.info_labels["max_frame"].setText(f"Max Frame: {max_frame_size / 1024:.1f} KB")
             except Exception:
-                self.info_labels["speed"].setText(" Upload: Error")
-                self.info_labels["max_frame"].setText(" Max Frame: -- KB")
+                self.info_labels["speed"].setText("Upload: Error")
+                self.info_labels["max_frame"].setText("Max Frame: -- KB")
 
         threading.Thread(target=run_speedtest, daemon=True).start()
 
@@ -277,7 +362,7 @@ class MainWindow(QWidget):
         self.current_fps = self.frame_counter
         self.frame_counter = 0
         self.info_labels["fps"].setText(f"FPS: {self.current_fps}")
-        self.info_labels["frame_size"].setText(f" Frame Size: {self.current_frame_size / 1024:.1f} KB")
+        self.info_labels["frame_size"].setText(f"Frame Size: {self.current_frame_size / 1024:.1f} KB")
 
     def try_reconnect(self):
         threading.Thread(target=self.reconnect_socket, daemon=True).start()

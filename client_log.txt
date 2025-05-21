@@ -21401,3 +21401,1000 @@ DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:500
 DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747833529.1940596 HTTP/1.1" 200 97
 INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
 INFO:root:Sent config: {'jpeg_quality': 50, 'fps': 10, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.1.146
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747833586.3326175 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 50, 'fps': 10, 'resolution': (1536, 864)}
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 159, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747834664.4968064 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747834731.4963367 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 80, 'fps': 10, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747835950.54397 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 159, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747835989.3722322 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 82, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 82, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 82, 'fps': 10, 'resolution': (1024, 576)}
+INFO:root:Sent config: {'jpeg_quality': 82, 'fps': 10, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747836230.6350617 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 159, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747836294.9380403 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747836479.1749365 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 222, in run_detector
+    bridge.analysed_frame.emit(analysed)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747836791.2451828 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001ECAC0002F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747836798.057258 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (384, 216)}
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1024, 576)}
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 120, in connect
+    raise exceptions.ConnectionError('Already connected')
+socketio.exceptions.ConnectionError: Already connected
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 220, in run_detector
+    bridge.analysed_frame.emit(analysed)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 157, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747837125.439259 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 220, in run_detector
+    bridge.analysed_frame.emit(analysed)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 157, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747837148.1777942 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 220, in run_detector
+    bridge.analysed_frame.emit(analysed)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747837414.1501603 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 157, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839075.0838435 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000026B4B9602F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839082.1608114 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000026B4B951D10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (3): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 314, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839089.2748578 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000026B4FD84550>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 339, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839416.986321 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002647F8102F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 339, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839424.1135912 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002647F805E50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (3): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 339, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839431.1825075 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002642D718690>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (4): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 339, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839438.2795913 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002647F85F490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 369, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839757.9383109 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001D64A8642F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 369, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839765.087533 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001D64A859D10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (3): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 369, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839772.1643276 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001D64A85BD90>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (4): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 369, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839779.2594469 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001D64A8AF820>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (5): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 369, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839786.3328378 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001D64A8AFA80>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (6): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 369, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839793.4165194 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001D64B09D010>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (7): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747839800.495397 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1024, 576)}
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 275, in run_detector
+    bridge.analysed_frame.emit(analysed)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839929.6139975 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DEC82442F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839936.8122392 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DEC823DD10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (3): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839944.1807625 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DEC9B88690>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (4): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839951.2749095 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DEC8217820>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (5): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839958.3496692 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DEC828F6F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (6): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839965.428566 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DEC9B61010>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (7): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839972.4955714 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DEC82C1150>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (8): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839979.6284175 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DEC82C2250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (9): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747839986.7305665 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DEC82C28B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840073.5258896 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289742F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840080.8841233 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C62896DD10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (3): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840087.992574 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6293E0190>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (4): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840095.1028905 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289BF490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (5): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840102.19148 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289BEEA0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (6): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840109.2638104 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C62939CCB0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (7): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840116.477541 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E49E0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (8): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840123.557143 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E6580>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (9): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840130.6420453 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E68B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (10): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840137.7097588 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E6CF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (11): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840144.7948308 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E78A0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (12): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840151.8768265 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E79B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (13): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840158.9542372 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E6F10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (14): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840166.047385 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E7AC0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (15): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840173.1248357 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6294806B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (16): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840180.1930437 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6294807C0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (17): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840187.2617102 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C629480D10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (18): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840194.3575118 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C629480F30>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (19): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840201.4545002 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C629481150>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (20): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840208.575058 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E6F10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (21): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840215.6479785 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E7DF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (22): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840222.7318592 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E7F00>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (23): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840229.830727 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E7790>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (24): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840236.8832233 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E7350>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (25): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840243.9617918 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E6E00>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (26): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840251.0504308 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E6BE0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (27): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840258.125773 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E67A0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (28): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840265.1973631 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E6690>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (29): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840272.2744966 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E5480>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (30): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840279.3465252 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E4F30>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (31): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840286.4325917 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E48D0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (32): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840293.521939 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C67EF7F680>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (33): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840300.5966413 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C62A39C160>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (34): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840307.708383 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C62A39C6B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (35): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840314.8019776 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C62A39C8D0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (36): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840321.8801644 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C62A39CAF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (37): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840328.9415429 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C62A39CD10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (38): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840336.0420084 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C67EF7F680>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (39): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840343.142056 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E48D0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (40): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840350.2360518 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E4F30>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (41): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840357.3294632 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E6470>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (42): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840364.4079971 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E6030>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (43): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840371.4907486 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E67A0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (44): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840378.5605435 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6289E68B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840497.0690074 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98F342F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (2): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840504.3980086 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98F2DD10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (3): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840511.50176 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E9A7A0190>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (4): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840518.5810347 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98F7F490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (5): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840525.6735506 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98F7EEA0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (6): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840532.7570772 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E9A75CCB0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (7): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840539.8314483 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98FA9150>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (8): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840546.9184253 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98FAA690>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (9): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840554.0004923 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98FAA8B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (10): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840561.0906863 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98FAAE00>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (11): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840568.163395 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98FAB680>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (12): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840575.246912 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98FAB9B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (13): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840582.339745 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98FAAF10>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (14): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840589.41317 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E98FABAC0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (15): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840596.5247738 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E9A8205A0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (16): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 389, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840603.624908 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020E9A8207C0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+ERROR:root:SocketIO connection error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 401, in socket_thread
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1747840614.8469467 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000021D451802F0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747840634.7736142 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1024, 576)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 51, 'resolution': (1024, 576)}
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 244, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+ERROR:root:Detector error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 307, in run_detector
+    bridge.analysed_frame.emit(analysed)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+ERROR:root:Frame decode error
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client2.py", line 244, in on_frame
+    bridge.frame_received.emit(frame)
+    ^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type Bridge has been deleted
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747842750.28883 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 59, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 59, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747843193.408455 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 59, 'resolution': (1536, 864)}
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 59, 'resolution': (1536, 864)}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.1.146:5000
+DEBUG:urllib3.connectionpool:http://192.168.1.146:5000 "GET /socket.io/?transport=polling&EIO=4&t=1747843220.9091008 HTTP/1.1" 200 97
+INFO:root:Sent config: {'jpeg_quality': 70, 'fps': 10, 'resolution': (192, 108)}
