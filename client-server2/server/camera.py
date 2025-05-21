@@ -92,6 +92,11 @@ def connect():
 def disconnect():
     print("[INFO] Disconnected from server.")
     streamer.connected = False
+    # Stop streaming and camera on disconnect
+    streamer.streaming = False
+    if hasattr(streamer, "picam") and getattr(streamer.picam, "started", False):
+        streamer.picam.stop()
+        print("[INFO] Camera stopped due to disconnect.")
 
 
 @sio.on("start_camera")
