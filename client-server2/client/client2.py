@@ -178,24 +178,7 @@ class MainWindow(QWidget):
         detector_btn_group.setLayout(detector_btn_layout)
         right_layout.addWidget(detector_btn_group)
 
-        # --- Payload Mode Section ---
-        payload_group = QGroupBox("Payload Mode")
-        payload_layout = QVBoxLayout()
-        self.graph_mode_label = QLabel("Payload Mode:")
-        self.graph_dropdown = QComboBox()
-        self.graph_dropdown.addItems([
-            "None",
-            "Relative Distance",
-            "Relative Angle",
-            "Angular Position"
-        ])
-        self.launch_graph_btn = QPushButton("Launch Payload")
-        self.launch_graph_btn.clicked.connect(self.launch_graph)
-        payload_layout.addWidget(self.graph_mode_label)
-        payload_layout.addWidget(self.graph_dropdown)
-        payload_layout.addWidget(self.launch_graph_btn)
-        payload_group.setLayout(payload_layout)
-        right_layout.addWidget(payload_group)
+
 
         # --- Record Button with Duration Selection ---
         record_group = QGroupBox("Record Payload")
@@ -213,15 +196,85 @@ class MainWindow(QWidget):
 
         graph_display_group = QGroupBox("Graph Display")
         self.graph_display_layout = QVBoxLayout()
-        self.graph_display_label = QLabel("Select payload mode")
-        self.graph_display_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.graph_display_label.setMinimumSize(384, 230)
-        self.graph_display_label.setStyleSheet("background: #eee; border: 1px solid #888; color: #888;")
-        self.graph_display_layout.addWidget(self.graph_display_label)
+        self.graph_display_placeholder = QWidget()
+        self.graph_display_placeholder_layout = QVBoxLayout(self.graph_display_placeholder)
+        self.graph_display_placeholder_layout.setContentsMargins(10, 10, 10, 10)
+        self.graph_display_placeholder_layout.setSpacing(15)
+
+        self.graph_modes = ["Relative Distance", "Relative Angle", "Angular Position"]
+        self.select_buttons = {}
+
+        for mode in self.graph_modes:
+            btn = QPushButton(mode)
+            btn.setMinimumHeight(60)
+            btn.setStyleSheet("""
+                QPushButton {
+                    font-size: 16px;
+                    background-color: #444;
+                    color: white;
+                    border: 2px solid #888;
+                    border-radius: 6px;
+                }
+                QPushButton:hover {
+                    background-color: #666;
+                }
+            """)
+            btn.clicked.connect(lambda _, m=mode: self.load_graph(m))
+            self.graph_display_placeholder_layout.addWidget(btn)
+            self.select_buttons[mode] = btn
+
+        self.graph_display_layout.addWidget(self.graph_display_placeholder)
+
         graph_display_group.setLayout(self.graph_display_layout)
         right_layout.addWidget(graph_display_group)
 
         right_layout.addStretch()
+
+    def load_graph(self, mode):
+        # Remove the placeholder with buttons
+        self.graph_display_placeholder.setParent(None)
+
+        # Load the selected graph
+        if mode == "Relative Distance":
+            self.graph_widget = RelativeDistancePlotter()
+        elif mode == "Relative Angle":
+            self.graph_widget = RelativeAnglePlotter()
+        elif mode == "Angular Position":
+            self.graph_widget = AngularPositionPlotter()
+        else:
+            return
+
+        self.shared_start_time = time.time()
+        self.graph_widget.start_time = self.shared_start_time
+        self.graph_display_layout.addWidget(self.graph_widget)
+
+        # Add Exit button
+        self.exit_graph_btn = QPushButton("← Back")
+        self.exit_graph_btn.setMinimumHeight(40)
+        self.exit_graph_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 14px;
+                background-color: #222;
+                color: white;
+                border: 1px solid #888;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #444;
+            }
+        """)
+        self.exit_graph_btn.clicked.connect(self.exit_graph)
+        self.graph_display_layout.addWidget(self.exit_graph_btn)
+
+    def exit_graph(self):
+        if hasattr(self, "graph_widget") and self.graph_widget:
+            self.graph_widget.setParent(None)
+            self.graph_widget = None
+
+        if hasattr(self, "exit_graph_btn"):
+            self.exit_graph_btn.setParent(None)
+
+        self.graph_display_layout.addWidget(self.graph_display_placeholder)
 
     def launch_graph(self):
         mode = self.graph_dropdown.currentText()
@@ -260,7 +313,6 @@ class MainWindow(QWidget):
 
         # Add the new graph widget into the placeholder layout
         self.graph_display_layout.addWidget(self.graph_widget)
-
 
     def setup_socket_events(self):
         @sio.event

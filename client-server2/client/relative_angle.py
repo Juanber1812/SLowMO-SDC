@@ -47,6 +47,17 @@ class RelativeAnglePlotter(QWidget):
         self.ax.set_xlabel("Time (s)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
         self.ax.set_ylabel("Angle (deg)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
 
+        self.setStyleSheet("""
+            QWidget, QFrame {
+                background-color: #111111;
+                border-radius: 0px;
+                border: 1px solid #888;
+                font-family: Segoe UI, Arial, sans-serif;
+                font-size: 8pt;
+                color: #eee;
+            }
+        """)
+
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.canvas)

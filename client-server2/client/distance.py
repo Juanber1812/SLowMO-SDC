@@ -2,7 +2,7 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from PyQt6.QtWidgets import QVBoxLayout, QFrame, QSizePolicy
+from PyQt6.QtWidgets import QVBoxLayout, QFrame, QSizePolicy, QWidget
 from collections import deque
 import numpy as np
 import time
@@ -28,7 +28,7 @@ class RelativeDistancePlotter(QFrame):
 
         # Set QFrame style: black background and border color to match GUI (e.g. #888)
         self.setStyleSheet("""
-            QFrame {
+            QWidget, QFrame {
                 background-color: #111111;
                 border-radius: 0px;
                 border: 1px solid #888;
