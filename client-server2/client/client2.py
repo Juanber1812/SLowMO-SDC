@@ -4,6 +4,9 @@ from PyQt6.QtWidgets import (
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox)
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage
+
+LOGO_PATH = "slowmosat_logo.png"  # Place your logo in the same folder
+
 import detector4  # Make sure detector4.py is in the same folder
 
 from distance import RelativeDistancePlotter
@@ -63,32 +66,56 @@ class MainWindow(QWidget):
         self.graph_window = None
 
     def setup_ui(self):
-        main_layout = QHBoxLayout(self)
-        left_layout = QVBoxLayout()
-        right_layout = QVBoxLayout()
-        main_layout.addLayout(left_layout)
-        main_layout.addLayout(right_layout)
+        # Main vertical layout
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(32, 32, 32, 32)
+        main_layout.setSpacing(24)
+
+        # --- Logo at the top ---
+        logo_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
+        logo_pixmap = QPixmap(LOGO_PATH)
+        logo_label.setPixmap(logo_pixmap.scaledToWidth(120, Qt.TransformationMode.SmoothTransformation))
+        logo_label.setStyleSheet("margin-bottom: 12px;")
+        main_layout.addWidget(logo_label)
+
+        # --- Two columns: left (controls), right (output/graphs) ---
+        columns = QHBoxLayout()
+        columns.setSpacing(32)
+        main_layout.addLayout(columns)
+
+        # --- Left column ---
+        left_col = QVBoxLayout()
+        left_col.setSpacing(16)
+        columns.addLayout(left_col, 1)
+
+        # --- Right column ---
+        right_col = QVBoxLayout()
+        right_col.setSpacing(16)
+        columns.addLayout(right_col, 2)
 
         # --- Status Section ---
         status_group = QGroupBox("Connection Status")
+        status_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         status_layout = QVBoxLayout()
         self.status_label = QLabel("Status: Disconnected")
         status_layout.addWidget(self.status_label)
         status_group.setLayout(status_layout)
-        left_layout.addWidget(status_group)
+        left_col.addWidget(status_group)
 
         # --- Live Stream Section ---
         stream_group = QGroupBox("Live Stream")
+        stream_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         stream_layout = QVBoxLayout()
         self.image_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.image_label.setFixedSize(384, 216)  # 16:9 aspect ratio
+        self.image_label.setFixedSize(384, 216)
         self.image_label.setStyleSheet("background: #222; border: 1px solid #888;")
         stream_layout.addWidget(self.image_label)
         stream_group.setLayout(stream_layout)
-        left_layout.addWidget(stream_group)
+        left_col.addWidget(stream_group)
 
-        # --- Stream Control Section ---
+        # --- Stream Controls ---
         control_group = QGroupBox("Stream Controls")
+        control_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         control_layout = QVBoxLayout()
         self.toggle_btn = QPushButton("Start Stream")
         self.toggle_btn.setEnabled(False)
@@ -98,19 +125,11 @@ class MainWindow(QWidget):
         control_layout.addWidget(self.toggle_btn)
         control_layout.addWidget(self.reconnect_btn)
         control_group.setLayout(control_layout)
-        left_layout.addWidget(control_group)
+        left_col.addWidget(control_group)
 
-        # --- Capture Image Button ---
-        capture_btn_group = QGroupBox("Image Capture")
-        capture_btn_layout = QVBoxLayout()
-        self.capture_btn = QPushButton("Capture Image")
-        self.capture_btn.setEnabled(False)  # Dead button for now
-        capture_btn_layout.addWidget(self.capture_btn)
-        capture_btn_group.setLayout(capture_btn_layout)
-        left_layout.addWidget(capture_btn_group)
-
-        # --- Camera Settings Section ---
+        # --- Camera Settings ---
         config_group = QGroupBox("Camera Settings")
+        config_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         grid = QGridLayout()
         self.jpeg_slider = QSlider(Qt.Orientation.Horizontal)
         self.jpeg_slider.setRange(1, 100)
@@ -137,10 +156,11 @@ class MainWindow(QWidget):
         self.apply_btn.clicked.connect(self.apply_config)
         grid.addWidget(self.apply_btn, 3, 0, 1, 2)
         config_group.setLayout(grid)
-        left_layout.addWidget(config_group)
+        left_col.addWidget(config_group)
 
-        # --- System Info Section (moved to left column, bottom) ---
+        # --- System Info ---
         info_group = QGroupBox("System Info")
+        info_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         info_layout = QVBoxLayout()
         self.info_labels = {
             "temp": QLabel("Temp: -- °C"),
@@ -154,81 +174,112 @@ class MainWindow(QWidget):
             label.setStyleSheet("font-family: monospace;")
             info_layout.addWidget(label)
         info_group.setLayout(info_layout)
-        left_layout.addWidget(info_group)
+        left_col.addWidget(info_group)
+        left_col.addStretch()
 
-        left_layout.addStretch()
-
-        # --- Detector Output Section (right column) ---
+        # --- Detector Output ---
         detector_group = QGroupBox("Detector Output")
+        detector_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         detector_layout = QVBoxLayout()
         self.analysed_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.analysed_label.setFixedSize(384, 216)  # 16:9 aspect ratio
+        self.analysed_label.setFixedSize(384, 216)
         self.analysed_label.setStyleSheet("background: #222; border: 1px solid #888;")
         detector_layout.addWidget(self.analysed_label)
         detector_group.setLayout(detector_layout)
-        right_layout.addWidget(detector_group)
+        right_col.addWidget(detector_group)
 
         # --- Detection Control ---
         detector_btn_group = QGroupBox("Detection Control")
+        detector_btn_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         detector_btn_layout = QVBoxLayout()
         self.detector_btn = QPushButton("Start Detector")
         self.detector_btn.setEnabled(False)
         self.detector_btn.clicked.connect(self.toggle_detector)
         detector_btn_layout.addWidget(self.detector_btn)
         detector_btn_group.setLayout(detector_btn_layout)
-        right_layout.addWidget(detector_btn_group)
+        right_col.addWidget(detector_btn_group)
 
-
-
-        # --- Record Button with Duration Selection ---
+        # --- Record Button ---
         record_group = QGroupBox("Record Payload")
+        record_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         record_layout = QHBoxLayout()
         self.record_btn = QPushButton("Record")
-        self.record_btn.setEnabled(False)  # Dead button for now
+        self.record_btn.setEnabled(False)
         self.duration_dropdown = QComboBox()
         self.duration_dropdown.addItems(["5s", "10s", "30s", "60s"])
         record_layout.addWidget(self.record_btn)
         record_layout.addWidget(self.duration_dropdown)
         record_group.setLayout(record_layout)
-        right_layout.addWidget(record_group)
+        right_col.addWidget(record_group)
 
-        # --- Graph Display Placeholder ---
-
-        graph_display_group = QGroupBox("Graph Display")
+        # --- Graph Display ---
+        graph_display_group = QGroupBox("Graphs")
+        graph_display_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         self.graph_display_layout = QVBoxLayout()
-        self.graph_display_placeholder = QWidget()
-        self.graph_display_placeholder_layout = QVBoxLayout(self.graph_display_placeholder)
-        self.graph_display_placeholder_layout.setContentsMargins(10, 10, 10, 10)
-        self.graph_display_placeholder_layout.setSpacing(15)
-
+        graph_select_row = QHBoxLayout()
         self.graph_modes = ["Relative Distance", "Relative Angle", "Angular Position"]
         self.select_buttons = {}
-
         for mode in self.graph_modes:
             btn = QPushButton(mode)
-            btn.setMinimumHeight(60)
+            btn.setMinimumHeight(40)
             btn.setStyleSheet("""
                 QPushButton {
-                    font-size: 16px;
-                    background-color: #444;
-                    color: white;
-                    border: 2px solid #888;
+                    background-color: #FFE5C2;
+                    color: #222831;
+                    font-weight: bold;
                     border-radius: 6px;
+                    margin-right: 8px;
                 }
                 QPushButton:hover {
-                    background-color: #666;
+                    background-color: #F24E1E;
+                    color: #fff;
                 }
             """)
             btn.clicked.connect(lambda _, m=mode: self.load_graph(m))
-            self.graph_display_placeholder_layout.addWidget(btn)
+            graph_select_row.addWidget(btn)
             self.select_buttons[mode] = btn
-
+        self.graph_display_layout.addLayout(graph_select_row)
+        self.graph_display_placeholder = QWidget()
+        self.graph_display_placeholder_layout = QVBoxLayout(self.graph_display_placeholder)
+        self.graph_display_placeholder_layout.setContentsMargins(20, 20, 20, 20)
+        self.graph_display_placeholder_layout.setSpacing(20)
         self.graph_display_layout.addWidget(self.graph_display_placeholder)
-
         graph_display_group.setLayout(self.graph_display_layout)
-        right_layout.addWidget(graph_display_group)
+        right_col.addWidget(graph_display_group)
+        right_col.addStretch()
 
-        right_layout.addStretch()
+        # --- Style ---
+        self.setStyleSheet("""
+            QWidget {
+                background: #222831;
+                color: #FFFFFF;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-size: 15px;
+            }
+            QGroupBox {
+                border: none;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            QPushButton {
+                background-color: #219EBC;
+                color: #fff;
+                border-radius: 8px;
+                padding: 10px 18px;
+                font-size: 16px;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #F24E1E;
+            }
+            QComboBox, QSlider, QLabel {
+                background: transparent;
+                border: none;
+            }
+            QLabel {
+                font-size: 15px;
+            }
+        """)
 
     def load_graph(self, mode):
         # Remove the placeholder with buttons
