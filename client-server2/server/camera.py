@@ -17,10 +17,10 @@ def print_status_line(status, resolution, jpeg_quality, fps, fps_value):
     msg = f"[CAMERA] {status} | Res:{resolution} | Q:{jpeg_quality} | FPS:{fps} | {fps_value}fps"
     # Only print a new line if status (Idle/Streaming) changes
     if last_status != status:
-
+        print()  # Move to a new line if status changes (optional, can remove for always-in-place)
         last_status = status
     # Always update the line in place
-
+    print(msg.ljust(80), end='\r', flush=True)
     last_fps_value = fps_value
 
 class CameraStreamer:
@@ -39,7 +39,7 @@ class CameraStreamer:
             sio.connect(SERVER_URL)
             self.connected = True
         except Exception as e:
-
+            print("[ERROR] Socket connection failed:", e)
 
     def apply_config(self):
         try:
@@ -54,11 +54,11 @@ class CameraStreamer:
             stream_cfg = self.picam.create_preview_configuration(
                 main={"format": "XRGB8888", "size": res},
                 controls={"FrameDurationLimits": (duration, duration)}
-            
+            )
             self.picam.configure(stream_cfg)
             self.picam.start()
         except Exception as e:
-
+            print("[ERROR] Failed to configure camera:", e)
 
     def stream_loop(self):
         frame_count = 0
@@ -102,6 +102,7 @@ class CameraStreamer:
                     last_streaming = False
                     time.sleep(0.5)
             except Exception as e:
+                print("[ERROR] Stream loop exception:", e)
                 time.sleep(1)
 
 streamer = CameraStreamer()
@@ -137,6 +138,7 @@ def on_camera_config(data):
 def start_stream():
     streamer.connect_socket()
     streamer.apply_config()
+    print("[INFO] Camera ready.")
     streamer.stream_loop()
 
 if __name__ == "__main__":
