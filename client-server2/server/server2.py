@@ -10,6 +10,8 @@ import threading
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+camera_state = "Idle"  # Default camera state
+
 
 def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
@@ -40,16 +42,22 @@ def handle_frame(data):
 
 @socketio.on('start_camera')
 def handle_start_camera():
+    global camera_state
     try:
         emit('start_camera', {}, broadcast=True)
+        camera_state = "Streaming"
+        socketio.emit('camera_status', {'status': camera_state})
     except Exception as e:
         print(f"[ERROR] start_camera: {e}")
 
 
 @socketio.on('stop_camera')
 def handle_stop_camera():
+    global camera_state
     try:
         emit('stop_camera', {}, broadcast=True)
+        camera_state = "Idle"
+        socketio.emit('camera_status', {'status': camera_state})
     except Exception as e:
         print(f"[ERROR] stop_camera: {e}")
 
@@ -77,6 +85,18 @@ def handle_camera_status(data):
         emit("camera_status", data, broadcast=True)
     except Exception as e:
         print(f"[ERROR] camera_status: {e}")
+
+
+@socketio.on('get_camera_status')
+def handle_get_camera_status():
+    # Send the current camera state to the requesting client
+    emit('camera_status', {'status': camera_state})
+
+
+def set_camera_state(new_state):
+    global camera_state
+    camera_state = new_state
+    socketio.emit('camera_status', {'status': camera_state})
 
 
 if __name__ == "__main__":

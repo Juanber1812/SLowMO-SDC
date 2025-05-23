@@ -529,9 +529,7 @@ class MainWindow(QWidget):
 
         @sio.on("camera_status")
         def on_camera_status(data):
-            # data should be a dict like {"status": "Idle"} or {"status": "Streaming"}
             status = data.get("status", "Unknown")
-            # Update the label with live status and make it white for active feedback
             self.camera_status_label.setText(f"Camera: {status}")
             self.camera_status_label.setStyleSheet("color: white;" if status.lower() in ("streaming", "idle", "ready") else "color: #bbb;")
 

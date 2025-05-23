@@ -38,6 +38,7 @@ class CameraStreamer:
         try:
             sio.connect(SERVER_URL)
             self.connected = True
+            sio.emit("camera_status", {"status": "Idle"})
         except Exception as e:
             print("[ERROR] Socket connection failed:", e)
 
@@ -124,16 +125,24 @@ def on_start_camera(_):
     streamer.streaming = True
     if not streamer.picam.started:
         streamer.picam.start()
+    sio.emit("camera_status", {"status": "Streaming"})
 
 @sio.on("stop_camera")
 def on_stop_camera(_):
     streamer.streaming = False
+    sio.emit("camera_status", {"status": "Idle"})
 
 @sio.on("camera_config")
 def on_camera_config(data):
     streamer.config.update(data)
     if not streamer.streaming:
         streamer.apply_config()
+        sio.emit("camera_status", {"status": "Ready"})
+
+@sio.on("get_camera_status")
+def on_get_camera_status(_):
+    status = "Streaming" if streamer.streaming else "Idle"
+    sio.emit("camera_status", {"status": status})
 
 def start_stream():
     streamer.connect_socket()
