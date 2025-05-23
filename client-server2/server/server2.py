@@ -93,6 +93,15 @@ def handle_get_camera_status():
     emit('camera_status', {'status': camera_state})
 
 
+@socketio.on("camera_info")
+def on_camera_info(data):
+    try:
+        # Broadcast the camera info to all connected clients
+        emit("camera_info", data, broadcast=True)
+    except Exception as e:
+        print("Camera info error:", e)
+
+
 def set_camera_state(new_state):
     global camera_state
     camera_state = new_state

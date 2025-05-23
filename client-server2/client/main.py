@@ -67,9 +67,12 @@ def setup_socket_events(main_window):
         try:
             fps = data.get("fps", "--")
             frame_size = data.get("frame_size", "--")
+            speed = data.get("speed", "--")
+            max_frame = data.get("max_frame", "--")
             main_window.info_labels["fps"].setText(f"FPS: {fps}")
             main_window.info_labels["frame_size"].setText(f"Frame Size: {frame_size} KB")
-            # Add more fields as needed
+            main_window.info_labels["speed"].setText(f"Upload: {speed} Mbps")
+            main_window.info_labels["max_frame"].setText(f"Max Frame: {max_frame} KB")
         except Exception as e:
             print("Camera info error:", e)
 
@@ -94,3 +97,25 @@ if __name__ == "__main__":
     exit_code = app.exec()
     sio.disconnect()  # <-- Add this line
     sys.exit(exit_code)
+
+# In ui_main.py or MainWindow class
+def measure_speed(self):
+    self.info_labels["speed"].setText("Upload: Testing...")
+    self.info_labels["max_frame"].setText("Max Frame: ...")
+
+    def run_speedtest():
+        try:
+            import speedtest
+            st = speedtest.Speedtest()
+            upload = st.upload()
+            upload_mbps = upload / 1_000_000
+            self.info_labels["speed"].setText(f"Upload: {upload_mbps:.2f} Mbps")
+            fps = self.fps_slider.value()
+            max_bytes_per_sec = upload / 8
+            max_frame_size = max_bytes_per_sec / fps
+            self.info_labels["max_frame"].setText(f"Max Frame: {max_frame_size / 1024:.1f} KB")
+        except Exception:
+            self.info_labels["speed"].setText("Upload: Error")
+            self.info_labels["max_frame"].setText("Max Frame: -- KB")
+
+    threading.Thread(target=run_speedtest, daemon=True).start()
