@@ -26,17 +26,7 @@ class RelativeDistancePlotter(QFrame):
         self.subplot_top = 0.93
         self.subplot_bottom = 0.18
 
-        # Set QFrame style: black background and border color to match GUI (e.g. #888)
-        self.setStyleSheet("""
-            QWidget, QFrame {
-                background-color: #111111;
-                border-radius: 0px;
-                border: 1px solid #888;
-                font-family: Segoe UI, Arial, sans-serif;
-                font-size: 8pt;
-                color: #eee;
-            }
-        """)
+
         self.setMinimumSize(384, 216)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 

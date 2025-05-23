@@ -54,16 +54,7 @@ class AngularPositionPlotter(QWidget):
         layout.addWidget(self.canvas)
         self.setLayout(layout)
 
-        self.setStyleSheet("""
-            QWidget, QFrame {
-                background-color: #111111;
-                border-radius: 0px;
-                border: 1px solid #888;
-                font-family: Segoe UI, Arial, sans-serif;
-                font-size: 8pt;
-                color: #eee;
-            }
-        """)
+
 
     def update(self, rvec, tvec, timestamp=None):
         if timestamp is None:

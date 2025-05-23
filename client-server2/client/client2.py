@@ -1,12 +1,9 @@
 import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
+    QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox)
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage
-
-LOGO_PATH = "slowmosat_logo.png"  # Place your logo in the same folder
-
 import detector4  # Make sure detector4.py is in the same folder
 
 from distance import RelativeDistancePlotter
@@ -66,70 +63,78 @@ class MainWindow(QWidget):
         self.graph_window = None
 
     def setup_ui(self):
-        # Main vertical layout
-        main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(32, 32, 32, 32)
-        main_layout.setSpacing(24)
+        main_layout = QHBoxLayout(self)
 
-        # --- Logo at the top ---
-        logo_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
-        logo_pixmap = QPixmap(LOGO_PATH)
-        logo_label.setPixmap(logo_pixmap.scaledToWidth(120, Qt.TransformationMode.SmoothTransformation))
-        logo_label.setStyleSheet("margin-bottom: 12px;")
-        main_layout.addWidget(logo_label)
+        # --- Make left column fixed width ---
+        left_widget = QWidget()
+        left_layout = QVBoxLayout(left_widget)
+        left_widget.setFixedWidth(420)
 
-        # --- Two columns: left (controls), right (output/graphs) ---
-        columns = QHBoxLayout()
-        columns.setSpacing(32)
-        main_layout.addLayout(columns)
+        # --- Make right column fixed width ---
+        right_widget = QWidget()
+        right_layout = QVBoxLayout(right_widget)
+        right_widget.setFixedWidth(420)
 
-        # --- Left column ---
-        left_col = QVBoxLayout()
-        left_col.setSpacing(16)
-        columns.addLayout(left_col, 1)
+        # --- ADCS column (will stretch) ---
+        adcs_layout = QVBoxLayout()
 
-        # --- Right column ---
-        right_col = QVBoxLayout()
-        right_col.setSpacing(16)
-        columns.addLayout(right_col, 2)
+        # --- Info column (new, will stretch) ---
+        info_layout = QVBoxLayout()
+
+        # --- Add columns to main layout (no separators) ---
+        main_layout.addWidget(left_widget)
+        main_layout.addWidget(right_widget)
+        main_layout.addLayout(adcs_layout)
+        main_layout.addLayout(info_layout)
 
         # --- Status Section ---
-        status_group = QGroupBox("Connection Status")
-        status_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
-        status_layout = QVBoxLayout()
-        self.status_label = QLabel("Status: Disconnected")
-        status_layout.addWidget(self.status_label)
-        status_group.setLayout(status_layout)
-        left_col.addWidget(status_group)
+        #status_group = QGroupBox("Connection Status")
+        #status_layout = QVBoxLayout()
+        #self.status_label = QLabel("Status: Disconnected")
+        #status_layout.addWidget(self.status_label)
+        #status_group.setLayout(status_layout)
+        #left_layout.addWidget(status_group)
 
         # --- Live Stream Section ---
         stream_group = QGroupBox("Live Stream")
-        stream_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         stream_layout = QVBoxLayout()
         self.image_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.image_label.setFixedSize(384, 216)
+        self.image_label.setFixedSize(384, 216)  # 16:9 aspect ratio
         self.image_label.setStyleSheet("background: #222; border: 1px solid #888;")
         stream_layout.addWidget(self.image_label)
         stream_group.setLayout(stream_layout)
-        left_col.addWidget(stream_group)
+        left_layout.addWidget(stream_group)
 
-        # --- Stream Controls ---
-        control_group = QGroupBox("Stream Controls")
-        control_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
-        control_layout = QVBoxLayout()
+        # --- Camera Controls Section (combining Stream and Capture) ---
+        camera_controls_group = QGroupBox("Camera Controls")
+        camera_controls_layout = QGridLayout()
+
+        # Stream controls
         self.toggle_btn = QPushButton("Start Stream")
         self.toggle_btn.setEnabled(False)
         self.toggle_btn.clicked.connect(self.toggle_stream)
+
         self.reconnect_btn = QPushButton("Reconnect")
         self.reconnect_btn.clicked.connect(self.try_reconnect)
-        control_layout.addWidget(self.toggle_btn)
-        control_layout.addWidget(self.reconnect_btn)
-        control_group.setLayout(control_layout)
-        left_col.addWidget(control_group)
 
-        # --- Camera Settings ---
+        # Image controls
+        self.capture_btn = QPushButton("Capture Image")
+        self.capture_btn.setEnabled(False)  # Dead button for now
+
+        self.crop_btn = QPushButton("Crop")
+        self.crop_btn.setEnabled(False)  # Enable as needed
+
+        # Arrange buttons in a 2x2 grid
+        camera_controls_layout.addWidget(self.toggle_btn, 0, 0)
+        camera_controls_layout.addWidget(self.reconnect_btn, 0, 1)
+        camera_controls_layout.addWidget(self.capture_btn, 1, 0)
+        camera_controls_layout.addWidget(self.crop_btn, 1, 1)
+
+        camera_controls_group.setLayout(camera_controls_layout)
+        left_layout.addWidget(camera_controls_group)
+
+        # --- Camera Settings Section ---
         config_group = QGroupBox("Camera Settings")
-        config_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         grid = QGridLayout()
         self.jpeg_slider = QSlider(Qt.Orientation.Horizontal)
         self.jpeg_slider.setRange(1, 100)
@@ -156,12 +161,22 @@ class MainWindow(QWidget):
         self.apply_btn.clicked.connect(self.apply_config)
         grid.addWidget(self.apply_btn, 3, 0, 1, 2)
         config_group.setLayout(grid)
-        left_col.addWidget(config_group)
+        left_layout.addWidget(config_group)
 
-        # --- System Info ---
+        # --- ADCS Section (third column) ---
+        adcs_group = QGroupBox("ADCS")
+        adcs_box_layout = QVBoxLayout()
+        adcs_placeholder = QLabel("ADCS Placeholder\n(More controls coming soon)")
+        adcs_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        adcs_placeholder.setMinimumHeight(200)
+        adcs_box_layout.addWidget(adcs_placeholder)
+        adcs_group.setLayout(adcs_box_layout)
+        adcs_layout.addWidget(adcs_group)
+        adcs_layout.addStretch()
+
+        # --- System Info Section (move back to left column) ---
         info_group = QGroupBox("System Info")
-        info_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
-        info_layout = QVBoxLayout()
+        info_layout_inner = QVBoxLayout()
         self.info_labels = {
             "temp": QLabel("Temp: -- °C"),
             "cpu": QLabel("CPU: --%"),
@@ -172,114 +187,195 @@ class MainWindow(QWidget):
         }
         for label in self.info_labels.values():
             label.setStyleSheet("font-family: monospace;")
-            info_layout.addWidget(label)
-        info_group.setLayout(info_layout)
-        left_col.addWidget(info_group)
-        left_col.addStretch()
+            info_layout_inner.addWidget(label)
+        info_group.setLayout(info_layout_inner)
+        left_layout.addWidget(info_group)
 
-        # --- Detector Output ---
+        # --- Detector Output Section (right column) ---
         detector_group = QGroupBox("Detector Output")
-        detector_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         detector_layout = QVBoxLayout()
         self.analysed_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.analysed_label.setFixedSize(384, 216)
+        self.analysed_label.setFixedSize(384, 216)  # 16:9 aspect ratio
         self.analysed_label.setStyleSheet("background: #222; border: 1px solid #888;")
         detector_layout.addWidget(self.analysed_label)
         detector_group.setLayout(detector_layout)
-        right_col.addWidget(detector_group)
+        right_layout.addWidget(detector_group)
 
         # --- Detection Control ---
         detector_btn_group = QGroupBox("Detection Control")
-        detector_btn_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
         detector_btn_layout = QVBoxLayout()
         self.detector_btn = QPushButton("Start Detector")
         self.detector_btn.setEnabled(False)
         self.detector_btn.clicked.connect(self.toggle_detector)
         detector_btn_layout.addWidget(self.detector_btn)
         detector_btn_group.setLayout(detector_btn_layout)
-        right_col.addWidget(detector_btn_group)
+        right_layout.addWidget(detector_btn_group)
 
-        # --- Record Button ---
-        record_group = QGroupBox("Record Payload")
-        record_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
-        record_layout = QHBoxLayout()
+
+
+        # --- Prepare Record Button for dynamic use ---
         self.record_btn = QPushButton("Record")
-        self.record_btn.setEnabled(False)
+        self.record_btn.setEnabled(False)  # Enable as needed
         self.duration_dropdown = QComboBox()
         self.duration_dropdown.addItems(["5s", "10s", "30s", "60s"])
-        record_layout.addWidget(self.record_btn)
-        record_layout.addWidget(self.duration_dropdown)
-        record_group.setLayout(record_layout)
-        right_col.addWidget(record_group)
 
-        # --- Graph Display ---
-        graph_display_group = QGroupBox("Graphs")
-        graph_display_group.setStyleSheet("QGroupBox { background: #222831; border-radius: 8px; }")
+        # --- Graph Display Placeholder ---
+        graph_display_group = QGroupBox("Graph Display")
         self.graph_display_layout = QVBoxLayout()
-        graph_select_row = QHBoxLayout()
+        self.graph_display_placeholder = QWidget()
+        self.graph_display_placeholder_layout = QVBoxLayout(self.graph_display_placeholder)
+        self.graph_display_placeholder_layout.setContentsMargins(10, 10, 10, 10)
+        self.graph_display_placeholder_layout.setSpacing(15)
+
+        # Set fixed height for the graph display group and placeholder (adjust as needed)
+        graph_display_group.setFixedHeight(300)  # Half of previous 360, adjust as needed
+        self.graph_display_placeholder.setFixedHeight(260)  # Slightly less than group to allow for margins
+
         self.graph_modes = ["Relative Distance", "Relative Angle", "Angular Position"]
         self.select_buttons = {}
+
         for mode in self.graph_modes:
             btn = QPushButton(mode)
-            btn.setMinimumHeight(40)
+            btn.setMinimumHeight(60)
             btn.setStyleSheet("""
                 QPushButton {
-                    background-color: #FFE5C2;
-                    color: #222831;
-                    font-weight: bold;
+                    font-size: 16px;
+                    background-color: #444;
+                    color: white;
+                    border: 2px solid #888;
                     border-radius: 6px;
-                    margin-right: 8px;
                 }
                 QPushButton:hover {
-                    background-color: #F24E1E;
-                    color: #fff;
+                    background-color: #666;
                 }
             """)
             btn.clicked.connect(lambda _, m=mode: self.load_graph(m))
-            graph_select_row.addWidget(btn)
+            self.graph_display_placeholder_layout.addWidget(btn)
             self.select_buttons[mode] = btn
-        self.graph_display_layout.addLayout(graph_select_row)
-        self.graph_display_placeholder = QWidget()
-        self.graph_display_placeholder_layout = QVBoxLayout(self.graph_display_placeholder)
-        self.graph_display_placeholder_layout.setContentsMargins(20, 20, 20, 20)
-        self.graph_display_placeholder_layout.setSpacing(20)
+
         self.graph_display_layout.addWidget(self.graph_display_placeholder)
         graph_display_group.setLayout(self.graph_display_layout)
-        right_col.addWidget(graph_display_group)
-        right_col.addStretch()
+        right_layout.addWidget(graph_display_group)
 
-        # --- Style ---
-        self.setStyleSheet("""
-            QWidget {
-                background: #222831;
-                color: #FFFFFF;
-                font-family: 'Segoe UI', Arial, sans-serif;
-                font-size: 15px;
-            }
-            QGroupBox {
-                border: none;
-                margin-top: 10px;
-                margin-bottom: 10px;
-            }
-            QPushButton {
-                background-color: #219EBC;
-                color: #fff;
-                border-radius: 8px;
-                padding: 10px 18px;
-                font-size: 16px;
-                border: none;
-            }
-            QPushButton:hover {
-                background-color: #F24E1E;
-            }
-            QComboBox, QSlider, QLabel {
-                background: transparent;
-                border: none;
-            }
-            QLabel {
-                font-size: 15px;
-            }
-        """)
+        # --- LIDAR Section ---
+        lidar_group = QGroupBox("LIDAR")
+        lidar_layout = QVBoxLayout()
+        lidar_placeholder = QLabel("LIDAR here")
+        lidar_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lidar_placeholder.setStyleSheet("background: white; color: black; border: 1px solid #888; border-radius: 6px; font-size: 16px;")
+        lidar_placeholder.setFixedHeight(60)
+        lidar_layout.addWidget(lidar_placeholder)
+        lidar_group.setLayout(lidar_layout)
+        right_layout.addWidget(lidar_group)
+
+        right_layout.addStretch()
+
+        # --- Subsystem Info Boxes (templates) ---
+        # Power Subsystem
+        power_group = QGroupBox("Power Subsystem")
+        power_layout = QVBoxLayout()
+        lbl = QLabel("Battery Voltage: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        power_layout.addWidget(lbl)
+        lbl = QLabel("Battery Current: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        power_layout.addWidget(lbl)
+        lbl = QLabel("Battery Temp: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        power_layout.addWidget(lbl)
+        lbl = QLabel("Status: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        power_layout.addWidget(lbl)
+        power_group.setLayout(power_layout)
+        info_layout.addWidget(power_group)
+
+        # Thermal Subsystem
+        thermal_group = QGroupBox("Thermal Subsystem")
+        thermal_layout = QVBoxLayout()
+        lbl = QLabel("Internal Temp: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        thermal_layout.addWidget(lbl)
+        lbl = QLabel("Status: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        thermal_layout.addWidget(lbl)
+        thermal_group.setLayout(thermal_layout)
+        info_layout.addWidget(thermal_group)
+
+        # Communication Subsystem
+        comm_group = QGroupBox("Communication Subsystem")
+        comm_layout = QVBoxLayout()
+        lbl = QLabel("Downlink Frequency: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        comm_layout.addWidget(lbl)
+        lbl = QLabel("Uplink Frequency: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        comm_layout.addWidget(lbl)
+        lbl = QLabel("Signal Strength: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        comm_layout.addWidget(lbl)
+        lbl = QLabel("Data Rate: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        comm_layout.addWidget(lbl)
+        self.comms_status_label = QLabel("Status: Disconnected")
+        comm_layout.addWidget(self.comms_status_label)
+        comm_group.setLayout(comm_layout)
+        info_layout.addWidget(comm_group)
+
+        # ADCS Subsystem
+        adcs_info_group = QGroupBox("ADCS Subsystem")
+        adcs_info_layout = QVBoxLayout()
+        for text in ["Gyro: Pending...", "Orientation: Pending...", "Sun Sensor: Pending...", "Wheel Rpm: Pending...", "Status: Pending..."]:
+            lbl = QLabel(text)
+            lbl.setStyleSheet("color: #bbb;")
+            adcs_info_layout.addWidget(lbl)
+        adcs_info_group.setLayout(adcs_info_layout)
+        info_layout.addWidget(adcs_info_group)
+
+        # Payload Subsystem
+        payload_group = QGroupBox("Payload Subsystem")
+        payload_layout = QVBoxLayout()
+        self.camera_status_label = QLabel("Camera: Pending...")
+        self.camera_status_label.setStyleSheet("color: #bbb;")
+        payload_layout.addWidget(self.camera_status_label)
+        lbl = QLabel("Status: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        payload_layout.addWidget(lbl)
+        payload_group.setLayout(payload_layout)
+        info_layout.addWidget(payload_group)
+
+        # Command and Data Handling Subsystem
+        cdh_group = QGroupBox("Command & Data Handling Subsystem")
+        cdh_layout = QVBoxLayout()
+        for text in ["Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]:
+            lbl = QLabel(text)
+            lbl.setStyleSheet("color: #bbb;")
+            cdh_layout.addWidget(lbl)
+        cdh_group.setLayout(cdh_layout)
+        info_layout.addWidget(cdh_group)
+
+        # Error Log
+        error_group = QGroupBox("Error Log")
+        error_layout = QVBoxLayout()
+        lbl = QLabel("No Critical Errors Detected: Pending...")
+        lbl.setStyleSheet("color: #bbb;")
+        error_layout.addWidget(lbl)
+        error_group.setLayout(error_layout)
+        info_layout.addWidget(error_group)
+
+        # Overall Status
+        overall_group = QGroupBox("Overall Status")
+        overall_layout = QVBoxLayout()
+        for text in ["No Anomalies Detected: Pending...", "Recommended Actions: Pending..."]:
+            lbl = QLabel(text)
+            lbl.setStyleSheet("color: #bbb;")
+            overall_layout.addWidget(lbl)
+        overall_group.setLayout(overall_layout)
+        info_layout.addWidget(overall_group)
+
+        # --- Print Health Check Report Button above column 4 ---
+        print_report_btn = QPushButton("Print Health Check Report")
+        print_report_btn.setEnabled(False)  # Dead button
+        info_layout.insertWidget(0, print_report_btn)
 
     def load_graph(self, mode):
         # Remove the placeholder with buttons
@@ -297,14 +393,26 @@ class MainWindow(QWidget):
 
         self.shared_start_time = time.time()
         self.graph_widget.start_time = self.shared_start_time
+        self.graph_widget.setFixedHeight(230)  # Match the placeholder height
         self.graph_display_layout.addWidget(self.graph_widget)
 
-        # Add Exit button
+        # Add Exit and Record buttons in a horizontal layout
+        btn_layout = QHBoxLayout()
+        btn_layout.setSpacing(10)
+
+        # Add Record button (to the left)
+        btn_layout.addWidget(self.record_btn)
+        btn_layout.addWidget(self.duration_dropdown)
+
+        # Add Exit button (to the right)
         self.exit_graph_btn = QPushButton("← Back")
-        self.exit_graph_btn.setMinimumHeight(40)
+        self.exit_graph_btn.setMinimumHeight(self.record_btn.minimumHeight())
+        self.exit_graph_btn.setMaximumHeight(self.record_btn.maximumHeight())
+        self.exit_graph_btn.setMinimumWidth(self.record_btn.minimumWidth())
+        self.exit_graph_btn.setMaximumWidth(self.record_btn.maximumWidth())
         self.exit_graph_btn.setStyleSheet("""
             QPushButton {
-                font-size: 14px;
+                font-size: 9pt;
                 background-color: #222;
                 color: white;
                 border: 1px solid #888;
@@ -315,7 +423,13 @@ class MainWindow(QWidget):
             }
         """)
         self.exit_graph_btn.clicked.connect(self.exit_graph)
-        self.graph_display_layout.addWidget(self.exit_graph_btn)
+        btn_layout.addWidget(self.exit_graph_btn)
+
+        # Set the same size policy as record_btn
+        self.exit_graph_btn.setSizePolicy(self.record_btn.sizePolicy())
+
+        # Add the button layout to the graph display
+        self.graph_display_layout.addLayout(btn_layout)
 
     def exit_graph(self):
         if hasattr(self, "graph_widget") and self.graph_widget:
@@ -324,6 +438,10 @@ class MainWindow(QWidget):
 
         if hasattr(self, "exit_graph_btn"):
             self.exit_graph_btn.setParent(None)
+        if hasattr(self, "record_btn"):
+            self.record_btn.setParent(None)
+        if hasattr(self, "duration_dropdown"):
+            self.duration_dropdown.setParent(None)
 
         self.graph_display_layout.addWidget(self.graph_display_placeholder)
 
@@ -369,14 +487,18 @@ class MainWindow(QWidget):
         @sio.event
         def connect():
             print("Connected event fired")
-            self.status_label.setText("Status: Connected")
+            self.comms_status_label.setText("Status: Connected")
             self.toggle_btn.setEnabled(True)
             self.detector_btn.setEnabled(True)
             self.apply_config()
+            # Ensure camera is idle unless streaming is already True
+            if not self.streaming:
+                sio.emit("stop_camera")
+            sio.emit("get_camera_status")
 
         @sio.event
         def disconnect():
-            self.status_label.setText("Status: Disconnected")
+            self.comms_status_label.setText("Status: Disconnected")
             self.toggle_btn.setEnabled(False)
             self.detector_btn.setEnabled(False)
 
@@ -404,6 +526,14 @@ class MainWindow(QWidget):
                 self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
             except Exception as e:
                 logging.exception("Sensor update failed")
+
+        @sio.on("camera_status")
+        def on_camera_status(data):
+            # data should be a dict like {"status": "Idle"} or {"status": "Streaming"}
+            status = data.get("status", "Unknown")
+            # Update the label with live status and make it white for active feedback
+            self.camera_status_label.setText(f"Camera: {status}")
+            self.camera_status_label.setStyleSheet("color: white;" if status.lower() in ("streaming", "idle", "ready") else "color: #bbb;")
 
     def update_fps_slider(self):
         self.fps_slider.setRange(1, 120)
@@ -550,7 +680,7 @@ class MainWindow(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = MainWindow()
-    win.show()
+    win.showMaximized()
 
     def socket_thread():
         while True:

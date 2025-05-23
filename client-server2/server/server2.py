@@ -70,6 +70,15 @@ def handle_sensor_data(data):
         print(f"[ERROR] sensor_data: {e}")
 
 
+@socketio.on("camera_status")
+def handle_camera_status(data):
+    try:
+        # Broadcast the camera status to all connected clients
+        emit("camera_status", data, broadcast=True)
+    except Exception as e:
+        print(f"[ERROR] camera_status: {e}")
+
+
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
     print("Press Ctrl+C to stop the server and clean up resources.")
