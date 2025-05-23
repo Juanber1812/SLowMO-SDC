@@ -4,11 +4,10 @@ from PyQt6.QtWidgets import (
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox)
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage
-import detector4  # Make sure detector4.py is in the same folder
-
-from distance import RelativeDistancePlotter
-from relative_angle import RelativeAnglePlotter
-from spin import AngularPositionPlotter
+from payload.distance import RelativeDistancePlotter
+from payload.relative_angle import RelativeAnglePlotter
+from payload.spin import AngularPositionPlotter
+from payload import detector4
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.1.146:5000"
@@ -605,10 +604,12 @@ class MainWindow(QWidget):
             self.toggle_btn.setEnabled(True)
             self.detector_btn.setEnabled(True)
             self.apply_config()
-            # Ensure camera is idle unless streaming is already True
-            if not self.streaming:
-                sio.emit("stop_camera")
-            sio.emit("get_camera_status")
+            # Delay emits to ensure connection is fully established
+            def delayed_emits():
+                if not self.streaming:
+                    sio.emit("stop_camera")
+                sio.emit("get_camera_status")
+            QTimer.singleShot(100, delayed_emits)
 
         @sio.event
         def disconnect():

@@ -66,7 +66,8 @@ class CameraStreamer:
     def stream_loop(self):
         frame_count = 0
         last_time = time.time()
-        last_streaming = None  # Track last streaming state
+        bytes_sent = 0
+        last_bytes_sent = 0
 
         while True:
             try:
@@ -76,33 +77,28 @@ class CameraStreamer:
                     if not ok:
                         continue
 
-                    sio.emit("frame", buf.tobytes())
+                    frame_bytes = buf.tobytes()
+                    sio.emit("frame", frame_bytes)
                     frame_count += 1
+                    bytes_sent += len(frame_bytes)
+
                     now = time.time()
                     if now - last_time >= 1.0:
-                        # Always update the same line with current status and FPS
-                        cfg = self.config
-                        print_status_line(
-                            "Streaming",
-                            cfg.get("resolution"),
-                            cfg.get("jpeg_quality"),
-                            cfg.get("fps"),
-                            frame_count
-                        )
+                        fps = frame_count
+                        frame_size = len(frame_bytes) // 1024  # KB
+                        upload_speed = (bytes_sent - last_bytes_sent) // 1024  # KB/s
+
+                        # EMIT CAMERA INFO EVENT
+                        sio.emit("camera_info", {
+                            "fps": fps,
+                            "frame_size": frame_size,
+                            "upload_speed": upload_speed
+                        })
+
                         frame_count = 0
                         last_time = now
-                    last_streaming = True
+                        last_bytes_sent = bytes_sent
                 else:
-                    # Always update the same line with Idle status and FPS 0
-                    cfg = self.config
-                    print_status_line(
-                        "Idle",
-                        cfg.get("resolution"),
-                        cfg.get("jpeg_quality"),
-                        cfg.get("fps"),
-                        0
-                    )
-                    last_streaming = False
                     time.sleep(0.5)
             except Exception as e:
                 print("[ERROR] Stream loop exception:", e)
