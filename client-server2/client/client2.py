@@ -33,6 +33,31 @@ bridge = Bridge()
 
 
 class MainWindow(QWidget):
+    # --- GUI Color & Style Variables ---
+    COLOR_BG = "#222"
+    COLOR_BOX_BG = "#222"
+    COLOR_BOX_BORDER = "#888"
+    COLOR_BOX_BORDER_LIVE = "#ff0000"
+    COLOR_BOX_BORDER_DETECTOR = "#ff2222"
+    COLOR_BOX_BORDER_CAMERA_CONTROLS = "#888"
+    COLOR_BOX_BORDER_CONFIG = "#888"
+    COLOR_BOX_BORDER_SYSTEM_INFO = "#888"
+    COLOR_BOX_BORDER_LIDAR = "#888"
+    COLOR_BOX_BORDER_SUBSYSTEM = "#888"
+    COLOR_BOX_BORDER_COMM = "#888"
+    COLOR_BOX_BORDER_ADCS = "#888"
+    COLOR_BOX_BORDER_PAYLOAD = "#888"
+    COLOR_BOX_BORDER_CDH = "#888"
+    COLOR_BOX_BORDER_ERROR = "#888"
+    COLOR_BOX_BORDER_OVERALL = "#888"
+    COLOR_BOX_BG_LIDAR = "white"
+    COLOR_BOX_TEXT_LIDAR = "black"
+
+    # --- Border Style Variables ---
+    BOX_BORDER_THICKNESS = 1
+    BOX_BORDER_STYLE = "solid"
+    BOX_BORDER_RADIUS = 8
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SLowMO Client")
@@ -337,9 +362,9 @@ class MainWindow(QWidget):
         self.camera_status_label = QLabel("Camera: Pending...")
         self.camera_status_label.setStyleSheet("color: #bbb;")
         payload_layout.addWidget(self.camera_status_label)
-        lbl = QLabel("Status: Pending...")
-        lbl.setStyleSheet("color: #bbb;")
-        payload_layout.addWidget(lbl)
+        self.camera_ready_label = QLabel("Status: Not Ready")
+        self.camera_ready_label.setStyleSheet("color: #bbb;")
+        payload_layout.addWidget(self.camera_ready_label)
         payload_group.setLayout(payload_layout)
         info_layout.addWidget(payload_group)
 
@@ -377,6 +402,95 @@ class MainWindow(QWidget):
         print_report_btn.setEnabled(False)  # Dead button
         info_layout.insertWidget(0, print_report_btn)
 
+        # --- Apply Stylesheets to Groups ---
+        border = f"{self.BOX_BORDER_THICKNESS}px {self.BOX_BORDER_STYLE}"
+        radius = f"{self.BOX_BORDER_RADIUS}px"
+        bg = self.COLOR_BOX_BG
+
+        stream_group.setStyleSheet(f"""
+            QGroupBox {{
+                border: {border} {self.COLOR_BOX_BORDER_LIVE};
+                border-radius: {radius};
+                margin-top: 10px;
+                background: {bg};
+            }}
+            QGroupBox:title {{
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 3px 0 3px;
+            }}
+        """)
+
+        camera_controls_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_CAMERA_CONTROLS}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        config_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_CONFIG}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        info_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_SYSTEM_INFO}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        detector_group.setStyleSheet(f"""
+            QGroupBox {{
+                border: {border} {self.COLOR_BOX_BORDER_DETECTOR};
+                border-radius: {radius};
+                margin-top: 10px;
+                background: {bg};
+            }}
+            QGroupBox:title {{
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 3px 0 3px;
+            }}
+        """)
+
+        detector_btn_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_DETECTOR}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        graph_display_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        lidar_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_LIDAR}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        power_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_SUBSYSTEM}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        thermal_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_SUBSYSTEM}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        comm_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_COMM}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        adcs_info_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_ADCS}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        payload_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_PAYLOAD}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        cdh_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_CDH}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        error_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_ERROR}; border-radius: {radius}; background: {bg}; }}"
+        )
+
+        overall_group.setStyleSheet(
+            f"QGroupBox {{ border: {border} {self.COLOR_BOX_BORDER_OVERALL}; border-radius: {radius}; background: {bg}; }}"
+        )
+
     def load_graph(self, mode):
         # Remove the placeholder with buttons
         self.graph_display_placeholder.setParent(None)
@@ -385,7 +499,7 @@ class MainWindow(QWidget):
         if mode == "Relative Distance":
             self.graph_widget = RelativeDistancePlotter()
         elif mode == "Relative Angle":
-            self.graph_widget = RelativeAnglePlotter()
+            self.graph_widget = AngularPositionPlotter()
         elif mode == "Angular Position":
             self.graph_widget = AngularPositionPlotter()
         else:
@@ -531,7 +645,17 @@ class MainWindow(QWidget):
         def on_camera_status(data):
             status = data.get("status", "Unknown")
             self.camera_status_label.setText(f"Camera: {status}")
-            self.camera_status_label.setStyleSheet("color: white;" if status.lower() in ("streaming", "idle", "ready") else "color: #bbb;")
+            self.camera_status_label.setStyleSheet(
+                "color: white;" if status.lower() in ("streaming", "idle", "ready") else "color: #bbb;"
+            )
+            # Only show "Not Ready" in red if status is a known error/problem
+            error_statuses = {"error", "not connected", "damaged", "not found", "unavailable", "failed"}
+            if status.lower() in error_statuses:
+                self.camera_ready_label.setText("Status: Not Ready")
+                self.camera_ready_label.setStyleSheet("color: #f00;")  # Red for not ready
+            else:
+                self.camera_ready_label.setText("Status: Ready")
+                self.camera_ready_label.setStyleSheet("color: #0f0;")  # Green for ready
 
     def update_fps_slider(self):
         self.fps_slider.setRange(1, 120)

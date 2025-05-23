@@ -41,6 +41,7 @@ class CameraStreamer:
             sio.emit("camera_status", {"status": "Idle"})
         except Exception as e:
             print("[ERROR] Socket connection failed:", e)
+            sio.emit("camera_status", {"status": "Error"})
 
     def apply_config(self):
         try:
@@ -60,6 +61,7 @@ class CameraStreamer:
             self.picam.start()
         except Exception as e:
             print("[ERROR] Failed to configure camera:", e)
+            sio.emit("camera_status", {"status": "Error"})
 
     def stream_loop(self):
         frame_count = 0
