@@ -7,6 +7,16 @@ from collections import deque
 import numpy as np
 import time
 from matplotlib.ticker import MultipleLocator
+from theme import (
+    BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
+    TEXT_COLOR, TEXT_SECONDARY, BOX_TITLE_COLOR, LABEL_COLOR,
+    GRID_COLOR, TICK_COLOR, PLOT_LINE_PRIMARY, PLOT_LINE_SECONDARY, PLOT_LINE_ALT,
+    BUTTON_COLOR, BUTTON_HOVER, BUTTON_DISABLED, BUTTON_TEXT,
+    BORDER_COLOR, BORDER_ERROR, BORDER_HIGHLIGHT,
+    FONT_FAMILY, FONT_SIZE_NORMAL, FONT_SIZE_LABEL, FONT_SIZE_TITLE,
+    ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR,
+    GRAPH_MODE_COLORS
+)
 
 class RelativeDistancePlotter(QFrame):
     def __init__(self):
@@ -22,10 +32,15 @@ class RelativeDistancePlotter(QFrame):
 
         # === Customizable subplot margins ===
         self.subplot_left = 0.12      # Move graph closer to left edge
-        self.subplot_right = 0.98
+        self.subplot_right = 0.92
         self.subplot_top = 0.93
         self.subplot_bottom = 0.18
 
+        # === Theme colors from theme.py ===
+        self.bg_color = PLOT_BACKGROUND
+        self.line_color = GRAPH_MODE_COLORS["Relative Distance"]
+        self.tick_color = self.line_color
+        self.grid_color = self.line_color
 
         self.setMinimumSize(384, 216)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -34,19 +49,21 @@ class RelativeDistancePlotter(QFrame):
         self.time_data = deque(maxlen=100)
         self.start_time = time.time()
 
-        gui_bg = "#111111"  # Black background for matplotlib
-
-        self.figure = Figure(facecolor=gui_bg)
+        self.figure = Figure(facecolor=self.bg_color)
         self.canvas = FigureCanvas(self.figure)
+        self.canvas.setStyleSheet(f"background-color: {self.bg_color}; border: none;")
+        self.setStyleSheet(f"background-color: {self.bg_color}; border: none;")
+        if self.parent():
+            self.parent().setStyleSheet(f"background-color: {self.bg_color}; border: none;")
         self.canvas.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.canvas.setMinimumSize(384, 216)
         self.ax = self.figure.add_subplot(111)
-        self.ax.set_facecolor(gui_bg)
-        self.ax.tick_params(colors='#eee', labelsize=self.axis_number_size, width=0.5)
-        self.ax.xaxis.label.set_color('#eee')
-        self.ax.yaxis.label.set_color('#eee')
-        self.ax.title.set_color('#eee')
-        self.ax.grid(True, color='#888', linestyle='--', linewidth=0.2, alpha=0.5)
+        self.ax.set_facecolor(self.bg_color)
+        self.ax.tick_params(colors=self.tick_color, labelsize=self.axis_number_size, width=0.5)
+        self.ax.xaxis.label.set_color(self.tick_color)
+        self.ax.yaxis.label.set_color(self.tick_color)
+        self.ax.title.set_color(self.tick_color)
+        self.ax.grid(True, color=self.grid_color, linestyle='--', linewidth=0.2, alpha=0.5)
         self.figure.subplots_adjust(
             left=self.subplot_left,
             right=self.subplot_right,
@@ -64,6 +81,8 @@ class RelativeDistancePlotter(QFrame):
         layout.addWidget(self.canvas)
         self.setLayout(layout)
 
+        self.redraw()  # <-- Add this line at the end of __init__
+
     def update(self, rvec, tvec, timestamp=None):
         if timestamp is None:
             timestamp = time.time()
@@ -74,10 +93,9 @@ class RelativeDistancePlotter(QFrame):
         self.redraw()
 
     def redraw(self):
-        gui_bg = "#111111"
         self.ax.clear()
-        self.ax.set_facecolor(gui_bg)
-        self.ax.tick_params(colors='#eee', labelsize=self.axis_number_size, width=0.5)
+        self.ax.set_facecolor(self.bg_color)
+        self.ax.tick_params(colors=self.tick_color, labelsize=self.axis_number_size, width=0.5)
 
         # Only show integer seconds on x axis
         self.ax.xaxis.set_major_locator(MultipleLocator(1))
@@ -87,17 +105,17 @@ class RelativeDistancePlotter(QFrame):
         self.ax.yaxis.set_major_locator(MultipleLocator(0.5))
         self.ax.yaxis.set_major_formatter(lambda y, pos: f"{y:.1f}".rstrip('0').rstrip('.'))
 
-        self.ax.xaxis.label.set_color('#eee')
-        self.ax.yaxis.label.set_color('#eee')
-        self.ax.title.set_color('#eee')
-        self.ax.grid(True, color='#888', linestyle='--', linewidth=0.2, alpha=0.5)
+        self.ax.xaxis.label.set_color(self.tick_color)
+        self.ax.yaxis.label.set_color(self.tick_color)
+        self.ax.title.set_color(self.tick_color)
+        self.ax.grid(True, color=self.grid_color, linestyle='--', linewidth=0.5, alpha=0.2)
         self.figure.subplots_adjust(
             left=self.subplot_left,
             right=self.subplot_right,
             top=self.subplot_top,
             bottom=self.subplot_bottom
         )
-        self.ax.plot(self.time_data, self.data, color="#00bfff")
+        self.ax.plot(self.time_data, self.data, color=self.line_color, linewidth=2)
         self.ax.set_ylim(self.y_axis_min, self.y_axis_max)
         self.ax.set_yticks([0, 0.5, 1, 1.5, 2])  # Ensure these ticks are always present
         self.ax.set_ylabel("Distance (m)", fontsize=self.axis_label_size, fontfamily='Segoe UI')

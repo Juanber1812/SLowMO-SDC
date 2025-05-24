@@ -410,13 +410,8 @@ class MainWindow(QWidget):
             QGroupBox {{
                 border: {border} {self.COLOR_BOX_BORDER_LIVE};
                 border-radius: {radius};
-                margin-top: 10px;
+                margin-top: 5px;
                 background: {bg};
-            }}
-            QGroupBox:title {{
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 3px 0 3px;
             }}
         """)
 
@@ -438,11 +433,6 @@ class MainWindow(QWidget):
                 border-radius: {radius};
                 margin-top: 10px;
                 background: {bg};
-            }}
-            QGroupBox:title {{
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 3px 0 3px;
             }}
         """)
 
@@ -498,7 +488,7 @@ class MainWindow(QWidget):
         if mode == "Relative Distance":
             self.graph_widget = RelativeDistancePlotter()
         elif mode == "Relative Angle":
-            self.graph_widget = AngularPositionPlotter()
+            self.graph_widget = RelativeAnglePlotter()  # <-- Should be RelativeAnglePlotter()
         elif mode == "Angular Position":
             self.graph_widget = AngularPositionPlotter()
         else:
@@ -578,13 +568,13 @@ class MainWindow(QWidget):
 
         # Create new graph widget
         if mode == "Relative Distance":
-            from distance import RelativeDistancePlotter
+            from payload.distance import RelativeDistancePlotter
             self.graph_widget = RelativeDistancePlotter()
         elif mode == "Relative Angle":
-            from relative_angle import RelativeAnglePlotter
+            from payload.relative_angle import RelativeAnglePlotter
             self.graph_widget = RelativeAnglePlotter()
         elif mode == "Angular Position":
-            from spin import AngularPositionPlotter
+            from payload.spin import AngularPositionPlotter
             self.graph_widget = AngularPositionPlotter()
         else:
             QMessageBox.warning(self, "Invalid Selection", "Please choose a valid mode.")
@@ -599,7 +589,6 @@ class MainWindow(QWidget):
     def setup_socket_events(self):
         @sio.event
         def connect():
-            print("Connected event fired")
             self.comms_status_label.setText("Status: Connected")
             self.toggle_btn.setEnabled(True)
             self.detector_btn.setEnabled(True)
