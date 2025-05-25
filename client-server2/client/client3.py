@@ -1,4 +1,4 @@
-import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue
+import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea  # <-- add QScrollArea here
@@ -208,7 +208,6 @@ class MainWindow(QWidget):
         """)
 
     def style_button(self, btn):
-        btn.setStyleSheet(self.BUTTON_STYLE)
         btn.setFixedHeight(BUTTON_HEIGHT)
 
     def setup_ui(self):
@@ -574,6 +573,7 @@ class MainWindow(QWidget):
     def setup_socket_events(self):
         @sio.event
         def connect():
+            print("[DEBUG] ✓ Connected to server")
             self.comms_status_label.setText("Status: Connected")
             self.camera_controls.toggle_btn.setEnabled(True)
             self.detector_controls.detector_btn.setEnabled(True)
@@ -587,6 +587,7 @@ class MainWindow(QWidget):
 
         @sio.event
         def disconnect(reason=None):
+            print(f"[DEBUG] ❌ Disconnected from server: {reason}")
             self.comms_status_label.setText("Status: Disconnected")
             self.camera_controls.toggle_btn.setEnabled(False)
             self.detector_controls.detector_btn.setEnabled(False)
@@ -601,12 +602,15 @@ class MainWindow(QWidget):
                     self.frame_counter += 1
                     bridge.frame_received.emit(frame)
                 else:
+                    print("[WARNING] Frame decode returned None")
                     logging.warning("Frame decode returned None")
             except Exception as e:
+                print(f"[ERROR] Frame decode error: {e}")
                 logging.exception("Frame decode error")
+                import traceback
+                traceback.print_exc()
 
         @sio.on("sensor_broadcast")
-
         def on_sensor_data(data):
             try:
                 temp = data.get("temperature", 0)
@@ -614,23 +618,33 @@ class MainWindow(QWidget):
                 self.info_labels["temp"].setText(f"Temp: {temp:.1f} °C")
                 self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
             except Exception as e:
+                print(f"[ERROR] Sensor update error: {e}")
                 logging.exception("Sensor update failed")
 
         @sio.on("camera_status")
         def on_camera_status(data):
-            status = data.get("status", "Unknown")
-            self.camera_status_label.setText(f"Camera: {status}")
-            self.camera_status_label.setStyleSheet(
-                "color: white;" if status.lower() in ("streaming", "idle", "ready") else "color: #bbb;"
-            )
-            # Only show "Not Ready" in red if status is a known error/problem
-            error_statuses = {"error", "not connected", "damaged", "not found", "unavailable", "failed"}
-            if status.lower() in error_statuses:
-                self.camera_ready_label.setText("Status: Not Ready")
-                self.camera_ready_label.setStyleSheet("color: #f00;")  # Red for not ready
-            else:
-                self.camera_ready_label.setText("Status: Ready")
-                self.camera_ready_label.setStyleSheet("color: #0f0;")  # Green for ready
+            try:
+                status = data.get("status", "Unknown")
+                print(f"[DEBUG] Camera status received: {status}")
+                self.camera_status_label.setText(f"Camera: {status}")
+                
+                # Safer stylesheet updates
+                if status.lower() in ("streaming", "idle", "ready"):
+                    self.camera_status_label.setStyleSheet("color: white;")
+                else:
+                    self.camera_status_label.setStyleSheet("color: #bbb;")
+                
+                # More robust status checking
+                error_statuses = {"error", "not connected", "damaged", "not found", "unavailable", "failed"}
+                if status.lower() in error_statuses:
+                    self.camera_ready_label.setText("Status: Not Ready")
+                    self.camera_ready_label.setStyleSheet("color: #f00;")
+                else:
+                    self.camera_ready_label.setText("Status: Ready")
+                    self.camera_ready_label.setStyleSheet("color: #0f0;")
+                    
+            except Exception as e:
+                print(f"[ERROR] Camera status update error: {e}")
 
     def update_fps_slider(self):
         self.fps_slider.setRange(1, 120)
@@ -646,26 +660,103 @@ class MainWindow(QWidget):
     def apply_config(self):
         was_streaming = self.streaming
         if was_streaming:
-            # Stop stream before applying config
-            self.streaming = False
-            self.camera_controls.toggle_btn.setText("Start Stream")
-            sio.emit("stop_camera")
-            time.sleep(0.5)
-        config = self.camera_settings.get_config()
+            self.toggle_stream()
 
+        # Get config including calibration file
+        config = self.camera_settings.get_config()
+        
+        # Send config to server
         sio.emit("camera_config", config)
-        logging.info(f"Sent config: {config}")
+        
+        # Update detector calibration - handle legacy preset
+        try:
+            calibration_path = config.get('calibration_file', 'calibrations/calibration_default.npz')
+            preset_type = config.get('preset_type', 'standard')
+            
+            print(f"[DEBUG] Attempting to update calibration: {calibration_path} (type: {preset_type})")
+            
+            # Method 1: Update via detector4 module if available
+            if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
+                success = detector4.detector_instance.update_calibration(calibration_path)
+                if success:
+                    if preset_type == "legacy":
+                        print(f"[INFO] ✓ Legacy calibration loaded: {calibration_path}")
+                    else:
+                        print(f"[INFO] ✓ Detector calibration updated: {calibration_path}")
+                else:
+                    print(f"[WARNING] ❌ Failed to update detector calibration: {calibration_path}")
+            
+            # Method 2: Update via global function if available
+            elif hasattr(detector4, 'update_calibration'):
+                success = detector4.update_calibration(calibration_path)
+                if success:
+                    print(f"[INFO] ✓ Detector calibration updated via function: {calibration_path}")
+                else:
+                    print(f"[WARNING] ❌ Failed to update detector calibration via function: {calibration_path}")
+            
+            else:
+                print("[WARNING] No calibration update method found in detector4")
+                
+        except Exception as e:
+            print(f"[ERROR] Failed to update detector calibration: {e}")
+            import traceback
+            traceback.print_exc()
+    
         if was_streaming:
-            sio.emit("start_camera")
-            self.streaming = True
-            self.camera_controls.toggle_btn.setText("Stop Stream")
+            QTimer.singleShot(500, self.toggle_stream)
+
+    # Add method to check calibration status
+    def check_calibration_status(self):
+        """Check and display calibration status for current settings."""
+        try:
+            config = self.camera_settings.get_config()
+            calibration_file = config.get('calibration_file', 'calibrations/calibration_default.npz')
+            preset_type = config.get('preset_type', 'standard')
+            
+            # Handle relative paths
+            if not os.path.isabs(calibration_file):
+                calibration_file = os.path.join(os.path.dirname(__file__), calibration_file)
+                calibration_file = os.path.normpath(calibration_file)
+            
+            if os.path.exists(calibration_file):
+                if preset_type == "legacy":
+                    print(f"[INFO] ✓ Legacy calibration found (calibration_data.npz, 1536x864): {calibration_file}")
+                else:
+                    print(f"[INFO] ✓ Calibration found: {calibration_file}")
+                return True
+            else:
+                print(f"[WARNING] ❌ Calibration missing: {calibration_file}")
+                return False
+        except Exception as e:
+            print(f"[ERROR] Calibration status check failed: {e}")
+            return False
+
+    def debug_detector_state(self):
+        """Print debug info about detector state."""
+        try:
+            print(f"[DEBUG] Detector active: {self.detector_active}")
+            print(f"[DEBUG] Has detector4 module: {hasattr(self, 'detector4') or 'detector4' in globals()}")
+            if hasattr(detector4, 'detector_instance'):
+                print(f"[DEBUG] Detector instance exists: {detector4.detector_instance is not None}")
+                if detector4.detector_instance:
+                    print(f"[DEBUG] Detector has calibration: {detector4.detector_instance.mtx is not None}")
+            print(f"[DEBUG] Frame queue size: {self.frame_queue.qsize()}")
+            config = self.camera_settings.get_config()
+            print(f"[DEBUG] Current config: {config}")
+        except Exception as e:
+            print(f"[ERROR] Debug detector state failed: {e}")
 
     def toggle_detector(self):
         self.detector_active = not self.detector_active
         self.detector_controls.detector_btn.setText("Stop Detector" if self.detector_active else "Start Detector")
+        
         if self.detector_active:
+            print("[DEBUG] 🚀 Starting detector...")
+            self.check_calibration_status()  # Check calibration before starting
+            self.debug_detector_state()      # Print debug info
             threading.Thread(target=self.run_detector, daemon=True).start()
         else:
+            print("[DEBUG] 🛑 Stopping detector...")
             self.clear_queue()
 
     def run_detector(self):
@@ -673,20 +764,49 @@ class MainWindow(QWidget):
             try:
                 frame = self.frame_queue.get(timeout=0.1)
             
+                # Get crop status from camera settings
+                config = self.camera_settings.get_config()
+                is_cropped = config.get('cropped', False)
+                
+                # Calculate original height for cropped frames
+                original_height = None
+                if is_cropped:
+                    current_height = frame.shape[0]
+                    # Reverse calculate original height (current is 16:3, original was 16:9)
+                    # 16:3 aspect ratio means height = width * 3/16
+                    # So original height = current_height * 3 (since 16:9 means height = width * 9/16)
+                    original_height = int(current_height * 3)
+                
                 # Get both the analysed frame and pose (if available)
-                analysed, pose = detector4.detect_and_draw(frame, return_pose=True)
-                bridge.analysed_frame.emit(analysed)
+                try:
+                    if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
+                        # Use the class method with crop handling
+                        analysed, pose = detector4.detector_instance.detect_and_draw(
+                            frame, return_pose=True, is_cropped=is_cropped, original_height=original_height
+                        )
+                    else:
+                        # Fallback to old method
+                        analysed, pose = detector4.detect_and_draw(frame, return_pose=True)
+                    
+                    bridge.analysed_frame.emit(analysed)
 
-                # Feed pose data to graph if graph is active
-                if self.graph_section.graph_widget and pose:
-                    rvec, tvec = pose
-                    timestamp = time.time()
-                    self.graph_section.graph_widget.update(rvec, tvec, timestamp)
+                    # Feed pose data to graph if graph is active
+                    if self.graph_section.graph_widget and pose:
+                        rvec, tvec = pose
+                        timestamp = time.time()
+                        self.graph_section.graph_widget.update(rvec, tvec, timestamp)
+                        
+                except Exception as e:
+                    print(f"[ERROR] Detector processing error: {e}")
+                    # Emit original frame if detector fails
+                    bridge.analysed_frame.emit(frame)
 
             except queue.Empty:
                 continue
             except Exception as e:
-                logging.exception("Detector error")
+                print(f"[ERROR] Detector thread error: {e}")
+                import traceback
+                traceback.print_exc()
 
     def update_image(self, frame):
         self.last_frame = frame.copy()
@@ -833,23 +953,37 @@ class MainWindow(QWidget):
 
     def closeEvent(self, event):
         try:
-            # 1. Reset camera to default (uncropped, default res)
+            print("[DEBUG] 🛑 Closing application...")
+            
+            # Stop detector first
+            if self.detector_active:
+                self.detector_active = False
+                print("[DEBUG] Detector stopped")
+        
+            # Reset camera to default (uncropped, default res)
             self.reset_camera_to_default()
-            time.sleep(0.2)
-            # 2. Stop streaming if active
+            time.sleep(0.5)  # Increased delay
+        
+            # Stop streaming if active
             if self.streaming:
                 sio.emit("stop_camera")
                 self.streaming = False
                 self.camera_controls.toggle_btn.setText("Start Stream")
-                time.sleep(0.2)
-            # 3. Optionally set camera idle (if your server supports such a command)
+                time.sleep(0.5)  # Increased delay
+        
+            # Set camera idle
             sio.emit("set_camera_idle")
-            time.sleep(0.2)
-            # 4. Disconnect socket
+            time.sleep(0.5)  # Increased delay
+        
+            # Disconnect socket more gracefully
             if sio.connected:
+                print("[DEBUG] Disconnecting from server...")
                 sio.disconnect()
-        except Exception:
-            pass
+                time.sleep(0.2)
+                
+        except Exception as e:
+            print(f"[DEBUG] Cleanup error (expected): {e}")
+    
         event.accept()
 
     def keyPressEvent(self, event):
@@ -859,52 +993,69 @@ class MainWindow(QWidget):
             super().keyPressEvent(event)
 
     def toggle_crop(self):
+        print(f"[DEBUG] Toggling crop: {not self.crop_active}")
         self.crop_active = not self.crop_active
-
-        # Get current resolution
-        config = self.camera_settings.get_config()
-        width, height = config["resolution"]
-
-        # Apply 16:3 aspect ratio: keep width, reduce height
-        if self.crop_active:
-            new_height = int(width * 3 / 16)
-            # Add a custom cropped entry if not present
-            if self.camera_settings.res_dropdown.findText("Custom (Cropped)") == -1:
-                self.camera_settings.res_dropdown.addItem("Custom (Cropped)")
-            self.camera_settings.res_dropdown.setCurrentText("Custom (Cropped)")
-            # Override get_config to return cropped resolution
-            self.camera_settings.get_config = lambda: {
-                "jpeg_quality": self.camera_settings.jpeg_slider.value(),
-                "fps": self.camera_settings.fps_slider.value(),
-                "resolution": (width, new_height)
-            }
-            self.camera_settings.set_cropped_label(True)
-            self.camera_controls.crop_btn.setText("Uncrop")
-        else:
-            idx = self.camera_settings.res_dropdown.findText("Custom (Cropped)")
-            if idx != -1:
-                self.camera_settings.res_dropdown.removeItem(idx)
-            # Restore get_config to original version
-            from widgets.camera_settings import CameraSettingsWidget
-            self.camera_settings.get_config = CameraSettingsWidget.get_config.__get__(self.camera_settings)
-            self.camera_settings.set_cropped_label(False)
-            self.camera_controls.crop_btn.setText("Crop")
-
+        self.camera_settings.set_cropped_label(self.crop_active)
+        self.camera_controls.crop_btn.setText("Uncrop" if self.crop_active else "Crop")
+        print(f"[DEBUG] Crop now: {'ACTIVE' if self.crop_active else 'INACTIVE'}")
         self.apply_config()
+
+def check_all_calibrations():
+    """Check status of all calibration files including legacy."""
+    print("=== Calibration Status ===")
+    total = len(CALIBRATION_FILES)
+    found = 0
+    
+    for resolution, filename in CALIBRATION_FILES.items():
+        # Handle relative paths
+        if not os.path.isabs(filename):
+            filepath = os.path.join(os.path.dirname(__file__), filename)
+            filepath = os.path.normpath(filepath)
+        else:
+            filepath = filename
+            
+        if os.path.exists(filepath):
+            if resolution == "legacy":
+                print(f"✓ OLD (Legacy) - {filename}")
+            else:
+                print(f"✓ {resolution[0]}x{resolution[1]} - {filename}")
+            found += 1
+        else:
+            if resolution == "legacy":
+                print(f"❌ OLD (Legacy) - {filename} (MISSING)")
+            else:
+                print(f"❌ {resolution[0]}x{resolution[1]} - {filename} (MISSING)")
+    
+    print(f"\nStatus: {found}/{total} calibrations available")
+    
+    if found == total:
+        print("🎉 All calibrations complete!")
+    else:
+        print(f"⚠️  Missing {total - found} calibrations")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win = MainWindow()
-    win.showFullScreen()
-
-    def socket_thread():
-        while True:
-            try:
-                sio.connect(SERVER_URL, wait_timeout=5)
-                sio.wait()
-            except Exception as e:
-                logging.exception("SocketIO connection error")
-                time.sleep(5)
-
-    threading.Thread(target=socket_thread, daemon=True).start()
+    
+    # Set application properties
+    app.setApplicationName("SLowMO Client")
+    app.setApplicationVersion("3.0")
+    
+    # Create and show main window
+    window = MainWindow()
+    window.showFullScreen()
+    
+    # Connect to server in background
+    def connect_to_server():
+        try:
+            print(f"[DEBUG] Attempting to connect to {SERVER_URL}")
+            sio.connect(SERVER_URL, wait_timeout=10)
+            print("[DEBUG] Successfully connected to server")
+        except Exception as e:
+            print(f"[ERROR] Failed to connect to server: {e}")
+            # Still show the GUI even if connection fails
+    
+    # Start connection in a separate thread
+    threading.Thread(target=connect_to_server, daemon=True).start()
+    
+    # Start the application event loop
     sys.exit(app.exec())
