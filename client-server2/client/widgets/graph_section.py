@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import (
     QWidget, QGroupBox, QVBoxLayout, QPushButton, QHBoxLayout, QComboBox
 )
+from PyQt6.QtCore import Qt
 from payload.distance import RelativeDistancePlotter
 from payload.relative_angle import RelativeAnglePlotter
 from payload.spin import AngularPositionPlotter
@@ -55,6 +56,7 @@ class GraphSection(QGroupBox):
         self.graph_modes = ["Relative Distance", "Relative Angle", "Angular Position"]
         self.select_buttons = {}
 
+        # Make graph mode buttons smaller and centered
         for mode in self.graph_modes:
             btn = QPushButton(mode)
             color = GRAPH_MODE_COLORS[mode]
@@ -64,20 +66,21 @@ class GraphSection(QGroupBox):
                     color: {TEXT_COLOR};
                     border: {BORDER_WIDTH}px solid {color};
                     border-radius: {BORDER_RADIUS}px;
-                    padding: 8px 14px;
-                    font-size: 10pt;
-                    font-family: 'Segoe UI', sans-serif;
+                    padding: 1px 1px;
+                    font-size: 9pt;
+                    font-family: {FONT_FAMILY};
                 }}
                 QPushButton:hover {{
-                    background-color: {BUTTON_HOVER};
+                    background-color: {color};
                     color: black;
                     border: {BORDER_WIDTH}px solid {color};
                 }}
             """)
-            btn.setMinimumHeight(BUTTON_HEIGHT)
-            btn.setFixedHeight(BUTTON_HEIGHT + 32)
+            btn.setMinimumHeight(int(BUTTON_HEIGHT *1.5))
+            btn.setFixedHeight(int((BUTTON_HEIGHT + 4) *1.5))  # 20% bigger
+            btn.setMinimumWidth(int(120 * 1.5))                 # 20% bigger width
             btn.clicked.connect(lambda _, m=mode: self.load_graph(m))
-            self.placeholder_layout.addWidget(btn)
+            self.placeholder_layout.addWidget(btn, alignment=Qt.AlignmentFlag.AlignHCenter)
             self.select_buttons[mode] = btn
 
         self.graph_display_layout.addWidget(self.graph_display_placeholder)
@@ -105,15 +108,25 @@ class GraphSection(QGroupBox):
 
         self.shared_start_time = time.time()
         self.graph_widget.start_time = self.shared_start_time
-        self.graph_widget.setFixedSize(384, 216)
-        self.graph_display_layout.addWidget(self.graph_widget)
+        self.graph_widget.setFixedSize(480, 280)  # Larger graph size
 
-        btn_layout = QHBoxLayout()
-        btn_layout.setSpacing(10)
+        # Create a horizontal layout for graph and buttons
+        graph_and_btns_layout = QHBoxLayout()
+        graph_and_btns_layout.setContentsMargins(0, 0, 0, 0)
+        graph_and_btns_layout.setSpacing(18)
+
+        # Add the graph widget (left)
+        graph_and_btns_layout.addWidget(self.graph_widget, alignment=Qt.AlignmentFlag.AlignVCenter)
+
+        # Stack buttons vertically, left-aligned and vertically centered
+        btn_layout = QVBoxLayout()
+        btn_layout.setSpacing(12)
+        btn_layout.setContentsMargins(0, 0, 0, 0)
+        btn_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
         button_style = f"""
         QPushButton {{
-            background-color: #252525;
+            background-color: {BOX_BACKGROUND};
             color: {BUTTON_TEXT};
             border: {BORDER_WIDTH}px solid {BUTTON_COLOR};
             border-radius: {BORDER_RADIUS}px;
@@ -131,21 +144,26 @@ class GraphSection(QGroupBox):
         }}
         """
 
-        self.record_btn.setFixedHeight(BUTTON_HEIGHT)
+        self.record_btn.setFixedHeight(int(BUTTON_HEIGHT ))
         self.record_btn.setStyleSheet(button_style)
-        btn_layout.addWidget(self.record_btn)
+        btn_layout.addWidget(self.record_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        self.duration_dropdown.setFixedHeight(BUTTON_HEIGHT)
-        btn_layout.addWidget(self.duration_dropdown)
+        self.duration_dropdown.setFixedHeight(int(BUTTON_HEIGHT))
+        btn_layout.addWidget(self.duration_dropdown, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.exit_graph_btn = QPushButton("← Back")
-        self.exit_graph_btn.setFixedHeight(BUTTON_HEIGHT)
+        self.exit_graph_btn.setFixedHeight(int(BUTTON_HEIGHT ))
         self.exit_graph_btn.setStyleSheet(button_style)
         self.exit_graph_btn.clicked.connect(self.exit_graph)
-        btn_layout.addWidget(self.exit_graph_btn)
+        btn_layout.addWidget(self.exit_graph_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.exit_graph_btn.setSizePolicy(self.record_btn.sizePolicy())
-        self.graph_display_layout.addLayout(btn_layout)
+
+        # Add the button layout (right)
+        graph_and_btns_layout.addLayout(btn_layout)
+
+        # Add the combined layout to the main graph display layout
+        self.graph_display_layout.addLayout(graph_and_btns_layout)
 
     def exit_graph(self):
         if self.graph_widget:

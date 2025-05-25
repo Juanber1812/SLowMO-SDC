@@ -4,7 +4,7 @@ import pyapriltags
 import os
 
 # Load calibration data
-calib_file = 'calibration_data.npz'
+calib_file = os.path.join(os.path.dirname(__file__), "calibration_data.npz")
 if not os.path.exists(calib_file):
     raise FileNotFoundError(f"Calibration file '{calib_file}' not found.")
 

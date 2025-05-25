@@ -18,14 +18,18 @@ from theme import (
     GRAPH_MODE_COLORS
 )
 
+# === Font size configuration ===
+AXIS_LABEL_SIZE = 9      # Change this value to adjust axis label font size
+AXIS_NUMBER_SIZE = 9     # Change this value to adjust axis number/tick font size
+
 class AngularPositionPlotter(QWidget):
     def __init__(self):
         super().__init__()
         # --- Customizable style variables ---
-        self.axis_label_size = 6
-        self.axis_number_size = 6
-        self.subplot_left = 0.12
-        self.subplot_right = 0.92
+        self.axis_label_size = AXIS_LABEL_SIZE
+        self.axis_number_size = AXIS_NUMBER_SIZE
+        self.subplot_left = 0.14
+        self.subplot_right = 0.94
         self.subplot_top = 0.93
         self.subplot_bottom = 0.18
         self.bg_color = PLOT_BACKGROUND

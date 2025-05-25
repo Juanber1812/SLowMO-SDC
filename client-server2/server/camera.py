@@ -142,6 +142,11 @@ def on_get_camera_status(_):
     status = "Streaming" if streamer.streaming else "Idle"
     sio.emit("camera_status", {"status": status})
 
+@sio.on("set_camera_idle")
+def on_set_camera_idle(_):
+    streamer.streaming = False
+    sio.emit("camera_status", {"status": "Idle"})
+
 def start_stream():
     streamer.connect_socket()
     streamer.apply_config()

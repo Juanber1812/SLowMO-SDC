@@ -18,12 +18,16 @@ from theme import (
     GRAPH_MODE_COLORS
 )
 
+# === Font size configuration ===
+AXIS_LABEL_SIZE = 9      # Change this value to adjust axis label font size
+AXIS_NUMBER_SIZE = 9     # Change this value to adjust axis number/tick font size
+
 class RelativeDistancePlotter(QFrame):
     def __init__(self):
         super().__init__()
         # === Customizable label and tick sizes ===
-        self.axis_label_size = 6      # Size for axis labels ("Distance (m)", "Time (s)")
-        self.axis_number_size = 6     # Size for axis numbers/ticks
+        self.axis_label_size = AXIS_LABEL_SIZE      # Size for axis labels ("Distance (m)", "Time (s)")
+        self.axis_number_size = AXIS_NUMBER_SIZE     # Size for axis numbers/ticks
 
         # === Customizable axis ranges ===
         self.y_axis_min = 0           # Minimum value for y-axis
@@ -31,8 +35,8 @@ class RelativeDistancePlotter(QFrame):
         self.x_axis_window = 10       # Width of the x-axis window in seconds
 
         # === Customizable subplot margins ===
-        self.subplot_left = 0.12      # Move graph closer to left edge
-        self.subplot_right = 0.92
+        self.subplot_left = 0.14      # Move graph closer to left edge
+        self.subplot_right = 0.94
         self.subplot_top = 0.93
         self.subplot_bottom = 0.18
 

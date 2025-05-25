@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea  # <-- add QScrollArea here
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
-from PyQt6.QtGui import QPixmap, QImage
+from PyQt6.QtGui import QPixmap, QImage, QFont
 from payload.distance import RelativeDistancePlotter
 from payload.relative_angle import RelativeAnglePlotter
 from payload.spin import AngularPositionPlotter
@@ -21,11 +21,9 @@ from theme import (
     BUTTON_COLOR, BUTTON_HOVER, BUTTON_DISABLED, BUTTON_TEXT,
     BORDER_COLOR, BORDER_ERROR, BORDER_HIGHLIGHT,
     FONT_FAMILY, FONT_SIZE_NORMAL, FONT_SIZE_LABEL, FONT_SIZE_TITLE,
-    ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR,
+    ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR,SECOND_COLUMN,
     BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE, BUTTON_HEIGHT
 )
-
-
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.1.146:5000"
 
@@ -49,9 +47,12 @@ bridge = Bridge()
 
 
 class MainWindow(QWidget):
+    speedtest_result = pyqtSignal(float, float)  # upload_mbps, max_frame_size_kb
+
     # --- Sleek Dark Sci-Fi Theme ---
     COLOR_BG = BACKGROUND
     COLOR_BOX_BG = BOX_BACKGROUND
+    COLOR_BOX_BG_RIGHT = SECOND_COLUMN  # <-- Add a new variable for the right column background
     COLOR_BOX_BORDER = BORDER_COLOR
     COLOR_BOX_BORDER_LIVE = BORDER_COLOR
     COLOR_BOX_BORDER_DETECTOR = BORDER_COLOR
@@ -69,7 +70,10 @@ class MainWindow(QWidget):
     COLOR_BOX_BG_LIDAR = BOX_BACKGROUND
     COLOR_BOX_TEXT_LIDAR = BOX_TITLE_COLOR
     COLOR_BOX_BORDER_GRAPH = BORDER_COLOR
-
+    COLOR_BOX_BORDER_RIGHT = BORDER_COLOR
+    COLOR_BOX_RADIUS_RIGHT = BORDER_RADIUS
+    COLOR_BOX_TITLE_RIGHT = BOX_TITLE_COLOR
+    
     # --- Border Style Variables ---
     BOX_BORDER_THICKNESS = BORDER_WIDTH
     BOX_BORDER_STYLE = "solid"
@@ -151,6 +155,8 @@ class MainWindow(QWidget):
 
         self.shared_start_time = None
 
+        # Initialize crop_active state
+        self.crop_active = False
 
         self.setup_ui()
         self.setup_socket_events()
@@ -170,25 +176,34 @@ class MainWindow(QWidget):
 
         self.graph_window = None
 
-    def apply_groupbox_style(self, groupbox, border_color):
+        self.speedtest_result.connect(self.update_speed_labels)
+
+    # --- Improved groupbox styling for left/right columns ---
+    def apply_groupbox_style(self, groupbox, border_color, bg_color=None, title_color=None):
         border = f"{self.BOX_BORDER_THICKNESS}px {self.BOX_BORDER_STYLE}"
-        radius = f"{self.BOX_BORDER_RADIUS}px"
-        bg_color = self.COLOR_BG
+        # Use 0 radius for right column, theme radius for others
+        radius_value = self.COLOR_BOX_RADIUS_RIGHT if border_color == self.COLOR_BOX_BORDER_RIGHT else self.BOX_BORDER_RADIUS
+        radius = f"{radius_value}px"
+        bg = bg_color if bg_color else self.COLOR_BG
+        title = title_color if title_color else BOX_TITLE_COLOR
 
         groupbox.setStyleSheet(f"""
             QGroupBox {{
                 border: {border} {border_color};
                 border-radius: {radius};
-                background-color: {bg_color};
-                margin-top: 10px;
+                background-color: {bg};
+                margin-top: 14px;
             }}
             QGroupBox::title {{
                 subcontrol-origin: margin;
-                left: 8px;
-                padding: 0 4px;
+                subcontrol-position: top left;
+                left: 10px;
+                top: 0px;
+                padding: 0 8px;
                 font-size: {FONT_SIZE_TITLE}pt;
                 font-family: {self.FONT_FAMILY};
-                color: {BOX_TITLE_COLOR};
+                color: {title};
+                background-color: {bg};
             }}
         """)
 
@@ -198,108 +213,174 @@ class MainWindow(QWidget):
 
     def setup_ui(self):
         main_layout = QHBoxLayout(self)
+        main_layout.setSpacing(14)
+        main_layout.setContentsMargins(14, 14, 14, 14)
 
-        # Uniform spacing and margins for main and sublayouts
-        main_layout.setSpacing(20)
-        main_layout.setContentsMargins(15, 15, 15, 15)
+        # --- LEFT COLUMN: 3 stacked rows, each a QHBoxLayout ---
+        left_col = QVBoxLayout()
+        left_col.setSpacing(10)
+        left_col.setContentsMargins(10, 10, 10, 10)
 
-        # --- Make left column responsive ---
-        left_widget = QWidget()
-        left_layout = QVBoxLayout(left_widget)
-        left_widget.setFixedWidth(self.STREAM_WIDTH + self.MARGIN * 2)
-        left_widget.setMinimumWidth(350)
-        left_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        # Make left column widgets align to the left
+        left_col.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-        # --- Make right column responsive ---
-        right_widget = QWidget()
-        right_layout = QVBoxLayout(right_widget)
-        right_widget.setFixedWidth(self.STREAM_WIDTH + self.MARGIN * 2)
-        right_widget.setMinimumWidth(350)
-        right_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        # --- Row 1: Unified Video + Controls (no logo) ---
+        row1 = QHBoxLayout()
+        row1.setSpacing(10)
+        row1.setContentsMargins(10, 10, 10, 10)
+        row1.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-        # --- ADCS column (will stretch) ---
-        adcs_layout = QVBoxLayout()
-        adcs_layout.setSpacing(15)
-        adcs_layout.setContentsMargins(10, 10, 10, 10)
+        # --- Unified Video Stream in Row 1 ---
+        video_group = QGroupBox("Video Stream")
+        video_layout = QHBoxLayout()
+        video_layout.setSpacing(8)
+        video_layout.setContentsMargins(5, 5, 5, 5)
 
-        # --- Info column (new, will stretch) ---
-        # Create a scrollable container for info layout (4th column)
-        info_container = QWidget()
-        info_layout = QVBoxLayout(info_container)
-        info_layout.setSpacing(15)
-        info_layout.setContentsMargins(10, 10, 10, 10)
+        aspect_w, aspect_h = 16, 9
+        video_width = 640   # Increased from 480 to 640
+        video_height = int(video_width * aspect_h / aspect_w)
 
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setWidget(info_container)
-        scroll_area.setStyleSheet("QScrollArea { border: none; }")  # Optional: remove border
-
-        # --- Add columns to main layout (no separators) ---
-        main_layout.addWidget(left_widget)
-        main_layout.addWidget(right_widget)
-        main_layout.addLayout(adcs_layout)
-        main_layout.addWidget(scroll_area)  # Use scroll area for info column
-
-        # --- Live Stream Section ---
-        stream_group = QGroupBox("Live Stream")
-        stream_layout = QVBoxLayout()
-        stream_layout.setSpacing(10)
-        stream_layout.setContentsMargins(10, 10, 10, 10)
-        self.image_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.image_label.setFixedSize(384, 216)  # 16:9 aspect ratio
-        self.image_label.setStyleSheet(f"""
+        # Unified Video Label
+        self.video_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
+        self.video_label.setFixedSize(video_width, video_height)
+        self.video_label.setStyleSheet(f"""
             background-color: {STREAM_BACKGROUND};
             border: {BORDER_WIDTH}px solid {BORDER_COLOR};
         """)
-        stream_layout.addWidget(self.image_label)
-        stream_group.setLayout(stream_layout)
-        left_layout.addWidget(stream_group)
+        video_layout.addWidget(self.video_label)
 
-        # --- Camera Controls Section ---
+        video_group.setLayout(video_layout)
+        video_group.setFixedSize(video_width + 40, video_height + 40)
+        self.apply_groupbox_style(video_group, self.COLOR_BOX_BORDER_LIVE)
+
+        # --- Controls: Stack buttons vertically inside a groupbox ---
+        controls_group = QGroupBox("Controls")
+        controls_layout = QVBoxLayout()
+        controls_layout.setSpacing(8)
+        controls_layout.setContentsMargins(10, 10, 10, 10)
+
+        # Stream Controls Buttons
         self.camera_controls = CameraControlsWidget()
-        self.camera_controls.layout.setSpacing(10)
-        self.camera_controls.layout.setContentsMargins(10, 10, 10, 10)
-        left_layout.addWidget(self.camera_controls)
-        # Apply button style to camera controls buttons
+        self.camera_controls.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.camera_controls.layout.setSpacing(4)
+        self.camera_controls.layout.setContentsMargins(0, 0, 0, 0)
         self.style_button(self.camera_controls.toggle_btn)
         self.style_button(self.camera_controls.reconnect_btn)
         self.style_button(self.camera_controls.capture_btn)
         self.style_button(self.camera_controls.crop_btn)
+        self.camera_controls.toggle_btn.setFixedHeight(32)
+        self.camera_controls.reconnect_btn.setFixedHeight(32)
+        self.camera_controls.capture_btn.setFixedHeight(32)
+        self.camera_controls.crop_btn.setFixedHeight(32)
         self.camera_controls.toggle_btn.clicked.connect(self.toggle_stream)
         self.camera_controls.reconnect_btn.clicked.connect(self.try_reconnect)
         self.camera_controls.capture_btn.setEnabled(False)
-        self.camera_controls.crop_btn.setEnabled(False)
+        self.camera_controls.crop_btn.setEnabled(True)  # <-- ENABLE THE BUTTON!
+        self.camera_controls.crop_btn.clicked.connect(self.toggle_crop)
+        controls_layout.addWidget(self.camera_controls.toggle_btn)
+        controls_layout.addWidget(self.camera_controls.reconnect_btn)
+        controls_layout.addWidget(self.camera_controls.capture_btn)
+        controls_layout.addWidget(self.camera_controls.crop_btn)
 
-        # --- Camera Settings Section ---
+        # Detector Controls Button
+        self.detector_controls = DetectorControlWidget()
+        self.detector_controls.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.detector_controls.apply_style(self.BUTTON_STYLE)
+        self.detector_controls.layout.setSpacing(4)
+        self.detector_controls.layout.setContentsMargins(0, 0, 0, 0)
+        self.detector_controls.detector_btn.setFixedHeight(32)
+        self.detector_controls.detector_btn.clicked.connect(self.toggle_detector)
+        controls_layout.addWidget(self.detector_controls.detector_btn)
+
+        controls_layout.addStretch(1)
+        controls_group.setLayout(controls_layout)
+        controls_group.setFixedHeight(video_height + 40)  # Match live stream height
+        self.apply_groupbox_style(controls_group, self.COLOR_BOX_BORDER_CAMERA_CONTROLS)
+
+        # --- Camera Settings (move to row1, right of controls) ---
         self.camera_settings = CameraSettingsWidget()
-        self.camera_settings.layout.setSpacing(10)
-        self.camera_settings.layout.setContentsMargins(10, 10, 10, 10)
-        left_layout.addWidget(self.camera_settings)
+        self.camera_settings.setMaximumWidth(300)
+        self.camera_settings.layout.setSpacing(6)
+        self.camera_settings.layout.setContentsMargins(5, 5, 5, 5)
         self.style_button(self.camera_settings.apply_btn)
+        self.camera_settings.apply_btn.setFixedHeight(32)
+        self.camera_settings.apply_btn.setStyleSheet(self.BUTTON_STYLE + "padding: 4px 8px; font-size: 9pt;")
         self.camera_settings.apply_btn.clicked.connect(self.apply_config)
+        self.apply_groupbox_style(self.camera_settings, self.COLOR_BOX_BORDER_CONFIG)
+        self.camera_settings.setFixedHeight(video_height + 40)  # Match live stream height
 
+        # Add widgets to row1
+        row1.addWidget(video_group)
+        row1.addWidget(controls_group)
+        row1.addWidget(self.camera_settings)  # Camera settings now in row1
 
-        # --- ADCS Section (third column) ---
+        # --- Row 2: Detector Output + Graph Display ---
+        row2 = QHBoxLayout()
+        row2.setSpacing(10)
+        row2.setContentsMargins(10, 10, 10, 10)
+        row2.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        # Graph Section (as before)
+        self.record_btn = QPushButton("Record")
+        self.duration_dropdown = QComboBox()
+        self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
+        self.graph_section.setFixedSize(580, 300)  # Set a fixed size for the graph box
+        self.graph_section.graph_display_layout.setSpacing(2)
+        self.graph_section.graph_display_layout.setContentsMargins(2, 2, 2, 2)
+        self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
+        row2.addWidget(self.graph_section)
+
+        # --- Row 3: LIDAR + ADCS ---
+        row3 = QHBoxLayout()
+        row3.setSpacing(10)
+        row3.setContentsMargins(10, 10, 10, 10)
+        row3.setAlignment(Qt.AlignmentFlag.AlignLeft)  # Align row3 widgets to the left
+
+        lidar_group = QGroupBox("LIDAR")
+        lidar_layout = QVBoxLayout()
+        lidar_layout.setSpacing(5)
+        lidar_layout.setContentsMargins(5, 5, 5, 5)
+        lidar_placeholder = QLabel("LIDAR here")
+        lidar_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lidar_placeholder.setStyleSheet("background: white; color: black; border: 1px solid #888; border-radius: 6px; font-size: 14px;")
+        lidar_placeholder.setFixedHeight(50)
+        lidar_layout.addWidget(lidar_placeholder)
+        lidar_group.setLayout(lidar_layout)
+        self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR)
+
         adcs_group = QGroupBox("ADCS")
-        adcs_box_layout = QVBoxLayout()
-        adcs_box_layout.setSpacing(10)
-        adcs_box_layout.setContentsMargins(10, 10, 10, 10)
+        adcs_layout = QVBoxLayout()
+        adcs_layout.setSpacing(5)
+        adcs_layout.setContentsMargins(5, 5, 5, 5)
         adcs_placeholder = QLabel("ADCS Placeholder\n(More controls coming soon)")
         adcs_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        adcs_placeholder.setMinimumHeight(200)
-        adcs_box_layout.addWidget(adcs_placeholder)
-        adcs_group.setLayout(adcs_box_layout)
-        adcs_layout.addWidget(adcs_group)
-        adcs_layout.addStretch()
-
-        # Apply consistent groupbox style to ADCS section
+        adcs_placeholder.setFixedHeight(50)
+        adcs_layout.addWidget(adcs_placeholder)
+        adcs_group.setLayout(adcs_layout)
         self.apply_groupbox_style(adcs_group, self.COLOR_BOX_BORDER_ADCS)
 
-        # --- System Info Section (move back to left column) ---
+        row3.addWidget(lidar_group)
+        row3.addWidget(adcs_group)
+
+        # --- Add all rows to left column ---
+        left_col.addLayout(row1)
+        left_col.addLayout(row2)
+        left_col.addLayout(row3)
+
+        # --- RIGHT COLUMN: System Info Panel (scrollable, thin) ---
+        info_container = QWidget()
+        info_layout = QVBoxLayout(info_container)
+        info_layout.setSpacing(10)
+        info_layout.setContentsMargins(10, 10, 10, 10)
+
+        # Set background color for right column
+        info_container.setStyleSheet(f"background-color: {self.COLOR_BOX_BG_RIGHT};")
+
+        # System Info Group (right column)
         info_group = QGroupBox("System Info")
         info_layout_inner = QVBoxLayout()
-        info_layout_inner.setSpacing(10)
-        info_layout_inner.setContentsMargins(10, 10, 10, 10)
+        info_layout_inner.setSpacing(5)
+        info_layout_inner.setContentsMargins(8, 8, 8, 8)
         self.info_labels = {
             "temp": QLabel("Temp: -- °C"),
             "cpu": QLabel("CPU: --%"),
@@ -312,48 +393,13 @@ class MainWindow(QWidget):
             label.setStyleSheet(self.LABEL_STYLE)
             info_layout_inner.addWidget(label)
         info_group.setLayout(info_layout_inner)
-        left_layout.addWidget(info_group)
-        info_group.setStyleSheet(info_group.styleSheet() + self.LABEL_STYLE)
-
-        # --- Detector Output Section (right column) ---
-        self.detector_output = DetectorOutputWidget()
-        # FIX: layout is an attribute, not a method
-        self.detector_output.layout.setSpacing(10)
-        self.detector_output.layout.setContentsMargins(10, 10, 10, 10)
-        right_layout.addWidget(self.detector_output)
-
-        # --- Detection Control ---
-        self.detector_controls = DetectorControlWidget()
-        self.detector_controls.apply_style(self.BUTTON_STYLE)  # Apply consistent button style
-        self.detector_controls.layout.setSpacing(10)
-        self.detector_controls.layout.setContentsMargins(10, 10, 10, 10)
-        right_layout.addWidget(self.detector_controls)
-        self.detector_controls.detector_btn.clicked.connect(self.toggle_detector)
-
-        # --- Graph Display Section (replaced with modular widget) ---
-        # Make sure to create the graph_section before using it!
-        self.record_btn = QPushButton("Record")
-        self.duration_dropdown = QComboBox()
-        self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
-
-        self.graph_section.graph_display_layout.setSpacing(10)
-        self.graph_section.graph_display_layout.setContentsMargins(10, 10, 10, 10)
-        right_layout.addWidget(self.graph_section)
-
-        # --- LIDAR Section ---
-        lidar_group = QGroupBox("LIDAR")
-        lidar_layout = QVBoxLayout()
-        lidar_layout.setSpacing(10)
-        lidar_layout.setContentsMargins(10, 10, 10, 10)
-        lidar_placeholder = QLabel("LIDAR here")
-        lidar_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        lidar_placeholder.setStyleSheet("background: white; color: black; border: 1px solid #888; border-radius: 6px; font-size: 16px;")
-        lidar_placeholder.setFixedHeight(60)
-        lidar_layout.addWidget(lidar_placeholder)
-        lidar_group.setLayout(lidar_layout)
-        right_layout.addWidget(lidar_group)
-
-        right_layout.addStretch()
+        self.apply_groupbox_style(
+            info_group,
+            self.COLOR_BOX_BORDER_RIGHT,
+            self.COLOR_BOX_BG_RIGHT,
+            self.COLOR_BOX_TITLE_RIGHT
+        )
+        info_layout.addWidget(info_group)
 
         # --- Subsystem Info Boxes (templates) ---
         # Power Subsystem
@@ -365,6 +411,12 @@ class MainWindow(QWidget):
             lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             power_layout.addWidget(lbl)
         power_group.setLayout(power_layout)
+        self.apply_groupbox_style(
+            power_group,
+            self.COLOR_BOX_BORDER_RIGHT,
+            self.COLOR_BOX_BG_RIGHT,
+            self.COLOR_BOX_TITLE_RIGHT
+        )
         info_layout.addWidget(power_group)
 
         # Thermal Subsystem
@@ -376,6 +428,12 @@ class MainWindow(QWidget):
             lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             thermal_layout.addWidget(lbl)
         thermal_group.setLayout(thermal_layout)
+        self.apply_groupbox_style(
+            thermal_group,
+            self.COLOR_BOX_BORDER_RIGHT,
+            self.COLOR_BOX_BG_RIGHT,
+            self.COLOR_BOX_TITLE_RIGHT
+        )
         info_layout.addWidget(thermal_group)
 
         # Communication Subsystem
@@ -390,6 +448,12 @@ class MainWindow(QWidget):
         self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         comm_layout.addWidget(self.comms_status_label)
         comm_group.setLayout(comm_layout)
+        self.apply_groupbox_style(
+            comm_group,
+            self.COLOR_BOX_BORDER_RIGHT,
+            self.COLOR_BOX_BG_RIGHT,
+            self.COLOR_BOX_TITLE_RIGHT
+        )
         info_layout.addWidget(comm_group)
 
         # ADCS Subsystem
@@ -401,6 +465,12 @@ class MainWindow(QWidget):
             lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             adcs_info_layout.addWidget(lbl)
         adcs_info_group.setLayout(adcs_info_layout)
+        self.apply_groupbox_style(
+            adcs_info_group,
+            self.COLOR_BOX_BORDER_RIGHT,
+            self.COLOR_BOX_BG_RIGHT,
+            self.COLOR_BOX_TITLE_RIGHT
+        )
         info_layout.addWidget(adcs_info_group)
 
         # Payload Subsystem
@@ -415,6 +485,12 @@ class MainWindow(QWidget):
         self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         payload_layout.addWidget(self.camera_ready_label)
         payload_group.setLayout(payload_layout)
+        self.apply_groupbox_style(
+            payload_group,
+            self.COLOR_BOX_BORDER_RIGHT,
+            self.COLOR_BOX_BG_RIGHT,
+            self.COLOR_BOX_TITLE_RIGHT
+        )
         info_layout.addWidget(payload_group)
 
         # Command and Data Handling Subsystem
@@ -425,6 +501,12 @@ class MainWindow(QWidget):
             lbl.setStyleSheet("color: #bbb;")
             cdh_layout.addWidget(lbl)
         cdh_group.setLayout(cdh_layout)
+        self.apply_groupbox_style(
+            cdh_group,
+            self.COLOR_BOX_BORDER_RIGHT,
+            self.COLOR_BOX_BG_RIGHT,
+            self.COLOR_BOX_TITLE_RIGHT
+        )
         info_layout.addWidget(cdh_group)
 
         # Error Log
@@ -434,6 +516,12 @@ class MainWindow(QWidget):
         lbl.setStyleSheet("color: #bbb;")
         error_layout.addWidget(lbl)
         error_group.setLayout(error_layout)
+        self.apply_groupbox_style(
+            error_group,
+            self.COLOR_BOX_BORDER_RIGHT,
+            self.COLOR_BOX_BG_RIGHT,
+            self.COLOR_BOX_TITLE_RIGHT
+        )
         info_layout.addWidget(error_group)
 
         # Overall Status
@@ -444,33 +532,44 @@ class MainWindow(QWidget):
             lbl.setStyleSheet("color: #bbb;")
             overall_layout.addWidget(lbl)
         overall_group.setLayout(overall_layout)
+        self.apply_groupbox_style(
+            overall_group,
+            self.COLOR_BOX_BORDER_RIGHT,
+            self.COLOR_BOX_BG_RIGHT,
+            self.COLOR_BOX_TITLE_RIGHT
+        )
         info_layout.addWidget(overall_group)
 
-        # --- Print Health Check Report Button above column 4 ---
+        # Print Health Check Report Button
         print_report_btn = QPushButton("Print Health Check Report")
-        print_report_btn.setEnabled(False)  # Dead button
+        print_report_btn.setEnabled(False)
         self.style_button(print_report_btn)
         info_layout.insertWidget(0, print_report_btn)
 
+        # Scroll Area for right column
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(info_container)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        scroll_area.setStyleSheet(f"""
+            QScrollArea {{
+                border: 1px solid #2b2b2b;
+                border-radius: 0px;
+                background: {self.COLOR_BOX_BG_RIGHT};
+                min-width: 220px;
+                max-width: 260px;
+            }}
+            QScrollBar:horizontal, QScrollBar:vertical {{ height: 0px; width: 0px; background: transparent; }}
+            QWidget {{ min-width: 200px; background: {self.COLOR_BOX_BG_RIGHT}; }}
+        """)
+        info_container.setMinimumWidth(200)
+        info_container.setMaximumWidth(240)
 
-
-        self.apply_groupbox_style(stream_group, self.COLOR_BOX_BORDER_LIVE)
-        self.apply_groupbox_style(info_group, self.COLOR_BOX_BORDER_SYSTEM_INFO)
-        self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR)
-        self.apply_groupbox_style(power_group, self.COLOR_BOX_BORDER_SUBSYSTEM)
-        self.apply_groupbox_style(thermal_group, self.COLOR_BOX_BORDER_SUBSYSTEM)
-        self.apply_groupbox_style(comm_group, self.COLOR_BOX_BORDER_COMM)
-        self.apply_groupbox_style(adcs_info_group, self.COLOR_BOX_BORDER_ADCS)
-        self.apply_groupbox_style(payload_group, self.COLOR_BOX_BORDER_PAYLOAD)
-        self.apply_groupbox_style(cdh_group, self.COLOR_BOX_BORDER_CDH)
-        self.apply_groupbox_style(error_group, self.COLOR_BOX_BORDER_ERROR)
-        self.apply_groupbox_style(overall_group, self.COLOR_BOX_BORDER_OVERALL)
-        self.apply_groupbox_style(self.camera_controls, self.COLOR_BOX_BORDER_CAMERA_CONTROLS)
-        self.apply_groupbox_style(self.camera_settings, self.COLOR_BOX_BORDER_CONFIG)
-        self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
-        self.apply_groupbox_style(self.detector_output, self.COLOR_BOX_BORDER_DETECTOR)
-        self.apply_groupbox_style(self.detector_controls, self.COLOR_BOX_BORDER_SUBSYSTEM)
-
+        # --- Add columns to main layout ---
+        main_layout.addLayout(left_col, stretch=6)
+        main_layout.addWidget(scroll_area, stretch=0)
+        main_layout.setAlignment(scroll_area, Qt.AlignmentFlag.AlignRight)
 
     def setup_socket_events(self):
         @sio.event
@@ -591,23 +690,25 @@ class MainWindow(QWidget):
 
     def update_image(self, frame):
         self.last_frame = frame.copy()
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        h, w, ch = rgb.shape
-        qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
-        pixmap = QPixmap.fromImage(qimg)
-        pixmap = pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
-        self.image_label.setPixmap(pixmap)
+        if not self.detector_active:  # Only show live stream if detector is not active
+            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            h, w, ch = rgb.shape
+            qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
+            pixmap = QPixmap.fromImage(qimg)
+            pixmap = pixmap.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            self.video_label.setPixmap(pixmap)
         if self.detector_active:
             self.clear_queue()
             self.frame_queue.put(self.last_frame)
 
     def update_analysed_image(self, frame):
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        h, w, ch = rgb.shape
-        qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
-        pixmap = QPixmap.fromImage(qimg)
-        pixmap = pixmap.scaled(self.detector_output.label.size(), Qt.AspectRatioMode.KeepAspectRatio)
-        self.detector_output.label.setPixmap(pixmap)
+        if self.detector_active:  # Only show detector output if detector is active
+            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            h, w, ch = rgb.shape
+            qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
+            pixmap = QPixmap.fromImage(qimg)
+            pixmap = pixmap.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            self.video_label.setPixmap(pixmap)
 
     def clear_queue(self):
         while not self.frame_queue.empty():
@@ -626,16 +727,24 @@ class MainWindow(QWidget):
                 st = speedtest.Speedtest()
                 upload = st.upload()
                 upload_mbps = upload / 1_000_000
-                self.info_labels["speed"].setText(f"Upload: {upload_mbps:.2f} Mbps")
                 fps = self.fps_slider.value()
                 max_bytes_per_sec = upload / 8
                 max_frame_size = max_bytes_per_sec / fps
-                self.info_labels["max_frame"].setText(f"Max Frame: {max_frame_size / 1024:.1f} KB")
+                # Emit result to main thread
+                self.speedtest_result.emit(upload_mbps, max_frame_size / 1024)
             except Exception:
-                self.info_labels["speed"].setText("Upload: Error")
-                self.info_labels["max_frame"].setText("Max Frame: -- KB")
+                # Emit error values
+                self.speedtest_result.emit(-1, -1)
 
         threading.Thread(target=run_speedtest, daemon=True).start()
+
+    def update_speed_labels(self, upload_mbps, max_frame_size_kb):
+        if upload_mbps < 0:
+            self.info_labels["speed"].setText("Upload: Error")
+            self.info_labels["max_frame"].setText("Max Frame: -- KB")
+        else:
+            self.info_labels["speed"].setText(f"Upload: {upload_mbps:.2f} Mbps")
+            self.info_labels["max_frame"].setText(f"Max Frame: {max_frame_size_kb:.1f} KB")
 
     def timerEvent(self, event):
         self.current_fps = self.frame_counter
@@ -701,10 +810,92 @@ class MainWindow(QWidget):
         """)
         msg_box.exec()
 
+    def reset_camera_to_default(self):
+        # Uncrop if needed
+        if self.crop_active:
+            self.crop_active = False
+            idx = self.camera_settings.res_dropdown.findText("Custom (Cropped)")
+            if idx != -1:
+                self.camera_settings.res_dropdown.removeItem(idx)
+            from widgets.camera_settings import CameraSettingsWidget
+            self.camera_settings.get_config = CameraSettingsWidget.get_config.__get__(self.camera_settings)
+            self.camera_settings.set_cropped_label(False)
+            self.camera_controls.crop_btn.setText("Crop")
+        # Set default resolution (first preset)
+        self.camera_settings.res_dropdown.setCurrentIndex(0)
+        # Optionally reset other camera settings here (jpeg quality, fps, etc)
+        # self.camera_settings.jpeg_slider.setValue(DEFAULT_JPEG)
+        # self.camera_settings.fps_slider.setValue(DEFAULT_FPS)
+        # Send config to server
+        config = self.camera_settings.get_config()
+        sio.emit("camera_config", config)
+        time.sleep(0.2)  # Give server time to process
+
+    def closeEvent(self, event):
+        try:
+            # 1. Reset camera to default (uncropped, default res)
+            self.reset_camera_to_default()
+            time.sleep(0.2)
+            # 2. Stop streaming if active
+            if self.streaming:
+                sio.emit("stop_camera")
+                self.streaming = False
+                self.camera_controls.toggle_btn.setText("Start Stream")
+                time.sleep(0.2)
+            # 3. Optionally set camera idle (if your server supports such a command)
+            sio.emit("set_camera_idle")
+            time.sleep(0.2)
+            # 4. Disconnect socket
+            if sio.connected:
+                sio.disconnect()
+        except Exception:
+            pass
+        event.accept()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            self.close()  # This will trigger closeEvent
+        else:
+            super().keyPressEvent(event)
+
+    def toggle_crop(self):
+        self.crop_active = not self.crop_active
+
+        # Get current resolution
+        config = self.camera_settings.get_config()
+        width, height = config["resolution"]
+
+        # Apply 16:3 aspect ratio: keep width, reduce height
+        if self.crop_active:
+            new_height = int(width * 3 / 16)
+            # Add a custom cropped entry if not present
+            if self.camera_settings.res_dropdown.findText("Custom (Cropped)") == -1:
+                self.camera_settings.res_dropdown.addItem("Custom (Cropped)")
+            self.camera_settings.res_dropdown.setCurrentText("Custom (Cropped)")
+            # Override get_config to return cropped resolution
+            self.camera_settings.get_config = lambda: {
+                "jpeg_quality": self.camera_settings.jpeg_slider.value(),
+                "fps": self.camera_settings.fps_slider.value(),
+                "resolution": (width, new_height)
+            }
+            self.camera_settings.set_cropped_label(True)
+            self.camera_controls.crop_btn.setText("Uncrop")
+        else:
+            idx = self.camera_settings.res_dropdown.findText("Custom (Cropped)")
+            if idx != -1:
+                self.camera_settings.res_dropdown.removeItem(idx)
+            # Restore get_config to original version
+            from widgets.camera_settings import CameraSettingsWidget
+            self.camera_settings.get_config = CameraSettingsWidget.get_config.__get__(self.camera_settings)
+            self.camera_settings.set_cropped_label(False)
+            self.camera_controls.crop_btn.setText("Crop")
+
+        self.apply_config()
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = MainWindow()
-    win.showMaximized()
+    win.showFullScreen()
 
     def socket_thread():
         while True:

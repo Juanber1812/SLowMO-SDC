@@ -17,7 +17,7 @@ RES_PRESETS = [
     ("256x144", (256, 144)),
     ("384x216", (384, 216)),
     ("768x432", (768, 432)),
-    ("1024x576", (1024, 576)),
+    ("1024x576", (2000, 576)),
     ("1536x864", (1536, 864)),
 ]
 
@@ -105,3 +105,13 @@ class CameraSettingsWidget(QGroupBox):
 
     def apply_style(self, style: str):
         self.setStyleSheet(style)
+
+    def set_cropped_label(self, cropped: bool):
+        current_index = self.res_dropdown.currentIndex()
+        if current_index < len(RES_PRESETS):
+            label, _ = RES_PRESETS[current_index]
+        else:
+            label = self.res_dropdown.currentText()
+        base_label = label.split(" (Cropped)")[0]
+        new_label = f"{base_label} (Cropped)" if cropped else base_label
+        self.res_dropdown.setItemText(current_index, new_label)

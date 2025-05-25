@@ -45,4 +45,8 @@ class DetectorOutputWidget(QGroupBox):
         self.setLayout(self.layout)
         self.label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
         self.label.setFixedSize(STREAM_WIDTH, STREAM_HEIGHT)
+        self.label.setStyleSheet(f"""
+            background-color: {STREAM_BACKGROUND};
+            border: {BORDER_WIDTH}px solid {BORDER_COLOR};
+        """)
         self.layout.addWidget(self.label)

@@ -102,6 +102,17 @@ def on_camera_info(data):
         print("Camera info error:", e)
 
 
+@socketio.on('set_camera_idle')
+def handle_set_camera_idle():
+    global camera_state
+    try:
+        camera_state = "Idle"
+        socketio.emit('camera_status', {'status': camera_state})
+        print("[INFO] Camera set to idle by client request.")
+    except Exception as e:
+        print(f"[ERROR] set_camera_idle: {e}")
+
+
 def set_camera_state(new_state):
     global camera_state
     camera_state = new_state

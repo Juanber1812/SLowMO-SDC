@@ -14,7 +14,6 @@ from theme import (
 class CameraControlsWidget(QGroupBox):
     def __init__(self, parent=None):
         super().__init__("Camera Controls", parent)
-        self.setObjectName("CameraControls")
 
         self.layout = QGridLayout()
         self.setLayout(self.layout)
@@ -28,7 +27,7 @@ class CameraControlsWidget(QGroupBox):
         # Default states
         self.toggle_btn.setEnabled(False)
         self.capture_btn.setEnabled(False)
-        self.crop_btn.setEnabled(False)
+        self.crop_btn.setEnabled(True)  # <-- ENABLED BY DEFAULT
 
         # Add to layout
         self.layout.addWidget(self.toggle_btn, 0, 0)
@@ -76,3 +75,16 @@ class CameraControlsWidget(QGroupBox):
         self.setStyleSheet(style)
         for child in self.findChildren(QPushButton):
             child.setStyleSheet(style)
+
+class MainWindow(QWidget):
+    def __init__(self, theme, parent=None):
+        super().__init__(parent)
+        self.theme = theme
+
+        # Layout
+        self.layout = QGridLayout()
+        self.setLayout(self.layout)
+
+        # Camera controls
+        self.camera_controls = CameraControlsWidget(self.theme)
+        self.layout.addWidget(self.camera_controls, 0, 0)
