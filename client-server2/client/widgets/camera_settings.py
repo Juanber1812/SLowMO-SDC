@@ -252,13 +252,20 @@ class CameraSettingsWidget(QGroupBox):
         # Handle special case for OLD preset
         if resolution_data == "legacy":
             # Use 1536x864 resolution for OLD preset (matches your original calibration)
-            actual_resolution = (1536, 864)  # Resolution used for original calibration
+            width, height = 1536, 864
+            actual_resolution = (width, height)
             calibration_file = CALIBRATION_FILES["legacy"]
+            
+            # Apply cropping if active
+            if hasattr(self, 'cropped') and self.cropped:
+                cropped_height = int(width * 3 / 16)  # 16:3 aspect ratio
+                actual_resolution = (width, cropped_height)
+            
         else:
             width, height = resolution_data
             
             # If cropped, adjust height to 16:3 aspect ratio
-            if self.cropped:
+            if hasattr(self, 'cropped') and self.cropped:
                 cropped_height = int(width * 3 / 16)
                 actual_resolution = (width, cropped_height)
             else:
@@ -267,13 +274,13 @@ class CameraSettingsWidget(QGroupBox):
             # Get the appropriate calibration file (use original resolution for cropped)
             calibration_resolution = (width, height)
             calibration_file = CALIBRATION_FILES.get(calibration_resolution, "calibrations/calibration_default.npz")
-        
+    
         return {
             "jpeg_quality": self.jpeg_slider.value(),
             "fps": self.fps_slider.value(),
             "resolution": actual_resolution,
             "calibration_file": calibration_file,
-            "cropped": self.cropped,
+            "cropped": getattr(self, 'cropped', False),
             "preset_type": "legacy" if resolution_data == "legacy" else "standard"
         }
 
@@ -281,23 +288,52 @@ class CameraSettingsWidget(QGroupBox):
         self.setStyleSheet(style)
         # Do NOT set style individually on buttons, let the group box stylesheet apply
 
-    def set_cropped_label(self, cropped: bool):
-        """Switch all dropdown labels to cropped/uncropped, preserving selection."""
+    def set_cropped_label(self, cropped):
+        """Set the cropped state and update UI accordingly."""
         self.cropped = cropped
-        self._populate_res_dropdown()
+        
+        # Update the calibration status display
+        try:
+            self.update_calibration_status()
+        except:
+            pass  # Ignore if method doesn't exist
+        
+        print(f"[DEBUG] Camera settings cropped state: {cropped}")
 
     def has_calibration(self, resolution):
         """Check if calibration file exists for given resolution."""
         import os
-        filename = CALIBRATION_FILES.get(resolution, "calibrations/calibration_default.npz")
+        
+        if resolution == "legacy":
+            filename = CALIBRATION_FILES["legacy"]
+        else:
+            filename = CALIBRATION_FILES.get(resolution, "calibrations/calibration_default.npz")
+        
+        # Handle relative paths properly
+        if not os.path.isabs(filename):
+            client_dir = os.path.dirname(os.path.dirname(__file__))
+            filename = os.path.join(client_dir, filename)
+            filename = os.path.normpath(filename)
+        
         return os.path.exists(filename)
 
     def get_calibration_status(self):
         """Get status of all calibrations for current preset."""
         import os
         status = {}
-        for label, resolution in self.current_presets:
-            filename = CALIBRATION_FILES.get(resolution, f"calibrations/calibration_{resolution[0]}x{resolution[1]}.npz")
+        client_dir = os.path.dirname(os.path.dirname(__file__))
+        
+        for label, resolution_data in self.current_presets:
+            if resolution_data == "legacy":
+                filename = CALIBRATION_FILES["legacy"]
+            else:
+                filename = CALIBRATION_FILES.get(resolution_data, f"calibrations/calibration_{resolution_data[0]}x{resolution_data[1]}.npz")
+            
+            # Handle relative paths
+            if not os.path.isabs(filename):
+                filename = os.path.join(client_dir, filename)
+                filename = os.path.normpath(filename)
+                
             status[label] = os.path.exists(filename)
         return status
 
@@ -306,10 +342,27 @@ class CameraSettingsWidget(QGroupBox):
         import os
         config = self.get_config()
         calibration_file = config.get('calibration_file', 'calibrations/calibration_default.npz')
+        preset_type = config.get('preset_type', 'standard')
+        
+        # Handle relative paths properly - resolve relative to client directory
+        if not os.path.isabs(calibration_file):
+            # Get the client directory (go up one level from widgets directory)
+            client_dir = os.path.dirname(os.path.dirname(__file__))
+            calibration_file = os.path.join(client_dir, calibration_file)
+            calibration_file = os.path.normpath(calibration_file)
         
         if os.path.exists(calibration_file):
-            self.calibration_status_label.setText("Calibration: ✓ Available")
+            if preset_type == "legacy":
+                self.calibration_status_label.setText("Calibration: ✓ Legacy Available")
+            else:
+                self.calibration_status_label.setText("Calibration: ✓ Available")
             self.calibration_status_label.setStyleSheet(f"color: {SUCCESS_COLOR};")
         else:
-            self.calibration_status_label.setText("Calibration: ❌ Missing")
+            if preset_type == "legacy":
+                self.calibration_status_label.setText("Calibration: ❌ Legacy Missing")
+            else:
+                self.calibration_status_label.setText("Calibration: ❌ Missing")
             self.calibration_status_label.setStyleSheet(f"color: {ERROR_COLOR};")
+            
+            # Debug: print the actual path being checked
+            print(f"[DEBUG] Calibration check - Looking for: {calibration_file}")

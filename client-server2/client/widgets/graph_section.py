@@ -1,11 +1,12 @@
 from PyQt6.QtWidgets import (
     QWidget, QGroupBox, QVBoxLayout, QPushButton, QHBoxLayout, QComboBox
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from payload.distance import RelativeDistancePlotter
 from payload.relative_angle import RelativeAnglePlotter
 from payload.spin import AngularPositionPlotter
 import time
+import threading
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
     TEXT_COLOR, TEXT_SECONDARY, BOX_TITLE_COLOR, LABEL_COLOR,
@@ -174,3 +175,47 @@ class GraphSection(QGroupBox):
         self.record_btn.setParent(None)
         self.duration_dropdown.setParent(None)
         self.graph_display_layout.addWidget(self.graph_display_placeholder)
+
+
+class GraphWidget:
+    def __init__(self):
+        # ... existing init code ...
+        self.calibration_pause_active = False
+        self.calibration_pause_timer = None
+        self.pause_start_time = None
+        
+    def pause_for_calibration_change(self):
+        """Pause graph updates for 1 second during calibration changes."""
+        self.calibration_pause_active = True
+        self.pause_start_time = time.time()
+        
+        print("[DEBUG] 📊 Graph updates paused for calibration stabilization...")
+        
+        # Set timer to resume after 1 second
+        if hasattr(self, 'parent') and hasattr(self.parent(), 'startTimer'):
+            if self.calibration_pause_timer:
+                self.parent().killTimer(self.calibration_pause_timer)
+            
+            # Use QTimer for better control
+            self.calibration_resume_timer = QTimer()
+            self.calibration_resume_timer.setSingleShot(True)
+            self.calibration_resume_timer.timeout.connect(self.resume_after_calibration)
+            self.calibration_resume_timer.start(1000)  # 1 second pause
+        else:
+            # Fallback method
+            threading.Timer(1.0, self.resume_after_calibration).start()
+    
+    def resume_after_calibration(self):
+        """Resume graph updates after calibration stabilization."""
+        self.calibration_pause_active = False
+        self.pause_start_time = None
+        print("[DEBUG] 📊 Graph updates resumed after calibration stabilization")
+    
+    def update(self, rvec, tvec, timestamp):
+        """Update graphs with new pose data."""
+        # Skip updates during calibration pause
+        if self.calibration_pause_active:
+            return
+        
+        # ... existing update code ...
+        # Your existing graph update logic here

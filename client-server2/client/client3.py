@@ -1,16 +1,16 @@
 import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
-    QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea  # <-- add QScrollArea here
+    QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
-from PyQt6.QtGui import QPixmap, QImage, QFont
+from PyQt6.QtGui import QPixmap, QImage, QFont, QPainter, QPen
 from payload.distance import RelativeDistancePlotter
 from payload.relative_angle import RelativeAnglePlotter
 from payload.spin import AngularPositionPlotter
 from payload import detector4
 from widgets.camera_controls import CameraControlsWidget
-from widgets.camera_settings import CameraSettingsWidget
+from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
 from widgets.detector_output import DetectorOutputWidget
 from widgets.detector_control import DetectorControlWidget
@@ -21,9 +21,10 @@ from theme import (
     BUTTON_COLOR, BUTTON_HOVER, BUTTON_DISABLED, BUTTON_TEXT,
     BORDER_COLOR, BORDER_ERROR, BORDER_HIGHLIGHT,
     FONT_FAMILY, FONT_SIZE_NORMAL, FONT_SIZE_LABEL, FONT_SIZE_TITLE,
-    ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR,SECOND_COLUMN,
+    ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR, SECOND_COLUMN,
     BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE, BUTTON_HEIGHT
 )
+
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.1.146:5000"
 
@@ -42,9 +43,7 @@ class Bridge(QObject):
     frame_received = pyqtSignal(np.ndarray)
     analysed_frame = pyqtSignal(np.ndarray)
 
-
 bridge = Bridge()
-
 
 class MainWindow(QWidget):
     speedtest_result = pyqtSignal(float, float)  # upload_mbps, max_frame_size_kb
@@ -52,7 +51,7 @@ class MainWindow(QWidget):
     # --- Sleek Dark Sci-Fi Theme ---
     COLOR_BG = BACKGROUND
     COLOR_BOX_BG = BOX_BACKGROUND
-    COLOR_BOX_BG_RIGHT = SECOND_COLUMN  # <-- Add a new variable for the right column background
+    COLOR_BOX_BG_RIGHT = SECOND_COLUMN
     COLOR_BOX_BORDER = BORDER_COLOR
     COLOR_BOX_BORDER_LIVE = BORDER_COLOR
     COLOR_BOX_BORDER_DETECTOR = BORDER_COLOR
@@ -77,7 +76,7 @@ class MainWindow(QWidget):
     # --- Border Style Variables ---
     BOX_BORDER_THICKNESS = BORDER_WIDTH
     BOX_BORDER_STYLE = "solid"
-    BOX_BORDER_RADIUS = BORDER_RADIUS  # Use theme radius for consistency
+    BOX_BORDER_RADIUS = BORDER_RADIUS
 
     FONT_FAMILY = FONT_FAMILY
 
@@ -158,6 +157,9 @@ class MainWindow(QWidget):
         # Initialize crop_active state
         self.crop_active = False
 
+        # Initialize calibration change tracking
+        self.calibration_change_time = None
+
         self.setup_ui()
         self.setup_socket_events()
 
@@ -181,7 +183,6 @@ class MainWindow(QWidget):
     # --- Improved groupbox styling for left/right columns ---
     def apply_groupbox_style(self, groupbox, border_color, bg_color=None, title_color=None):
         border = f"{self.BOX_BORDER_THICKNESS}px {self.BOX_BORDER_STYLE}"
-        # Use 0 radius for right column, theme radius for others
         radius_value = self.COLOR_BOX_RADIUS_RIGHT if border_color == self.COLOR_BOX_BORDER_RIGHT else self.BOX_BORDER_RADIUS
         radius = f"{radius_value}px"
         bg = bg_color if bg_color else self.COLOR_BG
@@ -219,11 +220,9 @@ class MainWindow(QWidget):
         left_col = QVBoxLayout()
         left_col.setSpacing(10)
         left_col.setContentsMargins(10, 10, 10, 10)
-
-        # Make left column widgets align to the left
         left_col.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-        # --- Row 1: Unified Video + Controls (no logo) ---
+        # --- Row 1: Unified Video + Controls ---
         row1 = QHBoxLayout()
         row1.setSpacing(10)
         row1.setContentsMargins(10, 10, 10, 10)
@@ -236,7 +235,7 @@ class MainWindow(QWidget):
         video_layout.setContentsMargins(5, 5, 5, 5)
 
         aspect_w, aspect_h = 16, 9
-        video_width = 640   # Increased from 480 to 640
+        video_width = 640
         video_height = int(video_width * aspect_h / aspect_w)
 
         # Unified Video Label
@@ -274,7 +273,7 @@ class MainWindow(QWidget):
         self.camera_controls.toggle_btn.clicked.connect(self.toggle_stream)
         self.camera_controls.reconnect_btn.clicked.connect(self.try_reconnect)
         self.camera_controls.capture_btn.setEnabled(False)
-        self.camera_controls.crop_btn.setEnabled(True)  # <-- ENABLE THE BUTTON!
+        self.camera_controls.crop_btn.setEnabled(True)
         self.camera_controls.crop_btn.clicked.connect(self.toggle_crop)
         controls_layout.addWidget(self.camera_controls.toggle_btn)
         controls_layout.addWidget(self.camera_controls.reconnect_btn)
@@ -293,10 +292,10 @@ class MainWindow(QWidget):
 
         controls_layout.addStretch(1)
         controls_group.setLayout(controls_layout)
-        controls_group.setFixedHeight(video_height + 40)  # Match live stream height
+        controls_group.setFixedHeight(video_height + 40)
         self.apply_groupbox_style(controls_group, self.COLOR_BOX_BORDER_CAMERA_CONTROLS)
 
-        # --- Camera Settings (move to row1, right of controls) ---
+        # --- Camera Settings ---
         self.camera_settings = CameraSettingsWidget()
         self.camera_settings.setMaximumWidth(300)
         self.camera_settings.layout.setSpacing(6)
@@ -306,24 +305,24 @@ class MainWindow(QWidget):
         self.camera_settings.apply_btn.setStyleSheet(self.BUTTON_STYLE + "padding: 4px 8px; font-size: 9pt;")
         self.camera_settings.apply_btn.clicked.connect(self.apply_config)
         self.apply_groupbox_style(self.camera_settings, self.COLOR_BOX_BORDER_CONFIG)
-        self.camera_settings.setFixedHeight(video_height + 40)  # Match live stream height
+        self.camera_settings.setFixedHeight(video_height + 40)
 
         # Add widgets to row1
         row1.addWidget(video_group)
         row1.addWidget(controls_group)
-        row1.addWidget(self.camera_settings)  # Camera settings now in row1
+        row1.addWidget(self.camera_settings)
 
-        # --- Row 2: Detector Output + Graph Display ---
+        # --- Row 2: Graph Display ---
         row2 = QHBoxLayout()
         row2.setSpacing(10)
         row2.setContentsMargins(10, 10, 10, 10)
         row2.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-        # Graph Section (as before)
+        # Graph Section
         self.record_btn = QPushButton("Record")
         self.duration_dropdown = QComboBox()
         self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
-        self.graph_section.setFixedSize(580, 300)  # Set a fixed size for the graph box
+        self.graph_section.setFixedSize(580, 300)
         self.graph_section.graph_display_layout.setSpacing(2)
         self.graph_section.graph_display_layout.setContentsMargins(2, 2, 2, 2)
         self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
@@ -333,7 +332,7 @@ class MainWindow(QWidget):
         row3 = QHBoxLayout()
         row3.setSpacing(10)
         row3.setContentsMargins(10, 10, 10, 10)
-        row3.setAlignment(Qt.AlignmentFlag.AlignLeft)  # Align row3 widgets to the left
+        row3.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         lidar_group = QGroupBox("LIDAR")
         lidar_layout = QVBoxLayout()
@@ -366,16 +365,15 @@ class MainWindow(QWidget):
         left_col.addLayout(row2)
         left_col.addLayout(row3)
 
-        # --- RIGHT COLUMN: System Info Panel (scrollable, thin) ---
+        # --- RIGHT COLUMN: System Info Panel ---
         info_container = QWidget()
         info_layout = QVBoxLayout(info_container)
         info_layout.setSpacing(10)
         info_layout.setContentsMargins(10, 10, 10, 10)
 
-        # Set background color for right column
         info_container.setStyleSheet(f"background-color: {self.COLOR_BOX_BG_RIGHT};")
 
-        # System Info Group (right column)
+        # System Info Group
         info_group = QGroupBox("System Info")
         info_layout_inner = QVBoxLayout()
         info_layout_inner.setSpacing(5)
@@ -400,7 +398,7 @@ class MainWindow(QWidget):
         )
         info_layout.addWidget(info_group)
 
-        # --- Subsystem Info Boxes (templates) ---
+        # --- Subsystem Info Boxes ---
         # Power Subsystem
         power_group = QGroupBox("Power Subsystem")
         power_layout = QVBoxLayout()
@@ -577,8 +575,9 @@ class MainWindow(QWidget):
             self.comms_status_label.setText("Status: Connected")
             self.camera_controls.toggle_btn.setEnabled(True)
             self.detector_controls.detector_btn.setEnabled(True)
+            # Enable crop button when connected
+            self.camera_controls.crop_btn.setEnabled(True)
             self.apply_config()
-            # Delay emits to ensure connection is fully established
             def delayed_emits():
                 if not self.streaming:
                     sio.emit("stop_camera")
@@ -591,6 +590,8 @@ class MainWindow(QWidget):
             self.comms_status_label.setText("Status: Disconnected")
             self.camera_controls.toggle_btn.setEnabled(False)
             self.detector_controls.detector_btn.setEnabled(False)
+            # Disable crop button when disconnected
+            self.camera_controls.crop_btn.setEnabled(False)
 
         @sio.on("frame")
         def on_frame(data):
@@ -628,13 +629,11 @@ class MainWindow(QWidget):
                 print(f"[DEBUG] Camera status received: {status}")
                 self.camera_status_label.setText(f"Camera: {status}")
                 
-                # Safer stylesheet updates
                 if status.lower() in ("streaming", "idle", "ready"):
                     self.camera_status_label.setStyleSheet("color: white;")
                 else:
                     self.camera_status_label.setStyleSheet("color: #bbb;")
                 
-                # More robust status checking
                 error_statuses = {"error", "not connected", "damaged", "not found", "unavailable", "failed"}
                 if status.lower() in error_statuses:
                     self.camera_ready_label.setText("Status: Not Ready")
@@ -646,10 +645,6 @@ class MainWindow(QWidget):
             except Exception as e:
                 print(f"[ERROR] Camera status update error: {e}")
 
-    def update_fps_slider(self):
-        self.fps_slider.setRange(1, 120)
-        self.fps_label.setText(f"FPS: {self.fps_slider.value()}")
-    
     def toggle_stream(self):
         if not sio.connected:
             return
@@ -668,14 +663,24 @@ class MainWindow(QWidget):
         # Send config to server
         sio.emit("camera_config", config)
         
-        # Update detector calibration - handle legacy preset
+        # **PAUSE DISPLAY FOR 1 SECOND - NO VISUAL PLACEHOLDER**
+        try:
+            print("[DEBUG] 📊 Pausing display for calibration/crop change...")
+            self.calibration_change_time = time.time()
+            
+            # Start a timer to clear the pause after 1 second
+            QTimer.singleShot(1000, self.resume_after_calibration_change)
+            
+        except Exception as e:
+            print(f"[DEBUG] Display pause failed (continuing anyway): {e}")
+
+        # Update detector calibration
         try:
             calibration_path = config.get('calibration_file', 'calibrations/calibration_default.npz')
             preset_type = config.get('preset_type', 'standard')
             
             print(f"[DEBUG] Attempting to update calibration: {calibration_path} (type: {preset_type})")
             
-            # Method 1: Update via detector4 module if available
             if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
                 success = detector4.detector_instance.update_calibration(calibration_path)
                 if success:
@@ -686,7 +691,6 @@ class MainWindow(QWidget):
                 else:
                     print(f"[WARNING] ❌ Failed to update detector calibration: {calibration_path}")
             
-            # Method 2: Update via global function if available
             elif hasattr(detector4, 'update_calibration'):
                 success = detector4.update_calibration(calibration_path)
                 if success:
@@ -701,11 +705,16 @@ class MainWindow(QWidget):
             print(f"[ERROR] Failed to update detector calibration: {e}")
             import traceback
             traceback.print_exc()
-    
-        if was_streaming:
-            QTimer.singleShot(500, self.toggle_stream)
 
-    # Add method to check calibration status
+        if was_streaming:
+            threading.Timer(0.5, self.toggle_stream).start()
+
+    def resume_after_calibration_change(self):
+        """Resume display after calibration/crop change."""
+        if hasattr(self, 'calibration_change_time'):
+            delattr(self, 'calibration_change_time')
+        print("[DEBUG] 📊 Display resumed after calibration/crop pause")
+
     def check_calibration_status(self):
         """Check and display calibration status for current settings."""
         try:
@@ -713,7 +722,6 @@ class MainWindow(QWidget):
             calibration_file = config.get('calibration_file', 'calibrations/calibration_default.npz')
             preset_type = config.get('preset_type', 'standard')
             
-            # Handle relative paths
             if not os.path.isabs(calibration_file):
                 calibration_file = os.path.join(os.path.dirname(__file__), calibration_file)
                 calibration_file = os.path.normpath(calibration_file)
@@ -752,8 +760,8 @@ class MainWindow(QWidget):
         
         if self.detector_active:
             print("[DEBUG] 🚀 Starting detector...")
-            self.check_calibration_status()  # Check calibration before starting
-            self.debug_detector_state()      # Print debug info
+            self.check_calibration_status()
+            self.debug_detector_state()
             threading.Thread(target=self.run_detector, daemon=True).start()
         else:
             print("[DEBUG] 🛑 Stopping detector...")
@@ -764,41 +772,40 @@ class MainWindow(QWidget):
             try:
                 frame = self.frame_queue.get(timeout=0.1)
             
-                # Get crop status from camera settings
                 config = self.camera_settings.get_config()
                 is_cropped = config.get('cropped', False)
                 
-                # Calculate original height for cropped frames
                 original_height = None
                 if is_cropped:
                     current_height = frame.shape[0]
-                    # Reverse calculate original height (current is 16:3, original was 16:9)
-                    # 16:3 aspect ratio means height = width * 3/16
-                    # So original height = current_height * 3 (since 16:9 means height = width * 9/16)
                     original_height = int(current_height * 3)
-                
-                # Get both the analysed frame and pose (if available)
+            
                 try:
                     if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
-                        # Use the class method with crop handling
                         analysed, pose = detector4.detector_instance.detect_and_draw(
                             frame, return_pose=True, is_cropped=is_cropped, original_height=original_height
                         )
                     else:
-                        # Fallback to old method
                         analysed, pose = detector4.detect_and_draw(frame, return_pose=True)
-                    
+                
                     bridge.analysed_frame.emit(analysed)
 
-                    # Feed pose data to graph if graph is active
-                    if self.graph_section.graph_widget and pose:
+                    # **CHECK FOR CALIBRATION PAUSE BEFORE UPDATING GRAPHS**
+                    should_update_graphs = True
+                    if hasattr(self, 'calibration_change_time'):
+                        time_since_change = time.time() - self.calibration_change_time
+                        if time_since_change < 1.0:  # 1 second pause
+                            should_update_graphs = False
+                            if int(time_since_change * 10) % 5 == 0:  # Every 0.5 seconds
+                                print(f"[DEBUG] 📊 Skipping graph update - calibration stabilizing ({time_since_change:.1f}s)")
+
+                    if should_update_graphs and self.graph_section.graph_widget and pose:
                         rvec, tvec = pose
                         timestamp = time.time()
                         self.graph_section.graph_widget.update(rvec, tvec, timestamp)
                         
                 except Exception as e:
                     print(f"[ERROR] Detector processing error: {e}")
-                    # Emit original frame if detector fails
                     bridge.analysed_frame.emit(frame)
 
             except queue.Empty:
@@ -809,26 +816,40 @@ class MainWindow(QWidget):
                 traceback.print_exc()
 
     def update_image(self, frame):
+        """Handle live stream frames (only when detector is OFF)."""
         self.last_frame = frame.copy()
-        if not self.detector_active:  # Only show live stream if detector is not active
-            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            h, w, ch = rgb.shape
-            qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
-            pixmap = QPixmap.fromImage(qimg)
-            pixmap = pixmap.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
-            self.video_label.setPixmap(pixmap)
+        
+        # Only show live stream if detector is NOT active
+        if not self.detector_active:
+            self.display_frame(frame, is_live=True)
+        
+        # Always queue frames for detector if it's active
         if self.detector_active:
             self.clear_queue()
             self.frame_queue.put(self.last_frame)
 
     def update_analysed_image(self, frame):
-        if self.detector_active:  # Only show detector output if detector is active
-            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            h, w, ch = rgb.shape
-            qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
-            pixmap = QPixmap.fromImage(qimg)
-            pixmap = pixmap.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
-            self.video_label.setPixmap(pixmap)
+        """Handle detector output frames (only when detector is ON)."""
+        # Only show detector output if detector IS active
+        if self.detector_active:
+            self.display_frame(frame, is_live=False)
+
+    def display_frame(self, frame, is_live=True):
+        """Display frame with optional 1-second pause for crop changes."""
+        # Check if we should pause display during crop/calibration changes
+        if hasattr(self, 'calibration_change_time'):
+            time_since_change = time.time() - self.calibration_change_time
+            if time_since_change < 1.0:  # 1 second pause
+                # Just skip displaying during pause - no placeholder screen
+                return
+        
+        # Normal frame display
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb.shape
+        qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
+        pixmap = QPixmap.fromImage(qimg)
+        pixmap = pixmap.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
+        self.video_label.setPixmap(pixmap)
 
     def clear_queue(self):
         while not self.frame_queue.empty():
@@ -847,13 +868,11 @@ class MainWindow(QWidget):
                 st = speedtest.Speedtest()
                 upload = st.upload()
                 upload_mbps = upload / 1_000_000
-                fps = self.fps_slider.value()
+                fps = self.camera_settings.fps_slider.value()
                 max_bytes_per_sec = upload / 8
                 max_frame_size = max_bytes_per_sec / fps
-                # Emit result to main thread
                 self.speedtest_result.emit(upload_mbps, max_frame_size / 1024)
             except Exception:
-                # Emit error values
                 self.speedtest_result.emit(-1, -1)
 
         threading.Thread(target=run_speedtest, daemon=True).start()
@@ -888,7 +907,6 @@ class MainWindow(QWidget):
             pass
         try:
             sio.connect(SERVER_URL, wait_timeout=5)
-            # Apply config after reconnect
             self.apply_config()
             if was_streaming:
                 sio.emit("start_camera")
@@ -903,7 +921,6 @@ class MainWindow(QWidget):
         msg_box.setText(message)
         msg_box.setIcon(icon)
 
-        # Full override of internal structure for best cross-platform results
         msg_box.setStyleSheet("""
             QMessageBox {
                 background-color: #3b3e44;
@@ -931,7 +948,6 @@ class MainWindow(QWidget):
         msg_box.exec()
 
     def reset_camera_to_default(self):
-        # Uncrop if needed
         if self.crop_active:
             self.crop_active = False
             idx = self.camera_settings.res_dropdown.findText("Custom (Cropped)")
@@ -941,64 +957,64 @@ class MainWindow(QWidget):
             self.camera_settings.get_config = CameraSettingsWidget.get_config.__get__(self.camera_settings)
             self.camera_settings.set_cropped_label(False)
             self.camera_controls.crop_btn.setText("Crop")
-        # Set default resolution (first preset)
         self.camera_settings.res_dropdown.setCurrentIndex(0)
-        # Optionally reset other camera settings here (jpeg quality, fps, etc)
-        # self.camera_settings.jpeg_slider.setValue(DEFAULT_JPEG)
-        # self.camera_settings.fps_slider.setValue(DEFAULT_FPS)
-        # Send config to server
         config = self.camera_settings.get_config()
         sio.emit("camera_config", config)
-        time.sleep(0.2)  # Give server time to process
+        time.sleep(0.2)
 
     def closeEvent(self, event):
         try:
             print("[DEBUG] 🛑 Closing application...")
             
-            # Stop detector first
             if self.detector_active:
                 self.detector_active = False
                 print("[DEBUG] Detector stopped")
-        
-            # Reset camera to default (uncropped, default res)
+    
             self.reset_camera_to_default()
-            time.sleep(0.5)  # Increased delay
-        
-            # Stop streaming if active
+            time.sleep(0.5)
+    
             if self.streaming:
                 sio.emit("stop_camera")
                 self.streaming = False
                 self.camera_controls.toggle_btn.setText("Start Stream")
-                time.sleep(0.5)  # Increased delay
-        
-            # Set camera idle
+                time.sleep(0.5)
+    
             sio.emit("set_camera_idle")
-            time.sleep(0.5)  # Increased delay
-        
-            # Disconnect socket more gracefully
+            time.sleep(0.5)
+    
             if sio.connected:
                 print("[DEBUG] Disconnecting from server...")
                 sio.disconnect()
                 time.sleep(0.2)
-                
+            
         except Exception as e:
             print(f"[DEBUG] Cleanup error (expected): {e}")
-    
+
         event.accept()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape:
-            self.close()  # This will trigger closeEvent
+            self.close()
         else:
             super().keyPressEvent(event)
 
     def toggle_crop(self):
         print(f"[DEBUG] Toggling crop: {not self.crop_active}")
+        
+        # No more placeholder - just apply the crop change directly
         self.crop_active = not self.crop_active
-        self.camera_settings.set_cropped_label(self.crop_active)
+        
+        try:
+            self.camera_settings.set_cropped_label(self.crop_active)
+        except Exception as e:
+            print(f"[DEBUG] Could not update crop label: {e}")
+        
         self.camera_controls.crop_btn.setText("Uncrop" if self.crop_active else "Crop")
         print(f"[DEBUG] Crop now: {'ACTIVE' if self.crop_active else 'INACTIVE'}")
+        
+        # Apply the configuration (this will trigger the 1-second pause)
         self.apply_config()
+
 
 def check_all_calibrations():
     """Check status of all calibration files including legacy."""
@@ -1007,7 +1023,6 @@ def check_all_calibrations():
     found = 0
     
     for resolution, filename in CALIBRATION_FILES.items():
-        # Handle relative paths
         if not os.path.isabs(filename):
             filepath = os.path.join(os.path.dirname(__file__), filename)
             filepath = os.path.normpath(filepath)
@@ -1036,15 +1051,12 @@ def check_all_calibrations():
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     
-    # Set application properties
     app.setApplicationName("SLowMO Client")
     app.setApplicationVersion("3.0")
     
-    # Create and show main window
     window = MainWindow()
     window.showFullScreen()
     
-    # Connect to server in background
     def connect_to_server():
         try:
             print(f"[DEBUG] Attempting to connect to {SERVER_URL}")
@@ -1052,10 +1064,7 @@ if __name__ == "__main__":
             print("[DEBUG] Successfully connected to server")
         except Exception as e:
             print(f"[ERROR] Failed to connect to server: {e}")
-            # Still show the GUI even if connection fails
     
-    # Start connection in a separate thread
     threading.Thread(target=connect_to_server, daemon=True).start()
     
-    # Start the application event loop
     sys.exit(app.exec())
