@@ -1,3 +1,6 @@
+## As it stands, this code can be run directly on the pi with a monitor, and the adcs can be controlled with inputs to the pi. This needs to be changed so that inputs to another laptop call functions to be ran on the pi.
+
+
 # Required libraries
 import time
 import RPi.GPIO as GPIO
