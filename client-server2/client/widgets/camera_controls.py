@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QGroupBox
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QGroupBox
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
     TEXT_COLOR, TEXT_SECONDARY, BOX_TITLE_COLOR, LABEL_COLOR,
@@ -13,17 +13,21 @@ from theme import (
 
 class CameraControlsWidget(QGroupBox):
     def __init__(self, parent_window=None):
-        super().__init__("Camera Controls", parent_window)
+        super().__init__("Controls", parent_window)  # Changed title to include both camera and detector
 
         self.parent_window = parent_window  # Store reference to parent
-        self.layout = QGridLayout()
+        # Changed from QGridLayout to QVBoxLayout for vertical stacking
+        self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        # Buttons
+        # Camera Control Buttons
         self.toggle_btn = QPushButton("Start Stream")
         self.reconnect_btn = QPushButton("Reconnect")
         self.capture_btn = QPushButton("Capture Image")
         self.crop_btn = QPushButton("Crop")
+        
+        # Detector Control Button
+        self.detector_btn = QPushButton("Start Detector")
 
         # Define button style (thinner, same as Start Detector)
         self.BUTTON_STYLE = f"""
@@ -49,23 +53,34 @@ class CameraControlsWidget(QGroupBox):
         """
 
         # Apply the same style to all buttons
-        for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.crop_btn):
+        for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.crop_btn, self.detector_btn):
             btn.setStyleSheet(self.BUTTON_STYLE)
 
-        # Connect capture button to parent window's method
-        if self.parent_window and hasattr(self.parent_window, 'capture_image'):
-            self.capture_btn.clicked.connect(self.parent_window.capture_image)
+        # Connect camera buttons to parent window methods if they exist
+        if self.parent_window:
+            if hasattr(self.parent_window, 'toggle_stream'):
+                self.toggle_btn.clicked.connect(self.parent_window.toggle_stream)
+            if hasattr(self.parent_window, 'try_reconnect'):
+                self.reconnect_btn.clicked.connect(self.parent_window.try_reconnect)
+            if hasattr(self.parent_window, 'capture_image'):
+                self.capture_btn.clicked.connect(self.parent_window.capture_image)
+            if hasattr(self.parent_window, 'toggle_crop'):
+                self.crop_btn.clicked.connect(self.parent_window.toggle_crop)
+            if hasattr(self.parent_window, 'toggle_detector'):
+                self.detector_btn.clicked.connect(self.parent_window.toggle_detector)
 
         # Default states
         self.toggle_btn.setEnabled(False)
         self.capture_btn.setEnabled(False)  # Will be enabled when connected
         self.crop_btn.setEnabled(True)
+        self.detector_btn.setEnabled(False)  # Will be enabled when connected
 
-        # Add to layout with proper spacing
-        self.layout.addWidget(self.toggle_btn, 0, 0)
-        self.layout.addWidget(self.reconnect_btn, 0, 1)
-        self.layout.addWidget(self.capture_btn, 1, 0)
-        self.layout.addWidget(self.crop_btn, 1, 1)
+        # Add to layout vertically (all 5 buttons stacked)
+        self.layout.addWidget(self.toggle_btn)
+        self.layout.addWidget(self.reconnect_btn)
+        self.layout.addWidget(self.capture_btn)
+        self.layout.addWidget(self.crop_btn)
+        self.layout.addWidget(self.detector_btn)
         
         # Set layout spacing
         self.layout.setSpacing(WIDGET_SPACING)
@@ -93,7 +108,7 @@ class CameraControlsWidget(QGroupBox):
         """Apply external style while preserving button styles"""
         # Store current button styles
         button_styles = {}
-        for btn_name in ['toggle_btn', 'reconnect_btn', 'capture_btn', 'crop_btn']:
+        for btn_name in ['toggle_btn', 'reconnect_btn', 'capture_btn', 'crop_btn', 'detector_btn']:
             btn = getattr(self, btn_name)
             button_styles[btn_name] = btn.styleSheet()
         

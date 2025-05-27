@@ -242,49 +242,13 @@ class MainWindow(QWidget):
         video_group.setFixedSize(video_width + 40, video_height + 40)
         self.apply_groupbox_style(video_group, self.COLOR_BOX_BORDER_LIVE)
 
-        # --- Controls: Stack buttons vertically inside a groupbox ---
-        controls_group = QGroupBox("Controls")
-        controls_layout = QVBoxLayout()
-        controls_layout.setSpacing(8)
-        controls_layout.setContentsMargins(10, 10, 10, 10)
-
-        # Stream Controls Buttons - Pass self as parent_window
+        # --- Controls: Use the camera controls widget directly (includes detector button) ---
         self.camera_controls = CameraControlsWidget(parent_window=self)
-        self.camera_controls.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        self.camera_controls.layout.setSpacing(4)
-        self.camera_controls.layout.setContentsMargins(0, 0, 0, 0)
-        self.style_button(self.camera_controls.toggle_btn)
-        self.style_button(self.camera_controls.reconnect_btn)
-        self.style_button(self.camera_controls.capture_btn)
-        self.style_button(self.camera_controls.crop_btn)
-        self.camera_controls.toggle_btn.setFixedHeight(32)
-        self.camera_controls.reconnect_btn.setFixedHeight(32)
-        self.camera_controls.capture_btn.setFixedHeight(32)
-        self.camera_controls.crop_btn.setFixedHeight(32)
-        self.camera_controls.toggle_btn.clicked.connect(self.toggle_stream)
-        self.camera_controls.reconnect_btn.clicked.connect(self.try_reconnect)
-        self.camera_controls.capture_btn.setEnabled(False)
-        self.camera_controls.crop_btn.setEnabled(True)
-        self.camera_controls.crop_btn.clicked.connect(self.toggle_crop)
-        controls_layout.addWidget(self.camera_controls.toggle_btn)
-        controls_layout.addWidget(self.camera_controls.reconnect_btn)
-        controls_layout.addWidget(self.camera_controls.capture_btn)
-        controls_layout.addWidget(self.camera_controls.crop_btn)
-
-        # Detector Controls Button
-        self.detector_controls = DetectorControlWidget()
-        self.detector_controls.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        self.detector_controls.apply_style(self.BUTTON_STYLE)
-        self.detector_controls.layout.setSpacing(4)
-        self.detector_controls.layout.setContentsMargins(0, 0, 0, 0)
-        self.detector_controls.detector_btn.setFixedHeight(32)
-        self.detector_controls.detector_btn.clicked.connect(self.toggle_detector)
-        controls_layout.addWidget(self.detector_controls.detector_btn)
-
-        controls_layout.addStretch(1)
-        controls_group.setLayout(controls_layout)
-        controls_group.setFixedHeight(video_height + 40)
-        self.apply_groupbox_style(controls_group, self.COLOR_BOX_BORDER_CAMERA_CONTROLS)
+        self.camera_controls.setFixedHeight(video_height + 40)
+        self.apply_groupbox_style(self.camera_controls, self.COLOR_BOX_BORDER_CAMERA_CONTROLS)
+        
+        # For backward compatibility, create reference to detector button
+        self.detector_controls = type('obj', (object,), {'detector_btn': self.camera_controls.detector_btn})()
 
         # --- Camera Settings ---
         self.camera_settings = CameraSettingsWidget()
@@ -300,7 +264,7 @@ class MainWindow(QWidget):
 
         # Add widgets to row1
         row1.addWidget(video_group)
-        row1.addWidget(controls_group)
+        row1.addWidget(self.camera_controls)
         row1.addWidget(self.camera_settings)
 
         # --- Row 2: Graph Display ---
@@ -558,6 +522,7 @@ class MainWindow(QWidget):
         main_layout.addLayout(left_col, stretch=6)
         main_layout.addWidget(scroll_area, stretch=0)
         main_layout.setAlignment(scroll_area, Qt.AlignmentFlag.AlignRight)
+        
 
     def setup_socket_events(self):
         @sio.event
@@ -1079,6 +1044,26 @@ class MainWindow(QWidget):
         print(f"[UI] ❌ Capture failed: {error}")
         # You could show an error dialog here
 
+    def download_captured_image(self, server_path):
+        """Download captured image from server to local machine"""
+        try:
+            # Generate local filename
+            filename = os.path.basename(server_path)
+            
+            # Request image download from server
+            sio.emit("download_image", {"server_path": server_path, "filename": filename})
+            print(f"[DEBUG] 📥 Requesting image download: {filename}")
+            
+        except Exception as e:
+            print(f"[ERROR] Failed to request image download: {e}")
+
+    def show_local_save_success(self, local_path, file_size):
+        """Show success message for local image save"""
+        print(f"[UI] 📁 Image downloaded to: {local_path}")
+        print(f"[UI] 💾 Local file size: {file_size/1024:.1f} KB")
+        
+        # Optional: Show a popup notification
+        # self.show_message("Image Saved", f"Image saved to:\n{local_path}", QMessageBox.Icon.Information)
 
 def check_all_calibrations():
     """Check status of all calibration files including legacy."""
