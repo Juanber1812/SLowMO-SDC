@@ -11,7 +11,7 @@ from theme import (
     BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE,
     BUTTON_HEIGHT
 )
-
+strip=2
 RES_PRESETS_LOW = [
     ("OLD", "legacy"),  # Special case for old calibration
     ("768x432", (768, 432)),
@@ -258,7 +258,7 @@ class CameraSettingsWidget(QGroupBox):
             
             # Apply cropping if active
             if hasattr(self, 'cropped') and self.cropped:
-                cropped_height = int(width * 3 / 16)  # 16:3 aspect ratio
+                cropped_height = int(width * strip / 16)  # 16:3 aspect ratio
                 actual_resolution = (width, cropped_height)
             
         else:
@@ -266,7 +266,7 @@ class CameraSettingsWidget(QGroupBox):
             
             # If cropped, adjust height to 16:3 aspect ratio
             if hasattr(self, 'cropped') and self.cropped:
-                cropped_height = int(width * 3 / 16)
+                cropped_height = int(width * strip / 16)
                 actual_resolution = (width, cropped_height)
             else:
                 actual_resolution = (width, height)

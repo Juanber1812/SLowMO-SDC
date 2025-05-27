@@ -12,9 +12,10 @@ from theme import (
 )
 
 class CameraControlsWidget(QGroupBox):
-    def __init__(self, parent=None):
-        super().__init__("Camera Controls", parent)
+    def __init__(self, parent_window=None):
+        super().__init__("Camera Controls", parent_window)
 
+        self.parent_window = parent_window  # Store reference to parent
         self.layout = QGridLayout()
         self.setLayout(self.layout)
 
@@ -25,7 +26,7 @@ class CameraControlsWidget(QGroupBox):
         self.crop_btn = QPushButton("Crop")
 
         # Define button style (thinner, same as Start Detector)
-        BUTTON_STYLE = f"""
+        self.BUTTON_STYLE = f"""
         QPushButton {{
             background-color: {BOX_BACKGROUND};
             color: {TEXT_COLOR};
@@ -49,51 +50,57 @@ class CameraControlsWidget(QGroupBox):
 
         # Apply the same style to all buttons
         for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.crop_btn):
-            btn.setStyleSheet(BUTTON_STYLE)
+            btn.setStyleSheet(self.BUTTON_STYLE)
+
+        # Connect capture button to parent window's method
+        if self.parent_window and hasattr(self.parent_window, 'capture_image'):
+            self.capture_btn.clicked.connect(self.parent_window.capture_image)
 
         # Default states
         self.toggle_btn.setEnabled(False)
-        self.capture_btn.setEnabled(False)
+        self.capture_btn.setEnabled(False)  # Will be enabled when connected
         self.crop_btn.setEnabled(True)
 
-        # Add to layout
+        # Add to layout with proper spacing
         self.layout.addWidget(self.toggle_btn, 0, 0)
         self.layout.addWidget(self.reconnect_btn, 0, 1)
         self.layout.addWidget(self.capture_btn, 1, 0)
         self.layout.addWidget(self.crop_btn, 1, 1)
+        
+        # Set layout spacing
+        self.layout.setSpacing(WIDGET_SPACING)
+        self.layout.setContentsMargins(WIDGET_MARGIN, WIDGET_MARGIN, WIDGET_MARGIN, WIDGET_MARGIN)
 
-
+        # GroupBox styling
         self.setStyleSheet(f"""
             QGroupBox {{
                 background-color: {BOX_BACKGROUND};
-                border: {BORDER_WIDTH}px solid {BUTTON_COLOR};
+                border: {BORDER_WIDTH}px solid {BORDER_COLOR};
                 border-radius: {BORDER_RADIUS}px;
+                margin-top: 10px;
             }}
             QGroupBox::title {{
-                color: {TEXT_COLOR};
+                subcontrol-origin: margin;
+                left: 8px;
+                padding: 0 4px;
+                color: {BOX_TITLE_COLOR};
                 font-family: {FONT_FAMILY};
                 font-size: {FONT_SIZE_TITLE}pt;
-            }}
-            QLabel {{
-                color: {TEXT_COLOR};
-                font-family: {FONT_FAMILY};
-                font-size: {FONT_SIZE_NORMAL}pt;
             }}
         """)
 
     def apply_style(self, style: str):
+        """Apply external style while preserving button styles"""
+        # Store current button styles
+        button_styles = {}
+        for btn_name in ['toggle_btn', 'reconnect_btn', 'capture_btn', 'crop_btn']:
+            btn = getattr(self, btn_name)
+            button_styles[btn_name] = btn.styleSheet()
+        
+        # Apply the new style
         self.setStyleSheet(style)
-        # Do NOT set per-button style here!
-
-class MainWindow(QWidget):
-    def __init__(self, theme, parent=None):
-        super().__init__(parent)
-        self.theme = theme
-
-        # Layout
-        self.layout = QGridLayout()
-        self.setLayout(self.layout)
-
-        # Camera controls
-        self.camera_controls = CameraControlsWidget(self.theme)
-        self.layout.addWidget(self.camera_controls, 0, 0)
+        
+        # Restore button styles
+        for btn_name, btn_style in button_styles.items():
+            btn = getattr(self, btn_name)
+            btn.setStyleSheet(btn_style)

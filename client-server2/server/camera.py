@@ -104,6 +104,58 @@ class CameraStreamer:
                 print("[ERROR] Stream loop exception:", e)
                 time.sleep(1)
 
+    def capture_image(self, path=None):
+        """Capture a high-resolution still image"""
+        try:
+            if path is None:
+                timestamp = time.strftime("%Y%m%d_%H%M%S")
+                path = f"/home/pi/captures/image_{timestamp}.jpg"
+            
+            # Ensure capture directory exists
+            import os
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            
+            # If camera is not started, start it temporarily
+            temp_start = False
+            if not self.picam.started:
+                # Create still configuration for high quality capture
+                still_cfg = self.picam.create_still_configuration(
+                    main={"size": (4608, 2592)},  # Full resolution for Pi Camera V3
+                    controls={"FrameDurationLimits": (100000, 100000)}  # 10 FPS
+                )
+                self.picam.configure(still_cfg)
+                self.picam.start()
+                temp_start = True
+                time.sleep(2)  # Allow camera to adjust
+            
+            # Capture the frame
+            frame = self.picam.capture_array()
+            
+            # Save as high-quality JPEG
+            success = cv2.imwrite(path, frame, [
+                int(cv2.IMWRITE_JPEG_QUALITY), 95  # High quality
+            ])
+            
+            if success:
+                print(f"[INFO] High-res image saved: {path}")
+                file_size = os.path.getsize(path) / (1024 * 1024)  # MB
+                print(f"[INFO] File size: {file_size:.2f} MB")
+                
+                # If we started camera temporarily, restore streaming config
+                if temp_start and not self.streaming:
+                    self.picam.stop()
+                elif temp_start and self.streaming:
+                    # Reconfigure for streaming
+                    self.apply_config()
+                
+                return {"success": True, "path": path, "size_mb": round(file_size, 2)}
+            else:
+                return {"success": False, "error": "Failed to save image"}
+                
+        except Exception as e:
+            print(f"[ERROR] Image capture failed: {e}")
+            return {"success": False, "error": str(e)}
+
 streamer = CameraStreamer()
 
 

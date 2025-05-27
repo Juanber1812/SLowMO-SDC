@@ -12,7 +12,6 @@ from payload import detector4
 from widgets.camera_controls import CameraControlsWidget
 from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
-from widgets.detector_output import DetectorOutputWidget
 from widgets.detector_control import DetectorControlWidget
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
@@ -28,14 +27,6 @@ from theme import (
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.1.146:5000"
 
-RES_PRESETS = [
-    ("192x108", (192, 108)),
-    ("256x144", (256, 144)),
-    ("384x216", (384, 216)),
-    ("768x432", (768, 432)),
-    ("1024x576", (1024, 576)),
-    ("1536x864", (1536, 864)),
-]
 
 sio = socketio.Client()
 
@@ -257,8 +248,8 @@ class MainWindow(QWidget):
         controls_layout.setSpacing(8)
         controls_layout.setContentsMargins(10, 10, 10, 10)
 
-        # Stream Controls Buttons
-        self.camera_controls = CameraControlsWidget()
+        # Stream Controls Buttons - Pass self as parent_window
+        self.camera_controls = CameraControlsWidget(parent_window=self)
         self.camera_controls.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         self.camera_controls.layout.setSpacing(4)
         self.camera_controls.layout.setContentsMargins(0, 0, 0, 0)
@@ -577,7 +568,10 @@ class MainWindow(QWidget):
             self.detector_controls.detector_btn.setEnabled(True)
             # Enable crop button when connected
             self.camera_controls.crop_btn.setEnabled(True)
+            
+            # Only apply config AFTER connection is established
             self.apply_config()
+            
             def delayed_emits():
                 if not self.streaming:
                     sio.emit("stop_camera")
@@ -1014,6 +1008,28 @@ class MainWindow(QWidget):
         
         # Apply the configuration (this will trigger the 1-second pause)
         self.apply_config()
+
+    def capture_image(self):
+        """Request image capture from server"""
+        if not sio.connected:
+            print("[DEBUG] ⚠️ Cannot capture image - not connected to server")
+            return
+        
+        try:
+            sio.emit("capture_image", {})
+            print("[DEBUG] 📸 Image capture requested")
+        except Exception as e:
+            print(f"[ERROR] Failed to request image capture: {e}")
+
+    def show_capture_success(self, data):
+        """Show success notification for image capture"""
+        print(f"[UI] ✓ Image saved: {data['path']} ({data['size_mb']} MB)")
+        # You could add a status bar message or toast notification here
+
+    def show_capture_error(self, error):
+        """Show error notification for image capture"""
+        print(f"[UI] ❌ Capture failed: {error}")
+        # You could show an error dialog here
 
 
 def check_all_calibrations():

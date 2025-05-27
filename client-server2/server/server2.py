@@ -113,6 +113,35 @@ def handle_set_camera_idle():
         print(f"[ERROR] set_camera_idle: {e}")
 
 
+@socketio.on('capture_image')
+def handle_capture_image(data):
+    """Handle image capture request from client"""
+    try:
+        print("[INFO] Image capture requested from client")
+        
+        # Get custom path if provided in the request data
+        custom_path = data.get("path") if data else None
+        
+        # Use the existing camera streamer instance to capture image
+        result = camera.streamer.capture_image(custom_path)
+        
+        # Broadcast the result to all connected clients
+        emit("image_captured", result, broadcast=True)
+        
+        if result["success"]:
+            print(f"[INFO] ✓ Image captured successfully: {result['path']} ({result['size_mb']} MB)")
+        else:
+            print(f"[ERROR] ❌ Image capture failed: {result['error']}")
+            
+    except Exception as e:
+        print(f"[ERROR] capture_image handler: {e}")
+        # Send error response to client
+        emit("image_captured", {
+            "success": False, 
+            "error": f"Server error: {str(e)}"
+        }, broadcast=True)
+
+
 def set_camera_state(new_state):
     global camera_state
     camera_state = new_state
