@@ -109,7 +109,10 @@ class CameraStreamer:
         try:
             if path is None:
                 timestamp = time.strftime("%Y%m%d_%H%M%S")
-                path = f"/home/pi/captures/image_{timestamp}.jpg"
+                # Use the current user's home directory instead of /home/pi
+                import os
+                home_dir = os.path.expanduser("~")  # This will be /home/slowmo
+                path = os.path.join(home_dir, "captures", f"image_{timestamp}.jpg")
             
             # Ensure capture directory exists
             import os
