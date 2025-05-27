@@ -568,6 +568,8 @@ class MainWindow(QWidget):
             self.detector_controls.detector_btn.setEnabled(True)
             # Enable crop button when connected
             self.camera_controls.crop_btn.setEnabled(True)
+            # Enable capture button when connected
+            self.camera_controls.capture_btn.setEnabled(True)
             
             # Only apply config AFTER connection is established
             self.apply_config()
@@ -586,6 +588,8 @@ class MainWindow(QWidget):
             self.detector_controls.detector_btn.setEnabled(False)
             # Disable crop button when disconnected
             self.camera_controls.crop_btn.setEnabled(False)
+            # Disable capture button when disconnected
+            self.camera_controls.capture_btn.setEnabled(False)
 
         @sio.on("frame")
         def on_frame(data):
@@ -638,6 +642,50 @@ class MainWindow(QWidget):
                     
             except Exception as e:
                 print(f"[ERROR] Camera status update error: {e}")
+
+        @sio.on("image_captured")
+        def on_image_captured(data):
+            """Handle image capture response from server"""
+            try:
+                if data["success"]:
+                    print(f"[INFO] ✓ Image captured: {data['path']} ({data['size_mb']} MB)")
+                    
+                    # Automatically download the image to local machine
+                    self.download_captured_image(data['path'])
+                    self.show_capture_success(data)
+                else:
+                    print(f"[ERROR] ❌ Image capture failed: {data['error']}")
+                    self.show_capture_error(data['error'])
+            except Exception as e:
+                print(f"[ERROR] Failed to handle capture response: {e}")
+
+        @sio.on("image_download")
+        def on_image_download(data):
+            """Handle downloaded image from server"""
+            try:
+                if data["success"]:
+                    # Decode base64 image data
+                    import base64
+                    image_data = base64.b64decode(data["data"])
+                    
+                    # Save to local directory
+                    local_dir = os.path.join(os.path.dirname(__file__), "captured_images")
+                    os.makedirs(local_dir, exist_ok=True)
+                    local_path = os.path.join(local_dir, data["filename"])
+                    
+                    with open(local_path, 'wb') as f:
+                        f.write(image_data)
+                    
+                    print(f"[INFO] ✅ Image saved locally: {local_path} ({data['size']/1024:.1f} KB)")
+                    
+                    # Show success message to user
+                    self.show_local_save_success(local_path, data['size'])
+                    
+                else:
+                    print(f"[ERROR] ❌ Image download failed: {data['error']}")
+                    
+            except Exception as e:
+                print(f"[ERROR] Failed to save downloaded image: {e}")
 
     def toggle_stream(self):
         if not sio.connected:
@@ -1071,7 +1119,7 @@ if __name__ == "__main__":
     app.setApplicationVersion("3.0")
     
     window = MainWindow()
-    window.showFullScreen()
+    window.showMaximized()
     
     def connect_to_server():
         try:

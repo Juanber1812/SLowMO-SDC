@@ -117,6 +117,8 @@ class CameraStreamer:
             
             # If camera is not started, start it temporarily
             temp_start = False
+            was_streaming = self.streaming
+            
             if not self.picam.started:
                 # Create still configuration for high quality capture
                 still_cfg = self.picam.create_still_configuration(
@@ -127,6 +129,11 @@ class CameraStreamer:
                 self.picam.start()
                 temp_start = True
                 time.sleep(2)  # Allow camera to adjust
+            else:
+                # Camera is already running, temporarily stop streaming for capture
+                if self.streaming:
+                    self.streaming = False
+                    time.sleep(0.1)  # Brief pause
             
             # Capture the frame
             frame = self.picam.capture_array()
@@ -141,19 +148,29 @@ class CameraStreamer:
                 file_size = os.path.getsize(path) / (1024 * 1024)  # MB
                 print(f"[INFO] File size: {file_size:.2f} MB")
                 
-                # If we started camera temporarily, restore streaming config
-                if temp_start and not self.streaming:
+                # Restore previous state
+                if temp_start and not was_streaming:
                     self.picam.stop()
-                elif temp_start and self.streaming:
+                elif temp_start and was_streaming:
                     # Reconfigure for streaming
                     self.apply_config()
+                    self.streaming = True
+                elif not temp_start and was_streaming:
+                    # Resume streaming
+                    self.streaming = True
                 
                 return {"success": True, "path": path, "size_mb": round(file_size, 2)}
             else:
+                # Restore streaming state on failure
+                if was_streaming:
+                    self.streaming = True
                 return {"success": False, "error": "Failed to save image"}
                 
         except Exception as e:
             print(f"[ERROR] Image capture failed: {e}")
+            # Restore streaming state on exception
+            if 'was_streaming' in locals() and was_streaming:
+                self.streaming = True
             return {"success": False, "error": str(e)}
 
 streamer = CameraStreamer()

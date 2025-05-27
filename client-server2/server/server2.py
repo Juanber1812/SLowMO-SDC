@@ -142,6 +142,49 @@ def handle_capture_image(data):
         }, broadcast=True)
 
 
+@socketio.on('download_image')
+def handle_download_image(data):
+    """Send captured image to client for local storage"""
+    try:
+        import os
+        import base64
+        
+        server_path = data.get("server_path")
+        filename = data.get("filename")
+        
+        print(f"[INFO] Image download requested: {filename}")
+        
+        if os.path.exists(server_path):
+            # Read the image file
+            with open(server_path, 'rb') as f:
+                image_data = f.read()
+            
+            # Encode as base64 for transmission
+            encoded_image = base64.b64encode(image_data).decode('utf-8')
+            
+            # Send to client
+            emit("image_download", {
+                "success": True,
+                "filename": filename,
+                "data": encoded_image,
+                "size": len(image_data)
+            })
+            print(f"[INFO] 📤 Sent image to client: {filename} ({len(image_data)/1024:.1f} KB)")
+        else:
+            emit("image_download", {
+                "success": False,
+                "error": f"Image not found: {server_path}"
+            })
+            print(f"[ERROR] Image file not found: {server_path}")
+            
+    except Exception as e:
+        print(f"[ERROR] download_image handler: {e}")
+        emit("image_download", {
+            "success": False,
+            "error": str(e)
+        })
+
+
 def set_camera_state(new_state):
     global camera_state
     camera_state = new_state
