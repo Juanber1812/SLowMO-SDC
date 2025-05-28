@@ -21,6 +21,11 @@ GPIO.setup(Motor1A,GPIO.OUT)
 GPIO.setup(Motor1B,GPIO.OUT)
 GPIO.setup(Motor1E,GPIO.OUT)
 
+# Setting up rpm sensor
+GPIO.setmode(GPIO.BCM)  #Use Broadcom pin numbering
+GPIO.setup(17, GPIO.IN)  #Change for pin number used
+###set variable showing whether sensor is high or low###
+
 #Initialising I2C bus and multiplexer for light sensor
 i2c = busio.I2C(board.SCL, board.SDA)
 tca = adafruit_tca9548a.TCA9548A(i2c)
@@ -86,6 +91,7 @@ orientation = 0
 
 # Orientation tracking
 start_time = time.time()
+intial_time = None
 while True:
         elapsed = time.time() - start_time
         acc_x = read_raw_data(ACCEL_XOUT_H)
@@ -103,7 +109,22 @@ while True:
         velocity = Gz
         dt = 0.1
         orientation += velocity * dt
-  
+######## RPM sensing, needs editing ############
+	if GPIO.input(Motor1E) == GPIO.HIGH:
+	    if GPIO.input(17) == GPIO.HIGH: 
+            	if initial_time is None:  
+           		initial_time = time.time()
+        	else:
+                	current_time = time.time()
+                        period = current_time - last_time
+			rpm = fraction_rev*(60/period) #Must change for final fraction choice
+                        initial_time = current_time  
+                while GPIO.input(17) == GPIO.HIGH: 
+                	time.sleep(0.01)
+	    time.sleep(0.01)  
+	else:
+		rpm = 0
+
 # Creating environmental calibration mode function
 def environmental_calibration_mode():
     #Setting reference light readings
