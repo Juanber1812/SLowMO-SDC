@@ -147,59 +147,83 @@ def environmental_calibration_mode():
         orientation_offset = orientation
         if len(light_intensity_1) > 2 or len(light_intensity_2) > 2 or len(light_intensity_3) > 2:
                 if np.sign(light_intensity_1[-2]-light_intensity_1[-3]) == -np.sign(light_intensity_1[-1]-light_intensity_1[-2]):
-                    orientation -= orientation_offset
-                    orientation += velocity * dt
-                    desired_orientation = 0
-                    actual_orientation = orientation
-                    dt = 0.1
-                    while abs(actual_orientation - desired_orientation) > 0.1:  
-                        control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-                        GPIO.output(Motor1A,GPIO.HIGH)
-                        GPIO.output(Motor1B,GPIO.LOW)
-                        GPIO.output(Motor1E,GPIO.HIGH)
-                        actual_orientation = orientation
-                    else:
-                        GPIO.output(Motor1E,GPIO.LOW)
-                        GPIO.cleanup()
-                        orientation = 0
-                        orientation += velocity * dt
-                    break
-                elif np.sign(light_intensity_2[-2]-light_intensity_2[-3]) == -np.sign(light_intensity_2[-1]-light_intensity_2[-2]):
-                    orientation -= orientation_offset - 60
-                    orientation += velocity * dt
-                    desired_orientation = -60
-                    actual_orientation = orientation 
-                    dt = 0.1
-                    while abs(actual_orientation - desired_orientation) > 0.1:  
-                        control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-                        GPIO.output(Motor1A,GPIO.HIGH)
-                        GPIO.output(Motor1B,GPIO.LOW)
-                        GPIO.output(Motor1E,GPIO.HIGH)
-                        actual_orientation = orientation
-                    else:
-                        GPIO.output(Motor1E,GPIO.LOW)
-                        GPIO.cleanup()
-                        orientation = -60
-                        orientation += velocity * dt
-                    break
-                elif np.sign(light_intensity_3[-2]-light_intensity_3[-3]) == -np.sign(light_intensity_3[-1]-light_intensity_3[-2]):
-                    orientation -= orientation_offset + 60
-                    orientation += velocity * dt
-                    desired_orientation = 60
-                    actual_orientation = orientation 
-                    dt = 0.1
-                    while abs(actual_orientation - desired_orientation) > 0.1:  
-                        control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-                        GPIO.output(Motor1A,GPIO.HIGH)
-                        GPIO.output(Motor1B,GPIO.LOW)
-                        GPIO.output(Motor1E,GPIO.HIGH)
-                        actual_orientation = orientation
-                    else:
-                        GPIO.output(Motor1E,GPIO.LOW)
-                        GPIO.cleanup()
-                        orientation = 60
-                        orientation += velocity * dt
-                    break
+                	orientation -= orientation_offset
+                	orientation += velocity * dt
+                	desired_orientation = 0
+                	actual_orientation = orientation
+                	dt = 0.1
+			while abs(actual_orientation - desired_orientation) > 0.1:
+		    		control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+				# Mapping PD output to motor speed (ensure values are within valid range)
+		    		motor_speed = max(min(abs(control_signal), 100), 0)  # Limiting speed to 100
+				#Adjust motor direction based on control signal sign
+				if control_signal > 0:
+		        		GPIO.output(Motor1A, GPIO.HIGH)
+		        		GPIO.output(Motor1B, GPIO.LOW)
+		    		else:
+		        		GPIO.output(Motor1A, GPIO.LOW)
+		        		GPIO.output(Motor1B, GPIO.HIGH)
+		    		# Apply motor speed using PWM (assuming Motor1E controls speed)
+		    		pwm_motor.ChangeDutyCycle(motor_speed)
+		    		actual_orientation = orientation  # Update actual orientation in real-time
+		        else:
+		        	GPIO.output(Motor1E,GPIO.LOW)
+		                GPIO.cleanup()
+		                orientation = 0
+		                orientation += velocity * dt
+		        break
+        	elif np.sign(light_intensity_2[-2]-light_intensity_2[-3]) == -np.sign(light_intensity_2[-1]-light_intensity_2[-2]):
+                	orientation -= orientation_offset - 60
+                	orientation += velocity * dt
+                	desired_orientation = -60
+                	actual_orientation = orientation
+                	dt = 0.1
+			while abs(actual_orientation - desired_orientation) > 0.1:
+	    			control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+				# Mapping PD output to motor speed (ensure values are within valid range)
+	    			motor_speed = max(min(abs(control_signal), 100), 0)  # Limiting speed to 100
+				#Adjust motor direction based on control signal sign
+				if control_signal > 0:
+	        			GPIO.output(Motor1A, GPIO.HIGH)
+	        			GPIO.output(Motor1B, GPIO.LOW)
+	    			else:
+	        			GPIO.output(Motor1A, GPIO.LOW)
+	        			GPIO.output(Motor1B, GPIO.HIGH)
+	    				# Apply motor speed using PWM (assuming Motor1E controls speed)
+	    				pwm_motor.ChangeDutyCycle(motor_speed)
+	    				actual_orientation = orientation  # Update actual orientation in real-time
+	        	else:
+	        		GPIO.output(Motor1E,GPIO.LOW)
+	                	GPIO.cleanup()
+	                	orientation = -60
+	                	orientation += velocity * dt
+	        	break
+		elif np.sign(light_intensity_3[-2]-light_intensity_3[-3]) == -np.sign(light_intensity_3[-1]-light_intensity_3[-2]):
+                	orientation -= orientation_offset - 60
+                	orientation += velocity * dt
+                	desired_orientation = -60
+                	actual_orientation = orientation
+                	dt = 0.1
+			while abs(actual_orientation - desired_orientation) > 0.1:
+	    			control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+				# Mapping PD output to motor speed (ensure values are within valid range)
+	    			motor_speed = max(min(abs(control_signal), 100), 0)  # Limiting speed to 100
+				#Adjust motor direction based on control signal sign
+				if control_signal > 0:
+	        			GPIO.output(Motor1A, GPIO.HIGH)
+	        			GPIO.output(Motor1B, GPIO.LOW)
+	    			else:
+	        			GPIO.output(Motor1A, GPIO.LOW)
+	        			GPIO.output(Motor1B, GPIO.HIGH)
+	    				# Apply motor speed using PWM (assuming Motor1E controls speed)
+	    				pwm_motor.ChangeDutyCycle(motor_speed)
+	    				actual_orientation = orientation  # Update actual orientation in real-time
+	        	else:
+	        		GPIO.output(Motor1E,GPIO.LOW)
+	                	GPIO.cleanup()
+	                	orientation = -60
+	                	orientation += velocity * dt
+	        	break
         time.sleep(0.1)
 
 # Creating manual orientation mode function
