@@ -1,12 +1,15 @@
 from PyQt6.QtWidgets import (
     QWidget, QGroupBox, QVBoxLayout, QPushButton, QHBoxLayout, QComboBox
 )
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from payload.distance import RelativeDistancePlotter
 from payload.relative_angle import RelativeAnglePlotter
 from payload.spin import AngularPositionPlotter
 import time
 import threading
+import pandas as pd  # Add pandas import
+import os
+from datetime import datetime
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
     TEXT_COLOR, TEXT_SECONDARY, BOX_TITLE_COLOR, LABEL_COLOR,
@@ -42,6 +45,9 @@ def sci_fi_button_style(color):
     """
 
 class GraphSection(QGroupBox):
+    # new signal: emits the full path to the CSV just saved
+    recording_saved = pyqtSignal(str)
+
     def __init__(self, record_btn: QPushButton, duration_dropdown: QComboBox, parent=None):
         super().__init__("Graph Display", parent)
         self.setObjectName("GraphSection")
@@ -56,6 +62,12 @@ class GraphSection(QGroupBox):
 
         self.graph_modes = ["Relative Distance", "Relative Angle", "Angular Position"]
         self.select_buttons = {}
+
+        # Recording state tracking
+        self.is_recording = False
+        self.recorded_data = []
+        self.current_graph_mode = None  # Track which graph is currently active
+        self.recording_start_time = None
 
         # Make graph mode buttons smaller and centered
         for mode in self.graph_modes:
@@ -92,11 +104,17 @@ class GraphSection(QGroupBox):
         self.exit_graph_btn = None
         self.shared_start_time = None
 
+        # Connect the record button to toggle recording
+        self.record_btn.clicked.connect(self.toggle_recording)
+
     def apply_sci_fi_button_style(self, button: QPushButton, color=BOX_BACKGROUND):
         button.setStyleSheet(sci_fi_button_style(color))
 
     def load_graph(self, mode):
         self.graph_display_placeholder.setParent(None)
+        
+        # Set the current graph mode
+        self.current_graph_mode = mode
 
         if mode == "Relative Distance":
             self.graph_widget = RelativeDistancePlotter()
@@ -145,7 +163,10 @@ class GraphSection(QGroupBox):
         }}
         """
 
-        self.record_btn.setFixedHeight(int(BUTTON_HEIGHT ))
+        # Reset record button text when loading new graph
+        self.record_btn.setText("Record")
+        self.is_recording = False
+        self.record_btn.setFixedHeight(int(BUTTON_HEIGHT))
         self.record_btn.setStyleSheet(button_style)
         btn_layout.addWidget(self.record_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
@@ -153,7 +174,7 @@ class GraphSection(QGroupBox):
         btn_layout.addWidget(self.duration_dropdown, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.exit_graph_btn = QPushButton("← Back")
-        self.exit_graph_btn.setFixedHeight(int(BUTTON_HEIGHT ))
+        self.exit_graph_btn.setFixedHeight(int(BUTTON_HEIGHT))
         self.exit_graph_btn.setStyleSheet(button_style)
         self.exit_graph_btn.clicked.connect(self.exit_graph)
         btn_layout.addWidget(self.exit_graph_btn, alignment=Qt.AlignmentFlag.AlignLeft)
@@ -166,7 +187,131 @@ class GraphSection(QGroupBox):
         # Add the combined layout to the main graph display layout
         self.graph_display_layout.addLayout(graph_and_btns_layout)
 
+    def toggle_recording(self):
+        """Toggle recording state and update button text"""
+        if not self.current_graph_mode:
+            print("[WARNING] No graph mode selected for recording")
+            return
+
+        self.is_recording = not self.is_recording
+
+        if self.is_recording:
+            # Start recording
+            self.record_btn.setText("⏹ Stop")
+            self.record_btn.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {BOX_BACKGROUND};
+                    color: {ERROR_COLOR};
+                    border: {BORDER_WIDTH}px solid {ERROR_COLOR};
+                    border-radius: {BORDER_RADIUS}px;
+                    padding: 6px 12px;
+                    font-family: {FONT_FAMILY};
+                    font-size: {FONT_SIZE_NORMAL}pt;
+                }}
+                QPushButton:hover {{
+                    background-color: {ERROR_COLOR};
+                    color: white;
+                }}
+            """)
+            self.recorded_data = []  # Reset the log
+            self.recording_start_time = time.time()
+            print(f"[INFO] 🔴 Started recording: {self.current_graph_mode}")
+            
+            # Start the recording timer if graph widget exists
+            if self.graph_widget and hasattr(self.graph_widget, 'start_recording'):
+                self.graph_widget.start_recording()
+        else:
+            # Stop recording
+            self.record_btn.setText("Record")
+            self.record_btn.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {BOX_BACKGROUND};
+                    color: {BUTTON_TEXT};
+                    border: {BORDER_WIDTH}px solid {BUTTON_COLOR};
+                    border-radius: {BORDER_RADIUS}px;
+                    padding: 6px 12px;
+                    font-family: {FONT_FAMILY};
+                    font-size: {FONT_SIZE_NORMAL}pt;
+                }}
+                QPushButton:hover {{
+                    background-color: {BUTTON_HOVER};
+                    color: black;
+                }}
+            """)
+            print(f"[INFO] ⏹ Recording stopped: {self.current_graph_mode}")
+            
+            # Stop the recording timer if graph widget exists
+            if self.graph_widget and hasattr(self.graph_widget, 'stop_recording'):
+                self.graph_widget.stop_recording()
+            
+            # Save the recorded data
+            self.save_recording_to_csv()
+
+    def add_data_point(self, timestamp, value, **kwargs):
+        """Add a data point to the recording if recording is active"""
+        if self.is_recording:
+            data_point = {
+                'timestamp': timestamp,
+                'value': value,
+                'mode': self.current_graph_mode,
+                **kwargs  # Additional data like x, y coordinates, etc.
+            }
+            self.recorded_data.append(data_point)
+
+    def save_recording_to_csv(self):
+        """Save out recorded_data → CSV and then emit signal."""
+        if not getattr(self, "recorded_data", None):
+            return
+
+        import os, time, csv
+        rec_dir = os.path.normpath(
+            os.path.join(os.path.dirname(__file__), "..", "recordings")
+        )
+        os.makedirs(rec_dir, exist_ok=True)
+
+        MODE_CODES = {
+            "Relative Distance":  "distance_01",
+            "Relative Angle":     "angle_02",
+            "Angular Position":   "angular_position_03",
+        }
+        code = MODE_CODES.get(
+            self.current_graph_mode,
+            self.current_graph_mode.lower().replace(" ", "_")
+        )
+        timestr = time.strftime("%Y-%m-%d_%H-%M", time.localtime())
+        fname = f"{code}_{timestr}.csv"
+        fullpath = os.path.join(rec_dir, fname)
+
+        with open(fullpath, "w", newline="") as csvf:
+            writer = csv.writer(csvf)
+            writer.writerow(["timestamp", "value"])
+            for entry in self.recorded_data:
+                # handle dict entries
+                if isinstance(entry, dict):
+                    ts = entry.get("timestamp")
+                    val = entry.get("value")
+                # or sequence entries
+                elif isinstance(entry, (list, tuple)) and len(entry) >= 2:
+                    ts, val = entry[:2]
+                else:
+                    continue
+
+                try:
+                    writer.writerow([float(ts), float(val)])
+                except Exception:
+                    continue
+
+        print(f"[INFO] ✅ Recording saved to {fullpath}")
+        self.recording_saved.emit(fullpath)
+
     def exit_graph(self):
+        # Stop recording if active
+        if self.is_recording:
+            self.toggle_recording()  # This will save any recorded data
+        
+        # Reset state
+        self.current_graph_mode = None
+        
         if self.graph_widget:
             self.graph_widget.setParent(None)
             self.graph_widget = None
@@ -177,45 +322,3 @@ class GraphSection(QGroupBox):
         self.graph_display_layout.addWidget(self.graph_display_placeholder)
 
 
-class GraphWidget:
-    def __init__(self):
-        # ... existing init code ...
-        self.calibration_pause_active = False
-        self.calibration_pause_timer = None
-        self.pause_start_time = None
-        
-    def pause_for_calibration_change(self):
-        """Pause graph updates for 1 second during calibration changes."""
-        self.calibration_pause_active = True
-        self.pause_start_time = time.time()
-        
-        print("[DEBUG] 📊 Graph updates paused for calibration stabilization...")
-        
-        # Set timer to resume after 1 second
-        if hasattr(self, 'parent') and hasattr(self.parent(), 'startTimer'):
-            if self.calibration_pause_timer:
-                self.parent().killTimer(self.calibration_pause_timer)
-            
-            # Use QTimer for better control
-            self.calibration_resume_timer = QTimer()
-            self.calibration_resume_timer.setSingleShot(True)
-            self.calibration_resume_timer.timeout.connect(self.resume_after_calibration)
-            self.calibration_resume_timer.start(1000)  # 1 second pause
-        else:
-            # Fallback method
-            threading.Timer(1.0, self.resume_after_calibration).start()
-    
-    def resume_after_calibration(self):
-        """Resume graph updates after calibration stabilization."""
-        self.calibration_pause_active = False
-        self.pause_start_time = None
-        print("[DEBUG] 📊 Graph updates resumed after calibration stabilization")
-    
-    def update(self, rvec, tvec, timestamp):
-        """Update graphs with new pose data."""
-        # Skip updates during calibration pause
-        if self.calibration_pause_active:
-            return
-        
-        # ... existing update code ...
-        # Your existing graph update logic here

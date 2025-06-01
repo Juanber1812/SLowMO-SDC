@@ -46,6 +46,13 @@ class RelativeDistancePlotter(QFrame):
         self.tick_color = self.line_color
         self.grid_color = self.line_color
 
+        # === Current distance value ===
+        self.current_distance = 0.0
+        
+        # === Recording attributes ===
+        self.is_recording = False
+        self.recorded_data = []
+
         self.setMinimumSize(384, 216)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -85,16 +92,32 @@ class RelativeDistancePlotter(QFrame):
         layout.addWidget(self.canvas)
         self.setLayout(layout)
 
-        self.redraw()  # <-- Add this line at the end of __init__
+        # ── start patch ──
+        # throttle redraws
+        self._last_redraw = time.time()
+        self._redraw_interval = 0.01  # seconds between full redraws
+        # ensure initial draw
+        self.redraw()
+        # ── end patch ──
 
     def update(self, rvec, tvec, timestamp=None):
         if timestamp is None:
             timestamp = time.time()
         elapsed = timestamp - self.start_time
         distance = np.linalg.norm(tvec)
+
+        # Store and record every point
+        self.current_distance = distance
         self.time_data.append(elapsed)
         self.data.append(distance)
-        self.redraw()
+
+        # ── start patch ──
+        # only redraw at most once every _redraw_interval seconds
+        now = time.time()
+        if now - self._last_redraw >= self._redraw_interval:
+            self.redraw()
+            self._last_redraw = now
+        # ── end patch ──
 
     def redraw(self):
         self.ax.clear()
@@ -132,5 +155,19 @@ class RelativeDistancePlotter(QFrame):
             self.ax.set_xlim(xmin, xmax)
         else:
             self.ax.set_xlim(0, self.x_axis_window)
+
+        # Add current distance display in top right corner
+        self.ax.text(0.98, 0.95, f'{self.current_distance:.4f} m', 
+                    transform=self.ax.transAxes,
+                    fontsize=AXIS_LABEL_SIZE,
+                    fontweight='bold',
+                    fontfamily='Segoe UI',
+                    color=self.line_color,
+                    bbox=dict(boxstyle='round,pad=0.3', 
+                             facecolor=self.bg_color, 
+                             edgecolor=self.line_color, 
+                             alpha=0.8),
+                    horizontalalignment='right',
+                    verticalalignment='top')
 
         self.canvas.draw()

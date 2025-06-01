@@ -42,6 +42,7 @@ class RelativeAnglePlotter(QWidget):
         self.data = deque(maxlen=100)
         self.time_data = deque(maxlen=100)
         self.start_time = time.time()
+        self.current_ang = 0.0  # Initialize current angle  
 
         self.figure = Figure(facecolor=self.bg_color)
         self.canvas = FigureCanvas(self.figure)
@@ -60,6 +61,8 @@ class RelativeAnglePlotter(QWidget):
             bottom=self.subplot_bottom
         )
 
+         
+        
         self.ax.set_xlabel("Time (s)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
         self.ax.set_ylabel("Angle (deg)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
 
@@ -76,32 +79,67 @@ class RelativeAnglePlotter(QWidget):
         elapsed = timestamp - self.start_time
         angle_rad = np.arctan2(tvec[0], tvec[2])
         angle_deg = np.degrees(angle_rad)
+        
+        # Convert to float to avoid numpy array formatting issues
+        self.current_ang = float(angle_deg)  # Add float() here
+        
         self.time_data.append(elapsed)
         self.data.append(angle_deg)
         self.redraw()
 
     def redraw(self):
-        self.ax.clear()
-        self.ax.set_facecolor(self.bg_color)
-        self.ax.tick_params(colors=self.tick_color, labelsize=self.axis_number_size, width=0.5)
-        self.ax.xaxis.label.set_color(self.tick_color)
-        self.ax.yaxis.label.set_color(self.tick_color)
-        self.ax.title.set_color(self.tick_color)
-        self.ax.grid(True, color=self.grid_color, linestyle='--', linewidth=0.5, alpha=0.2)
-        self.figure.subplots_adjust(
-            left=self.subplot_left,
-            right=self.subplot_right,
-            top=self.subplot_top,
-            bottom=self.subplot_bottom
-        )
-        self.ax.set_xlabel("Time (s)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
-        self.ax.set_ylabel("Angle (deg)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
-        self.ax.plot(self.time_data, self.data, color=self.line_color, linewidth=2)
-        self.ax.set_ylim(self.y_axis_min, self.y_axis_max)
-        if self.time_data:
-            xmax = max(self.time_data[-1], self.x_axis_window)
-            xmin = xmax - self.x_axis_window
-            self.ax.set_xlim(xmin, xmax)
-        else:
-            self.ax.set_xlim(0, self.x_axis_window)
-        self.canvas.draw()
+        try:
+            self.ax.clear()
+            self.ax.set_facecolor(self.bg_color)
+            self.ax.tick_params(colors=self.tick_color, labelsize=self.axis_number_size, width=0.5)
+            self.ax.xaxis.label.set_color(self.tick_color)
+            self.ax.yaxis.label.set_color(self.tick_color)
+            self.ax.title.set_color(self.tick_color)
+            self.ax.grid(True, color=self.grid_color, linestyle='--', linewidth=0.5, alpha=0.2)
+            
+            self.figure.subplots_adjust(
+                left=self.subplot_left,
+                right=self.subplot_right,
+                top=self.subplot_top,
+                bottom=self.subplot_bottom
+            )
+            
+            self.ax.set_xlabel("Time (s)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
+            self.ax.set_ylabel("Angle (deg)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
+            
+            # Only plot if we have data
+            if self.time_data and self.data:
+                self.ax.plot(self.time_data, self.data, color=self.line_color, linewidth=2)
+            
+            self.ax.set_ylim(self.y_axis_min, self.y_axis_max)
+            
+            if self.time_data:
+                xmax = max(self.time_data[-1], self.x_axis_window)
+                xmin = xmax - self.x_axis_window
+                self.ax.set_xlim(xmin, xmax)
+            else:
+                self.ax.set_xlim(0, self.x_axis_window)
+
+            # Add current angle display - with safety check
+            try:
+                self.ax.text(0.98, 0.95, f'{float(self.current_ang):.3f}°', 
+                            transform=self.ax.transAxes,
+                            fontsize=self.axis_label_size,
+                            fontweight='bold',
+                            fontfamily='Segoe UI',
+                            color=self.line_color,
+                            bbox=dict(boxstyle='round,pad=0.3', 
+                                     facecolor=self.bg_color, 
+                                     edgecolor=self.line_color, 
+                                     alpha=0.8),
+                            horizontalalignment='right',
+                            verticalalignment='top')
+            except Exception as text_error:
+                print(f"[RelativeAngle] Text error: {text_error}")
+            
+            self.canvas.draw()
+            
+        except Exception as e:
+            print(f"[RelativeAngle] Redraw error: {e}")
+            import traceback
+            traceback.print_exc()

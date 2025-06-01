@@ -1,18 +1,35 @@
+##############################################################################
+#                              SLowMO CLIENT                                #
+#                         Satellite Control Interface                       #
+##############################################################################
+
 import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os
+import pandas as pd
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
-    QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea
+    QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea,
+    QTabWidget, QFileDialog, QDoubleSpinBox, QTextEdit
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage, QFont, QPainter, QPen
+
+##############################################################################
+#                                IMPORTS                                     #
+##############################################################################
+
+# Payload and detection modules
 from payload.distance import RelativeDistancePlotter
 from payload.relative_angle import RelativeAnglePlotter
 from payload.spin import AngularPositionPlotter
 from payload import detector4
+
+# UI Components
 from widgets.camera_controls import CameraControlsWidget
 from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
 from widgets.detector_control import DetectorControlWidget
+
+# Theme and styling
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
     TEXT_COLOR, TEXT_SECONDARY, BOX_TITLE_COLOR, LABEL_COLOR, 
@@ -24,9 +41,16 @@ from theme import (
     BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE, BUTTON_HEIGHT
 )
 
+##############################################################################
+#                            CONFIGURATION                                  #
+##############################################################################
+
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
 SERVER_URL = "http://192.168.1.146:5000"
 
+##############################################################################
+#                        SOCKETIO AND BRIDGE SETUP                         #
+##############################################################################
 
 sio = socketio.Client()
 
@@ -36,10 +60,18 @@ class Bridge(QObject):
 
 bridge = Bridge()
 
+##############################################################################
+#                            MAIN WINDOW CLASS                              #
+##############################################################################
+
 class MainWindow(QWidget):
     speedtest_result = pyqtSignal(float, float)  # upload_mbps, max_frame_size_kb
 
-    # --- Sleek Dark Sci-Fi Theme ---
+    #=========================================================================
+    #                         THEME CONFIGURATION                            
+    #=========================================================================
+    
+    # Color scheme
     COLOR_BG = BACKGROUND
     COLOR_BOX_BG = BOX_BACKGROUND
     COLOR_BOX_BG_RIGHT = SECOND_COLUMN
@@ -64,14 +96,13 @@ class MainWindow(QWidget):
     COLOR_BOX_RADIUS_RIGHT = BORDER_RADIUS
     COLOR_BOX_TITLE_RIGHT = BOX_TITLE_COLOR
     
-    # --- Border Style Variables ---
+    # Border configuration
     BOX_BORDER_THICKNESS = BORDER_WIDTH
     BOX_BORDER_STYLE = "solid"
     BOX_BORDER_RADIUS = BORDER_RADIUS
-
     FONT_FAMILY = FONT_FAMILY
 
-    # --- Button Style ---
+    # Style definitions
     BUTTON_STYLE = f"""
     QPushButton {{
         background-color: {BOX_BACKGROUND};
@@ -93,7 +124,6 @@ class MainWindow(QWidget):
     }}
     """
 
-    # --- Label Style ---
     LABEL_STYLE = f"""
     QLabel {{
         color: {TEXT_COLOR};
@@ -102,33 +132,36 @@ class MainWindow(QWidget):
     }}
     """
 
-    # --- GroupBox Header Style ---
     GROUPBOX_STYLE = f"""
     QGroupBox {{
         border: 2px solid {BORDER_COLOR};
         border-radius: 4px;
         background-color: {BOX_BACKGROUND};
-        margin-top: 10px;
+        margin-top: 6px;
         color: {BOX_TITLE_COLOR};
     }}
     QGroupBox::title {{
         subcontrol-origin: margin;
-        left: 8px;
-        padding: 0 4px;
+        left: 6px;
+        padding: 0 2px;
         font-size: {FONT_SIZE_TITLE}pt;
         font-family: {FONT_FAMILY};
         color: {BOX_TITLE_COLOR};
     }}
     """
 
-    # --- Stream Content Size Constants ---
+    # Display constants
     STREAM_WIDTH = 384
     STREAM_HEIGHT = 216
-    MARGIN = 20
+    MARGIN = 10
+
+    #=========================================================================
+    #                           INITIALIZATION                               
+    #=========================================================================
 
     def __init__(self):
         super().__init__()
-        # Set global background and font for the sci-fi theme
+        # Set global styling
         self.setStyleSheet(f"""
             QWidget {{
                 background-color: {BACKGROUND};
@@ -137,42 +170,66 @@ class MainWindow(QWidget):
                 font-size: {FONT_SIZE_NORMAL}pt;
             }}
         """)
+        
+        # Window configuration
         self.setWindowTitle("SLowMO Client")
+        
+        # Initialize state variables
         self.streaming = False
         self.detector_active = False
+        self.crop_active = False
         self.frame_queue = queue.Queue()
         self.last_frame = None
-
         self.shared_start_time = None
-
-        # Initialize crop_active state
-        self.crop_active = False
-
-        # Initialize calibration change tracking
         self.calibration_change_time = None
 
-        self.setup_ui()
-        self.setup_socket_events()
-
-        bridge.frame_received.connect(self.update_image)
-        bridge.analysed_frame.connect(self.update_analysed_image)
-
+        # Performance tracking
         self.last_frame_time = time.time()
         self.frame_counter = 0
         self.current_fps = 0
         self.current_frame_size = 0
-        self.fps_timer = self.startTimer(1000)
 
+
+        # display‐FPS counters
+        self.display_frame_counter = 0
+        self.current_display_fps   = 0
+        # ── end patch ──
+
+        # ── start patch ──
+        # throttle graph redraws to 10 Hz
+        self._last_graph_draw = 0.0
+        self._graph_update_interval = 0.
+        # ── end patch ──
+
+        # Setup UI and connections
+        self.setup_ui()
+        self.setup_socket_events()
+        self.setup_signals()
+        self.setup_timers()
+
+        # Graph window reference
+        self.graph_window = None
+
+    def setup_signals(self):
+        """Connect internal signals"""
+        bridge.frame_received.connect(self.update_image)
+        bridge.analysed_frame.connect(self.update_analysed_image)
+        self.speedtest_result.connect(self.update_speed_labels)
+
+    def setup_timers(self):
+        """Initialize performance timers"""
+        self.fps_timer = self.startTimer(1000)
+        
         self.speed_timer = QTimer()
         self.speed_timer.timeout.connect(self.measure_speed)
         self.speed_timer.start(10000)
 
-        self.graph_window = None
+    #=========================================================================
+    #                          UI SETUP METHODS                             
+    #=========================================================================
 
-        self.speedtest_result.connect(self.update_speed_labels)
-
-    # --- Improved groupbox styling for left/right columns ---
     def apply_groupbox_style(self, groupbox, border_color, bg_color=None, title_color=None):
+        """Apply consistent styling to group boxes"""
         border = f"{self.BOX_BORDER_THICKNESS}px {self.BOX_BORDER_STYLE}"
         radius_value = self.COLOR_BOX_RADIUS_RIGHT if border_color == self.COLOR_BOX_BORDER_RIGHT else self.BOX_BORDER_RADIUS
         radius = f"{radius_value}px"
@@ -184,14 +241,14 @@ class MainWindow(QWidget):
                 border: {border} {border_color};
                 border-radius: {radius};
                 background-color: {bg};
-                margin-top: 14px;
+                margin-top: 12px;
             }}
             QGroupBox::title {{
                 subcontrol-origin: margin;
                 subcontrol-position: top left;
-                left: 10px;
+                left: 6px;
                 top: 0px;
-                padding: 0 8px;
+                padding: 0 4px;
                 font-size: {FONT_SIZE_TITLE}pt;
                 font-family: {self.FONT_FAMILY};
                 color: {title};
@@ -200,36 +257,94 @@ class MainWindow(QWidget):
         """)
 
     def style_button(self, btn):
-        btn.setFixedHeight(BUTTON_HEIGHT)
+        """Apply standard button styling"""
+        btn.setFixedHeight(24)
 
     def setup_ui(self):
+        """Initialize the main user interface"""
         main_layout = QHBoxLayout(self)
-        main_layout.setSpacing(14)
-        main_layout.setContentsMargins(14, 14, 14, 14)
+        main_layout.setSpacing(2)
+        main_layout.setContentsMargins(2, 2, 2, 2)
 
-        # --- LEFT COLUMN: 3 stacked rows, each a QHBoxLayout ---
+        # Create main tab widget
+        self.tab_widget = QTabWidget()
+        self.tab_widget.setStyleSheet(f"""
+            QTabWidget::pane {{
+                border: 1px solid {BORDER_COLOR};
+                background-color: {BACKGROUND};
+            }}
+            QTabBar::tab {{
+                background-color: {BOX_BACKGROUND};
+                color: {TEXT_COLOR};
+                border: 1px solid {BORDER_COLOR};
+                padding: 8px 16px;
+                margin-right: 2px;
+                font-family: {FONT_FAMILY};
+                font-size: {FONT_SIZE_NORMAL}pt;
+            }}
+            QTabBar::tab:selected {{
+                background-color: {BUTTON_COLOR};
+                color: black;
+            }}
+            QTabBar::tab:hover {{
+                background-color: {BUTTON_HOVER};
+                color: black;
+            }}
+        """)
+
+        # Setup tabs
+        self.main_tab = QWidget()
+        self.setup_main_tab()
+        self.tab_widget.addTab(self.main_tab, "Mission Control")
+
+        self.analysis_tab = QWidget()
+        self.setup_analysis_tab()
+        self.tab_widget.addTab(self.analysis_tab, "Data Analysis")
+
+        main_layout.addWidget(self.tab_widget)
+
+    def setup_main_tab(self):
+        """Setup the main mission control interface"""
+        tab_layout = QHBoxLayout(self.main_tab)
+        tab_layout.setSpacing(2)
+        tab_layout.setContentsMargins(2, 2, 2, 2)
+
+        # Left column with control panels
         left_col = QVBoxLayout()
-        left_col.setSpacing(10)
-        left_col.setContentsMargins(10, 10, 10, 10)
+        left_col.setSpacing(2)
+        left_col.setContentsMargins(2, 2, 2, 2)
         left_col.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-        # --- Row 1: Unified Video + Controls ---
+        # Setup control rows
+        self.setup_video_controls_row(left_col)
+        self.setup_graph_display_row(left_col)
+        self.setup_subsystem_controls_row(left_col)
+
+        # Right column with system information
+        scroll_area = self.setup_system_info_panel()
+
+        # Add to main layout
+        tab_layout.addLayout(left_col, stretch=6)
+        tab_layout.addWidget(scroll_area, stretch=0)
+        tab_layout.setAlignment(scroll_area, Qt.AlignmentFlag.AlignRight)
+
+    def setup_video_controls_row(self, parent_layout):
+        """Setup video stream and camera controls"""
         row1 = QHBoxLayout()
-        row1.setSpacing(10)
-        row1.setContentsMargins(10, 10, 10, 10)
+        row1.setSpacing(2)
+        row1.setContentsMargins(2, 2, 2, 2)
         row1.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-        # --- Unified Video Stream in Row 1 ---
+        # Video stream display
         video_group = QGroupBox("Video Stream")
         video_layout = QHBoxLayout()
-        video_layout.setSpacing(8)
-        video_layout.setContentsMargins(5, 5, 5, 5)
+        video_layout.setSpacing(4)
+        video_layout.setContentsMargins(3, 3, 3, 3)
 
         aspect_w, aspect_h = 16, 9
         video_width = 640
         video_height = int(video_width * aspect_h / aspect_w)
 
-        # Unified Video Label
         self.video_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
         self.video_label.setFixedSize(video_width, video_height)
         self.video_label.setStyleSheet(f"""
@@ -239,266 +354,115 @@ class MainWindow(QWidget):
         video_layout.addWidget(self.video_label)
 
         video_group.setLayout(video_layout)
-        video_group.setFixedSize(video_width + 40, video_height + 40)
+        video_group.setFixedSize(video_width + 20, video_height + 20)
         self.apply_groupbox_style(video_group, self.COLOR_BOX_BORDER_LIVE)
 
-        # --- Controls: Use the camera controls widget directly (includes detector button) ---
+        # Camera controls
         self.camera_controls = CameraControlsWidget(parent_window=self)
-        self.camera_controls.setFixedHeight(video_height + 40)
+        self.camera_controls.setFixedHeight(video_height + 20)
         self.apply_groupbox_style(self.camera_controls, self.COLOR_BOX_BORDER_CAMERA_CONTROLS)
         
-        # For backward compatibility, create reference to detector button
+        # Backward compatibility
         self.detector_controls = type('obj', (object,), {'detector_btn': self.camera_controls.detector_btn})()
 
-        # --- Camera Settings ---
+        # Camera settings
         self.camera_settings = CameraSettingsWidget()
-        self.camera_settings.setMaximumWidth(300)
-        self.camera_settings.layout.setSpacing(6)
-        self.camera_settings.layout.setContentsMargins(5, 5, 5, 5)
+        self.camera_settings.setMaximumWidth(280)
+        self.camera_settings.layout.setSpacing(2)
+        self.camera_settings.layout.setContentsMargins(2, 2, 2, 2)
         self.style_button(self.camera_settings.apply_btn)
-        self.camera_settings.apply_btn.setFixedHeight(32)
-        self.camera_settings.apply_btn.setStyleSheet(self.BUTTON_STYLE + "padding: 4px 8px; font-size: 9pt;")
+        self.camera_settings.apply_btn.setFixedHeight(24)
+        self.camera_settings.apply_btn.setStyleSheet(self.BUTTON_STYLE + "padding: 2px 4px; font-size: 9pt;")
         self.camera_settings.apply_btn.clicked.connect(self.apply_config)
         self.apply_groupbox_style(self.camera_settings, self.COLOR_BOX_BORDER_CONFIG)
-        self.camera_settings.setFixedHeight(video_height + 40)
+        self.camera_settings.setFixedHeight(video_height + 20)
 
-        # Add widgets to row1
+        # Add to row
         row1.addWidget(video_group)
         row1.addWidget(self.camera_controls)
         row1.addWidget(self.camera_settings)
+        
+        parent_layout.addLayout(row1)
 
-        # --- Row 2: Graph Display ---
+    def setup_graph_display_row(self, parent_layout):
+        """Setup graph display section"""
         row2 = QHBoxLayout()
-        row2.setSpacing(10)
-        row2.setContentsMargins(10, 10, 10, 10)
+        row2.setSpacing(2)
+        row2.setContentsMargins(2, 2, 2, 2)
         row2.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-        # Graph Section
+        # Graph section with recording capabilities
         self.record_btn = QPushButton("Record")
         self.duration_dropdown = QComboBox()
-        self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
-        self.graph_section.setFixedSize(580, 300)
-        self.graph_section.graph_display_layout.setSpacing(2)
-        self.graph_section.graph_display_layout.setContentsMargins(2, 2, 2, 2)
-        self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
-        row2.addWidget(self.graph_section)
+        # ← hide the dropdown so it never shows up
+        self.duration_dropdown.setVisible(False)
 
-        # --- Row 3: LIDAR + ADCS ---
+        self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
+        self.graph_section.setFixedSize(560, 280)
+        self.graph_section.graph_display_layout.setSpacing(1)
+        self.graph_section.graph_display_layout.setContentsMargins(1, 1, 1, 1)
+        self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
+        
+        row2.addWidget(self.graph_section)
+        parent_layout.addLayout(row2)
+
+    def setup_subsystem_controls_row(self, parent_layout):
+        """Setup LIDAR and ADCS controls"""
         row3 = QHBoxLayout()
-        row3.setSpacing(10)
-        row3.setContentsMargins(10, 10, 10, 10)
+        row3.setSpacing(4)
+        row3.setContentsMargins(4, 4, 4, 4)
         row3.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
+        # LIDAR section
         lidar_group = QGroupBox("LIDAR")
         lidar_layout = QVBoxLayout()
-        lidar_layout.setSpacing(5)
-        lidar_layout.setContentsMargins(5, 5, 5, 5)
+        lidar_layout.setSpacing(2)
+        lidar_layout.setContentsMargins(2, 2, 2, 2)
         lidar_placeholder = QLabel("LIDAR here")
         lidar_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lidar_placeholder.setStyleSheet("background: white; color: black; border: 1px solid #888; border-radius: 6px; font-size: 14px;")
-        lidar_placeholder.setFixedHeight(50)
+        lidar_placeholder.setFixedHeight(40)
         lidar_layout.addWidget(lidar_placeholder)
         lidar_group.setLayout(lidar_layout)
         self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR)
 
+        # ADCS section
         adcs_group = QGroupBox("ADCS")
         adcs_layout = QVBoxLayout()
-        adcs_layout.setSpacing(5)
-        adcs_layout.setContentsMargins(5, 5, 5, 5)
+        adcs_layout.setSpacing(2)
+        adcs_layout.setContentsMargins(2, 2, 2, 2)
         adcs_placeholder = QLabel("ADCS Placeholder\n(More controls coming soon)")
         adcs_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        adcs_placeholder.setFixedHeight(50)
+        adcs_placeholder.setFixedHeight(40)
         adcs_layout.addWidget(adcs_placeholder)
         adcs_group.setLayout(adcs_layout)
         self.apply_groupbox_style(adcs_group, self.COLOR_BOX_BORDER_ADCS)
 
         row3.addWidget(lidar_group)
         row3.addWidget(adcs_group)
+        parent_layout.addLayout(row3)
 
-        # --- Add all rows to left column ---
-        left_col.addLayout(row1)
-        left_col.addLayout(row2)
-        left_col.addLayout(row3)
-
-        # --- RIGHT COLUMN: System Info Panel ---
+    def setup_system_info_panel(self):
+        """Setup right column system information panel"""
         info_container = QWidget()
         info_layout = QVBoxLayout(info_container)
-        info_layout.setSpacing(10)
-        info_layout.setContentsMargins(10, 10, 10, 10)
-
+        info_layout.setSpacing(2)
+        info_layout.setContentsMargins(2, 2, 2, 2)
         info_container.setStyleSheet(f"background-color: {self.COLOR_BOX_BG_RIGHT};")
 
-        # System Info Group
-        info_group = QGroupBox("System Info")
-        info_layout_inner = QVBoxLayout()
-        info_layout_inner.setSpacing(5)
-        info_layout_inner.setContentsMargins(8, 8, 8, 8)
-        self.info_labels = {
-            "temp": QLabel("Temp: -- °C"),
-            "cpu": QLabel("CPU: --%"),
-            "speed": QLabel("Upload: -- Mbps"),
-            "max_frame": QLabel("Max Frame: -- KB"),
-            "fps": QLabel("FPS: --"),
-            "frame_size": QLabel("Frame Size: -- KB"),
-        }
-        for label in self.info_labels.values():
-            label.setStyleSheet(self.LABEL_STYLE)
-            info_layout_inner.addWidget(label)
-        info_group.setLayout(info_layout_inner)
-        self.apply_groupbox_style(
-            info_group,
-            self.COLOR_BOX_BORDER_RIGHT,
-            self.COLOR_BOX_BG_RIGHT,
-            self.COLOR_BOX_TITLE_RIGHT
-        )
-        info_layout.addWidget(info_group)
-
-        # --- Subsystem Info Boxes ---
-        # Power Subsystem
-        power_group = QGroupBox("Power Subsystem")
-        power_layout = QVBoxLayout()
-        for text in ["Battery Voltage: Pending...", "Battery Current: Pending...", "Battery Temp: Pending...", "Status: Pending..."]:
-            lbl = QLabel(text)
-            lbl.setStyleSheet("color: #bbb;")
-            lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-            power_layout.addWidget(lbl)
-        power_group.setLayout(power_layout)
-        self.apply_groupbox_style(
-            power_group,
-            self.COLOR_BOX_BORDER_RIGHT,
-            self.COLOR_BOX_BG_RIGHT,
-            self.COLOR_BOX_TITLE_RIGHT
-        )
-        info_layout.addWidget(power_group)
-
-        # Thermal Subsystem
-        thermal_group = QGroupBox("Thermal Subsystem")
-        thermal_layout = QVBoxLayout()
-        for text in ["Internal Temp: Pending...", "Status: Pending..."]:
-            lbl = QLabel(text)
-            lbl.setStyleSheet("color: #bbb;")
-            lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-            thermal_layout.addWidget(lbl)
-        thermal_group.setLayout(thermal_layout)
-        self.apply_groupbox_style(
-            thermal_group,
-            self.COLOR_BOX_BORDER_RIGHT,
-            self.COLOR_BOX_BG_RIGHT,
-            self.COLOR_BOX_TITLE_RIGHT
-        )
-        info_layout.addWidget(thermal_group)
-
-        # Communication Subsystem
-        comm_group = QGroupBox("Communication Subsystem")
-        comm_layout = QVBoxLayout()
-        for text in ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Signal Strength: Pending...", "Data Rate: Pending..."]:
-            lbl = QLabel(text)
-            lbl.setStyleSheet("color: #bbb;")
-            lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-            comm_layout.addWidget(lbl)
-        self.comms_status_label = QLabel("Status: Disconnected")
-        self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        comm_layout.addWidget(self.comms_status_label)
-        comm_group.setLayout(comm_layout)
-        self.apply_groupbox_style(
-            comm_group,
-            self.COLOR_BOX_BORDER_RIGHT,
-            self.COLOR_BOX_BG_RIGHT,
-            self.COLOR_BOX_TITLE_RIGHT
-        )
-        info_layout.addWidget(comm_group)
-
-        # ADCS Subsystem
-        adcs_info_group = QGroupBox("ADCS Subsystem")
-        adcs_info_layout = QVBoxLayout()
-        for text in ["Gyro: Pending...", "Orientation: Pending...", "Sun Sensor: Pending...", "Wheel Rpm: Pending...", "Status: Pending..."]:
-            lbl = QLabel(text)
-            lbl.setStyleSheet("color: #bbb;")
-            lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-            adcs_info_layout.addWidget(lbl)
-        adcs_info_group.setLayout(adcs_info_layout)
-        self.apply_groupbox_style(
-            adcs_info_group,
-            self.COLOR_BOX_BORDER_RIGHT,
-            self.COLOR_BOX_BG_RIGHT,
-            self.COLOR_BOX_TITLE_RIGHT
-        )
-        info_layout.addWidget(adcs_info_group)
-
-        # Payload Subsystem
-        payload_group = QGroupBox("Payload Subsystem")
-        payload_layout = QVBoxLayout()
-        self.camera_status_label = QLabel("Camera: Pending...")
-        self.camera_status_label.setStyleSheet("color: #bbb;")
-        self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        payload_layout.addWidget(self.camera_status_label)
-        self.camera_ready_label = QLabel("Status: Not Ready")
-        self.camera_ready_label.setStyleSheet("color: #bbb;")
-        self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        payload_layout.addWidget(self.camera_ready_label)
-        payload_group.setLayout(payload_layout)
-        self.apply_groupbox_style(
-            payload_group,
-            self.COLOR_BOX_BORDER_RIGHT,
-            self.COLOR_BOX_BG_RIGHT,
-            self.COLOR_BOX_TITLE_RIGHT
-        )
-        info_layout.addWidget(payload_group)
-
-        # Command and Data Handling Subsystem
-        cdh_group = QGroupBox("Command & Data Handling Subsystem")
-        cdh_layout = QVBoxLayout()
-        for text in ["Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]:
-            lbl = QLabel(text)
-            lbl.setStyleSheet("color: #bbb;")
-            cdh_layout.addWidget(lbl)
-        cdh_group.setLayout(cdh_layout)
-        self.apply_groupbox_style(
-            cdh_group,
-            self.COLOR_BOX_BORDER_RIGHT,
-            self.COLOR_BOX_BG_RIGHT,
-            self.COLOR_BOX_TITLE_RIGHT
-        )
-        info_layout.addWidget(cdh_group)
-
-        # Error Log
-        error_group = QGroupBox("Error Log")
-        error_layout = QVBoxLayout()
-        lbl = QLabel("No Critical Errors Detected: Pending...")
-        lbl.setStyleSheet("color: #bbb;")
-        error_layout.addWidget(lbl)
-        error_group.setLayout(error_layout)
-        self.apply_groupbox_style(
-            error_group,
-            self.COLOR_BOX_BORDER_RIGHT,
-            self.COLOR_BOX_BG_RIGHT,
-            self.COLOR_BOX_TITLE_RIGHT
-        )
-        info_layout.addWidget(error_group)
-
-        # Overall Status
-        overall_group = QGroupBox("Overall Status")
-        overall_layout = QVBoxLayout()
-        for text in ["No Anomalies Detected: Pending...", "Recommended Actions: Pending..."]:
-            lbl = QLabel(text)
-            lbl.setStyleSheet("color: #bbb;")
-            overall_layout.addWidget(lbl)
-        overall_group.setLayout(overall_layout)
-        self.apply_groupbox_style(
-            overall_group,
-            self.COLOR_BOX_BORDER_RIGHT,
-            self.COLOR_BOX_BG_RIGHT,
-            self.COLOR_BOX_TITLE_RIGHT
-        )
-        info_layout.addWidget(overall_group)
-
-        # Print Health Check Report Button
+        # System performance info
+        self.setup_system_performance_group(info_layout)
+        
+        # Subsystem status groups
+        self.setup_subsystem_status_groups(info_layout)
+        
+        # Health report button
         print_report_btn = QPushButton("Print Health Check Report")
         print_report_btn.setEnabled(False)
         self.style_button(print_report_btn)
         info_layout.insertWidget(0, print_report_btn)
 
-        # Scroll Area for right column
+        # Scroll area wrapper
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(info_container)
@@ -509,276 +473,1093 @@ class MainWindow(QWidget):
                 border: 1px solid #2b2b2b;
                 border-radius: 0px;
                 background: {self.COLOR_BOX_BG_RIGHT};
-                min-width: 220px;
-                max-width: 260px;
+                min-width: 200px;
+                max-width: 240px;
             }}
             QScrollBar:horizontal, QScrollBar:vertical {{ height: 0px; width: 0px; background: transparent; }}
-            QWidget {{ min-width: 200px; background: {self.COLOR_BOX_BG_RIGHT}; }}
+            QWidget {{ min-width: 180px; background: {self.COLOR_BOX_BG_RIGHT}; }}
         """)
-        info_container.setMinimumWidth(200)
-        info_container.setMaximumWidth(240)
+        info_container.setMinimumWidth(180)
+        info_container.setMaximumWidth(220)
 
-        # --- Add columns to main layout ---
-        main_layout.addLayout(left_col, stretch=6)
-        main_layout.addWidget(scroll_area, stretch=0)
-        main_layout.setAlignment(scroll_area, Qt.AlignmentFlag.AlignRight)
+        return scroll_area
+
+    def setup_system_performance_group(self, parent_layout):
+        """Setup system performance monitoring group"""
+        info_group = QGroupBox("System Info")
+        info_layout_inner = QVBoxLayout()
+        # ── patch ──
+        # add fps_server label
+        self.info_labels = {
+            "temp":      QLabel("Temp: -- °C"),
+            "cpu":       QLabel("CPU: --%"),
+            "speed":     QLabel("Upload: -- Mbps"),
+            "max_frame": QLabel("Max Frame: -- KB"),
+            "fps":       QLabel("Live FPS: --"),
+            "frame_size":QLabel("Frame Size: -- KB"),
+        }
         
+        # ── start patch ──
+        # add display‐FPS label
+        self.info_labels["disp_fps"] = QLabel("Display FPS: --")
+        # ── end patch ──
+
+        for lbl in self.info_labels.values():
+            lbl.setStyleSheet(self.LABEL_STYLE + "margin: 2px 0px; padding: 2px 0px;")
+            info_layout_inner.addWidget(lbl)
+            
+        info_group.setLayout(info_layout_inner)
+        self.apply_groupbox_style(info_group, self.COLOR_BOX_BORDER_RIGHT, self.COLOR_BOX_BG_RIGHT, self.COLOR_BOX_TITLE_RIGHT)
+        parent_layout.addWidget(info_group)
+
+    def setup_subsystem_status_groups(self, parent_layout):
+        """Setup all subsystem status monitoring groups"""
+        subsystems = [
+            ("Power Subsystem", ["Battery Voltage: Pending...", "Battery Current: Pending...", "Battery Temp: Pending...", "Status: Pending..."]),
+            ("Thermal Subsystem", ["Internal Temp: Pending...", "Status: Pending..."]),
+            ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Signal Strength: Pending...", "Data Rate: Pending..."]),
+            ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Sun Sensor: Pending...", "Wheel Rpm: Pending...", "Status: Pending..."]),
+            ("Payload Subsystem", []),  # Special handling for payload
+            ("Command & Data Handling Subsystem", ["Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
+            ("Error Log", ["No Critical Errors Detected: Pending..."]),
+            ("Overall Status", ["No Anomalies Detected: Pending...", "Recommended Actions: Pending..."])
+        ]
+
+        for name, items in subsystems:
+            group = QGroupBox(name)
+            layout = QVBoxLayout()
+            layout.setSpacing(2)
+            layout.setContentsMargins(4, 4, 4, 4)
+
+            if name == "Communication Subsystem":
+                # Add standard comm items
+                for text in items:
+                    lbl = QLabel(text)
+                    lbl.setStyleSheet("color: #bbb; margin: 2px 0px; padding: 2px 0px;")
+                    lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    layout.addWidget(lbl)
+                # Add special status label
+                self.comms_status_label = QLabel("Status: Disconnected")
+                self.comms_status_label.setStyleSheet("margin: 2px 0px; padding: 2px 0px;")
+                self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.comms_status_label)
+            elif name == "Payload Subsystem":
+                # Special payload status labels
+                self.camera_status_label = QLabel("Camera: Pending...")
+                self.camera_status_label.setStyleSheet("color: #bbb; margin: 2px 0px; padding: 2px 0px;")
+                self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.camera_status_label)
+                
+                self.camera_ready_label = QLabel("Status: Not Ready")
+                self.camera_ready_label.setStyleSheet("color: #bbb; margin: 2px 0px; padding: 2px 0px;")
+                self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.camera_ready_label)
+            else:
+                # Standard subsystem items
+                for text in items:
+                    lbl = QLabel(text)
+                    lbl.setStyleSheet("color: #bbb; margin: 2px 0px; padding: 2px 0px;")
+                    if name != "Error Log" and name != "Overall Status":
+                        lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    layout.addWidget(lbl)
+
+            group.setLayout(layout)
+            self.apply_groupbox_style(group, self.COLOR_BOX_BORDER_RIGHT, self.COLOR_BOX_BG_RIGHT, self.COLOR_BOX_TITLE_RIGHT)
+            parent_layout.addWidget(group)
+
+    #=========================================================================
+    #                        DATA ANALYSIS TAB                              
+    #=========================================================================
+
+    def setup_analysis_tab(self):
+        """Setup the data analysis interface with full window utilization"""
+        analysis_layout = QVBoxLayout(self.analysis_tab)
+        analysis_layout.setSpacing(8)
+        analysis_layout.setContentsMargins(8, 8, 8, 8)
+        
+        # Top controls section - simplified without quick stats
+        controls_container = QWidget()
+        controls_layout = QHBoxLayout(controls_container)
+        controls_layout.setSpacing(15)
+        controls_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # File loading section
+        self.setup_file_loading_section_compact(controls_layout)
+        
+        # Range selection section
+        self.setup_range_selection_section_compact(controls_layout)
+        
+        # Add spacer to push content to left
+        controls_layout.addStretch()
+        
+        analysis_layout.addWidget(controls_container)
+        
+        # Main content area - full width layout
+        content_layout = QHBoxLayout()
+        content_layout.setSpacing(12)
+        
+        # Left side: plots container - takes most of the space
+        plots_container = QWidget()
+        plots_layout = QVBoxLayout(plots_container)
+        plots_layout.setSpacing(6)
+        plots_layout.setContentsMargins(8, 8, 8, 8)
+        
+        plots_container.setStyleSheet(f"""
+            QWidget {{
+                border: 1px solid {BORDER_COLOR};
+                border-radius: {BORDER_RADIUS}px;
+                background-color: {BOX_BACKGROUND};
+            }}
+        """)
+        
+        self.plots_container_parent = plots_container
+        
+        content_layout.addWidget(plots_container, stretch=5)  # Takes 5/7 of space
+        
+        # Right side: detailed metrics display - maximize vertical space
+        self.setup_metrics_display_section_compact(content_layout)  # Takes 2/7 of space
+        
+        analysis_layout.addLayout(content_layout)
+
+    def setup_metrics_display_section_compact(self, parent_layout):
+        """Setup compact metrics display section with export button at top"""
+        metrics_container = QWidget()
+        # match Mission Control info panel width
+        metrics_container.setMinimumWidth(180)
+        metrics_container.setMaximumWidth(220)
+
+        metrics_layout = QVBoxLayout(metrics_container)
+        metrics_layout.setSpacing(2)                # less spacing
+        metrics_layout.setContentsMargins(4, 4, 4, 4)  # slimmer margins
+        
+        # Title at the very top
+        title_label = QLabel("Analysis Results")
+        title_label.setStyleSheet(f"""
+            QLabel {{
+                color: {BOX_TITLE_COLOR};
+                font-size: {FONT_SIZE_TITLE}pt;
+                font-family: {FONT_FAMILY};
+                font-weight: bold;
+                padding: 6px 0px;
+                border-bottom: 1px solid {BORDER_COLOR};
+                margin-bottom: 6px;
+            }}
+        """)
+        metrics_layout.addWidget(title_label)
+        
+        # Export button
+        self.export_btn = QPushButton("Export Analysis")
+        self.export_btn.setStyleSheet(self.BUTTON_STYLE + f"""
+            QPushButton {{ 
+                margin-bottom: 8px; 
+                font-size: {FONT_SIZE_NORMAL-1}pt;
+            }}
+        """)
+        self.export_btn.setFixedHeight(28)
+        self.export_btn.setEnabled(False)
+        self.export_btn.clicked.connect(self.export_analysis)
+        metrics_layout.addWidget(self.export_btn)
+        
+        # Direct metrics display without scroll bars:
+        self.metrics_display = QTextEdit()
+        self.metrics_display.setReadOnly(True)
+        self.metrics_display.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: {BOX_BACKGROUND};
+                color: {TEXT_COLOR};
+                border: none;
+                font-family: 'Consolas', 'Monaco', monospace;
+                font-size: {FONT_SIZE_NORMAL-1}pt;
+                line-height: 1.3;
+            }}
+        """)
+        self.metrics_display.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.metrics_display.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.metrics_display.setText("Load a CSV file to see detailed analysis...")
+        metrics_layout.addWidget(self.metrics_display, stretch=1)
+        # ===================================================
+        
+        metrics_container.setStyleSheet(f"background-color: {BOX_BACKGROUND};")
+        parent_layout.addWidget(metrics_container, stretch=0)
+
+    def setup_file_loading_section_compact(self, parent_layout):
+        """Setup compact file loading controls"""
+        file_group = QGroupBox("Load CSV Data")
+        file_layout = QVBoxLayout()
+        file_layout.setSpacing(8)
+        file_layout.setContentsMargins(15, 15, 15, 15)
+        
+        # Load button
+        self.load_csv_btn = QPushButton("Browse & Load CSV")
+        self.load_csv_btn.setStyleSheet(self.BUTTON_STYLE)
+        self.load_csv_btn.setFixedHeight(32)
+        self.load_csv_btn.clicked.connect(self.load_csv_file)
+        
+        # Compact status label
+        self.csv_path_label = QLabel("No file loaded")
+        self.csv_path_label.setStyleSheet(f"""
+            QLabel {{
+                color: {TEXT_SECONDARY};
+                font-size: {FONT_SIZE_NORMAL-1}pt;
+                font-family: {FONT_FAMILY};
+                background-color: {BOX_BACKGROUND};
+                border: 1px solid {BORDER_COLOR};
+                border-radius: {BORDER_RADIUS}px;
+                padding: 6px;
+                margin: 2px 0px;
+            }}
+        """)
+        self.csv_path_label.setWordWrap(True)
+        self.csv_path_label.setMaximumHeight(60)
+        
+        file_layout.addWidget(self.load_csv_btn)
+        file_layout.addWidget(self.csv_path_label)
+        file_group.setLayout(file_layout)
+        file_group.setFixedWidth(280)
+        self.apply_groupbox_style(file_group, self.COLOR_BOX_BORDER)
+        parent_layout.addWidget(file_group)
+
+    def setup_range_selection_section_compact(self, parent_layout):
+        """Setup compact time range selection controls"""
+        range_group = QGroupBox("Time Range")
+        range_layout = QGridLayout()
+        range_layout.setSpacing(8)
+        range_layout.setContentsMargins(15, 15, 15, 15)
+        
+        # Start time controls
+        self.start_label = QLabel("Start (s):")
+        self.start_label.setStyleSheet(self.LABEL_STYLE)
+        self.start_spin = QDoubleSpinBox()
+        self.start_spin.setDecimals(2)
+        self.start_spin.setFixedWidth(80)
+        self.start_spin.setFixedHeight(28)
+        self.start_spin.setStyleSheet(f"""
+        QDoubleSpinBox {{
+            background-color: {BOX_BACKGROUND};
+            color: {TEXT_COLOR};
+            border: 1px solid {BORDER_COLOR};
+            border-radius: {BORDER_RADIUS}px;
+            padding: 4px;
+            font-family: {FONT_FAMILY};
+            font-size: {FONT_SIZE_NORMAL}pt;
+        }}
+        QDoubleSpinBox:focus {{
+            border: 1px solid {BORDER_HIGHLIGHT};
+        }}
+    """)
+        
+        # End time controls
+        self.end_label = QLabel("End (s):")
+        self.end_label.setStyleSheet(self.LABEL_STYLE)
+        self.end_spin = QDoubleSpinBox()
+        self.end_spin.setDecimals(2)
+        self.end_spin.setFixedWidth(80)
+        self.end_spin.setFixedHeight(28)
+        self.end_spin.setStyleSheet(f"""
+        QDoubleSpinBox {{
+            background-color: {BOX_BACKGROUND};
+            color: {TEXT_COLOR};
+            border: 1px solid {BORDER_COLOR};
+            border-radius: {BORDER_RADIUS}px;
+            padding: 4px;
+            font-family: {FONT_FAMILY};
+            font-size: {FONT_SIZE_NORMAL}pt;
+        }}
+        QDoubleSpinBox:focus {{
+            border: 1px solid {BORDER_HIGHLIGHT};
+        }}
+    """)
+    
+        # Grid layout for compact arrangement
+        range_layout.addWidget(self.start_label, 0, 0)
+        range_layout.addWidget(self.start_spin, 0, 1)
+        range_layout.addWidget(self.end_label, 1, 0)
+        range_layout.addWidget(self.end_spin, 1, 1)
+        
+        range_group.setLayout(range_layout)
+        range_group.setFixedWidth(180)
+        self.apply_groupbox_style(range_group, self.COLOR_BOX_BORDER)
+        parent_layout.addWidget(range_group)
+    
+        # Initially disable until CSV is loaded
+        self.start_spin.setEnabled(False)
+        self.end_spin.setEnabled(False)
+
+        # ── patch ──
+        # Use 1 second increments on the time spins (keep decimals)
+        self.start_spin.setSingleStep(1.0)
+        self.end_spin.setSingleStep(1.0)
+        # ── end patch ──
+    def update_metrics_display(self):
+        """Update the metrics display with only the average velocity"""
+        if not hasattr(self, 'metrics'):
+            self.metrics_display.setText("No metrics available")
+            return
+        try:
+            avg_vel = self.metrics.get('avg_velocity', 0.0)
+            self.metrics_display.setText(f"Average Velocity: {avg_vel:.6f} m/s")
+        except Exception as e:
+            print(f"[ERROR] Failed to update metrics display: {e}")
+            self.metrics_display.setText(f"Error displaying metrics: {str(e)}")
+
+    def calculate_std_dev(self):
+        """Calculate standard deviation of values"""
+        if not hasattr(self, 'full_df'):
+            return 0.0
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
+            return df_range['value'].std()
+        except:
+            return 0.0
+
+    def calculate_variance(self):
+        """Calculate variance of values"""
+        if not hasattr(self, 'full_df'):
+            return 0.0
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
+            return df_range['value'].var()
+        except:
+            return 0.0
+
+    def calculate_rms_velocity(self):
+        """Calculate RMS velocity"""
+        if not hasattr(self, 'metrics'):
+            return 0.0
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
+            timestamps = df_range["relative_time"].values
+            values = df_range["value"].values
+            
+            if len(timestamps) > 1:
+                dt = np.diff(timestamps)
+                dv = np.diff(values)
+                dt[dt == 0] = 1e-6
+                velocity = dv / dt
+                return np.sqrt(np.mean(velocity**2))
+            return 0.0
+        except:
+            return 0.0
+
+    def assess_data_quality(self):
+        """Assess overall data quality"""
+        if not hasattr(self, 'metrics'):
+            return "Unknown"
+        try:
+            points = self.metrics['data_points']
+            duration = self.metrics['time_range']
+            sampling_rate = points / duration if duration > 0 else 0
+            
+            if sampling_rate > 20:
+                return "Excellent"
+            elif sampling_rate > 10:
+                return "Good"
+            elif sampling_rate > 5:
+                return "Fair"
+            else:
+                return "Poor"
+        except:
+            return "Unknown"
+
+    def estimate_noise_level(self):
+        """Estimate noise level in the data"""
+        if not hasattr(self, 'full_df'):
+            return "Unknown"
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
+            
+            # Use standard deviation as a proxy for noise
+            std_dev = df_range['value'].std()
+            range_val = df_range['value'].max() - df_range['value'].min()
+            
+            if range_val == 0:
+                return "Minimal"
+            
+            noise_ratio = std_dev / range_val
+            
+            if noise_ratio < 0.01:
+                return "Very Low"
+            elif noise_ratio < 0.05:
+                return "Low"
+            elif noise_ratio < 0.1:
+                return "Moderate"
+            else:
+                return "High"
+        except:
+            return "Unknown"
+
+    def analyze_trend(self):
+        """Analyze overall trend in the data"""
+        if not hasattr(self, 'metrics'):
+            return "Unknown"
+        try:
+            avg_velocity = self.metrics['avg_velocity']
+            
+            if abs(avg_velocity) < 0.001:
+                return "Stable"
+            elif avg_velocity > 0.001:
+                return "Increasing"
+            else:
+                return "Decreasing"
+        except:
+            return "Unknown"
+
+    def assess_stability(self):
+        """Assess data stability"""
+        if not hasattr(self, 'full_df'):
+            return "Unknown"
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
+            
+            values = df_range['value'].values
+            if len(values) < 2:
+                return "Insufficient Data"
+            
+            # Calculate coefficient of variation
+            mean_val = np.mean(values)
+            std_val = np.std(values)
+            
+            if mean_val == 0:
+                return "Constant"
+            
+            cv = std_val / abs(mean_val)
+            
+            if cv < 0.01:
+                return "Very Stable"
+            elif cv < 0.05:
+                return "Stable"
+            elif cv < 0.1:
+                return "Moderately Stable"
+            else:
+                return "Unstable"
+        except:
+            return "Unknown"
+
+    def count_outliers(self):
+        """Count statistical outliers in the data"""
+        if not hasattr(self, 'full_df'):
+            return 0
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
+            
+            values = df_range['value'].values
+            if len(values) < 4:
+                return 0
+            
+            # Use IQR method to detect outliers
+            q1 = np.percentile(values, 25)
+            q3 = np.percentile(values, 75)
+            iqr = q3 - q1
+            
+            lower_bound = q1 - 1.5 * iqr
+            upper_bound = q3 + 1.5 * iqr
+            
+            outliers = np.sum((values < lower_bound) | (values > upper_bound))
+            return int(outliers)
+        except:
+            return 0
+
+    def signal_quality_score(self):
+        """Calculate a signal quality score out of 10"""
+        if not hasattr(self, 'metrics'):
+            return 0.0
+        try:
+            points = self.metrics['data_points']
+            duration = self.metrics['time_range']
+            sampling_rate = points / duration if duration > 0 else 0
+            
+            # Base score on sampling rate
+            if sampling_rate > 30:
+                score = 10.0
+            elif sampling_rate > 20:
+                score = 8.5
+            elif sampling_rate > 10:
+                score = 7.0
+            elif sampling_rate > 5:
+                score = 5.5
+            else:
+                score = 3.0
+            
+            # Adjust for noise level
+            noise = self.estimate_noise_level()
+            if noise == "Very Low":
+                score += 0.0
+            elif noise == "Low":
+                score -= 0.5
+            elif noise == "Moderate":
+                score -= 1.0
+            else:
+                score -= 2.0
+            
+            return max(0.0, min(10.0, score))
+        except:
+            return 0.0
+
+    def min_time_step(self):
+        """Calculate minimum time step"""
+        if not hasattr(self, 'full_df'):
+            return 0.0
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
+            
+            timestamps = df_range["relative_time"].values
+            if len(timestamps) > 1:
+                dt = np.diff(timestamps)
+                return np.min(dt[dt > 0])
+            return 0.0
+        except:
+            return 0.0
+
+    def max_time_step(self):
+        """Calculate maximum time step"""
+        if not hasattr(self, 'full_df'):
+            return 0.0
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
+            
+            timestamps = df_range["relative_time"].values
+            if len(timestamps) > 1:
+                dt = np.diff(timestamps)
+                return np.max(dt)
+            return 0.0
+        except:
+            return 0.0
+
+    def avg_time_step(self):
+        """Calculate average time step"""
+        if not hasattr(self, 'full_df'):
+            return 0.0
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
+            
+            timestamps = df_range["relative_time"].values
+            if len(timestamps) > 1:
+                dt = np.diff(timestamps)
+                return np.mean(dt)
+            return 0.0
+        except:
+            return 0.0
+
+    def update_analysis_plots(self):
+        """Update plots based on selected time range"""
+        if not hasattr(self, 'full_df'):
+            return
+
+        try:
+            start = self.start_spin.value()
+            end = self.end_spin.value()
+            
+            # Ensure end > start
+            if end <= start:
+                return
+                
+            df = self.full_df
+            df_range = df[(df['relative_time'] >= start) & (df['relative_time'] <= end)]
+
+            if len(df_range) < 2:
+                self.metrics_display.setText("Not enough data points in selected range")
+                return
+
+            # Use relative_time for analysis but show full data for context
+            full_timestamps = self.full_df["relative_time"].values
+            full_values = self.full_df["value"].values
+            
+            timestamps = df_range["relative_time"].values
+            values = df_range["value"].values
+            
+            # Compute derivative (velocity) for selected range
+            dt = np.diff(timestamps)
+            dv = np.diff(values)
+            # Avoid division by zero
+            dt[dt == 0] = 1e-6
+            velocity = dv / dt
+            velocity_times = timestamps[1:]
+
+            # Clear and recreate plots - always show full data with range markers
+            self.raw_canvas.figure.clear()
+            self.vel_canvas.figure.clear()
+
+            # Raw Data Plot - show full data with range selection highlighted
+            raw_ax = self.raw_canvas.figure.add_subplot(111)
+            raw_ax.set_facecolor(PLOT_BACKGROUND)
+            
+            # Plot full data in lighter color
+            raw_ax.plot(full_timestamps, full_values, color=PLOT_LINE_ALT, alpha=0.5, linewidth=1, label="Full Data")
+            
+            # Highlight selected range
+            raw_ax.plot(timestamps, values, label="Selected Range", color=PLOT_LINE_PRIMARY, linewidth=2)
+            
+            # Add range markers
+            raw_ax.axvline(start, color=SUCCESS_COLOR, linestyle='--', alpha=0.8, linewidth=2, label="Start")
+            raw_ax.axvline(end, color=ERROR_COLOR, linestyle='--', alpha=0.8, linewidth=2, label="End")
+            
+            # raw_ax.set_title("Raw Data (Distance vs Time)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=11, pad=8)
+            raw_ax.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
+            
+            # pick axis labels based on current graph mode
+            mode = self.graph_section.current_graph_mode
+            if mode == "Relative Distance":
+                raw_ylabel, vel_ylabel = "Distance (m)", "Velocity (m/s)"
+            elif mode == "Relative Angle":
+                raw_ylabel, vel_ylabel = "Angle (°)", "Angular Velocity (°/s)"
+            elif mode == "Angular Position":
+                raw_ylabel, vel_ylabel = "Position (°)", "Spin Rate (°/s)"
+            else:
+                raw_ylabel, vel_ylabel = "Value", "Rate"
+            raw_ax.set_ylabel(raw_ylabel, color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
+            
+            raw_ax.tick_params(colors=TEXT_COLOR, labelsize=8)
+            raw_ax.grid(True, color=GRID_COLOR, alpha=0.3)
+            raw_ax.legend(facecolor=BOX_BACKGROUND, edgecolor=BORDER_COLOR, labelcolor=TEXT_COLOR, fontsize=8)
+            
+            # Better margins for space efficiency
+            self.raw_canvas.figure.subplots_adjust(left=0.08, right=0.98, top=0.88, bottom=0.15)
+
+            # Velocity Plot - only show selected range data
+            vel_ax = self.vel_canvas.figure.add_subplot(111)
+            vel_ax.set_facecolor(PLOT_BACKGROUND)
+            vel_ax.plot(velocity_times, velocity, label="Velocity (Selected Range)", color=PLOT_LINE_SECONDARY, linewidth=2)
+            vel_ax.axvline(start, color=SUCCESS_COLOR, linestyle='--', alpha=0.8, linewidth=2, label="Start")
+            vel_ax.axvline(end, color=ERROR_COLOR, linestyle='--', alpha=0.8, linewidth=2, label="End")
+            # vel_ax.set_title("Velocity (Selected Range)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=11, pad=8)
+            vel_ax.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
+            vel_ax.set_ylabel(vel_ylabel, color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
+            vel_ax.tick_params(colors=TEXT_COLOR, labelsize=8)
+            vel_ax.grid(True, color=GRID_COLOR, alpha=0.3)
+            vel_ax.legend(facecolor=BOX_BACKGROUND, edgecolor=BORDER_COLOR, labelcolor=TEXT_COLOR, fontsize=8)
+            
+            # Better margins for space efficiency
+            self.vel_canvas.figure.subplots_adjust(left=0.08, right=0.98, top=0.88, bottom=0.15)
+
+            # Redraw canvases
+            self.raw_canvas.draw()
+            self.vel_canvas.draw()
+
+            # Calculate and store metrics
+            self.metrics = {
+                "data_points": len(df_range),
+                "time_range": end - start,
+                "peak_value": values.max(),
+                "min_value": values.min(),
+                "avg_value": values.mean(),
+                "value_range": values.max() - values.min(),
+                "peak_velocity": velocity.max() if len(velocity) > 0 else 0,
+                "min_velocity": velocity.min() if len(velocity) > 0 else 0,
+                "avg_velocity": velocity.mean() if len(velocity) > 0 else 0,
+                "start_time": start,
+                "end_time": end
+            }
+
+            # Update metrics display
+            self.update_metrics_display()
+            
+            print(f"[INFO] Analysis updated - Range: {start:.2f}s to {end:.2f}s ({len(df_range)} points)")
+
+        except Exception as e:
+            print(f"[ERROR] Failed to update analysis plots: {e}")
+            import traceback
+            traceback.print_exc()
+            self.metrics_display.setText(f"Error updating plots: {str(e)}")
+
+    def load_csv_file(self):
+        """Load and process CSV file for analysis"""
+        from PyQt6.QtWidgets import QFileDialog
+        
+        file_dialog = QFileDialog()
+        # ── start patch ──
+        recordings_dir = os.path.join(os.path.dirname(__file__), "recordings")
+        os.makedirs(recordings_dir, exist_ok=True)
+        file_path, _ = file_dialog.getOpenFileName(
+            self,
+            "Open CSV File",
+            recordings_dir,
+            "CSV Files (*.csv);;All Files (*)"
+        )
+        # ── end patch ──
+        
+        if not file_path:
+            return
+
+        self.csv_path_label.setText(f"Loaded: {os.path.basename(file_path)}")
+        try:
+            df = pd.read_csv(file_path)
+            
+            # Check for required columns
+            if "timestamp" not in df.columns or "value" not in df.columns:
+                self.show_message("Error", "CSV must have 'timestamp' and 'value' columns.", QMessageBox.Icon.Critical)
+                return
+            
+            # Add relative time column
+            df['relative_time'] = df['timestamp'] - df['timestamp'].min()
+            self.full_df = df
+            
+            # Setup time range controls
+            min_time = df["relative_time"].min()
+            max_time = df["relative_time"].max()
+            
+            self.start_spin.setRange(min_time, max_time)
+            self.end_spin.setRange(min_time, max_time)
+            self.start_spin.setValue(min_time)
+            self.end_spin.setValue(max_time)
+            self.start_spin.setSingleStep(0.01)
+            self.end_spin.setSingleStep(0.01)
+            
+            # Enable controls
+            self.start_spin.setEnabled(True)
+            self.end_spin.setEnabled(True)
+            self.export_btn.setEnabled(True)
+            
+            # Connect signals if not already connected
+            try:
+                self.start_spin.valueChanged.disconnect()
+                self.end_spin.valueChanged.disconnect()
+            except:
+                pass
+            
+            self.start_spin.valueChanged.connect(self.update_analysis_plots)
+            self.end_spin.valueChanged.connect(self.update_analysis_plots)
+            
+            # Create plots if they don't exist
+            self.create_analysis_plots()
+            
+            # Initial plot update
+            self.update_analysis_plots()
+            
+            # === NEW: switch to Data Analysis tab ===
+            self.tab_widget.setCurrentWidget(self.analysis_tab)
+            print("[INFO] 🔄 Switched to Data Analysis tab")
+            
+            print(f"[INFO] CSV loaded successfully: {len(df)} data points")
+        except Exception as e:
+            print(f"[ERROR] Failed to load CSV: {e}")
+            self.show_message("Error", f"Failed to load CSV file:\n{str(e)}", QMessageBox.Icon.Critical)
+
+    def create_analysis_plots(self):
+        """Create matplotlib plots for analysis tab"""
+        if hasattr(self, 'raw_canvas'):
+            return  # Already created
+            
+        try:
+            from matplotlib.backends.qt_compat import QtCore, QtWidgets
+            from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+            from matplotlib.figure import Figure
+            
+            # Clear existing layout
+            layout = self.plots_container_parent.layout()
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
+            
+            # Create matplotlib figures
+            self.raw_figure = Figure(figsize=(8, 4), facecolor=PLOT_BACKGROUND)
+            self.vel_figure = Figure(figsize=(8, 4), facecolor=PLOT_BACKGROUND)
+            
+            self.raw_canvas = FigureCanvas(self.raw_figure)
+            self.vel_canvas = FigureCanvas(self.vel_figure)
+            
+            # Style canvases
+            self.raw_canvas.setStyleSheet(f"background-color: {PLOT_BACKGROUND};")
+            self.vel_canvas.setStyleSheet(f"background-color: {PLOT_BACKGROUND};")
+            
+            # Add to layout
+            layout.addWidget(self.raw_canvas)
+            layout.addWidget(self.vel_canvas)
+            
+            print("[INFO] Analysis plots created successfully")
+            
+        except Exception as e:
+            print(f"[ERROR] Failed to create analysis plots: {e}")
+
+    def export_analysis(self):
+        """Export analysis results to file"""
+        if not hasattr(self, 'metrics'):
+            self.show_message("Error", "No analysis data to export.", QMessageBox.Icon.Warning)
+            return
+        
+        from PyQt6.QtWidgets import QFileDialog
+        
+        # suggest default filename based on selected mode
+        mode_key = self.graph_section.current_graph_mode.replace(" ", "_").lower()
+        default_name = f"{mode_key}_analysis.txt"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Analysis", default_name, "Text Files (*.txt);;All Files (*)"
+        )
+        
+        if file_path:
+            try:
+                with open(file_path, 'w') as f:
+                    f.write(self.metrics_display.toPlainText())
+                self.show_message("Success", f"Analysis exported to:\n{file_path}", QMessageBox.Icon.Information)
+                print(f"[INFO] Analysis exported to: {file_path}")
+            except Exception as e:
+                self.show_message("Error", f"Failed to export analysis:\n{str(e)}", QMessageBox.Icon.Critical)
+                print(f"[ERROR] Export failed: {e}")
+
+    def update_image(self, frame):
+        """Update video display with new frame"""
+        try:
+            # Only display raw frames if detector is NOT active
+            if self.detector_active:
+                # Just add to queue, don't display
+                if self.frame_queue.qsize() < 5:
+                    self.frame_queue.put(frame.copy())
+                return
+            
+            # Display raw frame when detector is off
+            height, width, channel = frame.shape
+            bytes_per_line = 3 * width
+            q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888).rgbSwapped()
+            
+            # Scale to fit display
+            scaled = q_image.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            pixmap = QPixmap.fromImage(scaled)
+            self.video_label.setPixmap(pixmap)
+                
+            # ── patch ──
+            self.display_frame_counter += 1
+        except Exception as e:
+            print(f"[ERROR] Failed to update image: {e}")
+
+    def update_analysed_image(self, frame):
+        """Update video display with analyzed frame"""
+        try:
+            # Only display analyzed frames when detector is active
+            if not self.detector_active:
+                return
+                
+            height, width, channel = frame.shape
+            bytes_per_line = 3 * width
+            q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888).rgbSwapped()
+            
+            # Scale to fit display
+            scaled = q_image.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            pixmap = QPixmap.fromImage(scaled)
+            self.video_label.setPixmap(pixmap)
+            self.display_frame_counter += 1
+        except Exception as e:
+            print(f"[ERROR] Failed to update analyzed image: {e}")
+
+    #=========================================================================
+    #                          SOCKET COMMUNICATION                          
+    #=========================================================================
 
     def setup_socket_events(self):
+        """Configure all socket event handlers"""
+        
         @sio.event
         def connect():
-            print("[DEBUG] ✓ Connected to server")
+            print("[INFO] ✓ Connected to server")
             self.comms_status_label.setText("Status: Connected")
             self.camera_controls.toggle_btn.setEnabled(True)
             self.detector_controls.detector_btn.setEnabled(True)
-            # Enable crop button when connected
             self.camera_controls.crop_btn.setEnabled(True)
-            # Enable capture button when connected
             self.camera_controls.capture_btn.setEnabled(True)
             
-            # Only apply config AFTER connection is established
             self.apply_config()
-            
-            def delayed_emits():
-                if not self.streaming:
-                    sio.emit("stop_camera")
-                sio.emit("get_camera_status")
-            QTimer.singleShot(100, delayed_emits)
+            QTimer.singleShot(100, self.delayed_server_setup)
 
         @sio.event
         def disconnect(reason=None):
-            print(f"[DEBUG] ❌ Disconnected from server: {reason}")
+            print(f"[INFO] ❌ Disconnected from server: {reason}")
             self.comms_status_label.setText("Status: Disconnected")
             self.camera_controls.toggle_btn.setEnabled(False)
             self.detector_controls.detector_btn.setEnabled(False)
-            # Disable crop button when disconnected
             self.camera_controls.crop_btn.setEnabled(False)
-            # Disable capture button when disconnected
             self.camera_controls.capture_btn.setEnabled(False)
 
         @sio.on("frame")
         def on_frame(data):
-            try:
-                arr = np.frombuffer(data, np.uint8)
-                frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-                if frame is not None:
-                    self.current_frame_size = len(data)
-                    self.frame_counter += 1
-                    bridge.frame_received.emit(frame)
-                else:
-                    print("[WARNING] Frame decode returned None")
-                    logging.warning("Frame decode returned None")
-            except Exception as e:
-                print(f"[ERROR] Frame decode error: {e}")
-                logging.exception("Frame decode error")
-                import traceback
-                traceback.print_exc()
+            self.handle_frame_data(data)
 
         @sio.on("sensor_broadcast")
         def on_sensor_data(data):
-            try:
-                temp = data.get("temperature", 0)
-                cpu = data.get("cpu_percent", 0)
-                self.info_labels["temp"].setText(f"Temp: {temp:.1f} °C")
-                self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
-            except Exception as e:
-                print(f"[ERROR] Sensor update error: {e}")
-                logging.exception("Sensor update failed")
+            # update temps/CPU
+            self.update_sensor_display(data)
+            # server already computes FPS in camera.py and sends it
+            if "fps" in data:
+                # format with one decimal place
+                self.info_labels["fps_server"].setText(
+                    f"Server FPS: {data['fps']:.1f}"
+                )
 
         @sio.on("camera_status")
         def on_camera_status(data):
-            try:
-                status = data.get("status", "Unknown")
-                print(f"[DEBUG] Camera status received: {status}")
-                self.camera_status_label.setText(f"Camera: {status}")
-                
-                if status.lower() in ("streaming", "idle", "ready"):
-                    self.camera_status_label.setStyleSheet("color: white;")
-                else:
-                    self.camera_status_label.setStyleSheet("color: #bbb;")
-                
-                error_statuses = {"error", "not connected", "damaged", "not found", "unavailable", "failed"}
-                if status.lower() in error_statuses:
-                    self.camera_ready_label.setText("Status: Not Ready")
-                    self.camera_ready_label.setStyleSheet("color: #f00;")
-                else:
-                    self.camera_ready_label.setText("Status: Ready")
-                    self.camera_ready_label.setStyleSheet("color: #0f0;")
-                    
-            except Exception as e:
-                print(f"[ERROR] Camera status update error: {e}")
+            self.update_camera_status(data)
 
         @sio.on("image_captured")
         def on_image_captured(data):
-            """Handle image capture response from server"""
-            try:
-                if data["success"]:
-                    print(f"[INFO] ✓ Image captured: {data['path']} ({data['size_mb']} MB)")
-                    
-                    # Automatically download the image to local machine
-                    self.download_captured_image(data['path'])
-                    self.show_capture_success(data)
-                else:
-                    print(f"[ERROR] ❌ Image capture failed: {data['error']}")
-                    self.show_capture_error(data['error'])
-            except Exception as e:
-                print(f"[ERROR] Failed to handle capture response: {e}")
+            self.handle_image_capture_response(data)
 
         @sio.on("image_download")
         def on_image_download(data):
-            """Handle downloaded image from server"""
-            try:
-                if data["success"]:
-                    # Decode base64 image data
-                    import base64
-                    image_data = base64.b64decode(data["data"])
-                    
-                    # Save to local directory
-                    local_dir = os.path.join(os.path.dirname(__file__), "captured_images")
-                    os.makedirs(local_dir, exist_ok=True)
-                    local_path = os.path.join(local_dir, data["filename"])
-                    
-                    with open(local_path, 'wb') as f:
-                        f.write(image_data)
-                    
-                    print(f"[INFO] ✅ Image saved locally: {local_path} ({data['size']/1024:.1f} KB)")
-                    
-                    # Show success message to user
-                    self.show_local_save_success(local_path, data['size'])
-                    
-                else:
-                    print(f"[ERROR] ❌ Image download failed: {data['error']}")
-                    
-            except Exception as e:
-                print(f"[ERROR] Failed to save downloaded image: {e}")
+            self.handle_image_download(data)
+
+    def delayed_server_setup(self):
+        """Called shortly after connect—override if needed."""
+        pass
+
+    def handle_frame_data(self, data):
+        """Process incoming frame data"""
+        try:
+            arr = np.frombuffer(data, np.uint8)
+            frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+            if frame is not None:
+                self.current_frame_size = len(data)
+                self.frame_counter += 1
+                bridge.frame_received.emit(frame)
+            else:
+                print("[WARNING] Frame decode failed")
+        except Exception as e:
+            print(f"[ERROR] Frame processing error: {e}")
+
+    def update_sensor_display(self, data):
+        """Update sensor information display"""
+        try:
+            temp = data.get("temperature", 0)
+            cpu = data.get("cpu_percent", 0)
+            self.info_labels["temp"].setText(f"Temp: {temp:.1f} °C")
+            self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
+        except Exception as e:
+            print(f"[ERROR] Sensor update error: {e}")
+
+    def update_camera_status(self, data):
+        """Update camera status display"""
+        try:
+            status = data.get("status", "Unknown")
+            self.camera_status_label.setText(f"Camera: {status}")
+            
+            if status.lower() in ("streaming", "idle", "ready"):
+                self.camera_status_label.setStyleSheet("color: white;")
+                self.camera_ready_label.setText("Status: Ready")
+                self.camera_ready_label.setStyleSheet("color: #0f0;")
+            else:
+                self.camera_status_label.setStyleSheet("color: #bbb;")
+                self.camera_ready_label.setText("Status: Not Ready")
+                self.camera_ready_label.setStyleSheet("color: #f00;")
+                
+        except Exception as e:
+            print(f"[ERROR] Camera status update error: {e}")
+
+    def handle_image_capture_response(self, data):
+        """Handle server response to image capture request"""
+        try:
+            if data["success"]:
+                print(f"[INFO] ✓ Image captured: {data['path']} ({data['size_mb']} MB)")
+                self.download_captured_image(data['path'])
+            else:
+                print(f"[ERROR] ❌ Image capture failed: {data['error']}")
+        except Exception as e:
+            print(f"[ERROR] Failed to handle capture response: {e}")
+
+    def handle_image_download(self, data):
+        """Handle downloaded image from server"""
+        try:
+            if data["success"]:
+                image_data = base64.b64decode(data["data"])
+                
+                local_dir = os.path.join(os.path.dirname(__file__), "captured_images")
+                os.makedirs(local_dir, exist_ok=True)
+                local_path = os.path.join(local_dir, data["filename"])
+                
+                with open(local_path, 'wb') as f:
+                    f.write(image_data)
+                
+                print(f"[INFO] ✅ Image saved: {local_path} ({data['size']/1024:.1f} KB)")
+            else:
+                print(f"[ERROR] ❌ Image download failed: {data['error']}")
+                
+        except Exception as e:
+            print(f"[ERROR] Failed to save downloaded image: {e}")
+
+    #=========================================================================
+    #                        CAMERA AND DETECTION                           
+    #=========================================================================
 
     def toggle_stream(self):
+        """Toggle video stream on/off"""
         if not sio.connected:
             return
         self.streaming = not self.streaming
         self.camera_controls.toggle_btn.setText("Stop Stream" if self.streaming else "Start Stream")
         sio.emit("start_camera" if self.streaming else "stop_camera")
-    
+
     def apply_config(self):
+        """Apply camera configuration changes"""
         was_streaming = self.streaming
         if was_streaming:
             self.toggle_stream()
 
-        # Get config including calibration file
         config = self.camera_settings.get_config()
-        
-        # Send config to server
         sio.emit("camera_config", config)
         
-        # **PAUSE DISPLAY FOR 1 SECOND - NO VISUAL PLACEHOLDER**
-        try:
-            print("[DEBUG] 📊 Pausing display for calibration/crop change...")
-            self.calibration_change_time = time.time()
-            
-            # Start a timer to clear the pause after 1 second
-            QTimer.singleShot(1000, self.resume_after_calibration_change)
-            
-        except Exception as e:
-            print(f"[DEBUG] Display pause failed (continuing anyway): {e}")
-
+        # Pause display during configuration change
+        self.calibration_change_time = time.time()
+        QTimer.singleShot(1000, self.resume_after_calibration_change)
+        
         # Update detector calibration
-        try:
-            calibration_path = config.get('calibration_file', 'calibrations/calibration_default.npz')
-            preset_type = config.get('preset_type', 'standard')
-            
-            print(f"[DEBUG] Attempting to update calibration: {calibration_path} (type: {preset_type})")
-            
-            if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
-                success = detector4.detector_instance.update_calibration(calibration_path)
-                if success:
-                    if preset_type == "legacy":
-                        print(f"[INFO] ✓ Legacy calibration loaded: {calibration_path}")
-                    else:
-                        print(f"[INFO] ✓ Detector calibration updated: {calibration_path}")
-                else:
-                    print(f"[WARNING] ❌ Failed to update detector calibration: {calibration_path}")
-            
-            elif hasattr(detector4, 'update_calibration'):
-                success = detector4.update_calibration(calibration_path)
-                if success:
-                    print(f"[INFO] ✓ Detector calibration updated via function: {calibration_path}")
-                else:
-                    print(f"[WARNING] ❌ Failed to update detector calibration via function: {calibration_path}")
-            
-            else:
-                print("[WARNING] No calibration update method found in detector4")
-                
-        except Exception as e:
-            print(f"[ERROR] Failed to update detector calibration: {e}")
-            import traceback
-            traceback.print_exc()
+        self.update_detector_calibration(config)
 
         if was_streaming:
             threading.Timer(0.5, self.toggle_stream).start()
 
     def resume_after_calibration_change(self):
-        """Resume display after calibration/crop change."""
+        """Resume display after configuration change"""
         if hasattr(self, 'calibration_change_time'):
             delattr(self, 'calibration_change_time')
-        print("[DEBUG] 📊 Display resumed after calibration/crop pause")
 
-    def check_calibration_status(self):
-        """Check and display calibration status for current settings."""
+    def update_detector_calibration(self, config):
+        """Update detector with new calibration settings"""
         try:
-            config = self.camera_settings.get_config()
-            calibration_file = config.get('calibration_file', 'calibrations/calibration_default.npz')
+            calibration_path = config.get('calibration_file', 'calibrations/calibration_default.npz')
             preset_type = config.get('preset_type', 'standard')
             
-            if not os.path.isabs(calibration_file):
-                calibration_file = os.path.join(os.path.dirname(__file__), calibration_file)
-                calibration_file = os.path.normpath(calibration_file)
-            
-            if os.path.exists(calibration_file):
-                if preset_type == "legacy":
-                    print(f"[INFO] ✓ Legacy calibration found (calibration_data.npz, 1536x864): {calibration_file}")
+            if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
+                success = detector4.detector_instance.update_calibration(calibration_path)
+                if success:
+                    print(f"[INFO] ✓ Detector calibration updated: {calibration_path}")
                 else:
-                    print(f"[INFO] ✓ Calibration found: {calibration_file}")
-                return True
-            else:
-                print(f"[WARNING] ❌ Calibration missing: {calibration_file}")
-                return False
+                    print(f"[WARNING] ❌ Failed to update detector calibration")
+            
         except Exception as e:
-            print(f"[ERROR] Calibration status check failed: {e}")
-            return False
-
-    def debug_detector_state(self):
-        """Print debug info about detector state."""
-        try:
-            print(f"[DEBUG] Detector active: {self.detector_active}")
-            print(f"[DEBUG] Has detector4 module: {hasattr(self, 'detector4') or 'detector4' in globals()}")
-            if hasattr(detector4, 'detector_instance'):
-                print(f"[DEBUG] Detector instance exists: {detector4.detector_instance is not None}")
-                if detector4.detector_instance:
-                    print(f"[DEBUG] Detector has calibration: {detector4.detector_instance.mtx is not None}")
-            print(f"[DEBUG] Frame queue size: {self.frame_queue.qsize()}")
-            config = self.camera_settings.get_config()
-            print(f"[DEBUG] Current config: {config}")
-        except Exception as e:
-            print(f"[ERROR] Debug detector state failed: {e}")
+            print(f"[ERROR] Calibration update failed: {e}")
 
     def toggle_detector(self):
+        """Toggle object detection on/off"""
         self.detector_active = not self.detector_active
         self.detector_controls.detector_btn.setText("Stop Detector" if self.detector_active else "Start Detector")
         
         if self.detector_active:
-            print("[DEBUG] 🚀 Starting detector...")
-            self.check_calibration_status()
-            self.debug_detector_state()
+            print("[INFO] 🚀 Starting detector...")
             threading.Thread(target=self.run_detector, daemon=True).start()
         else:
-            print("[DEBUG] 🛑 Stopping detector...")
+            print("[INFO] 🛑 Stopping detector...")
             self.clear_queue()
 
     def run_detector(self):
+        """Main detector processing loop"""
         while self.detector_active:
             try:
                 frame = self.frame_queue.get(timeout=0.1)
-            
+                
                 config = self.camera_settings.get_config()
                 is_cropped = config.get('cropped', False)
                 
@@ -786,7 +1567,8 @@ class MainWindow(QWidget):
                 if is_cropped:
                     current_height = frame.shape[0]
                     original_height = int(current_height * 3)
-            
+                
+                # Process frame with detector
                 try:
                     if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
                         analysed, pose = detector4.detector_instance.detect_and_draw(
@@ -797,20 +1579,31 @@ class MainWindow(QWidget):
                 
                     bridge.analysed_frame.emit(analysed)
 
-                    # **CHECK FOR CALIBRATION PAUSE BEFORE UPDATING GRAPHS**
-                    should_update_graphs = True
-                    if hasattr(self, 'calibration_change_time'):
-                        time_since_change = time.time() - self.calibration_change_time
-                        if time_since_change < 1.0:  # 1 second pause
-                            should_update_graphs = False
-                            if int(time_since_change * 10) % 5 == 0:  # Every 0.5 seconds
-                                print(f"[DEBUG] 📊 Skipping graph update - calibration stabilizing ({time_since_change:.1f}s)")
-
-                    if should_update_graphs and self.graph_section.graph_widget and pose:
+                    # only update graphs if needed
+                    if self.should_update_graphs() and self.graph_section.graph_widget and pose:
                         rvec, tvec = pose
-                        timestamp = time.time()
-                        self.graph_section.graph_widget.update(rvec, tvec, timestamp)
-                        
+                        ts = time.time()
+
+                        # ── start patch ──
+                        now = time.time()
+                        if now - self._last_graph_draw >= self._graph_update_interval:
+                            self._last_graph_draw = now
+                            self.graph_section.graph_widget.update(rvec, tvec, ts)
+                        # ── end patch ──
+
+                        # always record every data point
+                        value = None
+                        mode = self.graph_section.current_graph_mode
+                        widget = self.graph_section.graph_widget
+                        if mode == "Relative Distance" and hasattr(widget, 'current_distance'):
+                            value = widget.current_distance
+                        elif mode == "Relative Angle" and hasattr(widget, 'current_ang'):
+                            value = widget.current_ang
+                        elif mode == "Angular Position" and hasattr(widget, 'current_angle'):
+                            value = widget.current_angle
+
+                        if value is not None:
+                            self.graph_section.add_data_point(ts, value)
                 except Exception as e:
                     print(f"[ERROR] Detector processing error: {e}")
                     bridge.analysed_frame.emit(frame)
@@ -819,53 +1612,60 @@ class MainWindow(QWidget):
                 continue
             except Exception as e:
                 print(f"[ERROR] Detector thread error: {e}")
-                import traceback
-                traceback.print_exc()
 
-    def update_image(self, frame):
-        """Handle live stream frames (only when detector is OFF)."""
-        self.last_frame = frame.copy()
-        
-        # Only show live stream if detector is NOT active
-        if not self.detector_active:
-            self.display_frame(frame, is_live=True)
-        
-        # Always queue frames for detector if it's active
-        if self.detector_active:
-            self.clear_queue()
-            self.frame_queue.put(self.last_frame)
-
-    def update_analysed_image(self, frame):
-        """Handle detector output frames (only when detector is ON)."""
-        # Only show detector output if detector IS active
-        if self.detector_active:
-            self.display_frame(frame, is_live=False)
-
-    def display_frame(self, frame, is_live=True):
-        """Display frame with optional 1-second pause for crop changes."""
-        # Check if we should pause display during crop/calibration changes
+    def should_update_graphs(self):
+        """Check if graphs should be updated (not during calibration pause)"""
         if hasattr(self, 'calibration_change_time'):
             time_since_change = time.time() - self.calibration_change_time
-            if time_since_change < 1.0:  # 1 second pause
-                # Just skip displaying during pause - no placeholder screen
-                return
+            return time_since_change >= 1.0
+        return True
+
+    def toggle_crop(self):
+        """Toggle camera crop mode"""
+        self.crop_active = not self.crop_active
         
-        # Normal frame display
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        h, w, ch = rgb.shape
-        qimg = QImage(rgb.data, w, h, w * ch, QImage.Format.Format_RGB888)
-        pixmap = QPixmap.fromImage(qimg)
-        pixmap = pixmap.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio)
-        self.video_label.setPixmap(pixmap)
+        try:
+            self.camera_settings.set_cropped_label(self.crop_active)
+        except Exception as e:
+            print(f"[DEBUG] Could not update crop label: {e}")
+        
+        self.camera_controls.crop_btn.setText("Uncrop" if self.crop_active else "Crop")
+        self.apply_config()
+
+    def capture_image(self):
+        """Request image capture from server"""
+        if not sio.connected:
+            print("[WARNING] Cannot capture image - not connected to server")
+            return
+        
+        try:
+            sio.emit("capture_image", {})
+            print("[INFO] 📸 Image capture requested")
+        except Exception as e:
+            print(f"[ERROR] Failed to request image capture: {e}")
+
+    def download_captured_image(self, server_path):
+        """Download captured image from server"""
+        try:
+            filename = os.path.basename(server_path)
+            sio.emit("download_image", {"server_path": server_path, "filename": filename})
+        except Exception as e:
+            print(f"[ERROR] Failed to request image download: {e}")
 
     def clear_queue(self):
+        """Clear the frame queue"""
         while not self.frame_queue.empty():
             try:
                 self.frame_queue.get_nowait()
             except queue.Empty:
                 break
 
+    #=========================================================================
+    #                       PERFORMANCE MONITORING                          
+    #=========================================================================
+
     def measure_speed(self):
+        """Measure internet speed for performance monitoring"""
         self.info_labels["speed"].setText("Upload: Testing...")
         self.info_labels["max_frame"].setText("Max Frame: ...")
 
@@ -885,6 +1685,7 @@ class MainWindow(QWidget):
         threading.Thread(target=run_speedtest, daemon=True).start()
 
     def update_speed_labels(self, upload_mbps, max_frame_size_kb):
+        """Update speed test results in UI"""
         if upload_mbps < 0:
             self.info_labels["speed"].setText("Upload: Error")
             self.info_labels["max_frame"].setText("Max Frame: -- KB")
@@ -893,15 +1694,29 @@ class MainWindow(QWidget):
             self.info_labels["max_frame"].setText(f"Max Frame: {max_frame_size_kb:.1f} KB")
 
     def timerEvent(self, event):
+        """Handle timer events for FPS calculation"""
+        # live FPS (incoming)
         self.current_fps = self.frame_counter
         self.frame_counter = 0
-        self.info_labels["fps"].setText(f"FPS: {self.current_fps}")
-        self.info_labels["frame_size"].setText(f"Frame Size: {self.current_frame_size / 1024:.1f} KB")
+
+        # display FPS
+        self.current_display_fps   = self.display_frame_counter
+        self.display_frame_counter = 0
+
+        # update labels
+        self.info_labels["fps"].setText(f"Live FPS: {self.current_fps}")
+        self.info_labels["disp_fps"].setText(f"Display FPS: {self.current_display_fps}")
+        self.info_labels["frame_size"].setText(f"Frame Size: {self.current_frame_size/1024:.1f} KB")
+    #=========================================================================
+    #                          UTILITY METHODS                              
+    #=========================================================================
 
     def try_reconnect(self):
+        """Attempt to reconnect to server"""
         threading.Thread(target=self.reconnect_socket, daemon=True).start()
 
     def reconnect_socket(self):
+        """Handle socket reconnection logic"""
         was_streaming = self.streaming
         try:
             if was_streaming:
@@ -923,11 +1738,11 @@ class MainWindow(QWidget):
             logging.exception("Reconnect failed")
 
     def show_message(self, title, message, icon=QMessageBox.Icon.Information):
+        """Display styled message box"""
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle(title)
         msg_box.setText(message)
         msg_box.setIcon(icon)
-
         msg_box.setStyleSheet("""
             QMessageBox {
                 background-color: #3b3e44;
@@ -955,6 +1770,7 @@ class MainWindow(QWidget):
         msg_box.exec()
 
     def reset_camera_to_default(self):
+        """Reset camera to default configuration"""
         if self.crop_active:
             self.crop_active = False
             idx = self.camera_settings.res_dropdown.findText("Custom (Cropped)")
@@ -969,13 +1785,17 @@ class MainWindow(QWidget):
         sio.emit("camera_config", config)
         time.sleep(0.2)
 
+    #=========================================================================
+    #                           EVENT HANDLERS                              
+    #=========================================================================
+
     def closeEvent(self, event):
+        """Handle application close event"""
         try:
-            print("[DEBUG] 🛑 Closing application...")
+            print("[INFO] 🛑 Closing application...")
             
             if self.detector_active:
                 self.detector_active = False
-                print("[DEBUG] Detector stopped")
     
             self.reset_camera_to_default()
             time.sleep(0.5)
@@ -990,83 +1810,27 @@ class MainWindow(QWidget):
             time.sleep(0.5)
     
             if sio.connected:
-                print("[DEBUG] Disconnecting from server...")
                 sio.disconnect()
                 time.sleep(0.2)
             
         except Exception as e:
-            print(f"[DEBUG] Cleanup error (expected): {e}")
+            print(f"[DEBUG] Cleanup error: {e}")
 
         event.accept()
 
     def keyPressEvent(self, event):
+        """Handle keyboard events"""
         if event.key() == Qt.Key.Key_Escape:
             self.close()
         else:
             super().keyPressEvent(event)
 
-    def toggle_crop(self):
-        print(f"[DEBUG] Toggling crop: {not self.crop_active}")
-        
-        # No more placeholder - just apply the crop change directly
-        self.crop_active = not self.crop_active
-        
-        try:
-            self.camera_settings.set_cropped_label(self.crop_active)
-        except Exception as e:
-            print(f"[DEBUG] Could not update crop label: {e}")
-        
-        self.camera_controls.crop_btn.setText("Uncrop" if self.crop_active else "Crop")
-        print(f"[DEBUG] Crop now: {'ACTIVE' if self.crop_active else 'INACTIVE'}")
-        
-        # Apply the configuration (this will trigger the 1-second pause)
-        self.apply_config()
-
-    def capture_image(self):
-        """Request image capture from server"""
-        if not sio.connected:
-            print("[DEBUG] ⚠️ Cannot capture image - not connected to server")
-            return
-        
-        try:
-            sio.emit("capture_image", {})
-            print("[DEBUG] 📸 Image capture requested")
-        except Exception as e:
-            print(f"[ERROR] Failed to request image capture: {e}")
-
-    def show_capture_success(self, data):
-        """Show success notification for image capture"""
-        print(f"[UI] ✓ Image saved: {data['path']} ({data['size_mb']} MB)")
-        # You could add a status bar message or toast notification here
-
-    def show_capture_error(self, error):
-        """Show error notification for image capture"""
-        print(f"[UI] ❌ Capture failed: {error}")
-        # You could show an error dialog here
-
-    def download_captured_image(self, server_path):
-        """Download captured image from server to local machine"""
-        try:
-            # Generate local filename
-            filename = os.path.basename(server_path)
-            
-            # Request image download from server
-            sio.emit("download_image", {"server_path": server_path, "filename": filename})
-            print(f"[DEBUG] 📥 Requesting image download: {filename}")
-            
-        except Exception as e:
-            print(f"[ERROR] Failed to request image download: {e}")
-
-    def show_local_save_success(self, local_path, file_size):
-        """Show success message for local image save"""
-        print(f"[UI] 📁 Image downloaded to: {local_path}")
-        print(f"[UI] 💾 Local file size: {file_size/1024:.1f} KB")
-        
-        # Optional: Show a popup notification
-        # self.show_message("Image Saved", f"Image saved to:\n{local_path}", QMessageBox.Icon.Information)
+##############################################################################
+#                            UTILITY FUNCTIONS                              #
+##############################################################################
 
 def check_all_calibrations():
-    """Check status of all calibration files including legacy."""
+    """Check status of all calibration files"""
     print("=== Calibration Status ===")
     total = len(CALIBRATION_FILES)
     found = 0
@@ -1097,6 +1861,10 @@ def check_all_calibrations():
     else:
         print(f"⚠️  Missing {total - found} calibrations")
 
+##############################################################################
+#                              MAIN EXECUTION                               #
+##############################################################################
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     
@@ -1108,9 +1876,9 @@ if __name__ == "__main__":
     
     def connect_to_server():
         try:
-            print(f"[DEBUG] Attempting to connect to {SERVER_URL}")
+            print(f"[INFO] Attempting to connect to {SERVER_URL}")
             sio.connect(SERVER_URL, wait_timeout=10)
-            print("[DEBUG] Successfully connected to server")
+            print("[INFO] Successfully connected to server")
         except Exception as e:
             print(f"[ERROR] Failed to connect to server: {e}")
     

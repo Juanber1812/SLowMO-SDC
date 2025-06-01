@@ -45,6 +45,7 @@ class AngularPositionPlotter(QWidget):
         self.data = deque(maxlen=100)
         self.time_data = deque(maxlen=100)
         self.start_time = time.time()
+        self.current_angle = 0.0  # Add this line to initialize current_angle
 
         self.figure = Figure(facecolor=self.bg_color)
         self.canvas = FigureCanvas(self.figure)
@@ -80,6 +81,7 @@ class AngularPositionPlotter(QWidget):
         rotation_matrix, _ = cv2.Rodrigues(rvec)
         euler_angles = R.from_matrix(rotation_matrix).as_euler('xyz', degrees=True)
         yaw = euler_angles[1]
+        self.current_angle = yaw  # Add this line to update current_angle
         self.time_data.append(elapsed)
         self.data.append(yaw)
         self.redraw()
@@ -109,4 +111,19 @@ class AngularPositionPlotter(QWidget):
             self.ax.set_xlim(xmin, xmax)
         else:
             self.ax.set_xlim(0, self.x_axis_window)
+
+                # Add current angle display in top right corner
+        self.ax.text(0.98, 0.95, f'{self.current_angle:.3f}°', 
+                    transform=self.ax.transAxes,
+                    fontsize=self.axis_label_size,
+                    fontweight='bold',
+                    fontfamily='Segoe UI',
+                    color=self.line_color,
+                    bbox=dict(boxstyle='round,pad=0.3', 
+                             facecolor=self.bg_color, 
+                             edgecolor=self.line_color, 
+                             alpha=0.8),
+                    horizontalalignment='right',
+                    verticalalignment='top')
+        
         self.canvas.draw()

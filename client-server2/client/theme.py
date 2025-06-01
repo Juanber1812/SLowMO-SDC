@@ -1,33 +1,33 @@
 # === Background Colors ===
-BACKGROUND = "#f5f7fa"           # Light misty white
-BOX_BACKGROUND = "#ffffff"       # Pure white for widgets
-PLOT_BACKGROUND = BACKGROUND     # Consistent plot background
-STREAM_BACKGROUND = "#e0e4ec"    # Soft light gray for video
-SECOND_COLUMN = "#f0f2f5"        # Light gray for side panels
+BACKGROUND = "#1a1a1a"           # Dark charcoal background
+BOX_BACKGROUND = "#2d2d2d"       # Lighter dark gray for widgets
+PLOT_BACKGROUND = BACKGROUND     # Slightly lighter for plots
+STREAM_BACKGROUND = "#1e1e1e"    # Very dark for video area
+SECOND_COLUMN = "#252525"        # Dark gray for side panels
 
 # === Text Colors ===
-TEXT_COLOR = "#1a1a1a"           # Near-black for readability
-TEXT_SECONDARY = "#5f6a7d"       # Muted steel gray for secondary text
-BOX_TITLE_COLOR = "#0066cc"      # Clean sky blue
-LABEL_COLOR = "#1a1a1a"
+TEXT_COLOR = "#e0e0e0"           # Light gray for primary text
+TEXT_SECONDARY = "#b0b0b0"       # Medium gray for secondary text
+BOX_TITLE_COLOR = "#ffffff"      # Pure white for titles
+LABEL_COLOR = "#c0c0c0"          # Light gray for labels
 
 # === Button Colors ===
-BUTTON_COLOR = "#0066cc"         # Primary blue accent
-BUTTON_HOVER = "#65a1da"         # Hover: brighter blue
-BUTTON_DISABLED = "#c0c7d1"
-BUTTON_TEXT = "#000000"
+BUTTON_COLOR = "#4a90e2"         # Clean blue accent
+BUTTON_HOVER = "#5aa0f2"         # Brighter blue on hover
+BUTTON_DISABLED = "#404040"      # Dark gray for disabled
+BUTTON_TEXT = "#ffffff"          # White text on buttons
 
 # === Plot Styling ===
-GRID_COLOR = "#d3d9e1"
-TICK_COLOR = "#0066cc"
-PLOT_LINE_PRIMARY = "#0066cc"
-PLOT_LINE_SECONDARY = "#f57c00"
-PLOT_LINE_ALT = "#43a047"
+GRID_COLOR = "#404040"           # Dark grid lines
+TICK_COLOR = "#606060"           # Medium gray ticks
+PLOT_LINE_PRIMARY = "#4a90e2"    # Blue primary line
+PLOT_LINE_SECONDARY = "#ff8c42"  # Orange secondary line
+PLOT_LINE_ALT = "#50c878"        # Green alternate line
 
 # === Borders ===
-BORDER_COLOR = "#dce0e8"         # Subtle border tone
-BORDER_ERROR = "#d32f2f"
-BORDER_HIGHLIGHT = "#43a047"
+BORDER_COLOR = "#404040"         # Medium gray borders
+BORDER_ERROR = "#e74c3c"         # Red for errors
+BORDER_HIGHLIGHT = "#50c878"     # Green for highlights
 
 # === Fonts ===
 FONT_FAMILY = "'Space Mono', 'IBM Plex Sans', 'Roboto Mono', monospace"
@@ -37,25 +37,25 @@ FONT_SIZE_TITLE = 12
 
 # === Semantic Extras ===
 ERROR_COLOR = BORDER_ERROR
-SUCCESS_COLOR = "#43a047"
-WARNING_COLOR = "#f57c00"
+SUCCESS_COLOR = "#50c878"        # Green for success
+WARNING_COLOR = "#f39c12"        # Orange for warnings
 
 # === Graph Mode Colors ===
 GRAPH_MODE_COLORS = {
-    "Relative Distance": "#be1c1c",
-    "Relative Angle": "#702eff",
-    "Angular Position": "#358027",
+    "Relative Distance": "#e74c3c",    # Red
+    "Relative Angle": "#9b59b6",       # Purple
+    "Angular Position": "#50c878",     # Green
 }
 
 # === Layout & Border Styling ===
-BORDER_WIDTH = 1
+BORDER_WIDTH = 0
 BORDER_RADIUS = 4
 WIDGET_SPACING = 2
-WIDGET_MARGIN = 10
+WIDGET_MARGIN = 2
 
-PADDING_SMALL = 4
-PADDING_NORMAL = 8
-PADDING_LARGE = 8
+PADDING_SMALL = 2
+PADDING_NORMAL = 4
+PADDING_LARGE = 6
 
 BUTTON_HEIGHT = 40
 STREAM_ASPECT_RATIO = (16, 9)
