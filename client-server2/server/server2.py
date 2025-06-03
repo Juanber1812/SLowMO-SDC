@@ -1,3 +1,5 @@
+# server2.py
+
 from gevent import monkey; monkey.patch_all()
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
@@ -9,8 +11,7 @@ import time
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-camera_state = "Idle"
-background_threads_started = False  # ✅ Flag to avoid starting threads multiple times
+camera_state = "Idle"  # Default camera state
 
 
 def print_server_status(status):
@@ -18,19 +19,13 @@ def print_server_status(status):
 
 
 def start_background_tasks():
-    print("[DEBUG] Starting background threads for camera and sensors")
     threading.Thread(target=camera.start_stream, daemon=True).start()
     threading.Thread(target=sensors.start_sensors, daemon=True).start()
 
 
 @socketio.on('connect')
 def handle_connect():
-    global background_threads_started
     print(f"[INFO] Client connected: {request.sid}")
-
-    if not background_threads_started:
-        start_background_tasks()
-        background_threads_started = True
 
 
 @socketio.on('disconnect')
@@ -87,6 +82,7 @@ def handle_sensor_data(data):
 @socketio.on("camera_status")
 def handle_camera_status(data):
     try:
+        # Broadcast the camera status to all connected clients
         emit("camera_status", data, broadcast=True)
     except Exception as e:
         print(f"[ERROR] camera_status: {e}")
@@ -94,12 +90,14 @@ def handle_camera_status(data):
 
 @socketio.on('get_camera_status')
 def handle_get_camera_status():
+    # Send the current camera state to the requesting client
     emit('camera_status', {'status': camera_state})
 
 
 @socketio.on("camera_info")
 def on_camera_info(data):
     try:
+        # Broadcast the camera info to all connected clients
         emit("camera_info", data, broadcast=True)
     except Exception as e:
         print("Camera info error:", e)
@@ -118,39 +116,54 @@ def handle_set_camera_idle():
 
 @socketio.on('capture_image')
 def handle_capture_image(data):
+    """Handle image capture request from client"""
     try:
         print("[INFO] Image capture requested from client")
+        
+        # Get custom path if provided in the request data
         custom_path = data.get("path") if data else None
+        
+        # Use the existing camera streamer instance to capture image
         result = camera.streamer.capture_image(custom_path)
+        
+        # Broadcast the result to all connected clients
         emit("image_captured", result, broadcast=True)
-
+        
         if result["success"]:
-            print(f"[INFO] ✓ Image captured: {result['path']} ({result['size_mb']} MB)")
+            print(f"[INFO] ✓ Image captured successfully: {result['path']} ({result['size_mb']} MB)")
         else:
             print(f"[ERROR] ❌ Image capture failed: {result['error']}")
+            
     except Exception as e:
         print(f"[ERROR] capture_image handler: {e}")
+        # Send error response to client
         emit("image_captured", {
-            "success": False,
+            "success": False, 
             "error": f"Server error: {str(e)}"
         }, broadcast=True)
 
 
 @socketio.on('download_image')
 def handle_download_image(data):
+    """Send captured image to client for local storage"""
     try:
         import os
         import base64
-
+        
         server_path = data.get("server_path")
         filename = data.get("filename")
+        
         print(f"[INFO] Image download requested: {filename}")
-
+        
         if os.path.exists(server_path):
+            # Read the image file
             with open(server_path, 'rb') as f:
                 image_data = f.read()
-
+            
+            # Encode as base64 for transmission
             encoded_image = base64.b64encode(image_data).decode('utf-8')
+            
+            # Send to client
             emit("image_download", {
                 "success": True,
                 "filename": filename,
@@ -164,6 +177,7 @@ def handle_download_image(data):
                 "error": f"Image not found: {server_path}"
             })
             print(f"[ERROR] Image file not found: {server_path}")
+            
     except Exception as e:
         print(f"[ERROR] download_image handler: {e}")
         emit("image_download", {
@@ -181,10 +195,14 @@ def set_camera_state(new_state):
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
     print("Press Ctrl+C to stop the server and clean up resources.")
+    time.sleep(1)
+    start_background_tasks()
     try:
         socketio.run(app, host="0.0.0.0", port=5000)
     except KeyboardInterrupt:
         print("\n[INFO] Shutting down server...")
+
+        # Attempt to stop camera and sensors gracefully
         try:
             camera.streamer.streaming = False
             if hasattr(camera.streamer, "picam") and getattr(camera.streamer.picam, "started", False):
@@ -194,7 +212,7 @@ if __name__ == "__main__":
             print(f"[WARN] Could not stop camera: {e}")
 
         try:
-            sensors.stop_sensors()
+            sensors.stop_sensors()  # If you have a stop_sensors function
             print("[INFO] Sensors stopped.")
         except Exception as e:
             print(f"[WARN] Could not stop sensors: {e}")
