@@ -19,9 +19,9 @@ def print_server_status(status):
 
 
 def start_background_tasks():
-    print("[DEBUG] Starting background tasks...")
-    threading.Thread(target=camera.start_stream, daemon=True).start()
-    threading.Thread(target=sensors.start_sensors, daemon=True).start()
+    print("[DEBUG] Starting background tasks using socketio.start_background_task...")
+    socketio.start_background_task(camera.start_stream)
+    socketio.start_background_task(sensors.start_sensors)
 
 
 @socketio.on('connect')
