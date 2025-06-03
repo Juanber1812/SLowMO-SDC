@@ -37,6 +37,8 @@ class CameraStreamer:
     def connect_socket(self):
         try:
             print("[DEBUG] Connecting camera socket...")
+            import time
+            time.sleep(1)  # Wait for server to be fully up
             sio.connect(SERVER_URL)
             self.connected = True
             sio.emit("camera_status", {"status": "Idle"})
