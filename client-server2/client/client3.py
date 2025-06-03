@@ -48,7 +48,7 @@ from theme import (
 ##############################################################################
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
-SERVER_URL = "http://192.168.1.146:5000"
+SERVER_URL = "http://192.168.16.89:5000"
 
 ##############################################################################
 #                        SOCKETIO AND BRIDGE SETUP                         #
