@@ -5,10 +5,11 @@
 
 import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os
 import pandas as pd
+import traceback
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea,
-    QTabWidget, QFileDialog, QDoubleSpinBox, QTextEdit
+    QTabWidget, QFileDialog, QDoubleSpinBox, QSpinBox, QTextEdit
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage, QFont, QPainter, QPen
@@ -28,13 +29,14 @@ from widgets.camera_controls import CameraControlsWidget
 from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
 from widgets.detector_control import DetectorControlWidget
+from widgets.adcs import ADCSSection # <--- ADD THIS LINE
 
 # Theme and styling
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
     TEXT_COLOR, TEXT_SECONDARY, BOX_TITLE_COLOR, LABEL_COLOR, 
     GRID_COLOR, TICK_COLOR, PLOT_LINE_PRIMARY, PLOT_LINE_SECONDARY, PLOT_LINE_ALT,
-    BUTTON_COLOR, BUTTON_HOVER, BUTTON_DISABLED, BUTTON_TEXT,
+    BUTTON_COLOR, BUTTON_HOVER, BUTTON_DISABLED, BUTTON_TEXT,BUTTON_HEIGHT,
     BORDER_COLOR, BORDER_ERROR, BORDER_HIGHLIGHT,
     FONT_FAMILY, FONT_SIZE_NORMAL, FONT_SIZE_LABEL, FONT_SIZE_TITLE,
     ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR, SECOND_COLUMN,
@@ -170,18 +172,19 @@ class MainWindow(QWidget):
                 font-size: {FONT_SIZE_NORMAL}pt;
             }}
         """)
-        
+        self.smooth_mode = None
         # Window configuration
         self.setWindowTitle("SLowMO Client")
         
         # Initialize state variables
         self.streaming = False
         self.detector_active = False
-        self.crop_active = False
+        # self.crop_active = False # REMOVE THIS LINE
         self.frame_queue = queue.Queue()
         self.last_frame = None
         self.shared_start_time = None
         self.calibration_change_time = None
+        # self.active_config_for_detector will be initialized after setup_ui
 
         # Performance tracking
         self.last_frame_time = time.time()
@@ -202,11 +205,21 @@ class MainWindow(QWidget):
         # ── end patch ──
 
         # Setup UI and connections
-        self.setup_ui()
+        self.setup_ui() # self.camera_settings is created here
+
+        # Initialize active_config_for_detector with the initial UI settings
+        # This will be updated upon server acknowledgment of config changes
+        if hasattr(self, 'camera_settings') and self.camera_settings is not None:
+             self.active_config_for_detector = self.camera_settings.get_config()
+        else:
+             # Fallback if camera_settings isn't ready for some reason.
+             self.active_config_for_detector = None
+             print("[WARNING] MainWindow.__init__: camera_settings not available for initial active_config_for_detector.")
+
         self.setup_socket_events()
         self.setup_signals()
         self.setup_timers()
-
+        self.tab_widget.currentChanged.connect(self._on_tab_changed)
         # Graph window reference
         self.graph_window = None
 
@@ -215,6 +228,25 @@ class MainWindow(QWidget):
         bridge.frame_received.connect(self.update_image)
         bridge.analysed_frame.connect(self.update_analysed_image)
         self.speedtest_result.connect(self.update_speed_labels)
+
+    def _on_tab_changed(self, index):
+        pass
+        # if switched into the Data Analysis tab, re‐draw with correct labels
+        if self.tab_widget.widget(index) is self.analysis_tab and hasattr(self, 'full_df'):
+            self.update_analysis_plots()
+            
+    def set_smoothing_mode(self, mode):
+        """Toggle Raw/SMA/EMA buttons and refresh."""
+        self.smooth_mode = mode
+     # sync button states
+        self.raw_btn.setChecked( mode is None )
+        self.savgol_btn.setChecked(mode == "SG")
+        self.butter_btn.setChecked(mode == "BW")
+        # show the matching parameter page
+        idx = 0 if mode is None else (1 if mode=="SG" else 2)
+        self.filter_param_stack.setCurrentIndex(idx)
+         # redraw
+        self.update_analysis_plots()
 
     def setup_timers(self):
         """Initialize performance timers"""
@@ -228,18 +260,32 @@ class MainWindow(QWidget):
     #                          UI SETUP METHODS                             
     #=========================================================================
 
-    def apply_groupbox_style(self, groupbox, border_color, bg_color=None, title_color=None):
-        """Apply consistent styling to group boxes"""
-        border = f"{self.BOX_BORDER_THICKNESS}px {self.BOX_BORDER_STYLE}"
-        radius_value = self.COLOR_BOX_RADIUS_RIGHT if border_color == self.COLOR_BOX_BORDER_RIGHT else self.BOX_BORDER_RADIUS
-        radius = f"{radius_value}px"
-        bg = bg_color if bg_color else self.COLOR_BG
+    def apply_groupbox_style(self, groupbox, border_color, bg_color=None, title_color=None, is_part_of_right_column=False):
+        """Apply consistent styling to group boxes, with conditional border thickness."""
+        thickness = (
+            self.BOX_BORDER_THICKNESS
+            if is_part_of_right_column
+            else 0  # No border for items not in the right column
+        )
+        
+        radius_value = (
+            self.COLOR_BOX_RADIUS_RIGHT
+            if is_part_of_right_column
+            else self.BOX_BORDER_RADIUS
+        )
+        actual_radius_str = f"{radius_value}px"
+
+        bg = bg_color if bg_color else self.COLOR_BG 
         title = title_color if title_color else BOX_TITLE_COLOR
 
-        groupbox.setStyleSheet(f"""
+        border_style_components = f"{thickness}px {self.BOX_BORDER_STYLE}"
+
+        # Combine QGroupBox styles with the general QPushButton styles
+        # This ensures that QPushButtons within this groupbox also get styled.
+        groupbox_stylesheet = f"""
             QGroupBox {{
-                border: {border} {border_color};
-                border-radius: {radius};
+                border: {border_style_components} {border_color}; 
+                border-radius: {actual_radius_str};
                 background-color: {bg};
                 margin-top: 12px;
             }}
@@ -254,7 +300,12 @@ class MainWindow(QWidget):
                 color: {title};
                 background-color: {bg};
             }}
-        """)
+            {self.BUTTON_STYLE}
+        """
+        groupbox.setStyleSheet(groupbox_stylesheet)
+        groupbox.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+        )
 
     def style_button(self, btn):
         """Apply standard button styling"""
@@ -336,7 +387,7 @@ class MainWindow(QWidget):
         row1.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         # Video stream display
-        video_group = QGroupBox("Video Stream")
+        video_group = QGroupBox()
         video_layout = QHBoxLayout()
         video_layout.setSpacing(4)
         video_layout.setContentsMargins(3, 3, 3, 3)
@@ -367,14 +418,22 @@ class MainWindow(QWidget):
 
         # Camera settings
         self.camera_settings = CameraSettingsWidget()
+        # margins & spacing
         self.camera_settings.setMaximumWidth(280)
         self.camera_settings.layout.setSpacing(2)
         self.camera_settings.layout.setContentsMargins(2, 2, 2, 2)
-        self.style_button(self.camera_settings.apply_btn)
-        self.camera_settings.apply_btn.setFixedHeight(24)
-        self.camera_settings.apply_btn.setStyleSheet(self.BUTTON_STYLE + "padding: 2px 4px; font-size: 9pt;")
+        # unify with crop/start-stream button style
+        self.camera_settings.apply_btn.setStyleSheet(self.BUTTON_STYLE)
+        self.camera_settings.apply_btn.setFixedHeight(BUTTON_HEIGHT)
+
         self.camera_settings.apply_btn.clicked.connect(self.apply_config)
-        self.apply_groupbox_style(self.camera_settings, self.COLOR_BOX_BORDER_CONFIG)
+        # self.camera_settings.crop_config_requested.connect(self.apply_config) # Ensure this is commented out or removed
+        # The line above, if active, could cause apply_config to be called when crop UI changes,
+        # not just when "Apply Settings" is clicked.
+
+        self.apply_groupbox_style(
+            self.camera_settings, self.COLOR_BOX_BORDER_CONFIG
+        )
         self.camera_settings.setFixedHeight(video_height + 20)
 
         # Add to row
@@ -385,11 +444,11 @@ class MainWindow(QWidget):
         parent_layout.addLayout(row1)
 
     def setup_graph_display_row(self, parent_layout):
-        """Setup graph display section"""
+        """Setup graph display section and LIDAR section"""
         row2 = QHBoxLayout()
-        row2.setSpacing(2)
+        row2.setSpacing(2) # Keep spacing consistent, adjust if needed
         row2.setContentsMargins(2, 2, 2, 2)
-        row2.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        row2.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop) # Align top for differing heights
 
         # Graph section with recording capabilities
         self.record_btn = QPushButton("Record")
@@ -404,43 +463,58 @@ class MainWindow(QWidget):
         self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
         
         row2.addWidget(self.graph_section)
-        parent_layout.addLayout(row2)
 
-    def setup_subsystem_controls_row(self, parent_layout):
-        """Setup LIDAR and ADCS controls"""
-        row3 = QHBoxLayout()
-        row3.setSpacing(4)
-        row3.setContentsMargins(4, 4, 4, 4)
-        row3.setAlignment(Qt.AlignmentFlag.AlignLeft)
-
-        # LIDAR section
-        lidar_group = QGroupBox("LIDAR")
+        # LIDAR section (moved here)
+        lidar_group = QGroupBox("LIDAR") # Added title for clarity if not already there
         lidar_layout = QVBoxLayout()
         lidar_layout.setSpacing(2)
         lidar_layout.setContentsMargins(2, 2, 2, 2)
         lidar_placeholder = QLabel("LIDAR here")
         lidar_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lidar_placeholder.setStyleSheet("background: white; color: black; border: 1px solid #888; border-radius: 6px; font-size: 14px;")
-        lidar_placeholder.setFixedHeight(40)
+        lidar_placeholder.setFixedHeight(40) # Current height
+        # You might want to adjust LIDAR group's height or the graph section's if they look misaligned.
+        # For example, to make LIDAR group take similar height as graph:
+        # lidar_group.setFixedSize(DESIRED_WIDTH, self.graph_section.height()) 
+        # Or allow it to expand:
+        # lidar_group.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        # lidar_group.setMinimumHeight(self.graph_section.height()) # if you want it to match graph height
+        
         lidar_layout.addWidget(lidar_placeholder)
         lidar_group.setLayout(lidar_layout)
         self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR)
+        # Set a fixed width for LIDAR or let it expand. Example fixed width:
+        lidar_group.setFixedWidth(200) # Adjust as needed
 
-        # ADCS section
-        adcs_group = QGroupBox("ADCS")
-        adcs_layout = QVBoxLayout()
-        adcs_layout.setSpacing(2)
-        adcs_layout.setContentsMargins(2, 2, 2, 2)
-        adcs_placeholder = QLabel("ADCS Placeholder\n(More controls coming soon)")
-        adcs_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        adcs_placeholder.setFixedHeight(40)
-        adcs_layout.addWidget(adcs_placeholder)
-        adcs_group.setLayout(adcs_layout)
-        self.apply_groupbox_style(adcs_group, self.COLOR_BOX_BORDER_ADCS)
+        row2.addWidget(lidar_group)
+        
+        parent_layout.addLayout(row2)
 
-        row3.addWidget(lidar_group)
-        row3.addWidget(adcs_group)
+    def setup_subsystem_controls_row(self, parent_layout):
+        """Setup ADCS controls using ADCSSection widget"""
+        row3 = QHBoxLayout()
+        row3.setSpacing(4) 
+        row3.setContentsMargins(4, 4, 4, 4)
+        row3.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+
+        # ADCS section using the new ADCSSection widget
+        self.adcs_control_widget = ADCSSection()
+        
+        # Optional: Connect to the mode_selected signal if you need to react to mode changes
+        # self.adcs_control_widget.mode_selected.connect(self.handle_adcs_mode_selection) 
+                                                                                       
+        self.apply_groupbox_style(self.adcs_control_widget, self.COLOR_BOX_BORDER_ADCS)
+        # Adjust sizing as needed, e.g.:
+        # self.adcs_control_widget.setFixedWidth(400) 
+        # self.adcs_control_widget.setFixedHeight(100) 
+
+        row3.addWidget(self.adcs_control_widget)
         parent_layout.addLayout(row3)
+
+    # Optional: Add a handler method in client3.py if you connect the signal
+    # def handle_adcs_mode_selection(self, mode_index, mode_name):
+    #     print(f"[Client3] ADCS Mode selected: Index {mode_index}, Name '{mode_name}'")
+    #     # Add logic here to respond to ADCS mode changes
 
     def setup_system_info_panel(self):
         """Setup right column system information panel"""
@@ -457,11 +531,17 @@ class MainWindow(QWidget):
         self.setup_subsystem_status_groups(info_layout)
         
         # Health report button
-        print_report_btn = QPushButton("Print Health Check Report")
-        print_report_btn.setEnabled(False)
-        self.style_button(print_report_btn)
-        info_layout.insertWidget(0, print_report_btn)
+        self.print_report_btn = QPushButton("Print Health Check Report")
+        self.print_report_btn.setEnabled(False)
+        self.print_report_btn.clicked.connect(self.export_health_report)
+        # unify with crop/start-stream button style
+        self.print_report_btn.setStyleSheet(self.BUTTON_STYLE)
+        self.print_report_btn.setFixedHeight(BUTTON_HEIGHT)
+        self.print_report_btn.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
 
+        info_layout.insertWidget(0, self.print_report_btn)
         # Scroll area wrapper
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -473,16 +553,73 @@ class MainWindow(QWidget):
                 border: 1px solid #2b2b2b;
                 border-radius: 0px;
                 background: {self.COLOR_BOX_BG_RIGHT};
-                min-width: 200px;
-                max-width: 240px;
+                min-width: 240px;  /* Changed from 200px */
+                max-width: 240px;  /* Ensures fixed width of 240px */
             }}
             QScrollBar:horizontal, QScrollBar:vertical {{ height: 0px; width: 0px; background: transparent; }}
             QWidget {{ min-width: 180px; background: {self.COLOR_BOX_BG_RIGHT}; }}
         """)
         info_container.setMinimumWidth(180)
-        info_container.setMaximumWidth(220)
+        # info_container.setMaximumWidth(220) # Allow info_container to fill the scroll_area width
+
+        # ── start patch ──
+        # keep a handle to the container so we can walk its QGroupBoxes later
+        self.info_container = info_container
+        # ── end patch ──
 
         return scroll_area
+
+
+
+    def export_health_report(self):
+        """Export health check report to a text file"""
+        from PyQt6.QtWidgets import QFileDialog, QMessageBox, QGroupBox, QLabel
+
+        default_name = "health_report.txt"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Save Health Check Report", default_name, "Text Files (*.txt);;All Files (*)"
+        )
+        if not file_path:
+            return
+
+        try:
+            lines = []
+
+            # 1) system performance labels
+            for key, lbl in self.info_labels.items():
+                lines.append(lbl.text())
+
+            # 2) each subsystem status group
+            if hasattr(self, 'info_container'):
+                groups = self.info_container.findChildren(QGroupBox)
+                for grp in groups:
+                    title = grp.title()
+                    lines.append(f"\n=== {title} ===")
+                    # all QLabel children under this group
+                    for child in grp.findChildren(QLabel):
+                        # skip the group title if it's also a QLabel
+                        if child is grp:
+                            continue
+                        lines.append(child.text())
+
+            # write out
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write("\n".join(lines))
+
+            self.show_message(
+                "Success",
+                f"Health report exported to:\n{file_path}",
+                QMessageBox.Icon.Information
+            )
+            print(f"[INFO] Health report exported to: {file_path}")
+
+        except Exception as e:
+            self.show_message(
+                "Error",
+                f"Failed to export health report:\n{e}",
+                QMessageBox.Icon.Critical
+            )
+            print(f"[ERROR] Health report export failed: {e}")
 
     def setup_system_performance_group(self, parent_layout):
         """Setup system performance monitoring group"""
@@ -502,14 +639,30 @@ class MainWindow(QWidget):
         # ── start patch ──
         # add display‐FPS label
         self.info_labels["disp_fps"] = QLabel("Display FPS: --")
-        # ── end patch ──
+        # ── end patch
 
+        # Corrected stylesheet application
+        info_label_style = f"""
+            QLabel {{
+                color: {TEXT_COLOR};
+                font-size: {FONT_SIZE_NORMAL}pt;
+                font-family: {FONT_FAMILY};
+                margin: 2px 0px; 
+                padding: 2px 0px;
+            }}
+        """
         for lbl in self.info_labels.values():
-            lbl.setStyleSheet(self.LABEL_STYLE + "margin: 2px 0px; padding: 2px 0px;")
+            lbl.setStyleSheet(info_label_style)
             info_layout_inner.addWidget(lbl)
             
         info_group.setLayout(info_layout_inner)
-        self.apply_groupbox_style(info_group, self.COLOR_BOX_BORDER_RIGHT, self.COLOR_BOX_BG_RIGHT, self.COLOR_BOX_TITLE_RIGHT)
+        self.apply_groupbox_style(
+            info_group, 
+            self.COLOR_BOX_BORDER_RIGHT, 
+            self.COLOR_BOX_BG_RIGHT, 
+            self.COLOR_BOX_TITLE_RIGHT,
+            is_part_of_right_column=True # Explicitly flag as right column item
+        )
         parent_layout.addWidget(info_group)
 
     def setup_subsystem_status_groups(self, parent_layout):
@@ -529,42 +682,48 @@ class MainWindow(QWidget):
             group = QGroupBox(name)
             layout = QVBoxLayout()
             layout.setSpacing(2)
-            layout.setContentsMargins(4, 4, 4, 4)
+            layout.setContentsMargins(2, 2, 2, 2)
 
             if name == "Communication Subsystem":
                 # Add standard comm items
                 for text in items:
                     lbl = QLabel(text)
-                    lbl.setStyleSheet("color: #bbb; margin: 2px 0px; padding: 2px 0px;")
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                 # Add special status label
                 self.comms_status_label = QLabel("Status: Disconnected")
-                self.comms_status_label.setStyleSheet("margin: 2px 0px; padding: 2px 0px;")
+                self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.comms_status_label)
             elif name == "Payload Subsystem":
                 # Special payload status labels
                 self.camera_status_label = QLabel("Camera: Pending...")
-                self.camera_status_label.setStyleSheet("color: #bbb; margin: 2px 0px; padding: 2px 0px;")
+                self.camera_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.camera_status_label)
                 
                 self.camera_ready_label = QLabel("Status: Not Ready")
-                self.camera_ready_label.setStyleSheet("color: #bbb; margin: 2px 0px; padding: 2px 0px;")
+                self.camera_ready_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.camera_ready_label)
             else:
                 # Standard subsystem items
                 for text in items:
                     lbl = QLabel(text)
-                    lbl.setStyleSheet("color: #bbb; margin: 2px 0px; padding: 2px 0px;")
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     if name != "Error Log" and name != "Overall Status":
                         lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
 
             group.setLayout(layout)
-            self.apply_groupbox_style(group, self.COLOR_BOX_BORDER_RIGHT, self.COLOR_BOX_BG_RIGHT, self.COLOR_BOX_TITLE_RIGHT)
+            self.apply_groupbox_style(
+                group,
+                self.COLOR_BOX_BORDER_RIGHT,
+                self.COLOR_BOX_BG_RIGHT,
+                self.COLOR_BOX_TITLE_RIGHT,
+                is_part_of_right_column=True # Explicitly flag as right column item
+            )
             parent_layout.addWidget(group)
 
     #=========================================================================
@@ -582,14 +741,111 @@ class MainWindow(QWidget):
         controls_layout = QHBoxLayout(controls_container)
         controls_layout.setSpacing(15)
         controls_layout.setContentsMargins(0, 0, 0, 0)
+
+        # force this first row to a fixed height so it never collapses
+        controls_container.setFixedHeight(150)
         
         # File loading section
         self.setup_file_loading_section_compact(controls_layout)
         
-        # Range selection section
+        # ── Analysis mode selector ──
+        mode_lbl = QLabel("Analysis Mode:")
+        mode_lbl.setStyleSheet(self.LABEL_STYLE)
+        controls_layout.addWidget(mode_lbl)
+
+        self.analysis_mode_combo = QComboBox()
+        self.analysis_mode_combo.addItems([
+            "Relative Distance",
+            "Relative Angle",
+            "Angular Position"
+        ])
+        self.analysis_mode_combo.setFixedWidth(150)
+        # replot & rename metrics whenever user changes mode
+        self.analysis_mode_combo.currentIndexChanged.connect(self.update_analysis_plots)
+        controls_layout.addWidget(self.analysis_mode_combo)
         self.setup_range_selection_section_compact(controls_layout)
         
-        # Add spacer to push content to left
+        # ── smoothing controls ──
+        from PyQt6.QtWidgets import QButtonGroup
+        smooth_container = QWidget()
+        smooth_layout = QHBoxLayout(smooth_container)
+        smooth_layout.setSpacing(8)
+        smooth_layout.setContentsMargins(0, 0, 0, 0)
+
+        # define buttons: (label, mode_key, tooltip)
+        smooth_defs = [
+            ("Raw",    None,  "No filtering – raw data"),
+            ("SavGol", "SG",  "Savitzky–Golay filter"),
+            ("Butter", "BW",  "Butterworth filter")
+        ]
+        btn_group = QButtonGroup(self)       # exclusive toggling
+        btn_group.setExclusive(True)
+        for text, mode, tip in smooth_defs:
+            btn = QPushButton(text)
+            btn.setCheckable(True)
+            btn.setToolTip(tip)
+            # unify with main buttons
+            btn.setStyleSheet(self.BUTTON_STYLE)
+            btn.setFixedHeight(BUTTON_HEIGHT)
+            btn.clicked.connect(lambda _, m=mode: self.set_smoothing_mode(m))
+            setattr(self, f"{text.lower()}_btn", btn)
+            btn_group.addButton(btn)
+            smooth_layout.addWidget(btn)
+        # default selection
+        self.raw_btn.setChecked(True)
+        controls_layout.addWidget(smooth_container)
+
+        # ── per-filter parameter panels ──
+        from PyQt6.QtWidgets import QStackedWidget
+        self.filter_param_stack = QStackedWidget()
+
+        # 0: raw → empty
+        self.filter_param_stack.addWidget(QWidget())
+
+        # 1: SavGol params
+        sg_panel = QWidget()
+        sg_lay   = QHBoxLayout(sg_panel)
+        sg_lay.setSpacing(4)
+        sg_lay.addWidget(QLabel("Win len:"))
+        self.sg_window_len = QSpinBox()
+        self.sg_window_len.setRange(3, 101)
+        self.sg_window_len.setSingleStep(2)
+        self.sg_window_len.setValue(5)
+        self.sg_window_len.valueChanged.connect(self.update_analysis_plots)
+        sg_lay.addWidget(self.sg_window_len)
+        sg_lay.addWidget(QLabel("Poly:"))
+        self.sg_poly = QSpinBox()
+        self.sg_poly.setRange(1, 10)
+        self.sg_poly.setValue(2)
+        self.sg_poly.valueChanged.connect(self.update_analysis_plots)
+        sg_lay.addWidget(self.sg_poly)
+        self.filter_param_stack.addWidget(sg_panel)
+
+        # 2: Butter params
+        bw_panel = QWidget()
+        bw_lay   = QHBoxLayout(bw_panel)
+        bw_lay.setSpacing(4)
+        bw_lay.addWidget(QLabel("Cutoff:"))
+        self.butter_cutoff = QDoubleSpinBox()
+        self.butter_cutoff.setRange(0.1, 100.0)
+        self.butter_cutoff.setSingleStep(0.1)
+        self.butter_cutoff.setValue(1.0)
+        self.butter_cutoff.valueChanged.connect(self.update_analysis_plots)
+        bw_lay.addWidget(self.butter_cutoff)
+        self.butter_type = QComboBox()
+        self.butter_type.addItems(["Low-pass", "High-pass"])
+        self.butter_type.currentIndexChanged.connect(self.update_analysis_plots)
+        bw_lay.addWidget(self.butter_type)
+        bw_lay.addWidget(QLabel("Order:"))
+        self.butter_order = QSpinBox()
+        self.butter_order.setRange(1, 10)
+        self.butter_order.setValue(2)
+        self.butter_order.valueChanged.connect(self.update_analysis_plots)
+        bw_lay.addWidget(self.butter_order)
+        self.filter_param_stack.addWidget(bw_panel)
+
+        controls_layout.addWidget(self.filter_param_stack)
+         # spacer
         controls_layout.addStretch()
         
         analysis_layout.addWidget(controls_container)
@@ -624,13 +880,15 @@ class MainWindow(QWidget):
     def setup_metrics_display_section_compact(self, parent_layout):
         """Setup compact metrics display section with export button at top"""
         metrics_container = QWidget()
+
+        metrics_layout = QVBoxLayout(metrics_container)
+        metrics_layout.setSpacing(2)                   # less spacing
+        metrics_layout.setContentsMargins(4, 4, 4, 4)  # slimmer margins
+
+
         # match Mission Control info panel width
         metrics_container.setMinimumWidth(180)
         metrics_container.setMaximumWidth(220)
-
-        metrics_layout = QVBoxLayout(metrics_container)
-        metrics_layout.setSpacing(2)                # less spacing
-        metrics_layout.setContentsMargins(4, 4, 4, 4)  # slimmer margins
         
         # Title at the very top
         title_label = QLabel("Analysis Results")
@@ -649,13 +907,8 @@ class MainWindow(QWidget):
         
         # Export button
         self.export_btn = QPushButton("Export Analysis")
-        self.export_btn.setStyleSheet(self.BUTTON_STYLE + f"""
-            QPushButton {{ 
-                margin-bottom: 8px; 
-                font-size: {FONT_SIZE_NORMAL-1}pt;
-            }}
-        """)
-        self.export_btn.setFixedHeight(28)
+        self.export_btn.setStyleSheet(self.BUTTON_STYLE)
+        self.export_btn.setFixedHeight(BUTTON_HEIGHT)
         self.export_btn.setEnabled(False)
         self.export_btn.clicked.connect(self.export_analysis)
         metrics_layout.addWidget(self.export_btn)
@@ -683,21 +936,21 @@ class MainWindow(QWidget):
         parent_layout.addWidget(metrics_container, stretch=0)
 
     def setup_file_loading_section_compact(self, parent_layout):
-        """Setup compact file loading controls"""
-        file_group = QGroupBox("Load CSV Data")
-        file_layout = QVBoxLayout()
-        file_layout.setSpacing(8)
-        file_layout.setContentsMargins(15, 15, 15, 15)
-        
-        # Load button
-        self.load_csv_btn = QPushButton("Browse & Load CSV")
-        self.load_csv_btn.setStyleSheet(self.BUTTON_STYLE)
-        self.load_csv_btn.setFixedHeight(32)
-        self.load_csv_btn.clicked.connect(self.load_csv_file)
-        
-        # Compact status label
-        self.csv_path_label = QLabel("No file loaded")
-        self.csv_path_label.setStyleSheet(f"""
+         """Setup compact file loading controls"""
+         file_group = QGroupBox("Load CSV Data")
+         file_layout = QVBoxLayout()
+         file_layout.setSpacing(8)
+         file_layout.setContentsMargins(15, 15, 15, 15)
+         
+         # Load button
+         self.load_csv_btn = QPushButton("Browse & Load CSV")
+         self.load_csv_btn.setStyleSheet(self.BUTTON_STYLE)
+         self.load_csv_btn.setFixedHeight(BUTTON_HEIGHT)
+         self.load_csv_btn.clicked.connect(self.load_csv_file)
+         
+         # Compact status label
+         self.csv_path_label = QLabel("No file loaded")
+         self.csv_path_label.setStyleSheet(f"""
             QLabel {{
                 color: {TEXT_SECONDARY};
                 font-size: {FONT_SIZE_NORMAL-1}pt;
@@ -709,15 +962,15 @@ class MainWindow(QWidget):
                 margin: 2px 0px;
             }}
         """)
-        self.csv_path_label.setWordWrap(True)
-        self.csv_path_label.setMaximumHeight(60)
-        
-        file_layout.addWidget(self.load_csv_btn)
-        file_layout.addWidget(self.csv_path_label)
-        file_group.setLayout(file_layout)
-        file_group.setFixedWidth(280)
-        self.apply_groupbox_style(file_group, self.COLOR_BOX_BORDER)
-        parent_layout.addWidget(file_group)
+         self.csv_path_label.setWordWrap(True)
+         self.csv_path_label.setMaximumHeight(60)
+         
+         file_layout.addWidget(self.load_csv_btn)
+         file_layout.addWidget(self.csv_path_label)
+         file_group.setLayout(file_layout)
+         file_group.setFixedWidth(280)
+         self.apply_groupbox_style(file_group, self.COLOR_BOX_BORDER)
+         parent_layout.addWidget(file_group)
 
     def setup_range_selection_section_compact(self, parent_layout):
         """Setup compact time range selection controls"""
@@ -733,20 +986,7 @@ class MainWindow(QWidget):
         self.start_spin.setDecimals(2)
         self.start_spin.setFixedWidth(80)
         self.start_spin.setFixedHeight(28)
-        self.start_spin.setStyleSheet(f"""
-        QDoubleSpinBox {{
-            background-color: {BOX_BACKGROUND};
-            color: {TEXT_COLOR};
-            border: 1px solid {BORDER_COLOR};
-            border-radius: {BORDER_RADIUS}px;
-            padding: 4px;
-            font-family: {FONT_FAMILY};
-            font-size: {FONT_SIZE_NORMAL}pt;
-        }}
-        QDoubleSpinBox:focus {{
-            border: 1px solid {BORDER_HIGHLIGHT};
-        }}
-    """)
+
         
         # End time controls
         self.end_label = QLabel("End (s):")
@@ -755,20 +995,7 @@ class MainWindow(QWidget):
         self.end_spin.setDecimals(2)
         self.end_spin.setFixedWidth(80)
         self.end_spin.setFixedHeight(28)
-        self.end_spin.setStyleSheet(f"""
-        QDoubleSpinBox {{
-            background-color: {BOX_BACKGROUND};
-            color: {TEXT_COLOR};
-            border: 1px solid {BORDER_COLOR};
-            border-radius: {BORDER_RADIUS}px;
-            padding: 4px;
-            font-family: {FONT_FAMILY};
-            font-size: {FONT_SIZE_NORMAL}pt;
-        }}
-        QDoubleSpinBox:focus {{
-            border: 1px solid {BORDER_HIGHLIGHT};
-        }}
-    """)
+
     
         # Grid layout for compact arrangement
         range_layout.addWidget(self.start_label, 0, 0)
@@ -791,16 +1018,38 @@ class MainWindow(QWidget):
         self.end_spin.setSingleStep(1.0)
         # ── end patch ──
     def update_metrics_display(self):
-        """Update the metrics display with only the average velocity"""
+        """Update the metrics display with all calculated statistics"""
         if not hasattr(self, 'metrics'):
             self.metrics_display.setText("No metrics available")
             return
+
         try:
-            avg_vel = self.metrics.get('avg_velocity', 0.0)
-            self.metrics_display.setText(f"Average Velocity: {avg_vel:.6f} m/s")
+            # rename based on current graph mode
+            gm = self.analysis_mode_combo.currentText()
+            if   gm == "Relative Distance":
+                P, D = "Distance",       "Velocity"
+            elif gm == "Relative Angle":
+                P, D = "Rel. Angle",     "Rate of Change"
+            else:
+                P, D = "Angl. Pos.",     "Spin Rate"
+
+            m = self.metrics
+            text = "\n".join([
+                f"Data Points:    {m['data_points']}",
+                f"Time Range:     {m['time_range']:.2f} s",
+                f"Peak {P}:       {m['peak_value']:.4f}",
+                f"Min {P}:        {m['min_value']:.4f}",
+                f"▶ Avg {P}:      {m['avg_value']:.4f}",
+                f"{P} Range:      {m['value_range']:.4f}",
+                f"Peak {D}:       {m['peak_velocity']:.4f}",
+                f"Min {D}:        {m['min_velocity']:.4f}",
+                f"▶ Avg {D}:      {m['avg_velocity']:.4f}",
+            ])
+            self.metrics_display.setText(text)
+
         except Exception as e:
-            print(f"[ERROR] Failed to update metrics display: {e}")
-            self.metrics_display.setText(f"Error displaying metrics: {str(e)}")
+            print(f"[ERROR] update_metrics_display: {e}")
+            self.metrics_display.setText(f"Error displaying metrics: {e}")
 
     def calculate_std_dev(self):
         """Calculate standard deviation of values"""
@@ -867,146 +1116,6 @@ class MainWindow(QWidget):
         except:
             return "Unknown"
 
-    def estimate_noise_level(self):
-        """Estimate noise level in the data"""
-        if not hasattr(self, 'full_df'):
-            return "Unknown"
-        try:
-            start = self.start_spin.value()
-            end = self.end_spin.value()
-            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
-            
-            # Use standard deviation as a proxy for noise
-            std_dev = df_range['value'].std()
-            range_val = df_range['value'].max() - df_range['value'].min()
-            
-            if range_val == 0:
-                return "Minimal"
-            
-            noise_ratio = std_dev / range_val
-            
-            if noise_ratio < 0.01:
-                return "Very Low"
-            elif noise_ratio < 0.05:
-                return "Low"
-            elif noise_ratio < 0.1:
-                return "Moderate"
-            else:
-                return "High"
-        except:
-            return "Unknown"
-
-    def analyze_trend(self):
-        """Analyze overall trend in the data"""
-        if not hasattr(self, 'metrics'):
-            return "Unknown"
-        try:
-            avg_velocity = self.metrics['avg_velocity']
-            
-            if abs(avg_velocity) < 0.001:
-                return "Stable"
-            elif avg_velocity > 0.001:
-                return "Increasing"
-            else:
-                return "Decreasing"
-        except:
-            return "Unknown"
-
-    def assess_stability(self):
-        """Assess data stability"""
-        if not hasattr(self, 'full_df'):
-            return "Unknown"
-        try:
-            start = self.start_spin.value()
-            end = self.end_spin.value()
-            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
-            
-            values = df_range['value'].values
-            if len(values) < 2:
-                return "Insufficient Data"
-            
-            # Calculate coefficient of variation
-            mean_val = np.mean(values)
-            std_val = np.std(values)
-            
-            if mean_val == 0:
-                return "Constant"
-            
-            cv = std_val / abs(mean_val)
-            
-            if cv < 0.01:
-                return "Very Stable"
-            elif cv < 0.05:
-                return "Stable"
-            elif cv < 0.1:
-                return "Moderately Stable"
-            else:
-                return "Unstable"
-        except:
-            return "Unknown"
-
-    def count_outliers(self):
-        """Count statistical outliers in the data"""
-        if not hasattr(self, 'full_df'):
-            return 0
-        try:
-            start = self.start_spin.value()
-            end = self.end_spin.value()
-            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
-            
-            values = df_range['value'].values
-            if len(values) < 4:
-                return 0
-            
-            # Use IQR method to detect outliers
-            q1 = np.percentile(values, 25)
-            q3 = np.percentile(values, 75)
-            iqr = q3 - q1
-            
-            lower_bound = q1 - 1.5 * iqr
-            upper_bound = q3 + 1.5 * iqr
-            
-            outliers = np.sum((values < lower_bound) | (values > upper_bound))
-            return int(outliers)
-        except:
-            return 0
-
-    def signal_quality_score(self):
-        """Calculate a signal quality score out of 10"""
-        if not hasattr(self, 'metrics'):
-            return 0.0
-        try:
-            points = self.metrics['data_points']
-            duration = self.metrics['time_range']
-            sampling_rate = points / duration if duration > 0 else 0
-            
-            # Base score on sampling rate
-            if sampling_rate > 30:
-                score = 10.0
-            elif sampling_rate > 20:
-                score = 8.5
-            elif sampling_rate > 10:
-                score = 7.0
-            elif sampling_rate > 5:
-                score = 5.5
-            else:
-                score = 3.0
-            
-            # Adjust for noise level
-            noise = self.estimate_noise_level()
-            if noise == "Very Low":
-                score += 0.0
-            elif noise == "Low":
-                score -= 0.5
-            elif noise == "Moderate":
-                score -= 1.0
-            else:
-                score -= 2.0
-            
-            return max(0.0, min(10.0, score))
-        except:
-            return 0.0
-
     def min_time_step(self):
         """Calculate minimum time step"""
         if not hasattr(self, 'full_df'):
@@ -1065,119 +1174,142 @@ class MainWindow(QWidget):
 
         try:
             start = self.start_spin.value()
-            end = self.end_spin.value()
-            
-            # Ensure end > start
+            end   = self.end_spin.value()
             if end <= start:
                 return
-                
-            df = self.full_df
-            df_range = df[(df['relative_time'] >= start) & (df['relative_time'] <= end)]
 
+            df        = self.full_df
+            df_range  = df[(df['relative_time'] >= start) & (df['relative_time'] <= end)]
             if len(df_range) < 2:
                 self.metrics_display.setText("Not enough data points in selected range")
                 return
 
-            # Use relative_time for analysis but show full data for context
-            full_timestamps = self.full_df["relative_time"].values
-            full_values = self.full_df["value"].values
-            
-            timestamps = df_range["relative_time"].values
-            values = df_range["value"].values
-            
-            # Compute derivative (velocity) for selected range
-            dt = np.diff(timestamps)
-            dv = np.diff(values)
-            # Avoid division by zero
-            dt[dt == 0] = 1e-6
-            velocity = dv / dt
-            velocity_times = timestamps[1:]
+            # full series for context
+            full_ts = df["relative_time"].values
+            full_v  = df["value"].values
 
-            # Clear and recreate plots - always show full data with range markers
+            # selected range
+            ts       = df_range["relative_time"].values
+            raw_vals = df_range["value"].values
+
+            # apply filtering if requested
+            mode = self.smooth_mode
+            if mode == "SG":
+                from scipy.signal import savgol_filter
+                wl = self.sg_window_len.value()
+                if wl % 2 == 0: 
+                    wl += 1
+                poly = self.sg_poly.value()
+                vals = savgol_filter(raw_vals, window_length=wl, polyorder=poly)
+            elif mode == "BW":
+                from numpy import mean, diff
+                from scipy.signal import butter, filtfilt
+                # cutoff freq and order from UI
+                cutoff = self.butter_cutoff.value()
+                order  = self.butter_order.value()
+                # sampling rate from timestamps
+                dt0 = diff(ts)
+                fs  = 1.0/(mean(dt0) if len(dt0)>0 else 1.0)
+                nyq = 0.5*fs
+                btype = 'low' if self.butter_type.currentText()=="Low-pass" else 'high'
+                b, a  = butter(order, cutoff/nyq, btype=btype)
+                vals = filtfilt(b, a, raw_vals)
+            else:
+                vals = raw_vals
+
+            # compute velocity
+            from numpy import diff
+            dts = diff(ts)
+            dvs = diff(vals)
+            dts[dts==0] = 1e-6
+            vel = dvs/dts
+            vel_ts = ts[1:]
+
+            # clear & redraw
             self.raw_canvas.figure.clear()
             self.vel_canvas.figure.clear()
 
-            # Raw Data Plot - show full data with range selection highlighted
+            # Raw plot
             raw_ax = self.raw_canvas.figure.add_subplot(111)
             raw_ax.set_facecolor(PLOT_BACKGROUND)
-            
-            # Plot full data in lighter color
-            raw_ax.plot(full_timestamps, full_values, color=PLOT_LINE_ALT, alpha=0.5, linewidth=1, label="Full Data")
-            
-            # Highlight selected range
-            raw_ax.plot(timestamps, values, label="Selected Range", color=PLOT_LINE_PRIMARY, linewidth=2)
-            
-            # Add range markers
-            raw_ax.axvline(start, color=SUCCESS_COLOR, linestyle='--', alpha=0.8, linewidth=2, label="Start")
-            raw_ax.axvline(end, color=ERROR_COLOR, linestyle='--', alpha=0.8, linewidth=2, label="End")
-            
-            # raw_ax.set_title("Raw Data (Distance vs Time)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=11, pad=8)
-            raw_ax.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
-            
-            # pick axis labels based on current graph mode
-            mode = self.graph_section.current_graph_mode
-            if mode == "Relative Distance":
-                raw_ylabel, vel_ylabel = "Distance (m)", "Velocity (m/s)"
-            elif mode == "Relative Angle":
-                raw_ylabel, vel_ylabel = "Angle (°)", "Angular Velocity (°/s)"
-            elif mode == "Angular Position":
-                raw_ylabel, vel_ylabel = "Position (°)", "Spin Rate (°/s)"
+            raw_ax.plot(full_ts, full_v, color=PLOT_LINE_ALT, alpha=0.4, label="Full Data")
+            raw_ax.plot(ts, vals, color=PLOT_LINE_PRIMARY, linewidth=2, label="Selected Range")
+
+            # overlay filter legend with the correct parameters
+            if mode == "SG":
+                lbl = f"SavGol (wl={self.sg_window_len.value()}, poly={self.sg_poly.value()})"
+            elif mode == "BW":
+                lbl = (
+                    f"Butterworth ({self.butter_type.currentText()}, "
+                    f"fc={self.butter_cutoff.value():.2f}, "
+                    f"ord={self.butter_order.value()})"
+                )
             else:
-                raw_ylabel, vel_ylabel = "Value", "Rate"
-            raw_ax.set_ylabel(raw_ylabel, color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
-            
-            raw_ax.tick_params(colors=TEXT_COLOR, labelsize=8)
+                lbl = None
+            if lbl:
+                raw_ax.plot(
+                    ts, vals,
+                    linestyle="--",
+                    color=PLOT_LINE_SECONDARY,
+                    linewidth=2,
+                    label=lbl
+                )
+
+            # vertical markers
+            raw_ax.axvline(start, color=SUCCESS_COLOR, linestyle='--', label="Start")
+            raw_ax.axvline(end,   color=ERROR_COLOR,   linestyle='--', label="End")
+
+            raw_ax.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
+
+            # pick axis labels by mode
+            gm = self.analysis_mode_combo.currentText()
+            if   gm == "Relative Distance":
+                y_raw, y_vel = "Distance (m)",        "Velocity (m/s)"
+            elif gm == "Relative Angle":
+                y_raw, y_vel = "Relative Angle (°)",  "Rate of Change (°/s)"
+            else:  # Angular Position
+                y_raw, y_vel = "Angular Position (°)", "Spin Rate (°/s)"
+
+            raw_ax.set_ylabel(y_raw, color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
             raw_ax.grid(True, color=GRID_COLOR, alpha=0.3)
-            raw_ax.legend(facecolor=BOX_BACKGROUND, edgecolor=BORDER_COLOR, labelcolor=TEXT_COLOR, fontsize=8)
-            
-            # Better margins for space efficiency
+            raw_ax.tick_params(colors=TEXT_COLOR, labelsize=8)
+            raw_ax.legend(facecolor=BOX_BACKGROUND, edgecolor=BORDER_COLOR, fontsize=8)
             self.raw_canvas.figure.subplots_adjust(left=0.08, right=0.98, top=0.88, bottom=0.15)
 
-            # Velocity Plot - only show selected range data
+            # Velocity plot
             vel_ax = self.vel_canvas.figure.add_subplot(111)
             vel_ax.set_facecolor(PLOT_BACKGROUND)
-            vel_ax.plot(velocity_times, velocity, label="Velocity (Selected Range)", color=PLOT_LINE_SECONDARY, linewidth=2)
-            vel_ax.axvline(start, color=SUCCESS_COLOR, linestyle='--', alpha=0.8, linewidth=2, label="Start")
-            vel_ax.axvline(end, color=ERROR_COLOR, linestyle='--', alpha=0.8, linewidth=2, label="End")
-            # vel_ax.set_title("Velocity (Selected Range)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=11, pad=8)
+            vel_ax.plot(vel_ts, vel, color=PLOT_LINE_SECONDARY, linewidth=2, label=y_vel)
+            vel_ax.axvline(start, color=SUCCESS_COLOR, linestyle='--')
+            vel_ax.axvline(end,   color=ERROR_COLOR,   linestyle='--')
             vel_ax.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
-            vel_ax.set_ylabel(vel_ylabel, color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
-            vel_ax.tick_params(colors=TEXT_COLOR, labelsize=8)
+            vel_ax.set_ylabel(y_vel,   color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
             vel_ax.grid(True, color=GRID_COLOR, alpha=0.3)
-            vel_ax.legend(facecolor=BOX_BACKGROUND, edgecolor=BORDER_COLOR, labelcolor=TEXT_COLOR, fontsize=8)
-            
-            # Better margins for space efficiency
+            vel_ax.tick_params(colors=TEXT_COLOR, labelsize=8)
+            vel_ax.legend(facecolor=BOX_BACKGROUND, edgecolor=BORDER_COLOR, fontsize=8)
             self.vel_canvas.figure.subplots_adjust(left=0.08, right=0.98, top=0.88, bottom=0.15)
 
-            # Redraw canvases
             self.raw_canvas.draw()
             self.vel_canvas.draw()
 
-            # Calculate and store metrics
+            # update metrics
             self.metrics = {
                 "data_points": len(df_range),
-                "time_range": end - start,
-                "peak_value": values.max(),
-                "min_value": values.min(),
-                "avg_value": values.mean(),
-                "value_range": values.max() - values.min(),
-                "peak_velocity": velocity.max() if len(velocity) > 0 else 0,
-                "min_velocity": velocity.min() if len(velocity) > 0 else 0,
-                "avg_velocity": velocity.mean() if len(velocity) > 0 else 0,
-                "start_time": start,
-                "end_time": end
+                "time_range":  end - start,
+                "peak_value":  vals.max(),
+                "min_value":   vals.min(),
+                "avg_value":   vals.mean(),
+                "value_range": vals.max() - vals.min(),
+                "peak_velocity": float(vel.max()) if len(vel)>0 else 0.0,
+                "min_velocity":  float(vel.min()) if len(vel)>0 else 0.0,
+                "avg_velocity":  float(vel.mean())if len(vel)>0 else 0.0,
             }
-
-            # Update metrics display
             self.update_metrics_display()
-            
-            print(f"[INFO] Analysis updated - Range: {start:.2f}s to {end:.2f}s ({len(df_range)} points)")
 
         except Exception as e:
-            print(f"[ERROR] Failed to update analysis plots: {e}")
-            import traceback
+            print(f"[ERROR] update_analysis_plots: {e}")
             traceback.print_exc()
-            self.metrics_display.setText(f"Error updating plots: {str(e)}")
+            self.metrics_display.setText(f"Error plotting data: {e}")
 
     def load_csv_file(self):
         """Load and process CSV file for analysis"""
@@ -1219,8 +1351,8 @@ class MainWindow(QWidget):
             self.end_spin.setRange(min_time, max_time)
             self.start_spin.setValue(min_time)
             self.end_spin.setValue(max_time)
-            self.start_spin.setSingleStep(0.01)
-            self.end_spin.setSingleStep(0.01)
+            self.start_spin.setSingleStep(1)
+            self.end_spin.setSingleStep(1)
             
             # Enable controls
             self.start_spin.setEnabled(True)
@@ -1297,21 +1429,23 @@ class MainWindow(QWidget):
         
         from PyQt6.QtWidgets import QFileDialog
         
-        # suggest default filename based on selected mode
-        mode_key = self.graph_section.current_graph_mode.replace(" ", "_").lower()
-        default_name = f"{mode_key}_analysis.txt"
+        # guard against None
+        mode = self.graph_section.current_graph_mode or self.analysis_mode_combo.currentText() or ""
+        key = mode.replace(" ", "_").lower() if mode else "analysis"
+        default_name = f"{key}_analysis.txt"
+        
         file_path, _ = QFileDialog.getSaveFileName(
             self, "Export Analysis", default_name, "Text Files (*.txt);;All Files (*)"
         )
         
         if file_path:
             try:
-                with open(file_path, 'w') as f:
+                with open(file_path, 'w', encoding='utf-8') as f:
                     f.write(self.metrics_display.toPlainText())
                 self.show_message("Success", f"Analysis exported to:\n{file_path}", QMessageBox.Icon.Information)
                 print(f"[INFO] Analysis exported to: {file_path}")
             except Exception as e:
-                self.show_message("Error", f"Failed to export analysis:\n{str(e)}", QMessageBox.Icon.Critical)
+                self.show_message("Error", f"Failed to export analysis:\n{e}", QMessageBox.Icon.Critical)
                 print(f"[ERROR] Export failed: {e}")
 
     def update_image(self, frame):
@@ -1371,9 +1505,13 @@ class MainWindow(QWidget):
             self.comms_status_label.setText("Status: Connected")
             self.camera_controls.toggle_btn.setEnabled(True)
             self.detector_controls.detector_btn.setEnabled(True)
-            self.camera_controls.crop_btn.setEnabled(True)
+            # self.camera_controls.crop_btn.setEnabled(True) # DELETED
             self.camera_controls.capture_btn.setEnabled(True)
-            
+
+            # ── start patch: enable health‐report button on connect
+            self.print_report_btn.setEnabled(True)
+            # ── end patch
+
             self.apply_config()
             QTimer.singleShot(100, self.delayed_server_setup)
 
@@ -1383,7 +1521,7 @@ class MainWindow(QWidget):
             self.comms_status_label.setText("Status: Disconnected")
             self.camera_controls.toggle_btn.setEnabled(False)
             self.detector_controls.detector_btn.setEnabled(False)
-            self.camera_controls.crop_btn.setEnabled(False)
+            # self.camera_controls.crop_btn.setEnabled(False) # DELETED
             self.camera_controls.capture_btn.setEnabled(False)
 
         @sio.on("frame")
@@ -1504,22 +1642,56 @@ class MainWindow(QWidget):
 
     def apply_config(self):
         """Apply camera configuration changes"""
-        was_streaming = self.streaming
-        if was_streaming:
-            self.toggle_stream()
+        print("[INFO] Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.")
+        
+        # Capture current streaming state for this specific call
+        was_streaming_for_this_call = self.streaming
 
+        # 1. Pause stream immediately if active
+        if was_streaming_for_this_call:
+            # self.toggle_stream() # This stops the stream and updates self.streaming
+            # Avoid calling toggle_stream here if it has complex side effects or emits signals
+            # that might interfere with rapid calls. Instead, manage stream state directly for pause.
+            if self.streaming: # Double check, as state might change
+                sio.emit("stop_camera")
+                self.streaming = False
+                self.camera_controls.toggle_btn.setText("Start Stream")
+                print("[INFO] Stream paused for config application.")
+
+
+        # 2. Initiate graph pause immediately
+        self.calibration_change_time = time.time()
+        # Keep the existing 1-second timer for resuming graphs.
+        QTimer.singleShot(1000, self.resume_after_calibration_change)
+
+        # 3. Schedule the actual config sending and detector update after 0.5 seconds
+        # Pass the captured streaming state as an argument
+        QTimer.singleShot(500, lambda: self._execute_config_application_after_pause(was_streaming_for_this_call))
+
+    def _execute_config_application_after_pause(self, was_streaming_at_call_time):
+        """Helper method to get/send config and update detector after the initial 0.5s pause."""
+        print(f"[INFO] 0.5s pause complete. Getting/sending configuration (stream was {was_streaming_at_call_time}).")
+        
+        # Get and send configuration
         config = self.camera_settings.get_config()
         sio.emit("camera_config", config)
         
-        # Pause display during configuration change
-        self.calibration_change_time = time.time()
-        QTimer.singleShot(1000, self.resume_after_calibration_change)
-        
-        # Update detector calibration
-        self.update_detector_calibration(config)
+        #Update detector calibration (this will also update self.active_config_for_detector via server ack)
+        self.update_detector_calibration(config) # This is now handled by camera_config_updated
 
-        if was_streaming:
-            threading.Timer(0.5, self.toggle_stream).start()
+        # Resume stream if it was active before applying config
+        if was_streaming_at_call_time:
+            # Add a small delay for server to process config before restarting stream
+            def restart_stream_if_needed():
+                if not self.streaming: # Check if it wasn't restarted by another process
+                    sio.emit("start_camera")
+                    self.streaming = True
+                    self.camera_controls.toggle_btn.setText("Stop Stream")
+                    print("[INFO] Stream restart scheduled (if it was on before apply_config).")
+
+            threading.Timer(0.2, restart_stream_if_needed).start()
+        
+        # No need to delete an instance attribute as it's passed by argument.
 
     def resume_after_calibration_change(self):
         """Resume display after configuration change"""
@@ -1560,13 +1732,28 @@ class MainWindow(QWidget):
             try:
                 frame = self.frame_queue.get(timeout=0.1)
                 
-                config = self.camera_settings.get_config()
+                # Use the server-acknowledged and locally cached configuration
+                if self.active_config_for_detector is None:
+                    # Fallback if not initialized, though it should be in __init__ or connect event
+                    print("[WARNING] run_detector: active_config_for_detector is None. Using live UI settings as fallback.")
+                    config = self.camera_settings.get_config() # Fallback, not ideal
+                else:
+                    config = self.active_config_for_detector # CORRECT: Use cached config
+                
                 is_cropped = config.get('cropped', False)
                 
                 original_height = None
                 if is_cropped:
                     current_height = frame.shape[0]
-                    original_height = int(current_height * 3)
+                    crop_factor = config.get('crop_factor') # This is set in camera_settings.get_config()
+                    
+                    # Ensure crop_factor is valid and positive before division
+                    if crop_factor is not None and crop_factor > 0.001: # MIN_CROP_FACTOR is likely 0.1
+                        original_height = int(current_height / crop_factor)
+                    else:
+                        # Fallback if crop_factor is somehow invalid (should not happen with current setup)
+                        print(f"[WARNING] Invalid crop_factor: {crop_factor} during detection. Using current_height as original_height.")
+                        original_height = current_height 
                 
                 # Process frame with detector
                 try:
@@ -1589,7 +1776,7 @@ class MainWindow(QWidget):
                         if now - self._last_graph_draw >= self._graph_update_interval:
                             self._last_graph_draw = now
                             self.graph_section.graph_widget.update(rvec, tvec, ts)
-                        # ── end patch ──
+                        # ── end patch
 
                         # always record every data point
                         value = None
@@ -1619,18 +1806,6 @@ class MainWindow(QWidget):
             time_since_change = time.time() - self.calibration_change_time
             return time_since_change >= 1.0
         return True
-
-    def toggle_crop(self):
-        """Toggle camera crop mode"""
-        self.crop_active = not self.crop_active
-        
-        try:
-            self.camera_settings.set_cropped_label(self.crop_active)
-        except Exception as e:
-            print(f"[DEBUG] Could not update crop label: {e}")
-        
-        self.camera_controls.crop_btn.setText("Uncrop" if self.crop_active else "Crop")
-        self.apply_config()
 
     def capture_image(self):
         """Request image capture from server"""
@@ -1675,6 +1850,7 @@ class MainWindow(QWidget):
                 st = speedtest.Speedtest()
                 upload = st.upload()
                 upload_mbps = upload / 1_000_000
+               
                 fps = self.camera_settings.fps_slider.value()
                 max_bytes_per_sec = upload / 8
                 max_frame_size = max_bytes_per_sec / fps
@@ -1761,7 +1937,7 @@ class MainWindow(QWidget):
                 padding: 6px 12px;
                 font-size: 9pt;
                 font-family: 'Roboto Condensed', 'Segoe UI', sans-serif;
-            }
+                       }
             QMessageBox QPushButton:hover {
                 background-color: #50575f;
                 border: 2px solid #ffcc00;
@@ -1771,19 +1947,25 @@ class MainWindow(QWidget):
 
     def reset_camera_to_default(self):
         """Reset camera to default configuration"""
-        if self.crop_active:
-            self.crop_active = False
-            idx = self.camera_settings.res_dropdown.findText("Custom (Cropped)")
-            if idx != -1:
-                self.camera_settings.res_dropdown.removeItem(idx)
-            from widgets.camera_settings import CameraSettingsWidget
-            self.camera_settings.get_config = CameraSettingsWidget.get_config.__get__(self.camera_settings)
-            self.camera_settings.set_cropped_label(False)
-            self.camera_controls.crop_btn.setText("Crop")
-        self.camera_settings.res_dropdown.setCurrentIndex(0)
-        config = self.camera_settings.get_config()
+        # Set the crop state to False using the CameraSettingsWidget's method
+        # This will also trigger UI updates within CameraSettingsWidget
+        self.camera_settings.set_crop_state(False) 
+
+        # The following logic for "Custom (Cropped)" might need review.
+        # _populate_res_dropdown in CameraSettingsWidget should handle the (Cropped) suffix.
+        # If a specific "Custom (Cropped)" item needs explicit removal, that logic would remain,
+        # but ensure it's still relevant with the new setup.
+        # For now, assuming set_crop_state(False) and subsequent apply_config is sufficient.
+        # idx = self.camera_settings.res_dropdown.findText("Custom (Cropped)") 
+        # if idx != -1:
+        #     self.camera_settings.res_dropdown.removeItem(idx)
+        
+        self.camera_settings.res_dropdown.setCurrentIndex(0) # Reset dropdown to the first item
+        
+        # Apply the configuration which will now have cropping disabled
+        config = self.camera_settings.get_config() 
         sio.emit("camera_config", config)
-        time.sleep(0.2)
+        time.sleep(0.2) # Keep delay if necessary for server to process
 
     #=========================================================================
     #                           EVENT HANDLERS                              
@@ -1841,7 +2023,6 @@ def check_all_calibrations():
             filepath = os.path.normpath(filepath)
         else:
             filepath = filename
-            
         if os.path.exists(filepath):
             if resolution == "legacy":
                 print(f"✓ OLD (Legacy) - {filename}")
@@ -1852,7 +2033,7 @@ def check_all_calibrations():
             if resolution == "legacy":
                 print(f"❌ OLD (Legacy) - {filename} (MISSING)")
             else:
-                print(f"❌ {resolution[0]}x{resolution[1]} - {filename} (MISSING)")
+                               print(f"❌ {resolution[0]}x{resolution[1]} - {filename} (MISSING)")
     
     print(f"\nStatus: {found}/{total} calibrations available")
     

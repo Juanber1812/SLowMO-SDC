@@ -73,7 +73,8 @@ class AngularPositionPlotter(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.canvas)
         self.setLayout(layout)
-
+        self.redraw() 
+        
     def update(self, rvec, tvec, timestamp=None):
         if timestamp is None:
             timestamp = time.time()

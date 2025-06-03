@@ -13,7 +13,7 @@ from theme import (
 
 class CameraControlsWidget(QGroupBox):
     def __init__(self, parent_window=None):
-        super().__init__("Controls", parent_window)  # Changed title to include both camera and detector
+        super().__init__(parent_window)  # Changed title to include both camera and detector
 
         self.parent_window = parent_window  # Store reference to parent
         # Changed from QGridLayout to QVBoxLayout for vertical stacking
@@ -24,7 +24,6 @@ class CameraControlsWidget(QGroupBox):
         self.toggle_btn = QPushButton("Start Stream")
         self.reconnect_btn = QPushButton("Reconnect")
         self.capture_btn = QPushButton("Capture Image")
-        self.crop_btn = QPushButton("Crop")
         
         # Detector Control Button
         self.detector_btn = QPushButton("Start Detector")
@@ -53,7 +52,7 @@ class CameraControlsWidget(QGroupBox):
         """
 
         # Apply the same style to all buttons
-        for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.crop_btn, self.detector_btn):
+        for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.detector_btn):
             btn.setStyleSheet(self.BUTTON_STYLE)
 
         # Connect camera buttons to parent window methods if they exist
@@ -64,22 +63,18 @@ class CameraControlsWidget(QGroupBox):
                 self.reconnect_btn.clicked.connect(self.parent_window.try_reconnect)
             if hasattr(self.parent_window, 'capture_image'):
                 self.capture_btn.clicked.connect(self.parent_window.capture_image)
-            if hasattr(self.parent_window, 'toggle_crop'):
-                self.crop_btn.clicked.connect(self.parent_window.toggle_crop)
             if hasattr(self.parent_window, 'toggle_detector'):
                 self.detector_btn.clicked.connect(self.parent_window.toggle_detector)
 
         # Default states
         self.toggle_btn.setEnabled(False)
         self.capture_btn.setEnabled(False)  # Will be enabled when connected
-        self.crop_btn.setEnabled(True)
         self.detector_btn.setEnabled(False)  # Will be enabled when connected
 
         # Add to layout vertically (all 5 buttons stacked)
         self.layout.addWidget(self.toggle_btn)
         self.layout.addWidget(self.reconnect_btn)
         self.layout.addWidget(self.capture_btn)
-        self.layout.addWidget(self.crop_btn)
         self.layout.addWidget(self.detector_btn)
         
         # Set layout spacing
@@ -108,7 +103,7 @@ class CameraControlsWidget(QGroupBox):
         """Apply external style while preserving button styles"""
         # Store current button styles
         button_styles = {}
-        for btn_name in ['toggle_btn', 'reconnect_btn', 'capture_btn', 'crop_btn', 'detector_btn']:
+        for btn_name in ['toggle_btn', 'reconnect_btn', 'capture_btn', 'detector_btn']:
             btn = getattr(self, btn_name)
             button_styles[btn_name] = btn.styleSheet()
         

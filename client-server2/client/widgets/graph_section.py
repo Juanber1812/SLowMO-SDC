@@ -49,7 +49,7 @@ class GraphSection(QGroupBox):
     recording_saved = pyqtSignal(str)
 
     def __init__(self, record_btn: QPushButton, duration_dropdown: QComboBox, parent=None):
-        super().__init__("Graph Display", parent)
+        super().__init__(parent)
         self.setObjectName("GraphSection")
 
         self.graph_display_layout = QVBoxLayout()
@@ -80,7 +80,7 @@ class GraphSection(QGroupBox):
                     border: {BORDER_WIDTH}px solid {color};
                     border-radius: {BORDER_RADIUS}px;
                     padding: 1px 1px;
-                    font-size: 9pt;
+                    font-size: {FONT_SIZE_NORMAL}pt;
                     font-family: {FONT_FAMILY};
                 }}
                 QPushButton:hover {{
@@ -272,7 +272,7 @@ class GraphSection(QGroupBox):
         MODE_CODES = {
             "Relative Distance":  "distance_01",
             "Relative Angle":     "angle_02",
-            "Angular Position":   "angular_position_03",
+            "Angular Position":   "spin_03",
         }
         code = MODE_CODES.get(
             self.current_graph_mode,

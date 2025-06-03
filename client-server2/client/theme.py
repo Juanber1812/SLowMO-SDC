@@ -1,63 +1,63 @@
 # === Background Colors ===
-BACKGROUND = "#1a1a1a"           # Dark charcoal background
-BOX_BACKGROUND = "#2d2d2d"       # Lighter dark gray for widgets
-PLOT_BACKGROUND = BACKGROUND     # Slightly lighter for plots
-STREAM_BACKGROUND = "#1e1e1e"    # Very dark for video area
-SECOND_COLUMN = "#252525"        # Dark gray for side panels
+BACKGROUND         = "#F0F4F8"  # Pastel Breeze
+BOX_BACKGROUND     = "#FFFFFF"  # White
+PLOT_BACKGROUND    = BACKGROUND
+STREAM_BACKGROUND  = "#12122B"  # Deep midnight
+SECOND_COLUMN      = "#F1F1F1"  # Side-panel shade
 
 # === Text Colors ===
-TEXT_COLOR = "#e0e0e0"           # Light gray for primary text
-TEXT_SECONDARY = "#b0b0b0"       # Medium gray for secondary text
-BOX_TITLE_COLOR = "#ffffff"      # Pure white for titles
-LABEL_COLOR = "#c0c0c0"          # Light gray for labels
+TEXT_COLOR         = "#2E3A59"  # Dark blue-gray
+TEXT_SECONDARY     = "#5B6D8A"  # Muted blue-gray
+BOX_TITLE_COLOR    = "#FFFFFF"  # Pure white
+LABEL_COLOR        = "#CCCCFF"  # Soft periwinkle
 
 # === Button Colors ===
-BUTTON_COLOR = "#4a90e2"         # Clean blue accent
-BUTTON_HOVER = "#5aa0f2"         # Brighter blue on hover
-BUTTON_DISABLED = "#404040"      # Dark gray for disabled
-BUTTON_TEXT = "#ffffff"          # White text on buttons
+BUTTON_COLOR       = "#A3D5FF"  # Light blue
+BUTTON_HOVER       = "#6EB5FF"  # Vivid blue
+BUTTON_DISABLED    = "#C0C9D9"  # Light gray
+BUTTON_TEXT        = "#2E3A59"  # Dark text on bright button
 
 # === Plot Styling ===
-GRID_COLOR = "#404040"           # Dark grid lines
-TICK_COLOR = "#606060"           # Medium gray ticks
-PLOT_LINE_PRIMARY = "#4a90e2"    # Blue primary line
-PLOT_LINE_SECONDARY = "#ff8c42"  # Orange secondary line
-PLOT_LINE_ALT = "#50c878"        # Green alternate line
+GRID_COLOR         = "#D9E2EC"  # Light grayish blue
+TICK_COLOR         = "#7575A3"  # Muted bluish ticks
+PLOT_LINE_PRIMARY  = "#FF4081"  # Pink neon
+PLOT_LINE_SECONDARY= "#7C4DFF"  # Purple neon
+PLOT_LINE_ALT      = "#00E676"  # Green neon
 
 # === Borders ===
-BORDER_COLOR = "#404040"         # Medium gray borders
-BORDER_ERROR = "#e74c3c"         # Red for errors
-BORDER_HIGHLIGHT = "#50c878"     # Green for highlights
+BORDER_COLOR       = "#B3C0DA"  # Light indigo border
+BORDER_ERROR       = "#FF1744"  # Red alert
+BORDER_HIGHLIGHT   = "#00E676"  # Green success
 
 # === Fonts ===
-FONT_FAMILY = "'Space Mono', 'IBM Plex Sans', 'Roboto Mono', monospace"
-FONT_SIZE_NORMAL = 10
-FONT_SIZE_LABEL = 9
-FONT_SIZE_TITLE = 12
+FONT_FAMILY        = "'Montserrat', 'Segoe UI', sans-serif"
+FONT_SIZE_NORMAL   = 9
+FONT_SIZE_LABEL    = 9
+FONT_SIZE_TITLE    = 9
 
 # === Semantic Extras ===
-ERROR_COLOR = BORDER_ERROR
-SUCCESS_COLOR = "#50c878"        # Green for success
-WARNING_COLOR = "#f39c12"        # Orange for warnings
+ERROR_COLOR        = BORDER_ERROR
+SUCCESS_COLOR      = PLOT_LINE_ALT
+WARNING_COLOR      = "#FFC400"  # Amber
 
 # === Graph Mode Colors ===
 GRAPH_MODE_COLORS = {
-    "Relative Distance": "#e74c3c",    # Red
-    "Relative Angle": "#9b59b6",       # Purple
-    "Angular Position": "#50c878",     # Green
+    "Relative Distance":  "#FF1744",  # Red
+    "Relative Angle":     "#7C4DFF",  # Purple
+    "Angular Position":   "#00E676",  # Green
 }
 
 # === Layout & Border Styling ===
-BORDER_WIDTH = 0
-BORDER_RADIUS = 4
-WIDGET_SPACING = 2
-WIDGET_MARGIN = 2
+BORDER_WIDTH       = 1
+BORDER_RADIUS      = 6
+WIDGET_SPACING     = 4
+WIDGET_MARGIN      = 6
 
-PADDING_SMALL = 2
-PADDING_NORMAL = 4
-PADDING_LARGE = 6
+PADDING_SMALL      = 4
+PADDING_NORMAL     = 8
+PADDING_LARGE      = 12
 
-BUTTON_HEIGHT = 40
-STREAM_ASPECT_RATIO = (16, 9)
-STREAM_WIDTH = 384 * 2
-STREAM_HEIGHT = 216 * 2
+BUTTON_HEIGHT      = 36
+STREAM_ASPECT_RATIO= (16, 9)
+STREAM_WIDTH       = 640
+STREAM_HEIGHT      = 360

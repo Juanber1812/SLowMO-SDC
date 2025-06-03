@@ -35,23 +35,33 @@ class AprilTagDetector:
         """Load calibration data from file."""
         try:
             # Handle relative paths for legacy calibration
+            abs_calibration_file = calibration_file # Store original for logging if needed
             if not os.path.isabs(calibration_file):
                 # If it's a relative path, make it relative to the current file's directory
-                calibration_file = os.path.join(os.path.dirname(__file__), "..", calibration_file)
-                calibration_file = os.path.normpath(calibration_file)
+                # This path logic assumes calibration_file is like "payload/file.npz" or "calibrations/file.npz"
+                # and this script (detector4.py) is in client/payload
+                base_path = os.path.join(os.path.dirname(__file__), "..") # up to client/
+                abs_calibration_file = os.path.join(base_path, calibration_file)
+                abs_calibration_file = os.path.normpath(abs_calibration_file)
         
-            if not os.path.exists(calibration_file):
-                print(f"[WARNING] Calibration file not found: {calibration_file}")
+            if not os.path.exists(abs_calibration_file):
+                print(f"[WARNING] Calibration file not found: {abs_calibration_file} (original path: {calibration_file})")
                 return False
                 
-            calibration = np.load(calibration_file)
+            calibration = np.load(abs_calibration_file)
             self.mtx = calibration['mtx']
             self.dist = calibration['dist']
-            print(f"[INFO] Loaded calibration: {calibration_file}")
+            # --- ADD THIS DEBUG PRINT ---
+            print(f"[INFO] DETECTOR LOADED CALIBRATION: {abs_calibration_file}")
+            print(f"[INFO] DETECTOR MTX (first row): {self.mtx[0]}")
+            print(f"[INFO] DETECTOR MTX (cx, cy): ({self.mtx[0,2]:.2f}, {self.mtx[1,2]:.2f})")
+            # --- END DEBUG PRINT ---
             return True
             
         except Exception as e:
-            print(f"[ERROR] Failed to load calibration {calibration_file}: {e}")
+            print(f"[ERROR] Failed to load calibration {calibration_file} (resolved: {abs_calibration_file if 'abs_calibration_file' in locals() else 'N/A'}): {e}")
+            self.mtx = None # Clear on failure
+            self.dist = None # Clear on failure
             return False
     
     def update_calibration(self, calibration_file):
@@ -65,12 +75,17 @@ class AprilTagDetector:
             return (frame, None) if return_pose else frame
         
         # Adjust camera matrix for cropped images
-        mtx = self.mtx.copy()
+        mtx = self.mtx.copy() # self.mtx is the original calibration matrix
         if is_cropped and original_height is not None:
-            current_height = frame.shape[0]
-            crop_offset = (original_height - current_height) // 2
-            # Adjust principal point Y for the crop offset
-            mtx[1, 2] -= crop_offset
+            current_height = frame.shape[0] # Height of the cropped image
+            # original_height is the height of the sensor for which self.mtx was calibrated
+            
+            # Calculate how many rows were removed from the top (assuming centered crop)
+            crop_offset = (original_height - current_height) // 2 
+            
+            # Adjust principal point Y (cy) for the crop offset
+            # mtx[1, 2] is cy, the y-coordinate of the principal point
+            mtx[1, 2] -= crop_offset 
         
         frame = cv2.undistort(frame, mtx, self.dist)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

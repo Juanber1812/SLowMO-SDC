@@ -14,7 +14,7 @@ from theme import (
 
 class DetectorControlWidget(QGroupBox):
     def __init__(self):
-        super().__init__("Detection Control")
+        super().__init__()
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
         self.detector_btn = QPushButton("Start Detector")
