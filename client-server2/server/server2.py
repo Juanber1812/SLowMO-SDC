@@ -6,7 +6,6 @@ from flask_socketio import SocketIO, emit
 import camera
 import sensors
 import threading
-import time
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -19,9 +18,8 @@ def print_server_status(status):
 
 
 def start_background_tasks():
-    print("[DEBUG] Starting background tasks using socketio.start_background_task...")
-    socketio.start_background_task(camera.start_stream)
-    socketio.start_background_task(sensors.start_sensors)
+    threading.Thread(target=camera.start_stream, daemon=True).start()
+    threading.Thread(target=sensors.start_sensors, daemon=True).start()
 
 
 @socketio.on('connect')
@@ -196,10 +194,9 @@ def set_camera_state(new_state):
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
     print("Press Ctrl+C to stop the server and clean up resources.")
-    time.sleep(1)
     start_background_tasks()
     try:
-        socketio.run(app, host="0.0.0.0", port=5000, use_reloader=False, debug=False)
+        socketio.run(app, host="0.0.0.0", port=5000)
     except KeyboardInterrupt:
         print("\n[INFO] Shutting down server...")
 

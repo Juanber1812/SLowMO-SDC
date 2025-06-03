@@ -29,7 +29,7 @@ from widgets.camera_controls import CameraControlsWidget
 from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
 from widgets.detector_control import DetectorControlWidget
-from widgets.adcs import ADCSSection # <--- ADD THIS LINE
+from widgets.adcs import ADCSSection
 
 # Theme and styling
 from theme import (
@@ -1850,7 +1850,6 @@ class MainWindow(QWidget):
                 st = speedtest.Speedtest()
                 upload = st.upload()
                 upload_mbps = upload / 1_000_000
-               
                 fps = self.camera_settings.fps_slider.value()
                 max_bytes_per_sec = upload / 8
                 max_frame_size = max_bytes_per_sec / fps

@@ -6,7 +6,7 @@ import socketio
 import cv2
 from picamera2 import Picamera2
 
-SERVER_URL = "http://127.0.0.1:5000"
+SERVER_URL = "http://localhost:5000"
 sio = socketio.Client()
 
 last_status = None
@@ -36,17 +36,11 @@ class CameraStreamer:
 
     def connect_socket(self):
         try:
-            print("[DEBUG] Connecting camera socket...")
-            import time
-            time.sleep(1)  # Wait for server to be fully up
             sio.connect(SERVER_URL)
-            print("[DEBUG] Camera socket connected.")
             self.connected = True
             sio.emit("camera_status", {"status": "Idle"})
         except Exception as e:
-            print("[ERROR] Socket connection failed (camera):", e)
-            import traceback
-            traceback.print_exc()
+            print("[ERROR] Socket connection failed:", e)
             sio.emit("camera_status", {"status": "Error"})
 
     def apply_config(self):

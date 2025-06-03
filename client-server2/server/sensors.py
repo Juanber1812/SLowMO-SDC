@@ -6,7 +6,7 @@ import time
 import socketio
 import psutil
 
-SERVER_URL = "http://127.0.0.1:5000"
+SERVER_URL = "http://localhost:5000"
 sio = socketio.Client()
 
 @sio.event
@@ -25,15 +25,10 @@ def get_temp():
         return None
 
 def start_sensors():
-    print("[DEBUG] sensors.start_sensors called")
     try:
-        time.sleep(1)
         sio.connect(SERVER_URL)
-        print("📡 Connected to server from sensors.py")
     except Exception as e:
         print("❌ Sensor connection failed:", e)
-        import traceback
-        traceback.print_exc()
         return
 
     print("🌡️ Sensor monitoring started.")
