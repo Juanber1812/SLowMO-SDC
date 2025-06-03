@@ -30,7 +30,6 @@ from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
 from widgets.detector_control import DetectorControlWidget
 from widgets.adcs import ADCSSection
-
 # Theme and styling
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
@@ -179,12 +178,10 @@ class MainWindow(QWidget):
         # Initialize state variables
         self.streaming = False
         self.detector_active = False
-        # self.crop_active = False # REMOVE THIS LINE
         self.frame_queue = queue.Queue()
         self.last_frame = None
         self.shared_start_time = None
         self.calibration_change_time = None
-        # self.active_config_for_detector will be initialized after setup_ui
 
         # Performance tracking
         self.last_frame_time = time.time()
@@ -199,13 +196,27 @@ class MainWindow(QWidget):
         # ── end patch ──
 
         # ── start patch ──
-        # throttle graph redraws to 10 Hz
+        # throttle graph redraws
         self._last_graph_draw = 0.0
-        self._graph_update_interval = 0.
+        # Initialize with a default (e.g., 2 Hz). This will be updated by GraphSection's signal.
+        self._graph_update_interval = 1.0 / 2.0 
         # ── end patch ──
 
         # Setup UI and connections
-        self.setup_ui() # self.camera_settings is created here
+        self.setup_ui() # self.camera_settings and self.graph_section are created here
+
+        # Connect to the graph section's frequency change signal
+        if hasattr(self, 'graph_section') and self.graph_section:
+            self.graph_section.graph_update_frequency_changed.connect(self.handle_graph_update_frequency_change)
+            # Set initial interval based on GraphSection's default spinbox value if available
+            if hasattr(self.graph_section, 'freq_spinbox') and self.graph_section.freq_spinbox:
+                initial_freq_hz = self.graph_section.freq_spinbox.value()
+                if initial_freq_hz > 0:
+                    self._graph_update_interval = 1.0 / initial_freq_hz
+                print(f"[MainWindow] Initial graph update interval set to {self._graph_update_interval:.3f}s ({initial_freq_hz} Hz from GraphSection)")
+            else: # Fallback if spinbox not ready (e.g. graph not loaded yet)
+                 print(f"[MainWindow] Initial graph update interval set to {self._graph_update_interval:.3f}s (default). Will sync with GraphSection.")
+
 
         # Initialize active_config_for_detector with the initial UI settings
         # This will be updated upon server acknowledgment of config changes
@@ -234,6 +245,16 @@ class MainWindow(QWidget):
         # if switched into the Data Analysis tab, re‐draw with correct labels
         if self.tab_widget.widget(index) is self.analysis_tab and hasattr(self, 'full_df'):
             self.update_analysis_plots()
+
+    def handle_graph_update_frequency_change(self, frequency_hz):
+        """Slot to update the graph update interval when GraphSection's spinbox changes."""
+        if frequency_hz > 0:
+            self._graph_update_interval = 1.0 / frequency_hz
+            print(f"[MainWindow] Graph update interval changed to {self._graph_update_interval:.3f}s ({frequency_hz} Hz)")
+        else:
+            # Fallback to a sensible default if frequency is zero or negative
+            self._graph_update_interval = 1.0 / 1.0 # 1 Hz
+            print(f"[MainWindow] Warning: Invalid graph update frequency ({frequency_hz} Hz). Defaulting to 1 Hz.")
             
     def set_smoothing_mode(self, mode):
         """Toggle Raw/SMA/EMA buttons and refresh."""
@@ -457,7 +478,7 @@ class MainWindow(QWidget):
         self.duration_dropdown.setVisible(False)
 
         self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
-        self.graph_section.setFixedSize(560, 280)
+        self.graph_section.setFixedSize(560, 280) # Existing size
         self.graph_section.graph_display_layout.setSpacing(1)
         self.graph_section.graph_display_layout.setContentsMargins(1, 1, 1, 1)
         self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
@@ -465,26 +486,24 @@ class MainWindow(QWidget):
         row2.addWidget(self.graph_section)
 
         # LIDAR section (moved here)
-        lidar_group = QGroupBox("LIDAR") # Added title for clarity if not already there
+        lidar_group = QGroupBox("LIDAR") # Title for the LIDAR group
         lidar_layout = QVBoxLayout()
         lidar_layout.setSpacing(2)
-        lidar_layout.setContentsMargins(2, 2, 2, 2)
-        lidar_placeholder = QLabel("LIDAR here")
+        lidar_layout.setContentsMargins(5, 15, 5, 5) # Adjusted margins for title space
+        lidar_placeholder = QLabel("LIDAR Placeholder") # Placeholder text
         lidar_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        lidar_placeholder.setStyleSheet("background: white; color: black; border: 1px solid #888; border-radius: 6px; font-size: 14px;")
-        lidar_placeholder.setFixedHeight(40) # Current height
-        # You might want to adjust LIDAR group's height or the graph section's if they look misaligned.
-        # For example, to make LIDAR group take similar height as graph:
-        # lidar_group.setFixedSize(DESIRED_WIDTH, self.graph_section.height()) 
+        lidar_placeholder.setStyleSheet(f"background: {self.COLOR_BOX_BG}; color: {TEXT_SECONDARY}; border: 1px dashed #555; border-radius: {BORDER_RADIUS}px; font-size: {FONT_SIZE_NORMAL}pt;")
+        # Adjust LIDAR group's height or the graph section's if they look misaligned.
+        # To make LIDAR group take similar height as graph:
+        lidar_group.setFixedHeight(self.graph_section.height()) # Match graph height
         # Or allow it to expand:
-        # lidar_group.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        # lidar_group.setMinimumHeight(self.graph_section.height()) # if you want it to match graph height
+        # lidar_group.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
-        lidar_layout.addWidget(lidar_placeholder)
+        lidar_layout.addWidget(lidar_placeholder, stretch=1) # Allow placeholder to expand
         lidar_group.setLayout(lidar_layout)
-        self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR)
+        self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
         # Set a fixed width for LIDAR or let it expand. Example fixed width:
-        lidar_group.setFixedWidth(200) # Adjust as needed
+        lidar_group.setFixedWidth(200) # Adjust as needed, e.g., to fill remaining space if graph_section has fixed width
 
         row2.addWidget(lidar_group)
         
@@ -494,27 +513,37 @@ class MainWindow(QWidget):
         """Setup ADCS controls using ADCSSection widget"""
         row3 = QHBoxLayout()
         row3.setSpacing(4) 
-        row3.setContentsMargins(4, 4, 4, 4)
+        row3.setContentsMargins(4, 4, 4, 4) # Standard margins
         row3.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
         # ADCS section using the new ADCSSection widget
-        self.adcs_control_widget = ADCSSection()
+        self.adcs_control_widget = ADCSSection() # Instantiate your custom widget
         
-        # Optional: Connect to the mode_selected signal if you need to react to mode changes
-        # self.adcs_control_widget.mode_selected.connect(self.handle_adcs_mode_selection) 
-                                                                                       
+        # Optional: Connect to signals from ADCSSection if needed
+        # self.adcs_control_widget.mode_selected.connect(self.handle_adcs_mode_selection)
+        # self.adcs_control_widget.adcs_command_sent.connect(self.handle_adcs_command)
+                                                                                   
         self.apply_groupbox_style(self.adcs_control_widget, self.COLOR_BOX_BORDER_ADCS)
-        # Adjust sizing as needed, e.g.:
-        # self.adcs_control_widget.setFixedWidth(400) 
+        # ADCSSection is already a QGroupBox, so styling is applied directly.
+        # It will manage its own internal title ("ADCS").
+        
+        # Adjust sizing as needed. For example, to make it expand:
+        self.adcs_control_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        # Or set a fixed height if desired, e.g., to match other rows or content:
         # self.adcs_control_widget.setFixedHeight(100) 
 
         row3.addWidget(self.adcs_control_widget)
         parent_layout.addLayout(row3)
 
-    # Optional: Add a handler method in client3.py if you connect the signal
+    # Optional: Add handler methods in client3.py if you connect signals from ADCSSection
     # def handle_adcs_mode_selection(self, mode_index, mode_name):
     #     print(f"[Client3] ADCS Mode selected: Index {mode_index}, Name '{mode_name}'")
     #     # Add logic here to respond to ADCS mode changes
+
+    # def handle_adcs_command(self, mode_name, command_name):
+    #     print(f"[Client3] ADCS Command: Mode '{mode_name}', Command '{command_name}'")
+    #     # Here you would typically emit a socketio event to the server
+    #     # sio.emit("adcs_command", {"mode": mode_name, "command": command_name})
 
     def setup_system_info_panel(self):
         """Setup right column system information panel"""
@@ -1783,6 +1812,7 @@ class MainWindow(QWidget):
                         mode = self.graph_section.current_graph_mode
                         widget = self.graph_section.graph_widget
                         if mode == "Relative Distance" and hasattr(widget, 'current_distance'):
+
                             value = widget.current_distance
                         elif mode == "Relative Angle" and hasattr(widget, 'current_ang'):
                             value = widget.current_ang

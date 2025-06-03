@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (
-    QWidget, QGroupBox, QVBoxLayout, QPushButton, QHBoxLayout, QComboBox
+    QWidget, QGroupBox, QVBoxLayout, QPushButton, QHBoxLayout, QComboBox, QLabel, QDoubleSpinBox # Changed QSpinBox to QDoubleSpinBox
 )
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from payload.distance import RelativeDistancePlotter
@@ -7,7 +7,7 @@ from payload.relative_angle import RelativeAnglePlotter
 from payload.spin import AngularPositionPlotter
 import time
 import threading
-import pandas as pd  # Add pandas import
+import pandas as pd 
 import os
 from datetime import datetime
 from theme import (
@@ -47,6 +47,7 @@ def sci_fi_button_style(color):
 class GraphSection(QGroupBox):
     # new signal: emits the full path to the CSV just saved
     recording_saved = pyqtSignal(str)
+    graph_update_frequency_changed = pyqtSignal(float) # Changed to float for QDoubleSpinBox
 
     def __init__(self, record_btn: QPushButton, duration_dropdown: QComboBox, parent=None):
         super().__init__(parent)
@@ -103,6 +104,10 @@ class GraphSection(QGroupBox):
         self.graph_widget = None
         self.exit_graph_btn = None
         self.shared_start_time = None
+
+        # For frequency control
+        self.freq_label = None
+        self.freq_spinbox = None
 
         # Connect the record button to toggle recording
         self.record_btn.clicked.connect(self.toggle_recording)
@@ -162,6 +167,66 @@ class GraphSection(QGroupBox):
             color: #777;
         }}
         """
+        # Style for SpinBox and its Label (can be refined in theme.py later)
+        control_style = f"""
+            QLabel {{
+                color: {LABEL_COLOR};
+                font-family: {FONT_FAMILY};
+                font-size: {FONT_SIZE_LABEL}pt;
+                padding-top: 4px; /* Align better with spinbox */
+            }}
+            QDoubleSpinBox {{
+                background-color: {BOX_BACKGROUND}; 
+                color: {TEXT_COLOR};
+                border: {BORDER_WIDTH}px solid {BUTTON_COLOR}; 
+                border-radius: {BORDER_RADIUS}px;
+                padding: 1px 3px; /* Padding for the text area */
+                font-family: {FONT_FAMILY};
+                font-size: {FONT_SIZE_NORMAL}pt;
+                /* The setFixedHeight in code ensures this has a defined height */
+            }}
+
+            /* Common properties for the button area on the right */
+            QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {{
+                subcontrol-origin: border; /* Position relative to the spinbox's border */
+                background-color: {BOX_BACKGROUND}; /* Background of the button itself */
+                width: 20px; /* Width of the vertical strip for buttons */
+                border-left-width: 1px; /* Line separating text from buttons */
+                border-left-color: {BUTTON_COLOR};
+                border-left-style: solid;
+                /* Removed margin: 1px; from here to avoid potential conflicts */
+            }}
+
+            QDoubleSpinBox::up-button {{
+                subcontrol-position: top right; /* Position in the top-right of the button area */
+                height: 50%; /* Take up top half of the available height in the button strip */
+                border-top-right-radius: {max(0, BORDER_RADIUS - 2)}px; 
+                /* margin: 0px; /* Ensure no unexpected margins */
+            }}
+
+            QDoubleSpinBox::down-button {{
+                subcontrol-position: bottom right; /* Position in the bottom-right of the button area */
+                height: 50%; /* Take up bottom half of the available height in the button strip */
+                border-bottom-right-radius: {max(0, BORDER_RADIUS - 2)}px;
+                /* margin: 0px; /* Ensure no unexpected margins */
+                /* Optional: add a small border on top of the down-button to separate it visually from up-button */
+                /* border-top: 1px solid {BORDER_COLOR if BORDER_COLOR else '#AAAAAA'}; */
+            }}
+
+            /* COMPLETELY EMPTY to maximize chances of default rendering for arrows */
+            QDoubleSpinBox::up-arrow {{
+            }}
+            QDoubleSpinBox::down-arrow {{
+            }}
+
+            QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {{
+                background-color: {BUTTON_HOVER if BUTTON_HOVER else '#DDDDDD'}; 
+            }}
+            QDoubleSpinBox::up-button:pressed, QDoubleSpinBox::down-button:pressed {{
+                background-color: {BUTTON_COLOR if BUTTON_COLOR else '#CCCCCC'}; 
+            }}
+        """
+
 
         # Reset record button text when loading new graph
         self.record_btn.setText("Record")
@@ -171,7 +236,27 @@ class GraphSection(QGroupBox):
         btn_layout.addWidget(self.record_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.duration_dropdown.setFixedHeight(int(BUTTON_HEIGHT))
+        # self.duration_dropdown.setStyleSheet(button_style) # Apply similar style if visible
         btn_layout.addWidget(self.duration_dropdown, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        # Graph Update Frequency Control
+        self.freq_label = QLabel("Updates/sec:")
+        self.freq_label.setStyleSheet(control_style) # Apply label part of control_style
+        btn_layout.addWidget(self.freq_label, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        self.freq_spinbox = QDoubleSpinBox() # Changed to QDoubleSpinBox
+        self.freq_spinbox.setRange(0.1, 30.0)  # Min 0.1 Hz, Max 30 Hz, allows decimals
+        self.freq_spinbox.setSingleStep(0.1)   # Step by 0.1
+        self.freq_spinbox.setDecimals(1)       # Show 1 decimal place
+        self.freq_spinbox.setValue(2.0)        # Default to 2.0 Hz
+        self.freq_spinbox.setSuffix(" Hz")
+        self.freq_spinbox.setStyleSheet(control_style) # Apply spinbox part of control_style
+        self.freq_spinbox.setFixedHeight(int(BUTTON_HEIGHT))
+        self.freq_spinbox.valueChanged.connect(self.on_frequency_changed) # valueChanged emits float
+        btn_layout.addWidget(self.freq_spinbox, alignment=Qt.AlignmentFlag.AlignLeft)
+        # Emit initial value so client3.py can sync if it missed it
+        self.on_frequency_changed(self.freq_spinbox.value())
+
 
         self.exit_graph_btn = QPushButton("← Back")
         self.exit_graph_btn.setFixedHeight(int(BUTTON_HEIGHT))
@@ -186,6 +271,11 @@ class GraphSection(QGroupBox):
 
         # Add the combined layout to the main graph display layout
         self.graph_display_layout.addLayout(graph_and_btns_layout)
+
+    def on_frequency_changed(self, value_hz: float): # value_hz is now float
+        """Emits the new frequency when the spinbox changes."""
+        self.graph_update_frequency_changed.emit(value_hz) # Emitting float
+        print(f"[GraphSection] Update frequency set to: {value_hz:.1f} Hz via spinbox")
 
     def toggle_recording(self):
         """Toggle recording state and update button text"""
@@ -316,9 +406,40 @@ class GraphSection(QGroupBox):
             self.graph_widget.setParent(None)
             self.graph_widget = None
         if self.exit_graph_btn:
-            self.exit_graph_btn.setParent(None)
+            self.exit_graph_btn.setParent(None) # Remove from layout
+            # self.exit_graph_btn = None # Optional: clear reference
+        
+        # Remove frequency controls
+        if self.freq_label:
+            self.freq_label.setParent(None)
+            # self.freq_label = None
+        if self.freq_spinbox:
+            self.freq_spinbox.setParent(None)
+            # self.freq_spinbox = None
+
+        # Detach record_btn and duration_dropdown from this specific graph view's layout
+        # They are managed by client3.py and passed in, so we just remove them from the current dynamic layout
         self.record_btn.setParent(None)
         self.duration_dropdown.setParent(None)
+
+        # Clear the dynamic graph_and_btns_layout
+        # Assuming graph_and_btns_layout is the last item added to self.graph_display_layout
+        if self.graph_display_layout.count() > 1: # Check if placeholder is not the only widget
+            item = self.graph_display_layout.takeAt(self.graph_display_layout.count() -1 ) # take last added layout
+            if item is not None:
+                # Recursively delete widgets in the layout
+                while item.count():
+                    child = item.takeAt(0)
+                    if child.widget():
+                        child.widget().deleteLater()
+                    elif child.layout(): # If it's a nested layout
+                        # This part might need more robust clearing for nested layouts
+                        # For now, assuming simple structure where widgets are direct children
+                        pass 
+                # item.deleteLater() # This might be problematic if it's a layout not a widget
+                del item
+
+
         self.graph_display_layout.addWidget(self.graph_display_placeholder)
 
 
