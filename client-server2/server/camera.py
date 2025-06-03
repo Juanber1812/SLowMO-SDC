@@ -36,13 +36,14 @@ class CameraStreamer:
 
     def connect_socket(self):
         try:
+            print("[DEBUG] Connecting camera socket...")
             sio.connect(SERVER_URL)
             self.connected = True
             sio.emit("camera_status", {"status": "Idle"})
         except Exception as e:
-            print("[ERROR] Socket connection failed:", e)
+            print("[ERROR] Socket connection failed (camera):", e)
             import traceback
-            traceback.print_exc()  # <- ADD THIS to print full error
+            traceback.print_exc()
             sio.emit("camera_status", {"status": "Error"})
 
     def apply_config(self):
