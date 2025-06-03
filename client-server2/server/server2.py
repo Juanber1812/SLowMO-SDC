@@ -199,7 +199,7 @@ if __name__ == "__main__":
     time.sleep(1)
     start_background_tasks()
     try:
-        socketio.run(app, host="0.0.0.0", port=5000)
+        socketio.run(app, host="0.0.0.0", port=5000, use_reloader=False, debug=False)
     except KeyboardInterrupt:
         print("\n[INFO] Shutting down server...")
 
