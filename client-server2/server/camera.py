@@ -57,19 +57,35 @@ class CameraStreamer:
             bri = int(self.config.get("brightness", 50))
             bri = max(0, min(bri, 100))
 
+            controls = {
+                "FrameDurationLimits": (dur, dur),
+                "Brightness": bri
+            }
+            # If AE enabled, let camera pick exposure for one second
+            if self.config.get("auto_exposure", True):
+                controls["AeEnable"] = True
+            else:
+                # manual exposure: clamp & apply
+                raw = int(self.config.get("exposure", dur))
+                exp = max(100, min(raw, 200_000))
+                exp = min(exp, dur)
+                controls["AeEnable"]      = False
+                controls["ExposureTime"]  = exp
+
             if self.picam.started:
                 self.picam.stop()
 
             cfg = self.picam.create_preview_configuration(
                 main={"format": "XRGB8888", "size": res},
-                controls={
-                    "FrameDurationLimits": (dur, dur),
-                    "ExposureTime": exp,
-                    "Brightness": bri
-                }
+                controls=controls
             )
             self.picam.configure(cfg)
             self.picam.start()
+
+            # Dump what we actually set
+            meta = self.picam.capture_metadata()
+            print(f"[CAMERA CONFIG] AeEnable={controls.get('AeEnable')}, "
+                  f"ExposureTime={meta['ExposureTime']}µs, Brightness={bri}")
         except Exception as e:
             print("[ERROR] Failed to configure camera:", e)
             sio.emit("camera_status", {"status": "Error"})

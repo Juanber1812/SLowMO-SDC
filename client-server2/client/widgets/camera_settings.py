@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QGroupBox, QVBoxLayout, QLabel, QSlider, QComboBox, QPushButton, QHBoxLayout, QButtonGroup, QDoubleSpinBox
+from PyQt6.QtWidgets import QWidget, QGroupBox, QVBoxLayout, QLabel, QSlider, QComboBox, QPushButton, QHBoxLayout, QButtonGroup, QDoubleSpinBox, QCheckBox
 from PyQt6.QtCore import Qt, pyqtSignal # Added pyqtSignal
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
@@ -183,7 +183,12 @@ class CameraSettingsWidget(QGroupBox):
         self.layout.addWidget(self.exposure_label, 0, Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.exposure_slider)
         self.layout.addStretch(1)
-        
+
+        # Auto-Exposure toggle
+        self.ae_checkbox = QCheckBox("Auto-Exposure")
+        self.ae_checkbox.setChecked(True)
+        self.layout.addWidget(self.ae_checkbox, 0, Qt.AlignmentFlag.AlignCenter)
+
         # Crop Controls (NEW - PLACEMENT of QHBoxLayout)
         # Create a container widget for the crop_controls_layout to center it
         crop_controls_container = QWidget()

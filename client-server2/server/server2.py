@@ -6,6 +6,7 @@ from flask_socketio import SocketIO, emit
 import camera
 import sensors
 import threading
+import time  # <-- Import time module
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
