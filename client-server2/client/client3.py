@@ -1728,8 +1728,12 @@ QPushButton#danger_btn:hover {
         """Helper method to get/send config and update detector after the initial 0.5s pause."""
         print(f"[INFO] 0.5s pause complete. Getting/sending configuration (stream was {was_streaming_at_call_time}).")
         
-        # Get and send configuration
+        # 1) grab config dict from widget
         config = self.camera_settings.get_config()
+        # 2) guard against None or non‐dict
+        if not isinstance(config, dict):
+            config = {}
+        # 3) emit with a guaranteed dict payload
         sio.emit("camera_config", config)
         
         #Update detector calibration (this will also update self.active_config_for_detector via server ack)

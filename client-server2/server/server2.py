@@ -66,18 +66,18 @@ def handle_stop_camera():
 import camera  # make sure this brings in your CameraStreamer instance
 
 @socketio.on('camera_config')
-def handle_camera_config(data=None):
-    """Receive new camera settings; data may be None if client emitted without payload."""
-    if data is None:
-        print("[WARN] Received camera_config event with no data.")
+def handle_camera_config(*args):
+    """Receive new camera settings; ignore calls without a dict payload."""
+    if not args:
+        return
+    data = args[0]
+    if not isinstance(data, dict):
         return
 
     try:
         # Merge in the new settings
         camera.streamer.config.update(data)
-        # Reconfigure the hardware
         camera.streamer.apply_config()
-        # Tell everyone the updated config
         emit('camera_config', data, broadcast=True)
     except Exception as e:
         print(f"[ERROR] handle_camera_config: {e}")
