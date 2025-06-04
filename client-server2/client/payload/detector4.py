@@ -2,23 +2,27 @@ import cv2
 import numpy as np
 import pyapriltags
 import os
+import time
 
 class AprilTagDetector:
     def __init__(self, calibration_file=None):
         """Initialize detector with calibration file."""
+        # 1) store config in a dict
+        self.config = {
+            'families':   'tag25h9',
+            'nthreads':   16,
+            'quad_decimate':    1,
+            'quad_sigma':       0,
+            'refine_edges':     4,
+            'decode_sharpening':0.25
+        }
+        
+        # 2) pass it into the real detector
+        self.detector = pyapriltags.Detector(**self.config)
+
         self.tag_size = 0.0545  # meters
         self.line_color = (0, 255, 0)
         self.line_thickness = 8
-        
-        # AprilTag detector setup
-        self.detector = pyapriltags.Detector(
-            families='tag36h11',
-            nthreads=16,
-            quad_decimate=0,
-            quad_sigma=0,
-            refine_edges=4,
-            decode_sharpening=0.25
-        )
         
         # Load initial calibration
         self.mtx = None
@@ -74,6 +78,8 @@ class AprilTagDetector:
             print("[WARNING] No calibration data - skipping detection")
             return (frame, None) if return_pose else frame
         
+        start_time = time.time()
+
         # Adjust camera matrix for cropped images
         mtx = self.mtx.copy() # self.mtx is the original calibration matrix
         if is_cropped and original_height is not None:
@@ -108,13 +114,19 @@ class AprilTagDetector:
             self.draw_cube_manual(frame, rvec, tvec, cube_size, offset=np.array([0, 0, 0], dtype=np.float32), mtx=mtx)
             self.draw_cube_manual(frame, rvec, tvec, cube_size, offset=np.array([0, -cube_size, 0], dtype=np.float32), mtx=mtx)
             self.draw_cube_manual(frame, rvec, tvec, cube_size, offset=np.array([0, cube_size, 0], dtype=np.float32), mtx=mtx)
+        
+        end_time= time.time()
+        latency_ms = (end_time - start_time) * 1000.0
 
         if return_pose and tags:
             rvec, _ = cv2.Rodrigues(tags[0].pose_R)
             tvec = tags[0].pose_t.reshape(3, 1)
-            return frame, (rvec, tvec)
+            return frame, (rvec, tvec), latency_ms
 
-        return frame, None if return_pose else frame
+        if return_pose:
+            return frame, None, latency_ms
+
+        return frame
 
     def draw_cube_manual(self, img, rvec, tvec, size, offset, mtx=None):
         """Draw a 3D cube on the image."""
@@ -156,6 +168,18 @@ class AprilTagDetector:
         cv2.line(img, tuple(pts[2]), tuple(pts[6]), self.line_color, self.line_thickness)
         cv2.line(img, tuple(pts[3]), tuple(pts[7]), self.line_color, self.line_thickness)
 
+    def get_config(self) -> dict:
+        """Return the current detector parameters."""
+        return self.config.copy()
+
+    def update_params(self, **kwargs):
+        """Reconfigure detector on the fly."""
+        # merge new settings
+        self.config.update(kwargs)
+        # re-create the underlying detector
+        self.detector = pyapriltags.Detector(**self.config)
+        return self.config
+
 
 # Create global detector instance
 try:
@@ -189,4 +213,10 @@ def update_calibration(calibration_file):
     except Exception as e:
         print(f"[ERROR] update_calibration failed: {e}")
         return False
+
+def get_detector_config():
+    """Global helper for backward compatibility."""
+    if detector_instance:
+        return detector_instance.get_config()
+    return None
 

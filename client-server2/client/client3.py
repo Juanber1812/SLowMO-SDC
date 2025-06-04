@@ -31,6 +31,8 @@ from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
 from widgets.detector_control import DetectorControlWidget
 from widgets.adcs import ADCSSection
+from widgets.detector_settings_widget import DetectorSettingsWidget
+from payload.detector4 import detector_instance
 
 # Theme and styling
 from theme import (
@@ -69,6 +71,7 @@ bridge = Bridge()
 
 class MainWindow(QWidget):
     speedtest_result = pyqtSignal(float, float)  # upload_mbps, max_frame_size_kb
+    latencyUpdated = pyqtSignal(float)
 
     #=========================================================================
     #                         THEME CONFIGURATION                            
@@ -241,6 +244,7 @@ class MainWindow(QWidget):
         bridge.frame_received.connect(self.update_image)
         bridge.analysed_frame.connect(self.update_analysed_image)
         self.speedtest_result.connect(self.update_speed_labels)
+        self.latencyUpdated.connect(self.detector_settings.set_latency)
 
     def _on_tab_changed(self, index):
         pass
@@ -403,11 +407,11 @@ class MainWindow(QWidget):
         tab_layout.setAlignment(scroll_area, Qt.AlignmentFlag.AlignRight)
 
     def setup_video_controls_row(self, parent_layout):
-        """Setup video stream and camera controls"""
+        """Setup video stream, camera controls, camera settings & detector settings."""
         row1 = QHBoxLayout()
         row1.setSpacing(2)
         row1.setContentsMargins(2, 2, 2, 2)
-        row1.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        row1.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
         # Video stream display
         video_group = QGroupBox()
@@ -439,31 +443,30 @@ class MainWindow(QWidget):
         # Backward compatibility
         self.detector_controls = type('obj', (object,), {'detector_btn': self.camera_controls.detector_btn})()
 
-        # Camera settings
+        # Camera settings (fixed size to match video height)
         self.camera_settings = CameraSettingsWidget()
-        # margins & spacing
         self.camera_settings.setMaximumWidth(280)
-        self.camera_settings.layout.setSpacing(2)
-        self.camera_settings.layout.setContentsMargins(2, 2, 2, 2)
-        # unify with crop/start-stream button style
+        self.camera_settings.setFixedHeight(video_group.height())
+        self.apply_groupbox_style(self.camera_settings, self.COLOR_BOX_BORDER_CONFIG)
         self.camera_settings.apply_btn.setStyleSheet(self.BUTTON_STYLE)
         self.camera_settings.apply_btn.setFixedHeight(BUTTON_HEIGHT)
-
         self.camera_settings.apply_btn.clicked.connect(self.apply_config)
-        # self.camera_settings.crop_config_requested.connect(self.apply_config) # Ensure this is commented out or removed
-        # The line above, if active, could cause apply_config to be called when crop UI changes,
-        # not just when "Apply Settings" is clicked.
 
-        self.apply_groupbox_style(
-            self.camera_settings, self.COLOR_BOX_BORDER_CONFIG
-        )
-        self.camera_settings.setFixedHeight(video_height + 20)
-
-        # Add to row
         row1.addWidget(video_group)
         row1.addWidget(self.camera_controls)
         row1.addWidget(self.camera_settings)
-        
+
+        # ── Detector settings to the RIGHT of camera settings ────────────────
+        self.detector_settings = DetectorSettingsWidget()
+        self.detector_settings.setMaximumWidth(280)
+        self.detector_settings.setFixedHeight(video_group.height())
+        self.apply_groupbox_style(self.detector_settings, self.COLOR_BOX_BORDER_DETECTOR)
+        self.detector_settings.settingsChanged.connect(
+            lambda cfg: detector_instance.update_params(**cfg)
+        )
+        row1.addWidget(self.detector_settings)
+        # ─────────────────────────────────────────────────────────────────────
+
         parent_layout.addLayout(row1)
 
     def setup_graph_display_row(self, parent_layout):
@@ -1038,6 +1041,8 @@ QPushButton#danger_btn:hover {
         # Start time controls
         self.start_label = QLabel("Start (s):")
         self.start_label.setStyleSheet(self.LABEL_STYLE)
+        # controls_layout.addWidget(self.start_label)  # FIX: Remove this line
+
         self.start_spin = QDoubleSpinBox()
         self.start_spin.setDecimals(2)
         self.start_spin.setFixedWidth(80)
@@ -1047,6 +1052,8 @@ QPushButton#danger_btn:hover {
         # End time controls
         self.end_label = QLabel("End (s):")
         self.end_label.setStyleSheet(self.LABEL_STYLE)
+        # controls_layout.addWidget(self.end_label)  # FIX: Remove this line
+
         self.end_spin = QDoubleSpinBox()
         self.end_spin.setDecimals(2)
         self.end_spin.setFixedWidth(80)
@@ -1802,8 +1809,10 @@ QPushButton#danger_btn:hover {
         self._back_btn.clicked.connect(self.hide_full_image)
         self._back_btn.show()
  
+ 
     def hide_full_image(self):
          pass
+        
          # remove full-screen image and back button
          self._full_lbl.hide()
          self._back_btn.hide()
@@ -1840,14 +1849,18 @@ QPushButton#danger_btn:hover {
                 # Process frame with detector
                 try:
                     if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
-                        analysed, pose = detector4.detector_instance.detect_and_draw(
-                            frame, return_pose=True, is_cropped=is_cropped, original_height=original_height
+                        analysed, pose, latency_ms = detector4.detector_instance.detect_and_draw(
+                            frame,
+                            return_pose=True,
+                            is_cropped=is_cropped,
+                            original_height=original_height
                         )
                     else:
                         analysed, pose = detector4.detect_and_draw(frame, return_pose=True)
                 
 
                 
+                    self.latencyUpdated.emit(latency_ms)
                     bridge.analysed_frame.emit(analysed)
 
                     # only update graphs if needed

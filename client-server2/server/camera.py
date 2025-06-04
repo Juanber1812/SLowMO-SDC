@@ -32,8 +32,7 @@ class CameraStreamer:
             "fps": 10,
             "resolution": [1536, 864],
             "brightness": 0.0,             # Default brightness
-            "exposure_time": None,         # None means auto
-            "auto_exposure": True          # Enable AE by default
+            "exposure_time": None,         # None means auto         # Enable AE by default
         }
         self.picam = Picamera2()
 
@@ -48,10 +47,10 @@ class CameraStreamer:
 
     def apply_config(self):
         try:
-            res = self.config["resolution"]
+            res          = self.config["resolution"]
             jpeg_quality = self.config["jpeg_quality"]
-            fps = self.config["fps"]
-            duration = int(1e6 / max(fps, 1))
+            fps          = self.config["fps"]
+            duration     = int(1e6 / max(fps, 1))
 
             if self.picam.started:
                 self.picam.stop()
@@ -59,25 +58,24 @@ class CameraStreamer:
             # build controls dict with new parameters
             controls = {
                 "FrameDurationLimits": (duration, duration),
-                "Brightness": self.config.get("brightness", 0.0),
-                "AeEnable": self.config.get("auto_exposure", True)
+                "Brightness":         self.config.get("brightness", 0.0),
             }
 
-            # if manual exposure requested, override AE
+            # if manual exposure requested, disable auto‐exposure and set exposure time
             if not self.config.get("auto_exposure", True):
+                controls["AeEnable"]     = False    # turn off auto exposure
                 exposure = self.config.get("exposure_time")
-                if exposure:
+                if exposure is not None:
                     controls["ExposureTime"] = exposure
 
-            # debug print
             print("[CONFIG] Applying controls:", controls)
-
             stream_cfg = self.picam.create_preview_configuration(
                 main={"format": "XRGB8888", "size": res},
                 controls=controls
             )
             self.picam.configure(stream_cfg)
             self.picam.start()
+
         except Exception as e:
             print("[ERROR] Failed to configure camera:", e)
             sio.emit("camera_status", {"status": "Error"})

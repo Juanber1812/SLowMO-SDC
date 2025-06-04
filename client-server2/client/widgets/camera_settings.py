@@ -100,6 +100,7 @@ class CameraSettingsWidget(QGroupBox):
 
         self.res_dropdown = QComboBox()
 
+        # FPS Controls
         self.fps_label = QLabel("FPS Setting:") 
         self.fps_slider = QSlider(Qt.Orientation.Horizontal)
         self.fps_slider.setRange(1, 120) 
@@ -149,12 +150,21 @@ class CameraSettingsWidget(QGroupBox):
         self.layout.addWidget(self.res_dropdown) 
         self.layout.addStretch(1)
 
-        # FPS Controls
-        self.layout.addWidget(self.fps_label, 0, Qt.AlignmentFlag.AlignCenter) 
-        self.layout.addWidget(self.fps_slider) 
-        self.layout.addWidget(self.fps_value_label, 0, Qt.AlignmentFlag.AlignCenter) 
+        # ───── FPS Controls (label + value on one line) ─────
+        fps_label = QLabel("FPS:")
+        # recreate value label so it's next to the text
+        self.fps_value_label = QLabel(str(self.fps_slider.value()))
+        self.fps_slider.valueChanged.connect(
+            lambda v: self.fps_value_label.setText(str(v))
+        )
+        fps_layout = QHBoxLayout()
+        fps_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        fps_layout.addWidget(fps_label)
+        fps_layout.addWidget(self.fps_value_label)
+        self.layout.addLayout(fps_layout)
+        self.layout.addWidget(self.fps_slider)
         self.layout.addStretch(1)
-        
+
         # Apply Button
         self.layout.addWidget(self.apply_btn, 0, Qt.AlignmentFlag.AlignCenter)
         self.layout.addStretch(1)
@@ -169,34 +179,45 @@ class CameraSettingsWidget(QGroupBox):
         # Calibration Status Label
         self.layout.addWidget(self.calibration_status_label, 0, Qt.AlignmentFlag.AlignCenter)
         
-        # ───── Brightness Slider ─────
+        # ───── Brightness Slider + Numeric Value ─────
         brightness_label = QLabel("Brightness:")
         self.brightness_slider = QSlider(Qt.Orientation.Horizontal)
         self.brightness_slider.setRange(-10, 10)   # maps to -1.0…1.0
         self.brightness_slider.setValue(0)
         self.brightness_slider.setSingleStep(1)
         self.brightness_slider.setToolTip("Adjust brightness (-1.0 to 1.0)")
-        self.layout.addWidget(brightness_label)
+        # numeric display
+        self.brightness_value_label = QLabel(f"{self.brightness_slider.value()/10.0:.1f}")
+        self.brightness_slider.valueChanged.connect(
+            lambda v: self.brightness_value_label.setText(f"{v/10.0:.1f}")
+        )
+        brightness_layout = QHBoxLayout()
+        brightness_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        brightness_layout.addWidget(brightness_label)
+        brightness_layout.addWidget(self.brightness_value_label)
+        self.layout.addLayout(brightness_layout)
         self.layout.addWidget(self.brightness_slider)
         self.layout.addStretch(1)
 
-        # ───── Auto Exposure Toggle ─────
-        self.auto_exposure_checkbox = QPushButton("Auto Exposure: ON")
-        self.auto_exposure_checkbox.setCheckable(True)
-        self.auto_exposure_checkbox.setChecked(True)
-        self.auto_exposure_checkbox.clicked.connect(self.toggle_auto_exposure)
-        self.layout.addWidget(self.auto_exposure_checkbox)
-        self.layout.addStretch(1)
 
-        # ───── Manual Exposure Slider ─────
+        # ───── Manual Exposure Slider + Numeric Value ─────
+        exposure_label = QLabel("Exposure (μs):")
         self.exposure_slider = QSlider(Qt.Orientation.Horizontal)
-        self.exposure_slider.setRange(100, 1_000_000)  # µs
+        self.exposure_slider.setRange(10, 66_660)  # µs
         self.exposure_slider.setValue(20_000)
-        self.exposure_slider.setSingleStep(100)
+        self.exposure_slider.setSingleStep(10)
         self.exposure_slider.setToolTip("Exposure time in microseconds")
-        self.layout.addWidget(QLabel("Exposure Time (μs):"))
+        self.exposure_value_label = QLabel(str(self.exposure_slider.value()))
+        self.exposure_slider.valueChanged.connect(
+            lambda v: self.exposure_value_label.setText(str(v))
+        )
+        exposure_layout = QHBoxLayout()
+        exposure_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        exposure_layout.addWidget(exposure_label)
+        exposure_layout.addWidget(self.exposure_value_label)
+        self.layout.addLayout(exposure_layout)
         self.layout.addWidget(self.exposure_slider)
-        self.exposure_slider.setVisible(False)
+
         self.layout.addStretch(1)
 
         self.setLayout(self.layout)
@@ -441,14 +462,6 @@ class CameraSettingsWidget(QGroupBox):
         label = self.res_dropdown.currentText()
         return label.replace(" (Cropped)", "")
 
-    def toggle_auto_exposure(self):
-        if self.auto_exposure_checkbox.isChecked():
-            self.auto_exposure_checkbox.setText("Auto Exposure: ON")
-            self.exposure_slider.setVisible(False)
-        else:
-            self.auto_exposure_checkbox.setText("Auto Exposure: OFF")
-            self.exposure_slider.setVisible(True)
-
     def get_config(self):
         # Add debug prints to understand the state when get_config is called
         # print(f"[DEBUG] get_config: res_dropdown count: {self.res_dropdown.count()}, currentIndex: {self.res_dropdown.currentIndex()}, currentText: '{self.res_dropdown.currentText()}'")
@@ -527,9 +540,7 @@ class CameraSettingsWidget(QGroupBox):
 
         # Add brightness and exposure settings
         cfg["brightness"] = self.brightness_slider.value() / 10.0
-        cfg["auto_exposure"] = self.auto_exposure_checkbox.isChecked()
-        if not cfg["auto_exposure"]:
-            cfg["exposure_time"] = self.exposure_slider.value()
+        cfg["exposure_time"] = self.exposure_slider.value()
 
         return cfg
     def apply_style(self, style: str):
