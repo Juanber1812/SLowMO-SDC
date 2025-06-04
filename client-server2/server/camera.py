@@ -30,9 +30,7 @@ class CameraStreamer:
         self.config = {
             "jpeg_quality": 70,
             "fps": 10,
-            "resolution": [1536, 864],
-            "exposure": 10000,
-            "brightness": 50
+            "resolution": [1536, 864]
         }
         self.picam = Picamera2()
 
@@ -47,45 +45,20 @@ class CameraStreamer:
 
     def apply_config(self):
         try:
-            res = tuple(self.config["resolution"])
-            dur = int(1e6 / max(self.config["fps"], 1))
-            # clamp exposure between 100µs and 200000µs, but never > frame duration
-            raw = int(self.config.get("exposure", dur))
-            exp  = max(100, min(raw, 200_000))
-            exp  = min(exp, dur)
-            # clamp brightness between 0–100
-            bri = int(self.config.get("brightness", 50))
-            bri = max(0, min(bri, 100))
-
-            controls = {
-                "FrameDurationLimits": (dur, dur),
-                "Brightness": bri
-            }
-            # If AE enabled, let camera pick exposure for one second
-            if self.config.get("auto_exposure", True):
-                controls["AeEnable"] = True
-            else:
-                # manual exposure: clamp & apply
-                raw = int(self.config.get("exposure", dur))
-                exp = max(100, min(raw, 200_000))
-                exp = min(exp, dur)
-                controls["AeEnable"]      = False
-                controls["ExposureTime"]  = exp
+            res = self.config["resolution"]
+            jpeg_quality = self.config["jpeg_quality"]
+            fps = self.config["fps"]
+            duration = int(1e6 / max(fps, 1))
 
             if self.picam.started:
                 self.picam.stop()
 
-            cfg = self.picam.create_preview_configuration(
+            stream_cfg = self.picam.create_preview_configuration(
                 main={"format": "XRGB8888", "size": res},
-                controls=controls
+                controls={"FrameDurationLimits": (duration, duration)}
             )
-            self.picam.configure(cfg)
+            self.picam.configure(stream_cfg)
             self.picam.start()
-
-            # Dump what we actually set
-            meta = self.picam.capture_metadata()
-            print(f"[CAMERA CONFIG] AeEnable={controls.get('AeEnable')}, "
-                  f"ExposureTime={meta['ExposureTime']}µs, Brightness={bri}")
         except Exception as e:
             print("[ERROR] Failed to configure camera:", e)
             sio.emit("camera_status", {"status": "Error"})
@@ -231,15 +204,10 @@ def on_stop_camera(_):
 
 @sio.on("camera_config")
 def on_camera_config(data):
-        """Receive new settings, always reconfigure camera hardware."""
-        streamer.config.update(data)
-        try:
-            # reconfigure even if streaming
-            streamer.apply_config()
-            sio.emit("camera_status", {"status": "Ready"})
-        except Exception as e:
-            print(f"[ERROR] on_camera_config failed: {e}")
-            sio.emit("camera_status", {"status": "Error"})
+    streamer.config.update(data)
+    if not streamer.streaming:
+        streamer.apply_config()
+        sio.emit("camera_status", {"status": "Ready"})
 
 @sio.on("get_camera_status")
 def on_get_camera_status(_):

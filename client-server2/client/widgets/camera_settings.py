@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QGroupBox, QVBoxLayout, QLabel, QSlider, QComboBox, QPushButton, QHBoxLayout, QButtonGroup, QDoubleSpinBox, QCheckBox
+from PyQt6.QtWidgets import QWidget, QGroupBox, QVBoxLayout, QLabel, QSlider, QComboBox, QPushButton, QHBoxLayout, QButtonGroup, QDoubleSpinBox
 from PyQt6.QtCore import Qt, pyqtSignal # Added pyqtSignal
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
@@ -11,7 +11,7 @@ from theme import (
     BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE,
     BUTTON_HEIGHT
 )
-import os
+
 # Crop Factor Constants
 DEFAULT_CROP_FACTOR = 3
 MIN_CROP_FACTOR = 1.0
@@ -100,7 +100,12 @@ class CameraSettingsWidget(QGroupBox):
 
         self.res_dropdown = QComboBox()
 
-
+        self.fps_label = QLabel("FPS Setting:") 
+        self.fps_slider = QSlider(Qt.Orientation.Horizontal)
+        self.fps_slider.setRange(1, 120) 
+        self.fps_slider.setValue(10)     
+        self.fps_value_label = QLabel(f"FPS: {self.fps_slider.value()}") 
+        self.fps_slider.valueChanged.connect(lambda val: self.fps_value_label.setText(f"FPS: {val}"))
 
         self.apply_btn = QPushButton("Apply Settings")
         
@@ -121,9 +126,7 @@ class CameraSettingsWidget(QGroupBox):
         self.crop_controls_layout.setStretchFactor(self.crop_factor_spinbox, 0) 
 
 
-        # create a label to show calibration status
-        self.calibration_status_label = QLabel("Calibration: Pending…")
-        self.layout.addWidget(self.calibration_status_label)
+        self.calibration_status_label = QLabel("Calibration: Unknown")
 
         for btn in (self.low_btn, self.mid_btn, self.high_btn):
             btn.setFont(self.apply_btn.font())
@@ -146,48 +149,15 @@ class CameraSettingsWidget(QGroupBox):
         self.layout.addWidget(self.res_dropdown) 
         self.layout.addStretch(1)
 
-        # FPS Controls (show numeric value inline)
-        # Initialize slider before label so we can read its value
-        self.fps_slider = QSlider(Qt.Orientation.Horizontal)
-        self.fps_slider.setRange(1, 120)
-        self.fps_slider.setValue(10)
-        self.fps_label = QLabel(f"FPS Setting: {self.fps_slider.value()}")
-        # Update label text when slider moves
-        self.fps_slider.valueChanged.connect(
-            lambda val: self.fps_label.setText(f"FPS Setting: {val}")
-        )
-        self.layout.addWidget(self.fps_label, 0, Qt.AlignmentFlag.AlignCenter)
-        self.layout.addWidget(self.fps_slider)
+        # FPS Controls
+        self.layout.addWidget(self.fps_label, 0, Qt.AlignmentFlag.AlignCenter) 
+        self.layout.addWidget(self.fps_slider) 
+        self.layout.addWidget(self.fps_value_label, 0, Qt.AlignmentFlag.AlignCenter) 
         self.layout.addStretch(1)
         
-        # Brightness Controls (NEW)
-        self.brightness_label = QLabel(f"Brightness: {50}")
-        self.brightness_slider = QSlider(Qt.Orientation.Horizontal)
-        self.brightness_slider.setRange(0, 100)
-        self.brightness_slider.setValue(70)
-        self.brightness_slider.valueChanged.connect(
-            lambda val: self.brightness_label.setText(f"Brightness: {val}")
-        )
-        self.layout.addWidget(self.brightness_label, 0, Qt.AlignmentFlag.AlignCenter)
-        self.layout.addWidget(self.brightness_slider)
+        # Apply Button
+        self.layout.addWidget(self.apply_btn, 0, Qt.AlignmentFlag.AlignCenter)
         self.layout.addStretch(1)
-
-        # Exposure Controls (percentage → 100µs–200000µs)
-        self.exposure_label = QLabel("Exposure: 30%")
-        self.exposure_slider = QSlider(Qt.Orientation.Horizontal)
-        self.exposure_slider.setRange(1, 100)      # 1%–100%
-        self.exposure_slider.setValue(30)          # default 30%
-        self.exposure_slider.valueChanged.connect(
-            lambda pct: self.exposure_label.setText(f"Exposure: {pct}%")
-        )
-        self.layout.addWidget(self.exposure_label, 0, Qt.AlignmentFlag.AlignCenter)
-        self.layout.addWidget(self.exposure_slider)
-        self.layout.addStretch(1)
-
-        # Auto-Exposure toggle
-        self.ae_checkbox = QCheckBox("Auto-Exposure")
-        self.ae_checkbox.setChecked(True)
-        self.layout.addWidget(self.ae_checkbox, 0, Qt.AlignmentFlag.AlignCenter)
 
         # Crop Controls (NEW - PLACEMENT of QHBoxLayout)
         # Create a container widget for the crop_controls_layout to center it
@@ -196,10 +166,9 @@ class CameraSettingsWidget(QGroupBox):
         self.layout.addWidget(crop_controls_container, 0, Qt.AlignmentFlag.AlignCenter)
         self.layout.addStretch(1)
 
-        # ── move Apply Settings button to very bottom ──
-        self.layout.addWidget(self.apply_btn, 0, Qt.AlignmentFlag.AlignCenter)
-        # Calibration Status Label at very bottom
+        # Calibration Status Label
         self.layout.addWidget(self.calibration_status_label, 0, Qt.AlignmentFlag.AlignCenter)
+        
         self.layout.addStretch(1)
 
         self.setLayout(self.layout)
@@ -364,12 +333,6 @@ class CameraSettingsWidget(QGroupBox):
         self.on_preset_changed(self.preset_group.checkedId()) 
         self._update_crop_ui()
 
-        # allow MainWindow.reset_camera_to_default() to call this
-        # even if you don’t actually need to do more than toggle the button.
-        def set_crop_state(state: bool):
-            self.crop_btn.setChecked(state)
-        self.set_crop_state = set_crop_state
-
     def _update_crop_ui(self):
         """Updates UI elements related to the crop state: button text/state, dropdown, and calibration status."""
         # Text is now static ("Crop"), only update checked state
@@ -510,37 +473,98 @@ class CameraSettingsWidget(QGroupBox):
             }
 
         actual_resolution = (original_width, original_height)
-        if is_cropped and current_crop_factor > 0 and original_height > 0:
+        if is_cropped and current_crop_factor > 0 and original_height > 0 : # Check original_height to prevent division by zero if not set
             cropped_height = int(original_height / current_crop_factor)
-            cropped_height = max(1, cropped_height)
+            cropped_height = max(1, cropped_height) 
             actual_resolution = (original_width, cropped_height)
         
-        cfg = {
-             "jpeg_quality": self.jpeg_slider.value(),
-             "fps": self.fps_slider.value(),
-             "resolution": actual_resolution,
-             "calibration_file": calibration_file,
-             "cropped": is_cropped,
-             "crop_factor": current_crop_factor if is_cropped else None,
-             "preset_type": preset_type,
-             "preset_label": preset_label_for_config
+        return {
+            "jpeg_quality": self.jpeg_slider.value(),
+            "fps": self.fps_slider.value(),
+            "resolution": actual_resolution,
+            "calibration_file": calibration_file, # This is for the original uncropped resolution
+            "cropped": is_cropped,
+            "crop_factor": current_crop_factor if is_cropped else None, # Send factor only if cropped
+            "preset_type": preset_type,
+            "preset_label": preset_label_for_config 
         }
-        # ── include new sliders ──
-        cfg["brightness"] = self.brightness_slider.value()
-        # map 1–100% slider to 100µs–200000µs exposure
-        pct = self.exposure_slider.value() / 100.0
-        min_us, max_us = 100, 200_000
-        cfg["exposure"] = int(min_us + pct * (max_us - min_us))
+
+    def apply_style(self, style: str):
+        self.setStyleSheet(style)
+        # Do NOT set style individually on buttons, let the group box stylesheet apply
+
+    def set_crop_state(self, cropped): 
+        """Set the cropped state and update UI accordingly."""
+        if self.cropped == cropped: 
+            return
+        self.cropped = cropped
+        self._update_crop_ui() 
+        # Updated debug print
+        print(f"[DEBUG] Camera settings crop state programmatically set to: {self.cropped}. Current Factor in UI: {self.crop_factor_spinbox.value()}. Factor active for config: {self.cropped}")
+
+    def has_calibration(self, resolution):
+        """Check if calibration file exists for given resolution."""
+        import os
+        
+        if resolution == "legacy":
+            filename = CALIBRATION_FILES["legacy"]
+        else:
+            filename = CALIBRATION_FILES.get(resolution, "calibrations/calibration_default.npz")
+        
+        # Handle relative paths properly
+        if not os.path.isabs(filename):
+            client_dir = os.path.dirname(os.path.dirname(__file__))
+            filename = os.path.join(client_dir, filename)
+            filename = os.path.normpath(filename)
+        
+        return os.path.exists(filename)
+
+    def get_calibration_status(self):
+        """Get status of all calibrations for current preset."""
+        import os
+        status = {}
+        client_dir = os.path.dirname(os.path.dirname(__file__))
+        
+        for label, resolution_data in self.current_presets:
+            if resolution_data == "legacy":
+                filename = CALIBRATION_FILES["legacy"]
+            else:
+                filename = CALIBRATION_FILES.get(resolution_data, f"calibrations/calibration_{resolution_data[0]}x{resolution_data[1]}.npz")
+            
+            # Handle relative paths
+            if not os.path.isabs(filename):
+                filename = os.path.join(client_dir, filename)
+                filename = os.path.normpath(filename)
+                
+            status[label] = os.path.exists(filename)
+        return status
 
     def update_calibration_status(self):
-        """Slot: update the calibration_status_label based on current selection."""
-        # figure out which resolution key is selected
-        idx = self.res_dropdown.currentIndex()
-        status = "Unknown"
-        try:
-            _, base = self.current_presets[idx]
-            cal_path = CALIBRATION_FILES.get(base, "")
-            status = "Found" if os.path.exists(cal_path) else "Missing"
-        except Exception:
-            pass
-        self.calibration_status_label.setText(f"Calibration: {status}")
+        """Update the calibration status display."""
+        import os
+        config = self.get_config()
+        calibration_file = config.get('calibration_file', 'calibrations/calibration_default.npz')
+        preset_type = config.get('preset_type', 'standard')
+        
+        # Handle relative paths properly - resolve relative to client directory
+        if not os.path.isabs(calibration_file):
+            # Get the client directory (go up one level from widgets directory)
+            client_dir = os.path.dirname(os.path.dirname(__file__))
+            calibration_file = os.path.join(client_dir, calibration_file)
+            calibration_file = os.path.normpath(calibration_file)
+        
+        if os.path.exists(calibration_file):
+            if preset_type == "legacy":
+                self.calibration_status_label.setText("Calibration: ✓ Legacy Available")
+            else:
+                self.calibration_status_label.setText("Calibration: ✓ Available")
+            self.calibration_status_label.setStyleSheet(f"color: {SUCCESS_COLOR};")
+        else:
+            if preset_type == "legacy":
+                self.calibration_status_label.setText("Calibration: ❌ Legacy Missing")
+            else:
+                self.calibration_status_label.setText("Calibration: ❌ Missing")
+            self.calibration_status_label.setStyleSheet(f"color: {ERROR_COLOR};")
+            
+            # Debug: print the actual path being checked
+            print(f"[DEBUG] Calibration check - Looking for: {calibration_file}")

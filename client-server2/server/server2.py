@@ -6,7 +6,6 @@ from flask_socketio import SocketIO, emit
 import camera
 import sensors
 import threading
-import time  # <-- Import time module
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -63,24 +62,12 @@ def handle_stop_camera():
         print(f"[ERROR] stop_camera: {e}")
 
 
-import camera  # make sure this brings in your CameraStreamer instance
-
 @socketio.on('camera_config')
-def handle_camera_config(*args):
-    """Receive new camera settings; ignore calls without a dict payload."""
-    if not args:
-        return
-    data = args[0]
-    if not isinstance(data, dict):
-        return
-
+def handle_camera_config(data):
     try:
-        # Merge in the new settings
-        camera.streamer.config.update(data)
-        camera.streamer.apply_config()
         emit('camera_config', data, broadcast=True)
     except Exception as e:
-        print(f"[ERROR] handle_camera_config: {e}")
+        print(f"[ERROR] camera_config: {e}")
 
 
 @socketio.on("sensor_data")

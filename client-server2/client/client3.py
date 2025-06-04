@@ -1728,17 +1728,12 @@ QPushButton#danger_btn:hover {
         """Helper method to get/send config and update detector after the initial 0.5s pause."""
         print(f"[INFO] 0.5s pause complete. Getting/sending configuration (stream was {was_streaming_at_call_time}).")
         
-        # 1) grab config dict from widget
+        # Get and send configuration
         config = self.camera_settings.get_config()
-        # 2) guard against None or non‐dict
-        if not isinstance(config, dict):
-            config = {}
-        # 3) emit with a guaranteed dict payload
         sio.emit("camera_config", config)
         
         #Update detector calibration (this will also update self.active_config_for_detector via server ack)
-        # ensure we never pass None
-        self.update_detector_calibration(config or self.camera_settings.get_config())
+        self.update_detector_calibration(config) # This is now handled by camera_config_updated
 
         # Resume stream if it was active before applying config
         if was_streaming_at_call_time:
@@ -1762,9 +1757,8 @@ QPushButton#danger_btn:hover {
     def update_detector_calibration(self, config):
         """Update detector with new calibration settings"""
         try:
-            # config is now guaranteed a dict
             calibration_path = config.get('calibration_file', 'calibrations/calibration_default.npz')
-            preset_type      = config.get('preset_type', 'standard')
+            preset_type = config.get('preset_type', 'standard')
             
             if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
                 success = detector4.detector_instance.update_calibration(calibration_path)
