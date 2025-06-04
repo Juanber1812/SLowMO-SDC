@@ -359,6 +359,12 @@ class CameraSettingsWidget(QGroupBox):
         self.on_preset_changed(self.preset_group.checkedId()) 
         self._update_crop_ui()
 
+        # allow MainWindow.reset_camera_to_default() to call this
+        # even if you don’t actually need to do more than toggle the button.
+        def set_crop_state(state: bool):
+            self.crop_btn.setChecked(state)
+        self.set_crop_state = set_crop_state
+
     def _update_crop_ui(self):
         """Updates UI elements related to the crop state: button text/state, dropdown, and calibration status."""
         # Text is now static ("Crop"), only update checked state
