@@ -65,11 +65,12 @@ def handle_stop_camera():
 import camera  # make sure this brings in your CameraStreamer instance
 
 @socketio.on('camera_config')
-def handle_camera_config(data):
-    """
-    Receive new camera settings from the client (including exposure & brightness),
-    apply them to the PiCamera2, then re‐broadcast to all clients.
-    """
+def handle_camera_config(data=None):
+    """Receive new camera settings; data may be None if client emitted without payload."""
+    if data is None:
+        print("[WARN] Received camera_config event with no data.")
+        return
+
     try:
         # Merge in the new settings
         camera.streamer.config.update(data)
