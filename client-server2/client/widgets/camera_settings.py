@@ -169,6 +169,34 @@ class CameraSettingsWidget(QGroupBox):
         # Calibration Status Label
         self.layout.addWidget(self.calibration_status_label, 0, Qt.AlignmentFlag.AlignCenter)
         
+        # ───── Brightness Slider ─────
+        brightness_label = QLabel("Brightness:")
+        self.brightness_slider = QSlider(Qt.Orientation.Horizontal)
+        self.brightness_slider.setRange(-10, 10)   # maps to -1.0…1.0
+        self.brightness_slider.setValue(0)
+        self.brightness_slider.setSingleStep(1)
+        self.brightness_slider.setToolTip("Adjust brightness (-1.0 to 1.0)")
+        self.layout.addWidget(brightness_label)
+        self.layout.addWidget(self.brightness_slider)
+        self.layout.addStretch(1)
+
+        # ───── Auto Exposure Toggle ─────
+        self.auto_exposure_checkbox = QPushButton("Auto Exposure: ON")
+        self.auto_exposure_checkbox.setCheckable(True)
+        self.auto_exposure_checkbox.setChecked(True)
+        self.auto_exposure_checkbox.clicked.connect(self.toggle_auto_exposure)
+        self.layout.addWidget(self.auto_exposure_checkbox)
+        self.layout.addStretch(1)
+
+        # ───── Manual Exposure Slider ─────
+        self.exposure_slider = QSlider(Qt.Orientation.Horizontal)
+        self.exposure_slider.setRange(100, 1_000_000)  # µs
+        self.exposure_slider.setValue(20_000)
+        self.exposure_slider.setSingleStep(100)
+        self.exposure_slider.setToolTip("Exposure time in microseconds")
+        self.layout.addWidget(QLabel("Exposure Time (μs):"))
+        self.layout.addWidget(self.exposure_slider)
+        self.exposure_slider.setVisible(False)
         self.layout.addStretch(1)
 
         self.setLayout(self.layout)
@@ -413,6 +441,14 @@ class CameraSettingsWidget(QGroupBox):
         label = self.res_dropdown.currentText()
         return label.replace(" (Cropped)", "")
 
+    def toggle_auto_exposure(self):
+        if self.auto_exposure_checkbox.isChecked():
+            self.auto_exposure_checkbox.setText("Auto Exposure: ON")
+            self.exposure_slider.setVisible(False)
+        else:
+            self.auto_exposure_checkbox.setText("Auto Exposure: OFF")
+            self.exposure_slider.setVisible(True)
+
     def get_config(self):
         # Add debug prints to understand the state when get_config is called
         # print(f"[DEBUG] get_config: res_dropdown count: {self.res_dropdown.count()}, currentIndex: {self.res_dropdown.currentIndex()}, currentText: '{self.res_dropdown.currentText()}'")
@@ -478,7 +514,7 @@ class CameraSettingsWidget(QGroupBox):
             cropped_height = max(1, cropped_height) 
             actual_resolution = (original_width, cropped_height)
         
-        return {
+        cfg = {
             "jpeg_quality": self.jpeg_slider.value(),
             "fps": self.fps_slider.value(),
             "resolution": actual_resolution,
@@ -489,6 +525,13 @@ class CameraSettingsWidget(QGroupBox):
             "preset_label": preset_label_for_config 
         }
 
+        # Add brightness and exposure settings
+        cfg["brightness"] = self.brightness_slider.value() / 10.0
+        cfg["auto_exposure"] = self.auto_exposure_checkbox.isChecked()
+        if not cfg["auto_exposure"]:
+            cfg["exposure_time"] = self.exposure_slider.value()
+
+        return cfg
     def apply_style(self, style: str):
         self.setStyleSheet(style)
         # Do NOT set style individually on buttons, let the group box stylesheet apply

@@ -30,7 +30,10 @@ class CameraStreamer:
         self.config = {
             "jpeg_quality": 70,
             "fps": 10,
-            "resolution": [1536, 864]
+            "resolution": [1536, 864],
+            "brightness": 0.0,             # Default brightness
+            "exposure_time": None,         # None means auto
+            "auto_exposure": True          # Enable AE by default
         }
         self.picam = Picamera2()
 
@@ -53,9 +56,25 @@ class CameraStreamer:
             if self.picam.started:
                 self.picam.stop()
 
+            # build controls dict with new parameters
+            controls = {
+                "FrameDurationLimits": (duration, duration),
+                "Brightness": self.config.get("brightness", 0.0),
+                "AeEnable": self.config.get("auto_exposure", True)
+            }
+
+            # if manual exposure requested, override AE
+            if not self.config.get("auto_exposure", True):
+                exposure = self.config.get("exposure_time")
+                if exposure:
+                    controls["ExposureTime"] = exposure
+
+            # debug print
+            print("[CONFIG] Applying controls:", controls)
+
             stream_cfg = self.picam.create_preview_configuration(
                 main={"format": "XRGB8888", "size": res},
-                controls={"FrameDurationLimits": (duration, duration)}
+                controls=controls
             )
             self.picam.configure(stream_cfg)
             self.picam.start()
