@@ -203,8 +203,8 @@ class CameraSettingsWidget(QGroupBox):
         # ───── Manual Exposure Slider + Numeric Value ─────
         exposure_label = QLabel("Exposure (μs):")
         self.exposure_slider = QSlider(Qt.Orientation.Horizontal)
-        self.exposure_slider.setRange(10, 66_660)  # µs
-        self.exposure_slider.setValue(20_000)
+        self.exposure_slider.setRange(10, 66660)  # µs
+        self.exposure_slider.setValue(20000)
         self.exposure_slider.setSingleStep(10)
         self.exposure_slider.setToolTip("Exposure time in microseconds")
         self.exposure_value_label = QLabel(str(self.exposure_slider.value()))

@@ -47,10 +47,10 @@ class CameraStreamer:
 
     def apply_config(self):
         try:
-            res          = self.config["resolution"]
+            res = self.config["resolution"]
             jpeg_quality = self.config["jpeg_quality"]
-            fps          = self.config["fps"]
-            duration     = int(1e6 / max(fps, 1))
+            fps = self.config["fps"]
+            duration = int(1e6 / max(fps, 1))
 
             if self.picam.started:
                 self.picam.stop()
@@ -58,24 +58,24 @@ class CameraStreamer:
             # build controls dict with new parameters
             controls = {
                 "FrameDurationLimits": (duration, duration),
-                "Brightness":         self.config.get("brightness", 0.0),
+                "Brightness": self.config.get("brightness", 0.0),
             }
 
-            # if manual exposure requested, disable auto‐exposure and set exposure time
-            if not self.config.get("auto_exposure", True):
-                controls["AeEnable"]     = False    # turn off auto exposure
+            # if manual exposure requested, override AE
+            if not self.config.get("auto_exposure", False):
                 exposure = self.config.get("exposure_time")
-                if exposure is not None:
+                if exposure:
                     controls["ExposureTime"] = exposure
 
+            # debug print
             print("[CONFIG] Applying controls:", controls)
+
             stream_cfg = self.picam.create_preview_configuration(
                 main={"format": "XRGB8888", "size": res},
                 controls=controls
             )
             self.picam.configure(stream_cfg)
             self.picam.start()
-
         except Exception as e:
             print("[ERROR] Failed to configure camera:", e)
             sio.emit("camera_status", {"status": "Error"})
