@@ -11,7 +11,7 @@ from theme import (
     BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE,
     BUTTON_HEIGHT
 )
-
+import os
 # Crop Factor Constants
 DEFAULT_CROP_FACTOR = 3
 MIN_CROP_FACTOR = 1.0
@@ -121,7 +121,9 @@ class CameraSettingsWidget(QGroupBox):
         self.crop_controls_layout.setStretchFactor(self.crop_factor_spinbox, 0) 
 
 
-        self.calibration_status_label = QLabel("Calibration: Unknown")
+        # create a label to show calibration status
+        self.calibration_status_label = QLabel("Calibration: Pending…")
+        self.layout.addWidget(self.calibration_status_label)
 
         for btn in (self.low_btn, self.mid_btn, self.high_btn):
             btn.setFont(self.apply_btn.font())
@@ -518,4 +520,16 @@ class CameraSettingsWidget(QGroupBox):
         pct = self.exposure_slider.value() / 100.0
         min_us, max_us = 100, 200_000
         cfg["exposure"] = int(min_us + pct * (max_us - min_us))
-        
+
+    def update_calibration_status(self):
+        """Slot: update the calibration_status_label based on current selection."""
+        # figure out which resolution key is selected
+        idx = self.res_dropdown.currentIndex()
+        status = "Unknown"
+        try:
+            _, base = self.current_presets[idx]
+            cal_path = CALIBRATION_FILES.get(base, "")
+            status = "Found" if os.path.exists(cal_path) else "Missing"
+        except Exception:
+            pass
+        self.calibration_status_label.setText(f"Calibration: {status}")

@@ -64,7 +64,13 @@ def handle_stop_camera():
 
 @socketio.on('camera_config')
 def handle_camera_config(data):
+    """Receive new camera settings from client, apply to PiCamera2, and re-broadcast."""
     try:
+        # Merge client settings into streamer and reconfigure hardware
+        camera.streamer.config.update(data)
+        camera.streamer.apply_config()
+
+        # Broadcast the new config back to all clients
         emit('camera_config', data, broadcast=True)
     except Exception as e:
         print(f"[ERROR] camera_config: {e}")

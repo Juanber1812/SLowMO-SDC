@@ -31,8 +31,8 @@ class CameraStreamer:
             "jpeg_quality": 70,
             "fps": 10,
             "resolution": [1536, 864],
-            "exposure": 10000,     # default 10 ms
-            "brightness": 50       # default mid-level
+            "exposure": 10000,
+            "brightness": 50
         }
         self.picam = Picamera2()
 
@@ -49,13 +49,17 @@ class CameraStreamer:
         try:
             res = tuple(self.config["resolution"])
             dur = int(1e6 / max(self.config["fps"], 1))
-            exp = int(self.config.get("exposure", dur))      # μs
-            bri = int(self.config.get("brightness", 50))      # 0–100
+            # clamp exposure between 100µs and 200000µs
+            exp = int(self.config.get("exposure", dur))
+            exp = max(100, min(exp, 200_000))
+            # clamp brightness between 0–100
+            bri = int(self.config.get("brightness", 50))
+            bri = max(0, min(bri, 100))
 
             if self.picam.started:
                 self.picam.stop()
 
-            stream_cfg = self.picam.create_preview_configuration(
+            cfg = self.picam.create_preview_configuration(
                 main={"format": "XRGB8888", "size": res},
                 controls={
                     "FrameDurationLimits": (dur, dur),
@@ -63,7 +67,7 @@ class CameraStreamer:
                     "Brightness": bri
                 }
             )
-            self.picam.configure(stream_cfg)
+            self.picam.configure(cfg)
             self.picam.start()
         except Exception as e:
             print("[ERROR] Failed to configure camera:", e)
