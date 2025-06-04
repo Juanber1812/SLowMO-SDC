@@ -49,7 +49,7 @@ class GraphSection(QGroupBox):
     recording_saved = pyqtSignal(str)
     graph_update_frequency_changed = pyqtSignal(float) # Changed to float for QDoubleSpinBox
 
-    def __init__(self, record_btn: QPushButton, duration_dropdown: QComboBox, parent=None):
+    def __init__(self, record_btn: QPushButton, duration_dropdown: QComboBox, parent=None): # Or load_graph if style is there
         super().__init__(parent)
         self.setObjectName("GraphSection")
 
@@ -60,8 +60,24 @@ class GraphSection(QGroupBox):
         self.placeholder_layout = QVBoxLayout(self.graph_display_placeholder)
         self.placeholder_layout.setContentsMargins(10, 10, 10, 10)
         self.placeholder_layout.setSpacing(15)
+        # center everything
+        self.placeholder_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.graph_modes = ["Relative Distance", "Relative Angle", "Angular Position"]
+        # add a header label
+        header = QLabel("Select Payload Mode")
+        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setStyleSheet(f"""
+            QLabel {{
+                color: {BOX_TITLE_COLOR};
+                font-size: {FONT_SIZE_TITLE}pt;
+                font-family: {FONT_FAMILY};
+                font-weight: bold;
+                padding: 8px 0;
+            }}
+        """)
+        self.placeholder_layout.addWidget(header)
+
+        self.graph_modes = ["DISTANCE MEASURING MODE", "SCANNING MODE", "SPIN MODE"]
         self.select_buttons = {}
 
         # Recording state tracking
@@ -80,7 +96,7 @@ class GraphSection(QGroupBox):
                     color: {TEXT_COLOR};
                     border: {BORDER_WIDTH}px solid {color};
                     border-radius: {BORDER_RADIUS}px;
-                    padding: 1px 1px;
+                    padding: 4px 12px;
                     font-size: {FONT_SIZE_NORMAL}pt;
                     font-family: {FONT_FAMILY};
                 }}
@@ -90,9 +106,12 @@ class GraphSection(QGroupBox):
                     border: {BORDER_WIDTH}px solid {color};
                 }}
             """)
-            btn.setMinimumHeight(int(BUTTON_HEIGHT *1.5))
-            btn.setFixedHeight(int((BUTTON_HEIGHT + 4) *1.5))  # 20% bigger
-            btn.setMinimumWidth(int(120 * 1.5))                 # 20% bigger width
+            # stretch buttons to fill available width
+            from PyQt6.QtWidgets import QSizePolicy
+            btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            btn.setFixedHeight(int(BUTTON_HEIGHT * 1.8))        # taller
+            btn.setMinimumWidth(200)                            # wider
+
             btn.clicked.connect(lambda _, m=mode: self.load_graph(m))
             self.placeholder_layout.addWidget(btn, alignment=Qt.AlignmentFlag.AlignHCenter)
             self.select_buttons[mode] = btn
@@ -121,18 +140,18 @@ class GraphSection(QGroupBox):
         # Set the current graph mode
         self.current_graph_mode = mode
 
-        if mode == "Relative Distance":
+        if mode == "DISTANCE MEASURING MODE":
             self.graph_widget = RelativeDistancePlotter()
-        elif mode == "Relative Angle":
+        elif mode == "SCANNING MODE":
             self.graph_widget = RelativeAnglePlotter()
-        elif mode == "Angular Position":
+        elif mode == "SPIN MODE":
             self.graph_widget = AngularPositionPlotter()
         else:
             return
 
         self.shared_start_time = time.time()
         self.graph_widget.start_time = self.shared_start_time
-        self.graph_widget.setFixedSize(480, 280)  # Larger graph size
+        self.graph_widget.setFixedSize(500, 300)  # Larger graph size
 
         # Create a horizontal layout for graph and buttons
         graph_and_btns_layout = QHBoxLayout()
@@ -144,7 +163,7 @@ class GraphSection(QGroupBox):
 
         # Stack buttons vertically, left-aligned and vertically centered
         btn_layout = QVBoxLayout()
-        btn_layout.setSpacing(12)
+        btn_layout.setSpacing(2)
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
@@ -167,64 +186,38 @@ class GraphSection(QGroupBox):
             color: #777;
         }}
         """
-        # Style for SpinBox and its Label (can be refined in theme.py later)
+        # Style for SpinBox and its Label
         control_style = f"""
             QLabel {{
                 color: {LABEL_COLOR};
                 font-family: {FONT_FAMILY};
                 font-size: {FONT_SIZE_LABEL}pt;
                 padding-top: 4px; /* Align better with spinbox */
+                /* Add other QLabel specific styles if needed */
             }}
             QDoubleSpinBox {{
                 background-color: {BOX_BACKGROUND}; 
                 color: {TEXT_COLOR};
                 border: {BORDER_WIDTH}px solid {BUTTON_COLOR}; 
                 border-radius: {BORDER_RADIUS}px;
-                padding: 1px 3px; /* Padding for the text area */
+                padding: 1px 3px; /* Adjust padding as needed for text alignment */
                 font-family: {FONT_FAMILY};
                 font-size: {FONT_SIZE_NORMAL}pt;
-                /* The setFixedHeight in code ensures this has a defined height */
+                /* min-height: {int(BUTTON_HEIGHT * 0.9)}px; /* Optional: ensure a minimum height */
+                /* padding-right: 20px; /* Only if needed to reserve space for default buttons, usually not required */
             }}
 
-            /* Common properties for the button area on the right */
-            QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {{
-                subcontrol-origin: border; /* Position relative to the spinbox's border */
-                background-color: {BOX_BACKGROUND}; /* Background of the button itself */
-                width: 20px; /* Width of the vertical strip for buttons */
-                border-left-width: 1px; /* Line separating text from buttons */
-                border-left-color: {BUTTON_COLOR};
-                border-left-style: solid;
-                /* Removed margin: 1px; from here to avoid potential conflicts */
-            }}
-
-            QDoubleSpinBox::up-button {{
-                subcontrol-position: top right; /* Position in the top-right of the button area */
-                height: 50%; /* Take up top half of the available height in the button strip */
-                border-top-right-radius: {max(0, BORDER_RADIUS - 2)}px; 
-                /* margin: 0px; /* Ensure no unexpected margins */
-            }}
-
-            QDoubleSpinBox::down-button {{
-                subcontrol-position: bottom right; /* Position in the bottom-right of the button area */
-                height: 50%; /* Take up bottom half of the available height in the button strip */
-                border-bottom-right-radius: {max(0, BORDER_RADIUS - 2)}px;
-                /* margin: 0px; /* Ensure no unexpected margins */
-                /* Optional: add a small border on top of the down-button to separate it visually from up-button */
-                /* border-top: 1px solid {BORDER_COLOR if BORDER_COLOR else '#AAAAAA'}; */
-            }}
-
-            /* COMPLETELY EMPTY to maximize chances of default rendering for arrows */
-            QDoubleSpinBox::up-arrow {{
-            }}
-            QDoubleSpinBox::down-arrow {{
-            }}
-
-            QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {{
-                background-color: {BUTTON_HOVER if BUTTON_HOVER else '#DDDDDD'}; 
-            }}
-            QDoubleSpinBox::up-button:pressed, QDoubleSpinBox::down-button:pressed {{
-                background-color: {BUTTON_COLOR if BUTTON_COLOR else '#CCCCCC'}; 
-            }}
+            /* 
+            All custom styling for ::up-button, ::down-button, ::up-arrow, ::down-arrow 
+            has been removed from here. The QDoubleSpinBox will now use the default 
+            system appearance for its buttons and arrows.
+            
+            If you wish to style the hover/pressed state of these default buttons,
+            you might be able to add simple rules like:
+            QDoubleSpinBox::up-button:hover {{ background-color: {BUTTON_HOVER}; }}
+            QDoubleSpinBox::down-button:hover {{ background-color: {BUTTON_HOVER}; }}
+            However, for a truly default look, omit these as well.
+            */
         """
 
 
@@ -240,20 +233,72 @@ class GraphSection(QGroupBox):
         btn_layout.addWidget(self.duration_dropdown, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # Graph Update Frequency Control
-        self.freq_label = QLabel("Updates/sec:")
-        self.freq_label.setStyleSheet(control_style) # Apply label part of control_style
-        btn_layout.addWidget(self.freq_label, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        self.freq_spinbox = QDoubleSpinBox() # Changed to QDoubleSpinBox
-        self.freq_spinbox.setRange(0.1, 30.0)  # Min 0.1 Hz, Max 30 Hz, allows decimals
-        self.freq_spinbox.setSingleStep(0.1)   # Step by 0.1
-        self.freq_spinbox.setDecimals(1)       # Show 1 decimal place
-        self.freq_spinbox.setValue(2.0)        # Default to 2.0 Hz
+
+        self.freq_spinbox = QDoubleSpinBox() 
+        self.freq_spinbox.setRange(0.1, 30.0)
+        self.freq_spinbox.setSingleStep(0.1)   
+        self.freq_spinbox.setDecimals(1)       
+        self.freq_spinbox.setValue(2.0)        
         self.freq_spinbox.setSuffix(" Hz")
-        self.freq_spinbox.setStyleSheet(control_style) # Apply spinbox part of control_style
+        
+        # Apply the "modern" spinbox style from camera_settings.py:
+        self.freq_spinbox.setStyleSheet(f"""
+            QDoubleSpinBox {{
+                background-color: {BOX_BACKGROUND};
+                color: {TEXT_COLOR};
+                border: {BORDER_WIDTH}px solid {BUTTON_COLOR};
+                border-radius: {BORDER_RADIUS}px;
+                padding: 1px 3px;
+                min-height: {BUTTON_HEIGHT - 2}px;
+                font-family: {FONT_FAMILY};
+                font-size: {FONT_SIZE_NORMAL}pt;
+            }}
+            QDoubleSpinBox:disabled {{
+                background-color: {BUTTON_DISABLED};
+                color: #777;
+                border: {BORDER_WIDTH}px solid #555;
+            }}
+            QDoubleSpinBox::up-button,
+            QDoubleSpinBox::down-button {{
+                background-color: {BUTTON_COLOR};
+                border: none;
+                border-radius: {int(BORDER_RADIUS/2)}px;
+                width: 12px;
+            }}
+            QDoubleSpinBox::up-button {{
+                subcontrol-position: top right;
+                margin-right: 1px;
+                margin-top: 1px;
+            }}
+            QDoubleSpinBox::down-button {{
+                subcontrol-position: bottom right;
+                margin-right: 1px;
+                margin-bottom: 1px;
+            }}
+            QDoubleSpinBox::up-button:hover,
+            QDoubleSpinBox::down-button:hover {{
+                background-color: {BUTTON_HOVER};
+            }}
+            QDoubleSpinBox::up-arrow {{
+                image: url(./client/widgets/icons/arrow_up_light.png);
+                width: 4px; height: 6px;
+            }}
+            QDoubleSpinBox::down-arrow {{
+                image: url(./client/widgets/icons/arrow_down_light.png);
+                width: 4px; height: 6px;
+            }}
+        """)
+
+        # preserve the fixed height and signal:
         self.freq_spinbox.setFixedHeight(int(BUTTON_HEIGHT))
-        self.freq_spinbox.valueChanged.connect(self.on_frequency_changed) # valueChanged emits float
+        self.freq_spinbox.setFixedWidth(72)  # ← make it narrower (adjust as needed)
+        self.freq_spinbox.valueChanged.connect(self.on_frequency_changed)
+        btn_layout.setSpacing(0)
         btn_layout.addWidget(self.freq_spinbox, alignment=Qt.AlignmentFlag.AlignLeft)
+        # restore the 12px for the rest
+        btn_layout.setSpacing(12)
+
         # Emit initial value so client3.py can sync if it missed it
         self.on_frequency_changed(self.freq_spinbox.value())
 
@@ -360,9 +405,9 @@ class GraphSection(QGroupBox):
         os.makedirs(rec_dir, exist_ok=True)
 
         MODE_CODES = {
-            "Relative Distance":  "distance_01",
-            "Relative Angle":     "angle_02",
-            "Angular Position":   "spin_03",
+            "DISTANCE MEASURING MODE":  "distance_01",
+            "SCANNING MODE":     "angle_02",
+            "SPIN MODE":   "spin_03",
         }
         code = MODE_CODES.get(
             self.current_graph_mode,

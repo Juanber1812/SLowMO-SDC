@@ -33,7 +33,7 @@ class AngularPositionPlotter(QWidget):
         self.subplot_top = 0.93
         self.subplot_bottom = 0.18
         self.bg_color = PLOT_BACKGROUND
-        self.line_color = GRAPH_MODE_COLORS["Angular Position"]
+        self.line_color = GRAPH_MODE_COLORS["SPIN MODE"]
         self.tick_color = self.line_color
         self.grid_color = self.line_color
 

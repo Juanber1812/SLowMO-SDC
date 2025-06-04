@@ -12,7 +12,7 @@ class AprilTagDetector:
         
         # AprilTag detector setup
         self.detector = pyapriltags.Detector(
-            families='tag25h9',
+            families='tag36h11',
             nthreads=16,
             quad_decimate=0,
             quad_sigma=0,

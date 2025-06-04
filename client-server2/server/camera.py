@@ -30,7 +30,9 @@ class CameraStreamer:
         self.config = {
             "jpeg_quality": 70,
             "fps": 10,
-            "resolution": [1536, 864]
+            "resolution": [1536, 864],
+            "exposure": 10000,     # default 10 ms
+            "brightness": 50       # default mid-level
         }
         self.picam = Picamera2()
 
@@ -45,17 +47,21 @@ class CameraStreamer:
 
     def apply_config(self):
         try:
-            res = self.config["resolution"]
-            jpeg_quality = self.config["jpeg_quality"]
-            fps = self.config["fps"]
-            duration = int(1e6 / max(fps, 1))
+            res = tuple(self.config["resolution"])
+            dur = int(1e6 / max(self.config["fps"], 1))
+            exp = int(self.config.get("exposure", dur))      # μs
+            bri = int(self.config.get("brightness", 50))      # 0–100
 
             if self.picam.started:
                 self.picam.stop()
 
             stream_cfg = self.picam.create_preview_configuration(
                 main={"format": "XRGB8888", "size": res},
-                controls={"FrameDurationLimits": (duration, duration)}
+                controls={
+                    "FrameDurationLimits": (dur, dur),
+                    "ExposureTime": exp,
+                    "Brightness": bri
+                }
             )
             self.picam.configure(stream_cfg)
             self.picam.start()
@@ -204,6 +210,7 @@ def on_stop_camera(_):
 
 @sio.on("camera_config")
 def on_camera_config(data):
+    # merge in exposure & brightness
     streamer.config.update(data)
     if not streamer.streaming:
         streamer.apply_config()

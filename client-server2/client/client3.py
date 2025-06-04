@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage, QFont, QPainter, QPen
 
+
 ##############################################################################
 #                                IMPORTS                                     #
 ##############################################################################
@@ -30,6 +31,7 @@ from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
 from widgets.detector_control import DetectorControlWidget
 from widgets.adcs import ADCSSection
+
 # Theme and styling
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
@@ -47,7 +49,7 @@ from theme import (
 ##############################################################################
 
 logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
-SERVER_URL = "http://192.168.16.89:5000"
+SERVER_URL = "http://192.168.1.146:5000"
 
 ##############################################################################
 #                        SOCKETIO AND BRIDGE SETUP                         #
@@ -507,8 +509,33 @@ class MainWindow(QWidget):
 
         row2.addWidget(lidar_group)
         
+        # ── DO NOT PRESS Button ──
+        self.danger_btn = QPushButton("DO NOT PRESS")
+        self.danger_btn.setObjectName("danger_btn")     # give it a unique ID
+
+
+        # fill its cell
+        self.danger_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.danger_btn.clicked.connect(self.show_full_image)
+        row2.addWidget(self.danger_btn)
+        
         parent_layout.addLayout(row2)
 
+        self.danger_btn.setStyleSheet("""
+QPushButton#danger_btn {
+    background-color: #555555;
+    color: white;
+    font-size: 50pt;
+    padding: 40px;
+    border: 4px solid #222;
+}
+QPushButton#danger_btn:hover {
+    background-color: #ff3333;
+    color: black;
+}
+""")
+
+        
     def setup_subsystem_controls_row(self, parent_layout):
         """Setup ADCS controls using ADCSSection widget"""
         row3 = QHBoxLayout()
@@ -784,9 +811,9 @@ class MainWindow(QWidget):
 
         self.analysis_mode_combo = QComboBox()
         self.analysis_mode_combo.addItems([
-            "Relative Distance",
-            "Relative Angle",
-            "Angular Position"
+            "DISTANCE MEASURING MODE",
+            "SCANNING MODE",
+            "SPIN MODE"
         ])
         self.analysis_mode_combo.setFixedWidth(150)
         # replot & rename metrics whenever user changes mode
@@ -1055,9 +1082,9 @@ class MainWindow(QWidget):
         try:
             # rename based on current graph mode
             gm = self.analysis_mode_combo.currentText()
-            if   gm == "Relative Distance":
+            if   gm == "DISTANCE MEASURING MODE":
                 P, D = "Distance",       "Velocity"
-            elif gm == "Relative Angle":
+            elif gm == "SCANNING MODE":
                 P, D = "Rel. Angle",     "Rate of Change"
             else:
                 P, D = "Angl. Pos.",     "Spin Rate"
@@ -1292,9 +1319,9 @@ class MainWindow(QWidget):
 
             # pick axis labels by mode
             gm = self.analysis_mode_combo.currentText()
-            if   gm == "Relative Distance":
+            if   gm == "DISTANCE MEASURING MODE":
                 y_raw, y_vel = "Distance (m)",        "Velocity (m/s)"
-            elif gm == "Relative Angle":
+            elif gm == "SCANNING MODE":
                 y_raw, y_vel = "Relative Angle (°)",  "Rate of Change (°/s)"
             else:  # Angular Position
                 y_raw, y_vel = "Angular Position (°)", "Spin Rate (°/s)"
@@ -1755,6 +1782,34 @@ class MainWindow(QWidget):
             print("[INFO] 🛑 Stopping detector...")
             self.clear_queue()
 
+    def show_full_image(self):
+        """Cover UI with a full-screen image and tiny back button."""
+        # hide main tabs
+        self.tab_widget.hide()
+        # display full image
+        self._full_lbl = QLabel(self)
+        pix = QPixmap(r"C:\Users\juanb\OneDrive\Imágenes\Camera Roll\WIN_20250221_12_17_13_Pro.jpg")
+        pix = pix.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                         Qt.TransformationMode.SmoothTransformation)
+        self._full_lbl.setPixmap(pix)
+        self._full_lbl.setGeometry(self.rect())
+        self._full_lbl.show()
+        # tiny back button
+        self._back_btn = QPushButton("←", self)
+        self._back_btn.setStyleSheet("background:none; color:red; font-size:10pt;")
+        self._back_btn.setFixedSize(30, 20)
+        self._back_btn.move(5, 5)
+        self._back_btn.clicked.connect(self.hide_full_image)
+        self._back_btn.show()
+ 
+    def hide_full_image(self):
+         pass
+         # remove full-screen image and back button
+         self._full_lbl.hide()
+         self._back_btn.hide()
+         # restore main UI
+         self.tab_widget.show()
+
     def run_detector(self):
         """Main detector processing loop"""
         while self.detector_active:
@@ -1763,8 +1818,6 @@ class MainWindow(QWidget):
                 
                 # Use the server-acknowledged and locally cached configuration
                 if self.active_config_for_detector is None:
-                    # Fallback if not initialized, though it should be in __init__ or connect event
-                    print("[WARNING] run_detector: active_config_for_detector is None. Using live UI settings as fallback.")
                     config = self.camera_settings.get_config() # Fallback, not ideal
                 else:
                     config = self.active_config_for_detector # CORRECT: Use cached config
@@ -1793,6 +1846,8 @@ class MainWindow(QWidget):
                     else:
                         analysed, pose = detector4.detect_and_draw(frame, return_pose=True)
                 
+
+                
                     bridge.analysed_frame.emit(analysed)
 
                     # only update graphs if needed
@@ -1811,12 +1866,12 @@ class MainWindow(QWidget):
                         value = None
                         mode = self.graph_section.current_graph_mode
                         widget = self.graph_section.graph_widget
-                        if mode == "Relative Distance" and hasattr(widget, 'current_distance'):
+                        if mode == "DISTANCE MEASURING MODE" and hasattr(widget, 'current_distance'):
 
                             value = widget.current_distance
-                        elif mode == "Relative Angle" and hasattr(widget, 'current_ang'):
+                        elif mode == "SCANNIGN MODE" and hasattr(widget, 'current_ang'):
                             value = widget.current_ang
-                        elif mode == "Angular Position" and hasattr(widget, 'current_angle'):
+                        elif mode == "SPIN MODE" and hasattr(widget, 'current_angle'):
                             value = widget.current_angle
 
                         if value is not None:

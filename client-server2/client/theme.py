@@ -1,63 +1,69 @@
+# -*- coding: utf-8 -*-
+"""
+Dark Sci-Fi Green Theme
+Hacking-style monospaced font, neon green accents
+"""
+
 # === Background Colors ===
-BACKGROUND         = "#F0F4F8"  # Pastel Breeze
-BOX_BACKGROUND     = "#FFFFFF"  # White
+BACKGROUND         = "#0D110D"  # Very dark green-black
+BOX_BACKGROUND     = "#131A13"  # Slightly lighter panel
 PLOT_BACKGROUND    = BACKGROUND
-STREAM_BACKGROUND  = "#12122B"  # Deep midnight
-SECOND_COLUMN      = "#F1F1F1"  # Side-panel shade
+STREAM_BACKGROUND  = "#080C08"  # Deepest black-green
+SECOND_COLUMN      = "#1A211A"  # Sidebar panel
 
 # === Text Colors ===
-TEXT_COLOR         = "#2E3A59"  # Dark blue-gray
-TEXT_SECONDARY     = "#5B6D8A"  # Muted blue-gray
-BOX_TITLE_COLOR    = "#FFFFFF"  # Pure white
-LABEL_COLOR        = "#CCCCFF"  # Soft periwinkle
+TEXT_COLOR         = "#00FF7F"  # Neon spring green
+TEXT_SECONDARY     = "#33CC99"  # Muted teal
+BOX_TITLE_COLOR    = "#00FF7F"  # Same neon green
+LABEL_COLOR        = "#33CC99"  # Muted teal for labels
 
 # === Button Colors ===
-BUTTON_COLOR       = "#A3D5FF"  # Light blue
-BUTTON_HOVER       = "#6EB5FF"  # Vivid blue
-BUTTON_DISABLED    = "#C0C9D9"  # Light gray
-BUTTON_TEXT        = "#2E3A59"  # Dark text on bright button
+BUTTON_COLOR       = "#0A2F0A"  # Dark forest green
+BUTTON_HOVER       = "#117711"  # Bright green hover
+BUTTON_DISABLED    = "#073007"  # Very dark for disabled
+BUTTON_TEXT        = "#00FF7F"  # Neon green text
 
 # === Plot Styling ===
-GRID_COLOR         = "#D9E2EC"  # Light grayish blue
-TICK_COLOR         = "#7575A3"  # Muted bluish ticks
-PLOT_LINE_PRIMARY  = "#FF4081"  # Pink neon
-PLOT_LINE_SECONDARY= "#7C4DFF"  # Purple neon
-PLOT_LINE_ALT      = "#00E676"  # Green neon
+GRID_COLOR         = "#0A1A0A"  # Very dark grid
+TICK_COLOR         = "#009933"  # Dark green ticks
+PLOT_LINE_PRIMARY  = "#00FF00"  # Pure neon green
+PLOT_LINE_SECONDARY= "#33FF99"  # Light mint
+PLOT_LINE_ALT      = "#00CC66"  # Teal-green
 
 # === Borders ===
-BORDER_COLOR       = "#B3C0DA"  # Light indigo border
-BORDER_ERROR       = "#FF1744"  # Red alert
-BORDER_HIGHLIGHT   = "#00E676"  # Green success
+BORDER_COLOR       = "#00CC66"  # Teal border
+BORDER_ERROR       = "#FF5555"  # Bright red
+BORDER_HIGHLIGHT   = "#00FF00"  # Neon green
 
 # === Fonts ===
-FONT_FAMILY        = "'Montserrat', 'Segoe UI', sans-serif"
-FONT_SIZE_NORMAL   = 9
+FONT_FAMILY        = "Consolas, 'Courier New', monospace"
+FONT_SIZE_NORMAL   = 10
 FONT_SIZE_LABEL    = 9
-FONT_SIZE_TITLE    = 9
+FONT_SIZE_TITLE    = 11
 
-# === Semantic Extras ===
+# === Semantic Colors ===
 ERROR_COLOR        = BORDER_ERROR
 SUCCESS_COLOR      = PLOT_LINE_ALT
-WARNING_COLOR      = "#FFC400"  # Amber
+WARNING_COLOR      = "#CCCC00"  # Amber-yellow
 
 # === Graph Mode Colors ===
 GRAPH_MODE_COLORS = {
-    "Relative Distance":  "#FF1744",  # Red
-    "Relative Angle":     "#7C4DFF",  # Purple
-    "Angular Position":   "#00E676",  # Green
+    "DISTANCE MEASURING MODE":  "#00FF00",  # Neon green
+    "SCANNING MODE":     "#33FF99",  # Mint
+    "SPIN MODE":   "#00CC66",  # Teal
 }
 
-# === Layout & Border Styling ===
+# === Layout & Border Metrics ===
 BORDER_WIDTH       = 1
-BORDER_RADIUS      = 6
-WIDGET_SPACING     = 4
-WIDGET_MARGIN      = 6
+BORDER_RADIUS      = 4
+WIDGET_SPACING     = 6
+WIDGET_MARGIN      = 8
 
 PADDING_SMALL      = 4
 PADDING_NORMAL     = 8
 PADDING_LARGE      = 12
 
-BUTTON_HEIGHT      = 36
+BUTTON_HEIGHT      = 32
 STREAM_ASPECT_RATIO= (16, 9)
 STREAM_WIDTH       = 640
 STREAM_HEIGHT      = 360

@@ -42,7 +42,7 @@ class RelativeDistancePlotter(QFrame):
 
         # === Theme colors from theme.py ===
         self.bg_color = PLOT_BACKGROUND
-        self.line_color = GRAPH_MODE_COLORS["Relative Distance"]
+        self.line_color = GRAPH_MODE_COLORS["DISTANCE MEASURING MODE"]
         self.tick_color = self.line_color
         self.grid_color = self.line_color
 
