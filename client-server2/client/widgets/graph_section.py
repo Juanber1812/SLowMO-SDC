@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (
-    QWidget, QGroupBox, QVBoxLayout, QPushButton, QHBoxLayout, QComboBox, QLabel, QDoubleSpinBox # Changed QSpinBox to QDoubleSpinBox
+    QWidget, QGroupBox, QVBoxLayout, QPushButton, QHBoxLayout, QComboBox, QLabel, QDoubleSpinBox, QSizePolicy # Changed QSpinBox to QDoubleSpinBox
 )
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from payload.distance import RelativeDistancePlotter
@@ -53,6 +53,9 @@ class GraphSection(QGroupBox):
         super().__init__(parent)
         self.setObjectName("GraphSection")
 
+        # ── Store live‐value labels ───────────────────────────────────────
+        self.live_labels = {}
+
         self.graph_display_layout = QVBoxLayout()
         self.setLayout(self.graph_display_layout)
 
@@ -86,8 +89,10 @@ class GraphSection(QGroupBox):
         self.current_graph_mode = None  # Track which graph is currently active
         self.recording_start_time = None
 
-        # Make graph mode buttons smaller and centered
+        # ── replace old single‐column button loop with button+label rows ──
         for mode in self.graph_modes:
+            row = QHBoxLayout()
+            # mode button
             btn = QPushButton(mode)
             color = GRAPH_MODE_COLORS[mode]
             btn.setStyleSheet(f"""
@@ -103,18 +108,33 @@ class GraphSection(QGroupBox):
                 QPushButton:hover {{
                     background-color: {color};
                     color: black;
-                    border: {BORDER_WIDTH}px solid {color};
                 }}
             """)
-            # stretch buttons to fill available width
-            from PyQt6.QtWidgets import QSizePolicy
             btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            btn.setFixedHeight(int(BUTTON_HEIGHT * 1.8))        # taller
-            btn.setMinimumWidth(200)                            # wider
-
+            btn.setFixedHeight(int(BUTTON_HEIGHT * 1.8))
             btn.clicked.connect(lambda _, m=mode: self.load_graph(m))
-            self.placeholder_layout.addWidget(btn, alignment=Qt.AlignmentFlag.AlignHCenter)
+
+            # live‐value label, boxed in button‐color border + matching text
+            lbl = QLabel("0.0")
+            lbl.setFixedWidth(60)
+            lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            lbl.setStyleSheet(f"""
+                background-color: {BOX_BACKGROUND};
+                border: {BORDER_WIDTH}px solid {color};
+                border-radius: {BORDER_RADIUS}px;
+                color: {color};
+                font-size: {FONT_SIZE_LABEL}pt;
+                padding: 2px;
+            """)
+
+            # pack them
+            row.addWidget(btn)
+            row.addWidget(lbl)
+            self.placeholder_layout.addLayout(row)
+
+            # keep references
             self.select_buttons[mode] = btn
+            self.live_labels[mode]   = lbl
 
         self.graph_display_layout.addWidget(self.graph_display_placeholder)
 
@@ -153,6 +173,9 @@ class GraphSection(QGroupBox):
         self.graph_widget.start_time = self.shared_start_time
         self.graph_widget.setFixedSize(500, 300)  # Larger graph size
 
+        # ── hook the frequency‐spinbox to this plotter’s redraw rate ───────────
+        self.graph_update_frequency_changed.connect(self.graph_widget.set_redraw_rate)
+
         # Create a horizontal layout for graph and buttons
         graph_and_btns_layout = QHBoxLayout()
         graph_and_btns_layout.setContentsMargins(0, 0, 0, 0)
@@ -166,6 +189,23 @@ class GraphSection(QGroupBox):
         btn_layout.setSpacing(2)
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
+        # ── Detail live‐value label for the selected mode ───────────────
+        color = GRAPH_MODE_COLORS[mode]
+        detail_label = QLabel("0.0")
+        detail_label.setFixedWidth(60)                  # same width as small labels
+        detail_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        detail_label.setStyleSheet(f"""
+            background-color: {BOX_BACKGROUND};
+            border: {BORDER_WIDTH}px solid {color};
+            border-radius: {BORDER_RADIUS}px;
+            color: {color};
+            font-size: {FONT_SIZE_LABEL}pt;
+            padding: 2px;
+        """)
+        # keep for updates
+        self.current_detail_label = detail_label
+        btn_layout.addWidget(detail_label, alignment=Qt.AlignmentFlag.AlignLeft)
 
         button_style = f"""
         QPushButton {{
@@ -294,12 +334,11 @@ class GraphSection(QGroupBox):
         self.freq_spinbox.setFixedHeight(int(BUTTON_HEIGHT))
         self.freq_spinbox.setFixedWidth(72)  # ← make it narrower (adjust as needed)
         self.freq_spinbox.valueChanged.connect(self.on_frequency_changed)
-        btn_layout.setSpacing(0)
         btn_layout.addWidget(self.freq_spinbox, alignment=Qt.AlignmentFlag.AlignLeft)
         # restore the 12px for the rest
         btn_layout.setSpacing(12)
 
-        # Emit initial value so client3.py can sync if it missed it
+        # emit once to kick off the initial rate on our new widget
         self.on_frequency_changed(self.freq_spinbox.value())
 
 
@@ -462,6 +501,11 @@ class GraphSection(QGroupBox):
             self.freq_spinbox.setParent(None)
             # self.freq_spinbox = None
 
+        # ── remove the detail live‐value label if present ───────────────
+        if hasattr(self, "current_detail_label") and self.current_detail_label:
+            self.current_detail_label.setParent(None)
+            self.current_detail_label = None
+
         # Detach record_btn and duration_dropdown from this specific graph view's layout
         # They are managed by client3.py and passed in, so we just remove them from the current dynamic layout
         self.record_btn.setParent(None)
@@ -469,22 +513,14 @@ class GraphSection(QGroupBox):
 
         # Clear the dynamic graph_and_btns_layout
         # Assuming graph_and_btns_layout is the last item added to self.graph_display_layout
-        if self.graph_display_layout.count() > 1: # Check if placeholder is not the only widget
-            item = self.graph_display_layout.takeAt(self.graph_display_layout.count() -1 ) # take last added layout
-            if item is not None:
-                # Recursively delete widgets in the layout
-                while item.count():
-                    child = item.takeAt(0)
-                    if child.widget():
-                        child.widget().deleteLater()
-                    elif child.layout(): # If it's a nested layout
-                        # This part might need more robust clearing for nested layouts
-                        # For now, assuming simple structure where widgets are direct children
-                        pass 
-                # item.deleteLater() # This might be problematic if it's a layout not a widget
-                del item
+        if self.graph_display_layout.count() > 1: 
+             item = self.graph_display_layout.takeAt(self.graph_display_layout.count() -1)
+             if item is not None:
+                 widget = item.widget() or item.layout()
+                 if widget:
+                     widget.setParent(None)
 
-
+        # ── re‐insert the placeholder (buttons + small live‐boxes) ─────────
         self.graph_display_layout.addWidget(self.graph_display_placeholder)
 
 

@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_socketio import SocketIO, emit
 import camera
 import sensors
+import lidar
 import threading
 
 app = Flask(__name__)
@@ -20,7 +21,7 @@ def print_server_status(status):
 def start_background_tasks():
     threading.Thread(target=camera.start_stream, daemon=True).start()
     threading.Thread(target=sensors.start_sensors, daemon=True).start()
-
+    threading.Thread(target=lidar.start_lidar, daemon=True).start()
 
 @socketio.on('connect')
 def handle_connect():
@@ -140,6 +141,13 @@ def handle_capture_image(data):
             "success": False, 
             "error": f"Server error: {str(e)}"
         }, broadcast=True)
+
+@socketio.on("lidar_data")
+def handle_lidar_data(data):
+    try:
+        emit("lidar_broadcast", data, broadcast=True)
+    except Exception as e:
+        print(f"[ERROR] lidar_data: {e}")
 
 
 @socketio.on('download_image')

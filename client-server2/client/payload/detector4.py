@@ -20,7 +20,7 @@ class AprilTagDetector:
         # 2) pass it into the real detector
         self.detector = pyapriltags.Detector(**self.config)
 
-        self.tag_size = 0.0545  # meters
+        self.tag_size = 0.055  # meters
         self.line_color = (0, 255, 0)
         self.line_thickness = 8
         
@@ -84,14 +84,35 @@ class AprilTagDetector:
         mtx = self.mtx.copy() # self.mtx is the original calibration matrix
         if is_cropped and original_height is not None:
             current_height = frame.shape[0] # Height of the cropped image
-            # original_height is the height of the sensor for which self.mtx was calibrated
             
-            # Calculate how many rows were removed from the top (assuming centered crop)
-            crop_offset = (original_height - current_height) // 2 
+            print(f"[DEBUG] CROP ANALYSIS:")
+            print(f"[DEBUG]   Original height: {original_height}px")
+            print(f"[DEBUG]   Current height:  {current_height}px")
+            print(f"[DEBUG]   Crop factor implied: {original_height/current_height:.2f}")
+            print(f"[DEBUG]   Original cy: {self.mtx[1,2]:.2f}")
             
-            # Adjust principal point Y (cy) for the crop offset
-            # mtx[1, 2] is cy, the y-coordinate of the principal point
-            mtx[1, 2] -= crop_offset 
+            # Calculate how many rows were removed from the top (center crop)
+            total_removed = original_height - current_height
+            crop_offset_from_top = total_removed // 2  # Half removed from top, half from bottom
+            
+            print(f"[DEBUG]   Total pixels removed: {total_removed}")
+            print(f"[DEBUG]   Removed from top: {crop_offset_from_top}")
+            print(f"[DEBUG]   Removed from bottom: {total_removed - crop_offset_from_top}")
+            
+            # Adjust principal point Y (cy) for the crop offset from top
+            mtx[1, 2] -= crop_offset_from_top 
+            
+            print(f"[DEBUG]   Adjusted cy: {mtx[1,2]:.2f}")
+            print(f"[DEBUG]   Cy adjustment: -{crop_offset_from_top}px")
+            
+            # Sanity check - where should cy be proportionally?
+            original_cy_ratio = self.mtx[1,2] / original_height
+            expected_new_cy = original_cy_ratio * current_height
+            print(f"[DEBUG]   Expected cy (proportional): {expected_new_cy:.2f}")
+            print(f"[DEBUG]   Our calculated cy: {mtx[1,2]:.2f}")
+            print(f"[DEBUG]   Difference: {abs(expected_new_cy - mtx[1,2]):.2f}px")
+        else:
+            print(f"[DEBUG] NO CROP - is_cropped: {is_cropped}, original_height: {original_height}")
         
         frame = cv2.undistort(frame, mtx, self.dist)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -180,6 +201,11 @@ class AprilTagDetector:
         self.detector = pyapriltags.Detector(**self.config)
         return self.config
 
+    def update_tag_size(self, new_size):
+        """Update the AprilTag size."""
+        self.tag_size = new_size
+        print(f"[INFO] AprilTag size updated to {new_size:.4f} meters")
+
 
 # Create global detector instance
 try:
@@ -219,4 +245,11 @@ def get_detector_config():
     if detector_instance:
         return detector_instance.get_config()
     return None
+
+def update_tag_size(new_size):
+    """Update AprilTag size globally."""
+    if detector_instance:
+        detector_instance.update_tag_size(new_size)
+    else:
+        print("[WARNING] Detector instance not available")
 

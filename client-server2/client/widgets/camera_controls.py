@@ -27,6 +27,10 @@ class CameraControlsWidget(QGroupBox):
         
         # Detector Control Button
         self.detector_btn = QPushButton("Start Detector")
+        
+        # Manual Orientation Button
+        self.orientation_btn = QPushButton("Manual Orientation")
+        self.show_crosshairs = False  # Track crosshair state
 
         # Define button style (thinner, same as Start Detector)
         self.BUTTON_STYLE = f"""
@@ -52,7 +56,7 @@ class CameraControlsWidget(QGroupBox):
         """
 
         # Apply the same style to all buttons
-        for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.detector_btn):
+        for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.detector_btn, self.orientation_btn):
             btn.setStyleSheet(self.BUTTON_STYLE)
 
         # Connect camera buttons to parent window methods if they exist
@@ -65,17 +69,20 @@ class CameraControlsWidget(QGroupBox):
                 self.capture_btn.clicked.connect(self.parent_window.capture_image)
             if hasattr(self.parent_window, 'toggle_detector'):
                 self.detector_btn.clicked.connect(self.parent_window.toggle_detector)
+            if hasattr(self.parent_window, 'toggle_orientation'):
+                self.orientation_btn.clicked.connect(self.parent_window.toggle_orientation)
 
         # Default states
         self.toggle_btn.setEnabled(False)
         self.capture_btn.setEnabled(False)  # Will be enabled when connected
         self.detector_btn.setEnabled(False)  # Will be enabled when connected
 
-        # Add to layout vertically (all 5 buttons stacked)
+        # Add to layout vertically (all buttons stacked)
         self.layout.addWidget(self.toggle_btn)
         self.layout.addWidget(self.reconnect_btn)
         self.layout.addWidget(self.capture_btn)
         self.layout.addWidget(self.detector_btn)
+        self.layout.addWidget(self.orientation_btn)  # Add the new button
         
         # Set layout spacing
         self.layout.setSpacing(WIDGET_SPACING)

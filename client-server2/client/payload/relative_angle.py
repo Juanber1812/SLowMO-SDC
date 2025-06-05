@@ -14,6 +14,7 @@ from theme import (
     FONT_FAMILY, FONT_SIZE_NORMAL, FONT_SIZE_LABEL, FONT_SIZE_TITLE,
     ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR, GRAPH_MODE_COLORS
 )
+from PyQt6.QtCore import QTimer
 
 # === Font size configuration ===
 AXIS_LABEL_SIZE = 9      # Change this value to adjust axis label font size
@@ -71,7 +72,20 @@ class RelativeAnglePlotter(QWidget):
         layout.addWidget(self.canvas)
         self.setLayout(layout)
 
-        self.redraw()  # Ensure initial styling
+        # ── setup redraw timer (don't start until shown) ───────────────
+        self._redraw_timer = QTimer(self)
+        self._redraw_timer.timeout.connect(self.redraw)
+        self._redraw_interval_ms = 100  # default 10 Hz
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # start throttled redraws when widget appears
+        self._redraw_timer.start(self._redraw_interval_ms)
+
+    def hideEvent(self, event):
+        # stop redraws immediately when widget is hidden
+        self._redraw_timer.stop()
+        super().hideEvent(event)
 
     def update(self, rvec, tvec, timestamp=None):
         if timestamp is None:
@@ -80,12 +94,16 @@ class RelativeAnglePlotter(QWidget):
         angle_rad = np.arctan2(tvec[0], tvec[2])
         angle_deg = np.degrees(angle_rad)
         
-        # Convert to float to avoid numpy array formatting issues
-        self.current_ang = float(angle_deg)  # Add float() here
-        
+        self.current_ang = float(angle_deg)
         self.time_data.append(elapsed)
         self.data.append(angle_deg)
-        self.redraw()
+        # now redraw only happens at timer intervals
+
+    def set_redraw_rate(self, rate_hz: float):
+        """Adjust the redraw frequency (Hz)."""
+        interval = max(1, int(1000.0 / rate_hz))
+        self._redraw_interval_ms = interval
+        self._redraw_timer.setInterval(interval)
 
     def redraw(self):
         try:
@@ -141,5 +159,4 @@ class RelativeAnglePlotter(QWidget):
             
         except Exception as e:
             print(f"[RelativeAngle] Redraw error: {e}")
-            import traceback
-            traceback.print_exc()
+            import traceback; traceback.print_exc()

@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QGroupBox, QVBoxLayout, QHBoxLayout, QLabel,
-    QSlider, QComboBox
+    QSlider, QComboBox, QDoubleSpinBox, QPushButton
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 
@@ -10,6 +10,7 @@ class DetectorSettingsWidget(QGroupBox):
     Emits settingsChanged(dict) on any change.
     """
     settingsChanged = pyqtSignal(dict)
+    tagSizeUpdated = pyqtSignal(float)  # Move this to class level
 
     FAMILIES = [
         'tag25h9','tag36h11',  'tag16h5', 'tagStandard41h12'
@@ -26,7 +27,7 @@ class DetectorSettingsWidget(QGroupBox):
         # Threads
         self.threads_slider = QSlider(Qt.Orientation.Horizontal)
         self.threads_slider.setRange(1, 16)
-        self.threads_slider.setValue(4)
+        self.threads_slider.setValue(16)
         self.threads_slider.setSingleStep(1)
         self.threads_label = QLabel(str(self.threads_slider.value()))
         self.threads_slider.valueChanged.connect(
@@ -36,7 +37,7 @@ class DetectorSettingsWidget(QGroupBox):
       
         self.decimate_slider = QSlider(Qt.Orientation.Horizontal)
         self.decimate_slider.setRange(1, 100)
-        self.decimate_slider.setValue(10)
+        self.decimate_slider.setValue(5)
         self.decimate_slider.setSingleStep(1)  # corresponds to 1.0
         self.decimate_label = QLabel(f"{self.decimate_slider.value()*0.1:.1f}")
         self.decimate_slider.valueChanged.connect(
@@ -56,7 +57,7 @@ class DetectorSettingsWidget(QGroupBox):
         # Refine edges
         self.refine_slider = QSlider(Qt.Orientation.Horizontal)
         self.refine_slider.setRange(0, 10)
-        self.refine_slider.setValue(4)
+        self.refine_slider.setValue(10)
         self.refine_slider.setSingleStep(1)
         self.refine_label = QLabel(str(self.refine_slider.value()))
         self.refine_slider.valueChanged.connect(
@@ -66,12 +67,29 @@ class DetectorSettingsWidget(QGroupBox):
         # Decode sharpening (0.0–1.0, step 0.05 → slider 0–20)
         self.decode_slider = QSlider(Qt.Orientation.Horizontal)
         self.decode_slider.setRange(0, 20)
-        self.decode_slider.setValue(5)
+        self.decode_slider.setValue(20)
         self.decode_slider.setSingleStep(1)
         self.decode_label = QLabel(f"{self.decode_slider.value()*0.05:.2f}")
         self.decode_slider.valueChanged.connect(
             lambda v: (self.decode_label.setText(f"{v*0.05:.2f}"), self._emit_settings())
         )
+
+        # Tag size control - auto-update on value change
+        tag_size_layout = QHBoxLayout()
+        tag_size_layout.addWidget(QLabel("Tag Size (m):"))
+        self.tag_size_input = QDoubleSpinBox()
+        self.tag_size_input.setRange(0.001, 1.0)
+        self.tag_size_input.setDecimals(4)
+        self.tag_size_input.setValue(0.055)  # Current default
+        self.tag_size_input.setSingleStep(0.0001)
+
+        # Connect to update immediately when value changes
+        self.tag_size_input.valueChanged.connect(
+            lambda value: self.tagSizeUpdated.emit(value)
+        )
+        
+        tag_size_layout.addWidget(self.tag_size_input)
+        # No update button needed!
 
         # ── 2) Layout ────────────────────────────────────────────────
         layout = QVBoxLayout(self)
@@ -89,6 +107,7 @@ class DetectorSettingsWidget(QGroupBox):
         add_row("Blur:", self.sigma_slider, self.sigma_label)
         add_row("Refine Edges:", self.refine_slider, self.refine_label)
         add_row("Decode Sharpening:", self.decode_slider, self.decode_label)
+        layout.addLayout(tag_size_layout)
 
         # ── 3) Latency display ───────────────────────────────────────
         self.latency_label = QLabel("Latency: 0.0 ms")

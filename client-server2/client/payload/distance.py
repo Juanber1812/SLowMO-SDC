@@ -3,6 +3,7 @@ matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt6.QtWidgets import QVBoxLayout, QFrame, QSizePolicy, QWidget
+from PyQt6.QtCore import QTimer
 from collections import deque
 import numpy as np
 import time
@@ -90,34 +91,35 @@ class RelativeDistancePlotter(QFrame):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.canvas)
-        self.setLayout(layout)
 
-        # ── start patch ──
-        # throttle redraws
-        self._last_redraw = time.time()
-        self._redraw_interval = 0.01  # seconds between full redraws
-        # ensure initial draw
+        # ── setup redraw timer (don’t start until shown) ────────────
+        self._redraw_timer = QTimer(self)
+        self._redraw_timer.timeout.connect(self.redraw)
+        self._redraw_interval_ms = 10   # default 100 Hz (10 ms)
+        # initial draw
         self.redraw()
-        # ── end patch ──
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # start throttled redraws when widget appears
+        self._redraw_timer.start(self._redraw_interval_ms)
+
+    def hideEvent(self, event):
+        # stop redraws immediately when widget is hidden
+        self._redraw_timer.stop()
+        super().hideEvent(event)
 
     def update(self, rvec, tvec, timestamp=None):
         if timestamp is None:
             timestamp = time.time()
         elapsed = timestamp - self.start_time
-        distance = np.linalg.norm(tvec)
+        distance = float(np.linalg.norm(tvec))
 
         # Store and record every point
         self.current_distance = distance
         self.time_data.append(elapsed)
         self.data.append(distance)
-
-        # ── start patch ──
-        # only redraw at most once every _redraw_interval seconds
-        now = time.time()
-        if now - self._last_redraw >= self._redraw_interval:
-            self.redraw()
-            self._last_redraw = now
-        # ── end patch ──
+        # no immediate redraw here—timer will call redraw()
 
     def redraw(self):
         self.ax.clear()
@@ -171,3 +173,9 @@ class RelativeDistancePlotter(QFrame):
                     verticalalignment='top')
 
         self.canvas.draw()
+
+    def set_redraw_rate(self, rate_hz: float):
+        """Adjust the redraw frequency (Hz)."""
+        interval = max(1, int(1000.0 / rate_hz))
+        self._redraw_interval_ms = interval
+        self._redraw_timer.setInterval(interval)

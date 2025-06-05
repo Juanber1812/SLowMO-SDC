@@ -19,7 +19,6 @@ MAX_CROP_FACTOR = 10
 CROP_FACTOR_STEP = 0.5
 
 RES_PRESETS_LOW = [
-    ("OLD", "legacy"),  # Special case for old calibration
     ("768x432", (768, 432)),
     ("1024x576", (1024, 576)),
     ("1536x864", (1536, 864)),
@@ -38,9 +37,6 @@ RES_PRESETS_HIGH = [
 ]
 
 CALIBRATION_FILES = {
-    # Special case for OLD preset - uses your original calibration file
-    "legacy": "payload/calibration_data.npz",  # Correct filename: calibration_data.npz
-    
     # LOW presets
     (768, 432): "calibrations/calibration_768x432.npz",
     (1024, 576): "calibrations/calibration_1024x576.npz", 
@@ -410,11 +406,10 @@ class CameraSettingsWidget(QGroupBox):
             self.current_presets = RES_PRESETS_HIGH
         self._populate_res_dropdown()
 
-    def _populate_res_dropdown(self, add_custom_cropped_item=False): # add_custom_cropped_item is not actively used by this simplified version
+    def _populate_res_dropdown(self, add_custom_cropped_item=False):
         self.res_dropdown.blockSignals(True)
         
-        current_selected_text = self.res_dropdown.currentText() # Store current selection before clearing
-
+        current_selected_text = self.res_dropdown.currentText()
         self.res_dropdown.clear()
         
         items_to_add = []
@@ -434,11 +429,8 @@ class CameraSettingsWidget(QGroupBox):
                     self.low_btn.setChecked(True) 
 
         if self.current_presets: 
-            for label, data in self.current_presets:
-                if data == "legacy":
-                    items_to_add.append(f"{label} (Legacy)")
-                else:
-                    items_to_add.append(f"{label} ({data[0]}x{data[1]})")
+            for label, resolution_tuple in self.current_presets:
+                items_to_add.append(label)  # Just use the label, no redundant resolution info
         
         if items_to_add:
             self.res_dropdown.addItems(items_to_add)
@@ -448,9 +440,9 @@ class CameraSettingsWidget(QGroupBox):
                 new_index = self.res_dropdown.findText(current_selected_text)
                 if new_index != -1:
                     self.res_dropdown.setCurrentIndex(new_index)
-                elif self.res_dropdown.count() > 0: # Fallback to first item if previous not found
+                elif self.res_dropdown.count() > 0:
                     self.res_dropdown.setCurrentIndex(0)
-            elif self.res_dropdown.count() > 0: # Default to first item if there was no previous selection
+            elif self.res_dropdown.count() > 0:
                  self.res_dropdown.setCurrentIndex(0)
         else:
             print(f"[ERROR] _populate_res_dropdown: No items to add to res_dropdown. self.current_presets: {self.current_presets}. Dropdown will be empty.")
@@ -463,13 +455,6 @@ class CameraSettingsWidget(QGroupBox):
         return label.replace(" (Cropped)", "")
 
     def get_config(self):
-        # Add debug prints to understand the state when get_config is called
-        # print(f"[DEBUG] get_config: res_dropdown count: {self.res_dropdown.count()}, currentIndex: {self.res_dropdown.currentIndex()}, currentText: '{self.res_dropdown.currentText()}'")
-        # if self.current_presets:
-        #     print(f"[DEBUG] get_config: self.current_presets has {len(self.current_presets)} items. First is: {self.current_presets[0]}")
-        # else:
-        #     print(f"[DEBUG] get_config: self.current_presets is None or empty.")
-
         res_idx = self.res_dropdown.currentIndex()
         
         base_resolution_data = None
@@ -486,43 +471,24 @@ class CameraSettingsWidget(QGroupBox):
             return {
                 "jpeg_quality": self.jpeg_slider.value(),
                 "fps": self.fps_slider.value(),
-                "resolution": (640, 480), 
-                "calibration_file": CALIBRATION_FILES.get("legacy") or "calibrations/calibration_default.npz",
+                "resolution": (768, 432), 
+                "calibration_file": "calibrations/calibration_768x432.npz",
                 "cropped": False,
                 "crop_factor": None,
                 "preset_type": "fallback_critical"
             }
 
-        current_crop_factor = self.crop_factor_spinbox.value() # Always read the current factor
+        current_crop_factor = self.crop_factor_spinbox.value()
         is_cropped = getattr(self, 'cropped', False)
         
-        original_width, original_height = (0,0) 
-        calibration_file = "calibrations/calibration_default.npz" # Default calibration
-        preset_type = "unknown"
-
-        if base_resolution_data == "legacy":
-            original_width, original_height = 1536, 864 
-            calibration_file = CALIBRATION_FILES.get("legacy", "calibrations/calibration_default.npz")
-            preset_type = "legacy"
-        elif isinstance(base_resolution_data, tuple) and len(base_resolution_data) == 2:
-            original_width, original_height = base_resolution_data
-            preset_type = "standard"
-            calibration_resolution_key = (original_width, original_height)
-            calibration_file = CALIBRATION_FILES.get(calibration_resolution_key, "calibrations/calibration_default.npz")
-        else:
-            print(f"[ERROR] get_config: Invalid base_resolution_data: {base_resolution_data}. Using hardcoded default.")
-            return {
-                "jpeg_quality": self.jpeg_slider.value(),
-                "fps": self.fps_slider.value(),
-                "resolution": (640, 480),
-                "calibration_file": "calibrations/calibration_default.npz",
-                "cropped": False,
-                "crop_factor": None,
-                "preset_type": "fallback_data_error"
-            }
+        # All resolutions are now tuples
+        original_width, original_height = base_resolution_data
+        preset_type = "standard"
+        calibration_resolution_key = (original_width, original_height)
+        calibration_file = CALIBRATION_FILES.get(calibration_resolution_key, "calibrations/calibration_default.npz")
 
         actual_resolution = (original_width, original_height)
-        if is_cropped and current_crop_factor > 0 and original_height > 0 : # Check original_height to prevent division by zero if not set
+        if is_cropped and current_crop_factor > 0 and original_height > 0:
             cropped_height = int(original_height / current_crop_factor)
             cropped_height = max(1, cropped_height) 
             actual_resolution = (original_width, cropped_height)
@@ -531,9 +497,9 @@ class CameraSettingsWidget(QGroupBox):
             "jpeg_quality": self.jpeg_slider.value(),
             "fps": self.fps_slider.value(),
             "resolution": actual_resolution,
-            "calibration_file": calibration_file, # This is for the original uncropped resolution
+            "calibration_file": calibration_file,
             "cropped": is_cropped,
-            "crop_factor": current_crop_factor if is_cropped else None, # Send factor only if cropped
+            "crop_factor": current_crop_factor if is_cropped else None,
             "preset_type": preset_type,
             "preset_label": preset_label_for_config 
         }
@@ -560,10 +526,7 @@ class CameraSettingsWidget(QGroupBox):
         """Check if calibration file exists for given resolution."""
         import os
         
-        if resolution == "legacy":
-            filename = CALIBRATION_FILES["legacy"]
-        else:
-            filename = CALIBRATION_FILES.get(resolution, "calibrations/calibration_default.npz")
+        filename = CALIBRATION_FILES.get(resolution, "calibrations/calibration_default.npz")
         
         # Handle relative paths properly
         if not os.path.isabs(filename):
@@ -580,10 +543,7 @@ class CameraSettingsWidget(QGroupBox):
         client_dir = os.path.dirname(os.path.dirname(__file__))
         
         for label, resolution_data in self.current_presets:
-            if resolution_data == "legacy":
-                filename = CALIBRATION_FILES["legacy"]
-            else:
-                filename = CALIBRATION_FILES.get(resolution_data, f"calibrations/calibration_{resolution_data[0]}x{resolution_data[1]}.npz")
+            filename = CALIBRATION_FILES.get(resolution_data, f"calibrations/calibration_{resolution_data[0]}x{resolution_data[1]}.npz")
             
             # Handle relative paths
             if not os.path.isabs(filename):
@@ -598,26 +558,18 @@ class CameraSettingsWidget(QGroupBox):
         import os
         config = self.get_config()
         calibration_file = config.get('calibration_file', 'calibrations/calibration_default.npz')
-        preset_type = config.get('preset_type', 'standard')
         
         # Handle relative paths properly - resolve relative to client directory
         if not os.path.isabs(calibration_file):
-            # Get the client directory (go up one level from widgets directory)
             client_dir = os.path.dirname(os.path.dirname(__file__))
             calibration_file = os.path.join(client_dir, calibration_file)
             calibration_file = os.path.normpath(calibration_file)
         
         if os.path.exists(calibration_file):
-            if preset_type == "legacy":
-                self.calibration_status_label.setText("Calibration: ✓ Legacy Available")
-            else:
-                self.calibration_status_label.setText("Calibration: ✓ Available")
+            self.calibration_status_label.setText("Calibration: ✓ Available")
             self.calibration_status_label.setStyleSheet(f"color: {SUCCESS_COLOR};")
         else:
-            if preset_type == "legacy":
-                self.calibration_status_label.setText("Calibration: ❌ Legacy Missing")
-            else:
-                self.calibration_status_label.setText("Calibration: ❌ Missing")
+            self.calibration_status_label.setText("Calibration: ❌ Missing")
             self.calibration_status_label.setStyleSheet(f"color: {ERROR_COLOR};")
             
             # Debug: print the actual path being checked

@@ -9,8 +9,40 @@ import traceback
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea,
-    QTabWidget, QFileDialog, QDoubleSpinBox, QSpinBox, QTextEdit
+    QTabWidget, QFileDialog
 )
+
+import matplotlib
+matplotlib.use('Agg')
+logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
+
+# Add these lines to suppress ALL logging errors from network libraries
+import urllib3
+urllib3.disable_warnings()
+logging.getLogger('urllib3').setLevel(logging.ERROR)
+logging.getLogger('requests').setLevel(logging.ERROR)
+logging.getLogger('engineio').setLevel(logging.ERROR)
+logging.getLogger('socketio').setLevel(logging.ERROR)
+
+# Also suppress the problematic Windows logging flush error
+class SafeStreamHandler(logging.StreamHandler):
+    def flush(self):
+        try:
+            super().flush()
+        except OSError:
+            pass  # Ignore Windows flush errors
+
+# Configure logging properly at the module level
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('client_log.txt'),
+        SafeStreamHandler(sys.stdout)
+    ]
+)
+
+
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage, QFont, QPainter, QPen
 
@@ -20,9 +52,9 @@ from PyQt6.QtGui import QPixmap, QImage, QFont, QPainter, QPen
 ##############################################################################
 
 # Payload and detection modules
-from payload.distance import RelativeDistancePlotter
+from payload.spin           import AngularPositionPlotter
+from payload.distance       import RelativeDistancePlotter
 from payload.relative_angle import RelativeAnglePlotter
-from payload.spin import AngularPositionPlotter
 from payload import detector4
 
 # UI Components
@@ -33,6 +65,7 @@ from widgets.detector_control import DetectorControlWidget
 from widgets.adcs import ADCSSection
 from widgets.detector_settings_widget import DetectorSettingsWidget
 from payload.detector4 import detector_instance
+from data_analysis import DataAnalysisTab
 
 # Theme and styling
 from theme import (
@@ -167,6 +200,7 @@ class MainWindow(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.show_crosshairs = False  # Add this line
         # Set global styling
         self.setStyleSheet(f"""
             QWidget {{
@@ -207,21 +241,34 @@ class MainWindow(QWidget):
         self._graph_update_interval = 1.0 / 2.0 
         # ── end patch ──
 
+        # ── instantiate plotters early ─────────────────────────────
+        self.spin_plotter     = AngularPositionPlotter()
+        self.distance_plotter = RelativeDistancePlotter()
+        self.angular_plotter  = RelativeAnglePlotter()
+        # ── end instantiation ───────────────────────────────────────
+
         # Setup UI and connections
         self.setup_ui() # self.camera_settings and self.graph_section are created here
 
-        # Connect to the graph section's frequency change signal
+        # ── Hook the graph‐rate spinbox to each plotter’s redraw rate ─────────
         if hasattr(self, 'graph_section') and self.graph_section:
-            self.graph_section.graph_update_frequency_changed.connect(self.handle_graph_update_frequency_change)
-            # Set initial interval based on GraphSection's default spinbox value if available
-            if hasattr(self.graph_section, 'freq_spinbox') and self.graph_section.freq_spinbox:
-                initial_freq_hz = self.graph_section.freq_spinbox.value()
-                if initial_freq_hz > 0:
-                    self._graph_update_interval = 1.0 / initial_freq_hz
-                print(f"[MainWindow] Initial graph update interval set to {self._graph_update_interval:.3f}s ({initial_freq_hz} Hz from GraphSection)")
-            else: # Fallback if spinbox not ready (e.g. graph not loaded yet)
-                 print(f"[MainWindow] Initial graph update interval set to {self._graph_update_interval:.3f}s (default). Will sync with GraphSection.")
+            # spinbox emits graph_update_frequency_changed(float Hz)
+            self.graph_section.graph_update_frequency_changed.connect(self.spin_plotter.set_redraw_rate)
+            self.graph_section.graph_update_frequency_changed.connect(self.distance_plotter.set_redraw_rate)
+            self.graph_section.graph_update_frequency_changed.connect(self.angular_plotter.set_redraw_rate)
 
+            # initialize each plotter to the spinbox's default
+            # only pull the initial freq if the spinbox already exists
+            spin = getattr(self.graph_section, 'freq_spinbox', None)
+            if spin is not None:
+                try:
+                    freq = spin.value()
+                    if freq > 0:
+                        self.spin_plotter.set_redraw_rate(freq)
+                        self.distance_plotter.set_redraw_rate(freq)
+                        self.angular_plotter.set_redraw_rate(freq)
+                except Exception:
+                    pass
 
         # Initialize active_config_for_detector with the initial UI settings
         # This will be updated upon server acknowledgment of config changes
@@ -246,11 +293,17 @@ class MainWindow(QWidget):
         self.speedtest_result.connect(self.update_speed_labels)
         self.latencyUpdated.connect(self.detector_settings.set_latency)
 
+        # ── now it's safe to connect the frequency-spinbox signal ──
+        self.graph_section.graph_update_frequency_changed.connect(self.spin_plotter.set_redraw_rate)
+        self.graph_section.graph_update_frequency_changed.connect(self.distance_plotter.set_redraw_rate)
+        self.graph_section.graph_update_frequency_changed.connect(self.angular_plotter.set_redraw_rate)
+
     def _on_tab_changed(self, index):
-        pass
-        # if switched into the Data Analysis tab, re‐draw with correct labels
-        if self.tab_widget.widget(index) is self.analysis_tab and hasattr(self, 'full_df'):
-            self.update_analysis_plots()
+        """When the current tab switches, refresh the Data Analysis plots if needed."""
+        from data_analysis import DataAnalysisTab
+        w = self.tab_widget.widget(index)
+        if isinstance(w, DataAnalysisTab):
+            w.update_plots()
 
     def handle_graph_update_frequency_change(self, frequency_hz):
         """Slot to update the graph update interval when GraphSection's spinbox changes."""
@@ -262,18 +315,6 @@ class MainWindow(QWidget):
             self._graph_update_interval = 1.0 / 1.0 # 1 Hz
             print(f"[MainWindow] Warning: Invalid graph update frequency ({frequency_hz} Hz). Defaulting to 1 Hz.")
             
-    def set_smoothing_mode(self, mode):
-        """Toggle Raw/SMA/EMA buttons and refresh."""
-        self.smooth_mode = mode
-     # sync button states
-        self.raw_btn.setChecked( mode is None )
-        self.savgol_btn.setChecked(mode == "SG")
-        self.butter_btn.setChecked(mode == "BW")
-        # show the matching parameter page
-        idx = 0 if mode is None else (1 if mode=="SG" else 2)
-        self.filter_param_stack.setCurrentIndex(idx)
-         # redraw
-        self.update_analysis_plots()
 
     def setup_timers(self):
         """Initialize performance timers"""
@@ -375,8 +416,8 @@ class MainWindow(QWidget):
         self.setup_main_tab()
         self.tab_widget.addTab(self.main_tab, "Mission Control")
 
-        self.analysis_tab = QWidget()
-        self.setup_analysis_tab()
+        # Data Analysis now lives in its own module
+        self.analysis_tab = DataAnalysisTab(parent=self, main_window=self)
         self.tab_widget.addTab(self.analysis_tab, "Data Analysis")
 
         main_layout.addWidget(self.tab_widget)
@@ -464,6 +505,10 @@ class MainWindow(QWidget):
         self.detector_settings.settingsChanged.connect(
             lambda cfg: detector_instance.update_params(**cfg)
         )
+        # Connect the tag size update signal
+        self.detector_settings.tagSizeUpdated.connect(
+            lambda size: detector4.update_tag_size(size)
+        )
         row1.addWidget(self.detector_settings)
         # ─────────────────────────────────────────────────────────────────────
 
@@ -537,7 +582,29 @@ QPushButton#danger_btn:hover {
     color: black;
 }
 """)
+        
+    def draw_crosshairs(self, frame):
+        """Draw crosshairs at the center of the frame"""
+        height, width = frame.shape[:2]
+        center_x, center_y = width // 2, height // 2
+        
+        # Draw horizontal line
+        cv2.line(frame, (0, center_y), (width, center_y), (0, 255, 0), 2)
+        # Draw vertical line  
+        cv2.line(frame, (center_x, 0), (center_x, height), (0, 255, 0), 2)
+        
+        return frame
 
+    def toggle_orientation(self):
+        """Toggle crosshair display for manual orientation reference"""
+        self.show_crosshairs = not self.show_crosshairs
+        
+        if self.show_crosshairs:
+            self.camera_controls.orientation_btn.setText("Hide Crosshairs")
+            print("[INFO] Manual orientation crosshairs enabled")
+        else:
+            self.camera_controls.orientation_btn.setText("Manual Orientation")
+            print("[INFO] Manual orientation crosshairs disabled")
         
     def setup_subsystem_controls_row(self, parent_layout):
         """Setup ADCS controls using ADCSSection widget"""
@@ -785,732 +852,6 @@ QPushButton#danger_btn:hover {
             )
             parent_layout.addWidget(group)
 
-    #=========================================================================
-    #                        DATA ANALYSIS TAB                              
-    #=========================================================================
-
-    def setup_analysis_tab(self):
-        """Setup the data analysis interface with full window utilization"""
-        analysis_layout = QVBoxLayout(self.analysis_tab)
-        analysis_layout.setSpacing(8)
-        analysis_layout.setContentsMargins(8, 8, 8, 8)
-        
-        # Top controls section - simplified without quick stats
-        controls_container = QWidget()
-        controls_layout = QHBoxLayout(controls_container)
-        controls_layout.setSpacing(15)
-        controls_layout.setContentsMargins(0, 0, 0, 0)
-
-        # force this first row to a fixed height so it never collapses
-        controls_container.setFixedHeight(150)
-        
-        # File loading section
-        self.setup_file_loading_section_compact(controls_layout)
-        
-        # ── Analysis mode selector ──
-        mode_lbl = QLabel("Analysis Mode:")
-        mode_lbl.setStyleSheet(self.LABEL_STYLE)
-        controls_layout.addWidget(mode_lbl)
-
-        self.analysis_mode_combo = QComboBox()
-        self.analysis_mode_combo.addItems([
-            "DISTANCE MEASURING MODE",
-            "SCANNING MODE",
-            "SPIN MODE"
-        ])
-        self.analysis_mode_combo.setFixedWidth(150)
-        # replot & rename metrics whenever user changes mode
-        self.analysis_mode_combo.currentIndexChanged.connect(self.update_analysis_plots)
-        controls_layout.addWidget(self.analysis_mode_combo)
-        self.setup_range_selection_section_compact(controls_layout)
-        
-        # ── smoothing controls ──
-        from PyQt6.QtWidgets import QButtonGroup
-        smooth_container = QWidget()
-        smooth_layout = QHBoxLayout(smooth_container)
-        smooth_layout.setSpacing(8)
-        smooth_layout.setContentsMargins(0, 0, 0, 0)
-
-        # define buttons: (label, mode_key, tooltip)
-        smooth_defs = [
-            ("Raw",    None,  "No filtering – raw data"),
-            ("SavGol", "SG",  "Savitzky–Golay filter"),
-            ("Butter", "BW",  "Butterworth filter")
-        ]
-        btn_group = QButtonGroup(self)       # exclusive toggling
-        btn_group.setExclusive(True)
-        for text, mode, tip in smooth_defs:
-            btn = QPushButton(text)
-            btn.setCheckable(True)
-            btn.setToolTip(tip)
-            # unify with main buttons
-            btn.setStyleSheet(self.BUTTON_STYLE)
-            btn.setFixedHeight(BUTTON_HEIGHT)
-            btn.clicked.connect(lambda _, m=mode: self.set_smoothing_mode(m))
-            setattr(self, f"{text.lower()}_btn", btn)
-            btn_group.addButton(btn)
-            smooth_layout.addWidget(btn)
-        # default selection
-        self.raw_btn.setChecked(True)
-        controls_layout.addWidget(smooth_container)
-
-        # ── per-filter parameter panels ──
-        from PyQt6.QtWidgets import QStackedWidget
-        self.filter_param_stack = QStackedWidget()
-
-        # 0: raw → empty
-        self.filter_param_stack.addWidget(QWidget())
-
-        # 1: SavGol params
-        sg_panel = QWidget()
-        sg_lay   = QHBoxLayout(sg_panel)
-        sg_lay.setSpacing(4)
-        sg_lay.addWidget(QLabel("Win len:"))
-        self.sg_window_len = QSpinBox()
-        self.sg_window_len.setRange(3, 101)
-        self.sg_window_len.setSingleStep(2)
-        self.sg_window_len.setValue(5)
-        self.sg_window_len.valueChanged.connect(self.update_analysis_plots)
-        sg_lay.addWidget(self.sg_window_len)
-        sg_lay.addWidget(QLabel("Poly:"))
-        self.sg_poly = QSpinBox()
-        self.sg_poly.setRange(1, 10)
-        self.sg_poly.setValue(2)
-        self.sg_poly.valueChanged.connect(self.update_analysis_plots)
-        sg_lay.addWidget(self.sg_poly)
-        self.filter_param_stack.addWidget(sg_panel)
-
-        # 2: Butter params
-        bw_panel = QWidget()
-        bw_lay   = QHBoxLayout(bw_panel)
-        bw_lay.setSpacing(4)
-        bw_lay.addWidget(QLabel("Cutoff:"))
-        self.butter_cutoff = QDoubleSpinBox()
-        self.butter_cutoff.setRange(0.1, 100.0)
-        self.butter_cutoff.setSingleStep(0.1)
-        self.butter_cutoff.setValue(1.0)
-        self.butter_cutoff.valueChanged.connect(self.update_analysis_plots)
-        bw_lay.addWidget(self.butter_cutoff)
-        self.butter_type = QComboBox()
-        self.butter_type.addItems(["Low-pass", "High-pass"])
-        self.butter_type.currentIndexChanged.connect(self.update_analysis_plots)
-        bw_lay.addWidget(self.butter_type)
-        bw_lay.addWidget(QLabel("Order:"))
-        self.butter_order = QSpinBox()
-        self.butter_order.setRange(1, 10)
-        self.butter_order.setValue(2)
-        self.butter_order.valueChanged.connect(self.update_analysis_plots)
-        bw_lay.addWidget(self.butter_order)
-        self.filter_param_stack.addWidget(bw_panel)
-
-        controls_layout.addWidget(self.filter_param_stack)
-         # spacer
-        controls_layout.addStretch()
-        
-        analysis_layout.addWidget(controls_container)
-        
-        # Main content area - full width layout
-        content_layout = QHBoxLayout()
-        content_layout.setSpacing(12)
-        
-        # Left side: plots container - takes most of the space
-        plots_container = QWidget()
-        plots_layout = QVBoxLayout(plots_container)
-        plots_layout.setSpacing(6)
-        plots_layout.setContentsMargins(8, 8, 8, 8)
-        
-        plots_container.setStyleSheet(f"""
-            QWidget {{
-                border: 1px solid {BORDER_COLOR};
-                border-radius: {BORDER_RADIUS}px;
-                background-color: {BOX_BACKGROUND};
-            }}
-        """)
-        
-        self.plots_container_parent = plots_container
-        
-        content_layout.addWidget(plots_container, stretch=5)  # Takes 5/7 of space
-        
-        # Right side: detailed metrics display - maximize vertical space
-        self.setup_metrics_display_section_compact(content_layout)  # Takes 2/7 of space
-        
-        analysis_layout.addLayout(content_layout)
-
-    def setup_metrics_display_section_compact(self, parent_layout):
-        """Setup compact metrics display section with export button at top"""
-        metrics_container = QWidget()
-
-        metrics_layout = QVBoxLayout(metrics_container)
-        metrics_layout.setSpacing(2)                   # less spacing
-        metrics_layout.setContentsMargins(4, 4, 4, 4)  # slimmer margins
-
-
-        # match Mission Control info panel width
-        metrics_container.setMinimumWidth(180)
-        metrics_container.setMaximumWidth(220)
-        
-        # Title at the very top
-        title_label = QLabel("Analysis Results")
-        title_label.setStyleSheet(f"""
-            QLabel {{
-                color: {BOX_TITLE_COLOR};
-                font-size: {FONT_SIZE_TITLE}pt;
-                font-family: {FONT_FAMILY};
-                font-weight: bold;
-                padding: 6px 0px;
-                border-bottom: 1px solid {BORDER_COLOR};
-                margin-bottom: 6px;
-            }}
-        """)
-        metrics_layout.addWidget(title_label)
-        
-        # Export button
-        self.export_btn = QPushButton("Export Analysis")
-        self.export_btn.setStyleSheet(self.BUTTON_STYLE)
-        self.export_btn.setFixedHeight(BUTTON_HEIGHT)
-        self.export_btn.setEnabled(False)
-        self.export_btn.clicked.connect(self.export_analysis)
-        metrics_layout.addWidget(self.export_btn)
-        
-        # Direct metrics display without scroll bars:
-        self.metrics_display = QTextEdit()
-        self.metrics_display.setReadOnly(True)
-        self.metrics_display.setStyleSheet(f"""
-            QTextEdit {{
-                background-color: {BOX_BACKGROUND};
-                color: {TEXT_COLOR};
-                border: none;
-                font-family: 'Consolas', 'Monaco', monospace;
-                font-size: {FONT_SIZE_NORMAL-1}pt;
-                line-height: 1.3;
-            }}
-        """)
-        self.metrics_display.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.metrics_display.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.metrics_display.setText("Load a CSV file to see detailed analysis...")
-        metrics_layout.addWidget(self.metrics_display, stretch=1)
-        # ===================================================
-        
-        metrics_container.setStyleSheet(f"background-color: {BOX_BACKGROUND};")
-        parent_layout.addWidget(metrics_container, stretch=0)
-
-    def setup_file_loading_section_compact(self, parent_layout):
-         """Setup compact file loading controls"""
-         file_group = QGroupBox("Load CSV Data")
-         file_layout = QVBoxLayout()
-         file_layout.setSpacing(8)
-         file_layout.setContentsMargins(15, 15, 15, 15)
-         
-         # Load button
-         self.load_csv_btn = QPushButton("Browse & Load CSV")
-         self.load_csv_btn.setStyleSheet(self.BUTTON_STYLE)
-         self.load_csv_btn.setFixedHeight(BUTTON_HEIGHT)
-         self.load_csv_btn.clicked.connect(self.load_csv_file)
-         
-         # Compact status label
-         self.csv_path_label = QLabel("No file loaded")
-         self.csv_path_label.setStyleSheet(f"""
-            QLabel {{
-                color: {TEXT_SECONDARY};
-                font-size: {FONT_SIZE_NORMAL-1}pt;
-                font-family: {FONT_FAMILY};
-                background-color: {BOX_BACKGROUND};
-                border: 1px solid {BORDER_COLOR};
-                border-radius: {BORDER_RADIUS}px;
-                padding: 6px;
-                margin: 2px 0px;
-            }}
-        """)
-         self.csv_path_label.setWordWrap(True)
-         self.csv_path_label.setMaximumHeight(60)
-         
-         file_layout.addWidget(self.load_csv_btn)
-         file_layout.addWidget(self.csv_path_label)
-         file_group.setLayout(file_layout)
-         file_group.setFixedWidth(280)
-         self.apply_groupbox_style(file_group, self.COLOR_BOX_BORDER)
-         parent_layout.addWidget(file_group)
-
-    def setup_range_selection_section_compact(self, parent_layout):
-        """Setup compact time range selection controls"""
-        range_group = QGroupBox("Time Range")
-        range_layout = QGridLayout()
-        range_layout.setSpacing(8)
-        range_layout.setContentsMargins(15, 15, 15, 15)
-        
-        # Start time controls
-        self.start_label = QLabel("Start (s):")
-        self.start_label.setStyleSheet(self.LABEL_STYLE)
-        # controls_layout.addWidget(self.start_label)  # FIX: Remove this line
-
-        self.start_spin = QDoubleSpinBox()
-        self.start_spin.setDecimals(2)
-        self.start_spin.setFixedWidth(80)
-        self.start_spin.setFixedHeight(28)
-
-        
-        # End time controls
-        self.end_label = QLabel("End (s):")
-        self.end_label.setStyleSheet(self.LABEL_STYLE)
-        # controls_layout.addWidget(self.end_label)  # FIX: Remove this line
-
-        self.end_spin = QDoubleSpinBox()
-        self.end_spin.setDecimals(2)
-        self.end_spin.setFixedWidth(80)
-        self.end_spin.setFixedHeight(28)
-
-    
-        # Grid layout for compact arrangement
-        range_layout.addWidget(self.start_label, 0, 0)
-        range_layout.addWidget(self.start_spin, 0, 1)
-        range_layout.addWidget(self.end_label, 1, 0)
-        range_layout.addWidget(self.end_spin, 1, 1)
-        
-        range_group.setLayout(range_layout)
-        range_group.setFixedWidth(180)
-        self.apply_groupbox_style(range_group, self.COLOR_BOX_BORDER)
-        parent_layout.addWidget(range_group)
-    
-        # Initially disable until CSV is loaded
-        self.start_spin.setEnabled(False)
-        self.end_spin.setEnabled(False)
-
-        # ── patch ──
-        # Use 1 second increments on the time spins (keep decimals)
-        self.start_spin.setSingleStep(1.0)
-        self.end_spin.setSingleStep(1.0)
-        # ── end patch ──
-    def update_metrics_display(self):
-        """Update the metrics display with all calculated statistics"""
-        if not hasattr(self, 'metrics'):
-            self.metrics_display.setText("No metrics available")
-            return
-
-        try:
-            # rename based on current graph mode
-            gm = self.analysis_mode_combo.currentText()
-            if   gm == "DISTANCE MEASURING MODE":
-                P, D = "Distance",       "Velocity"
-            elif gm == "SCANNING MODE":
-                P, D = "Rel. Angle",     "Rate of Change"
-            else:
-                P, D = "Angl. Pos.",     "Spin Rate"
-
-            m = self.metrics
-            text = "\n".join([
-                f"Data Points:    {m['data_points']}",
-                f"Time Range:     {m['time_range']:.2f} s",
-                f"Peak {P}:       {m['peak_value']:.4f}",
-                f"Min {P}:        {m['min_value']:.4f}",
-                f"▶ Avg {P}:      {m['avg_value']:.4f}",
-                f"{P} Range:      {m['value_range']:.4f}",
-                f"Peak {D}:       {m['peak_velocity']:.4f}",
-                f"Min {D}:        {m['min_velocity']:.4f}",
-                f"▶ Avg {D}:      {m['avg_velocity']:.4f}",
-            ])
-            self.metrics_display.setText(text)
-
-        except Exception as e:
-            print(f"[ERROR] update_metrics_display: {e}")
-            self.metrics_display.setText(f"Error displaying metrics: {e}")
-
-    def calculate_std_dev(self):
-        """Calculate standard deviation of values"""
-        if not hasattr(self, 'full_df'):
-            return 0.0
-        try:
-            start = self.start_spin.value()
-            end = self.end_spin.value()
-            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
-            return df_range['value'].std()
-        except:
-            return 0.0
-
-    def calculate_variance(self):
-        """Calculate variance of values"""
-        if not hasattr(self, 'full_df'):
-            return 0.0
-        try:
-            start = self.start_spin.value()
-            end = self.end_spin.value()
-            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
-            return df_range['value'].var()
-        except:
-            return 0.0
-
-    def calculate_rms_velocity(self):
-        """Calculate RMS velocity"""
-        if not hasattr(self, 'metrics'):
-            return 0.0
-        try:
-            start = self.start_spin.value()
-            end = self.end_spin.value()
-            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
-            timestamps = df_range["relative_time"].values
-            values = df_range["value"].values
-            
-            if len(timestamps) > 1:
-                dt = np.diff(timestamps)
-                dv = np.diff(values)
-                dt[dt == 0] = 1e-6
-                velocity = dv / dt
-                return np.sqrt(np.mean(velocity**2))
-            return 0.0
-        except:
-            return 0.0
-
-    def assess_data_quality(self):
-        """Assess overall data quality"""
-        if not hasattr(self, 'metrics'):
-            return "Unknown"
-        try:
-            points = self.metrics['data_points']
-            duration = self.metrics['time_range']
-            sampling_rate = points / duration if duration > 0 else 0
-            
-            if sampling_rate > 20:
-                return "Excellent"
-            elif sampling_rate > 10:
-                return "Good"
-            elif sampling_rate > 5:
-                return "Fair"
-            else:
-                return "Poor"
-        except:
-            return "Unknown"
-
-    def min_time_step(self):
-        """Calculate minimum time step"""
-        if not hasattr(self, 'full_df'):
-            return 0.0
-        try:
-            start = self.start_spin.value()
-            end = self.end_spin.value()
-            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
-            
-            timestamps = df_range["relative_time"].values
-            if len(timestamps) > 1:
-                dt = np.diff(timestamps)
-                return np.min(dt[dt > 0])
-            return 0.0
-        except:
-            return 0.0
-
-    def max_time_step(self):
-        """Calculate maximum time step"""
-        if not hasattr(self, 'full_df'):
-            return 0.0
-        try:
-            start = self.start_spin.value()
-            end = self.end_spin.value()
-            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
-            
-            timestamps = df_range["relative_time"].values
-            if len(timestamps) > 1:
-                dt = np.diff(timestamps)
-                return np.max(dt)
-            return 0.0
-        except:
-            return 0.0
-
-    def avg_time_step(self):
-        """Calculate average time step"""
-        if not hasattr(self, 'full_df'):
-            return 0.0
-        try:
-            start = self.start_spin.value()
-            end = self.end_spin.value()
-            df_range = self.full_df[(self.full_df['relative_time'] >= start) & (self.full_df['relative_time'] <= end)]
-            
-            timestamps = df_range["relative_time"].values
-            if len(timestamps) > 1:
-                dt = np.diff(timestamps)
-                return np.mean(dt)
-            return 0.0
-        except:
-            return 0.0
-
-    def update_analysis_plots(self):
-        """Update plots based on selected time range"""
-        if not hasattr(self, 'full_df'):
-            return
-
-        try:
-            start = self.start_spin.value()
-            end   = self.end_spin.value()
-            if end <= start:
-                return
-
-            df        = self.full_df
-            df_range  = df[(df['relative_time'] >= start) & (df['relative_time'] <= end)]
-            if len(df_range) < 2:
-                self.metrics_display.setText("Not enough data points in selected range")
-                return
-
-            # full series for context
-            full_ts = df["relative_time"].values
-            full_v  = df["value"].values
-
-            # selected range
-            ts       = df_range["relative_time"].values
-            raw_vals = df_range["value"].values
-
-            # apply filtering if requested
-            mode = self.smooth_mode
-            if mode == "SG":
-                from scipy.signal import savgol_filter
-                wl = self.sg_window_len.value()
-                if wl % 2 == 0: 
-                    wl += 1
-                poly = self.sg_poly.value()
-                vals = savgol_filter(raw_vals, window_length=wl, polyorder=poly)
-            elif mode == "BW":
-                from numpy import mean, diff
-                from scipy.signal import butter, filtfilt
-                # cutoff freq and order from UI
-                cutoff = self.butter_cutoff.value()
-                order  = self.butter_order.value()
-                # sampling rate from timestamps
-                dt0 = diff(ts)
-                fs  = 1.0/(mean(dt0) if len(dt0)>0 else 1.0)
-                nyq = 0.5*fs
-                btype = 'low' if self.butter_type.currentText()=="Low-pass" else 'high'
-                b, a  = butter(order, cutoff/nyq, btype=btype)
-                vals = filtfilt(b, a, raw_vals)
-            else:
-                vals = raw_vals
-
-            # compute velocity
-            from numpy import diff
-            dts = diff(ts)
-            dvs = diff(vals)
-            dts[dts==0] = 1e-6
-            vel = dvs/dts
-            vel_ts = ts[1:]
-
-            # clear & redraw
-            self.raw_canvas.figure.clear()
-            self.vel_canvas.figure.clear()
-
-            # Raw plot
-            raw_ax = self.raw_canvas.figure.add_subplot(111)
-            raw_ax.set_facecolor(PLOT_BACKGROUND)
-            raw_ax.plot(full_ts, full_v, color=PLOT_LINE_ALT, alpha=0.4, label="Full Data")
-            raw_ax.plot(ts, vals, color=PLOT_LINE_PRIMARY, linewidth=2, label="Selected Range")
-
-            # overlay filter legend with the correct parameters
-            if mode == "SG":
-                lbl = f"SavGol (wl={self.sg_window_len.value()}, poly={self.sg_poly.value()})"
-            elif mode == "BW":
-                lbl = (
-                    f"Butterworth ({self.butter_type.currentText()}, "
-                    f"fc={self.butter_cutoff.value():.2f}, "
-                    f"ord={self.butter_order.value()})"
-                )
-            else:
-                lbl = None
-            if lbl:
-                raw_ax.plot(
-                    ts, vals,
-                    linestyle="--",
-                    color=PLOT_LINE_SECONDARY,
-                    linewidth=2,
-                    label=lbl
-                )
-
-            # vertical markers
-            raw_ax.axvline(start, color=SUCCESS_COLOR, linestyle='--', label="Start")
-            raw_ax.axvline(end,   color=ERROR_COLOR,   linestyle='--', label="End")
-
-            raw_ax.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
-
-            # pick axis labels by mode
-            gm = self.analysis_mode_combo.currentText()
-            if   gm == "DISTANCE MEASURING MODE":
-                y_raw, y_vel = "Distance (m)",        "Velocity (m/s)"
-            elif gm == "SCANNING MODE":
-                y_raw, y_vel = "Relative Angle (°)",  "Rate of Change (°/s)"
-            else:  # Angular Position
-                y_raw, y_vel = "Angular Position (°)", "Spin Rate (°/s)"
-
-            raw_ax.set_ylabel(y_raw, color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
-            raw_ax.grid(True, color=GRID_COLOR, alpha=0.3)
-            raw_ax.tick_params(colors=TEXT_COLOR, labelsize=8)
-            raw_ax.legend(facecolor=BOX_BACKGROUND, edgecolor=BORDER_COLOR, fontsize=8)
-            self.raw_canvas.figure.subplots_adjust(left=0.08, right=0.98, top=0.88, bottom=0.15)
-
-            # Velocity plot
-            vel_ax = self.vel_canvas.figure.add_subplot(111)
-            vel_ax.set_facecolor(PLOT_BACKGROUND)
-            vel_ax.plot(vel_ts, vel, color=PLOT_LINE_SECONDARY, linewidth=2, label=y_vel)
-            vel_ax.axvline(start, color=SUCCESS_COLOR, linestyle='--')
-            vel_ax.axvline(end,   color=ERROR_COLOR,   linestyle='--')
-            vel_ax.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
-            vel_ax.set_ylabel(y_vel,   color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=10)
-            vel_ax.grid(True, color=GRID_COLOR, alpha=0.3)
-            vel_ax.tick_params(colors=TEXT_COLOR, labelsize=8)
-            vel_ax.legend(facecolor=BOX_BACKGROUND, edgecolor=BORDER_COLOR, fontsize=8)
-            self.vel_canvas.figure.subplots_adjust(left=0.08, right=0.98, top=0.88, bottom=0.15)
-
-            self.raw_canvas.draw()
-            self.vel_canvas.draw()
-
-            # update metrics
-            self.metrics = {
-                "data_points": len(df_range),
-                "time_range":  end - start,
-                "peak_value":  vals.max(),
-                "min_value":   vals.min(),
-                "avg_value":   vals.mean(),
-                "value_range": vals.max() - vals.min(),
-                "peak_velocity": float(vel.max()) if len(vel)>0 else 0.0,
-                "min_velocity":  float(vel.min()) if len(vel)>0 else 0.0,
-                "avg_velocity":  float(vel.mean())if len(vel)>0 else 0.0,
-            }
-            self.update_metrics_display()
-
-        except Exception as e:
-            print(f"[ERROR] update_analysis_plots: {e}")
-            traceback.print_exc()
-            self.metrics_display.setText(f"Error plotting data: {e}")
-
-    def load_csv_file(self):
-        """Load and process CSV file for analysis"""
-        from PyQt6.QtWidgets import QFileDialog
-        
-        file_dialog = QFileDialog()
-        # ── start patch ──
-        recordings_dir = os.path.join(os.path.dirname(__file__), "recordings")
-        os.makedirs(recordings_dir, exist_ok=True)
-        file_path, _ = file_dialog.getOpenFileName(
-            self,
-            "Open CSV File",
-            recordings_dir,
-            "CSV Files (*.csv);;All Files (*)"
-        )
-        # ── end patch ──
-        
-        if not file_path:
-            return
-
-        self.csv_path_label.setText(f"Loaded: {os.path.basename(file_path)}")
-        try:
-            df = pd.read_csv(file_path)
-            
-            # Check for required columns
-            if "timestamp" not in df.columns or "value" not in df.columns:
-                self.show_message("Error", "CSV must have 'timestamp' and 'value' columns.", QMessageBox.Icon.Critical)
-                return
-            
-            # Add relative time column
-            df['relative_time'] = df['timestamp'] - df['timestamp'].min()
-            self.full_df = df
-            
-            # Setup time range controls
-            min_time = df["relative_time"].min()
-            max_time = df["relative_time"].max()
-            
-            self.start_spin.setRange(min_time, max_time)
-            self.end_spin.setRange(min_time, max_time)
-            self.start_spin.setValue(min_time)
-            self.end_spin.setValue(max_time)
-            self.start_spin.setSingleStep(1)
-            self.end_spin.setSingleStep(1)
-            
-            # Enable controls
-            self.start_spin.setEnabled(True)
-            self.end_spin.setEnabled(True)
-            self.export_btn.setEnabled(True)
-            
-            # Connect signals if not already connected
-            try:
-                self.start_spin.valueChanged.disconnect()
-                self.end_spin.valueChanged.disconnect()
-            except:
-                pass
-            
-            self.start_spin.valueChanged.connect(self.update_analysis_plots)
-            self.end_spin.valueChanged.connect(self.update_analysis_plots)
-            
-            # Create plots if they don't exist
-            self.create_analysis_plots()
-            
-            # Initial plot update
-            self.update_analysis_plots()
-            
-            # === NEW: switch to Data Analysis tab ===
-            self.tab_widget.setCurrentWidget(self.analysis_tab)
-            print("[INFO] 🔄 Switched to Data Analysis tab")
-            
-            print(f"[INFO] CSV loaded successfully: {len(df)} data points")
-        except Exception as e:
-            print(f"[ERROR] Failed to load CSV: {e}")
-            self.show_message("Error", f"Failed to load CSV file:\n{str(e)}", QMessageBox.Icon.Critical)
-
-    def create_analysis_plots(self):
-        """Create matplotlib plots for analysis tab"""
-        if hasattr(self, 'raw_canvas'):
-            return  # Already created
-            
-        try:
-            from matplotlib.backends.qt_compat import QtCore, QtWidgets
-            from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-            from matplotlib.figure import Figure
-            
-            # Clear existing layout
-            layout = self.plots_container_parent.layout()
-            while layout.count():
-                child = layout.takeAt(0)
-                if child.widget():
-                    child.widget().deleteLater()
-            
-            # Create matplotlib figures
-            self.raw_figure = Figure(figsize=(8, 4), facecolor=PLOT_BACKGROUND)
-            self.vel_figure = Figure(figsize=(8, 4), facecolor=PLOT_BACKGROUND)
-            
-            self.raw_canvas = FigureCanvas(self.raw_figure)
-            self.vel_canvas = FigureCanvas(self.vel_figure)
-            
-            # Style canvases
-            self.raw_canvas.setStyleSheet(f"background-color: {PLOT_BACKGROUND};")
-            self.vel_canvas.setStyleSheet(f"background-color: {PLOT_BACKGROUND};")
-            
-            # Add to layout
-            layout.addWidget(self.raw_canvas)
-            layout.addWidget(self.vel_canvas)
-            
-            print("[INFO] Analysis plots created successfully")
-            
-        except Exception as e:
-            print(f"[ERROR] Failed to create analysis plots: {e}")
-
-    def export_analysis(self):
-        """Export analysis results to file"""
-        if not hasattr(self, 'metrics'):
-            self.show_message("Error", "No analysis data to export.", QMessageBox.Icon.Warning)
-            return
-        
-        from PyQt6.QtWidgets import QFileDialog
-        
-        # guard against None
-        mode = self.graph_section.current_graph_mode or self.analysis_mode_combo.currentText() or ""
-        key = mode.replace(" ", "_").lower() if mode else "analysis"
-        default_name = f"{key}_analysis.txt"
-        
-        file_path, _ = QFileDialog.getSaveFileName(
-            self, "Export Analysis", default_name, "Text Files (*.txt);;All Files (*)"
-        )
-        
-        if file_path:
-            try:
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(self.metrics_display.toPlainText())
-                self.show_message("Success", f"Analysis exported to:\n{file_path}", QMessageBox.Icon.Information)
-                print(f"[INFO] Analysis exported to: {file_path}")
-            except Exception as e:
-                self.show_message("Error", f"Failed to export analysis:\n{e}", QMessageBox.Icon.Critical)
-                print(f"[ERROR] Export failed: {e}")
-
     def update_image(self, frame):
         """Update video display with new frame"""
         try:
@@ -1624,6 +965,10 @@ QPushButton#danger_btn:hover {
             arr = np.frombuffer(data, np.uint8)
             frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
             if frame is not None:
+                # Add crosshairs if manual orientation is enabled
+                if self.show_crosshairs:
+                    frame = self.draw_crosshairs(frame)
+                    
                 self.current_frame_size = len(data)
                 self.frame_counter += 1
                 bridge.frame_received.emit(frame)
@@ -1739,8 +1084,12 @@ QPushButton#danger_btn:hover {
         config = self.camera_settings.get_config()
         sio.emit("camera_config", config)
         
-        #Update detector calibration (this will also update self.active_config_for_detector via server ack)
-        self.update_detector_calibration(config) # This is now handled by camera_config_updated
+        # Store the applied configuration for detector use
+        self.active_config_for_detector = config.copy()
+        print(f"[DEBUG] Stored applied config: cropped={config.get('cropped')}, crop_factor={config.get('crop_factor')}")
+        
+        # Update detector calibration
+        self.update_detector_calibration(config)
 
         # Resume stream if it was active before applying config
         if was_streaming_at_call_time:
@@ -1767,12 +1116,20 @@ QPushButton#danger_btn:hover {
             calibration_path = config.get('calibration_file', 'calibrations/calibration_default.npz')
             preset_type = config.get('preset_type', 'standard')
             
+            print(f"[DEBUG] Updating detector calibration to: {calibration_path}")
+            
             if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
                 success = detector4.detector_instance.update_calibration(calibration_path)
                 if success:
                     print(f"[INFO] ✓ Detector calibration updated: {calibration_path}")
+                    # Verify the calibration was actually loaded
+                    if hasattr(detector4.detector_instance, 'mtx'):
+                        cy = detector4.detector_instance.mtx[1, 2] if detector4.detector_instance.mtx is not None else "None"
+                        print(f"[DEBUG] New calibration cy: {cy}")
                 else:
                     print(f"[WARNING] ❌ Failed to update detector calibration")
+            else:
+                print(f"[WARNING] Detector instance not available for calibration update")
             
         except Exception as e:
             print(f"[ERROR] Calibration update failed: {e}")
@@ -1791,33 +1148,102 @@ QPushButton#danger_btn:hover {
 
     def show_full_image(self):
         """Cover UI with a full-screen image and tiny back button."""
-        # hide main tabs
-        self.tab_widget.hide()
-        # display full image
-        self._full_lbl = QLabel(self)
-        pix = QPixmap(r"C:\Users\juanb\OneDrive\Imágenes\Camera Roll\WIN_20250221_12_17_13_Pro.jpg")
-        pix = pix.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding,
-                         Qt.TransformationMode.SmoothTransformation)
-        self._full_lbl.setPixmap(pix)
-        self._full_lbl.setGeometry(self.rect())
-        self._full_lbl.show()
-        # tiny back button
-        self._back_btn = QPushButton("←", self)
-        self._back_btn.setStyleSheet("background:none; color:red; font-size:10pt;")
-        self._back_btn.setFixedSize(30, 20)
-        self._back_btn.move(5, 5)
-        self._back_btn.clicked.connect(self.hide_full_image)
-        self._back_btn.show()
- 
- 
+        try:
+            # Hide main tabs
+            self.tab_widget.hide()
+            
+            # Create full-screen image label
+            self._full_lbl = QLabel(self)
+            self._full_lbl.setGeometry(0, 0, self.width(), self.height())  # Fill entire window
+            self._full_lbl.setStyleSheet("background-color: black;")  # Black background
+            
+            # Load and scale image
+            image_path = r"C:\Users\juanb\OneDrive\Imágenes\Camera Roll\WIN_20250221_12_17_13_Pro.jpg"
+            
+            if os.path.exists(image_path):
+                pix = QPixmap(image_path)
+                if not pix.isNull():
+                    # Scale image to fit screen while maintaining aspect ratio
+                    scaled_pix = pix.scaled(
+                        self.size(), 
+                        Qt.AspectRatioMode.KeepAspectRatio,
+                        Qt.TransformationMode.SmoothTransformation
+                    )
+                    self._full_lbl.setPixmap(scaled_pix)
+                    self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                else:
+                    print(f"[ERROR] Failed to load image: {image_path}")
+                    self._full_lbl.setText("Failed to load image")
+                    self._full_lbl.setStyleSheet(f"background-color: black; color: {TEXT_COLOR}; font-size: 24pt;")
+                    self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            else:
+                print(f"[ERROR] Image file not found: {image_path}")
+                self._full_lbl.setText("Image file not found")
+                self._full_lbl.setStyleSheet(f"background-color: black; color: {TEXT_COLOR}; font-size: 24pt;")
+                self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            
+            # Create back button
+            self._back_btn = QPushButton("← Back", self)
+            self._back_btn.setGeometry(20, 20, 100, 40)  # Top-left corner
+            self._back_btn.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: rgba(0, 0, 0, 180);
+                    color: {TEXT_COLOR};
+                    border: 2px solid {BUTTON_COLOR};
+                    border-radius: 8px;
+                    font-size: 14pt;
+                    font-family: {FONT_FAMILY};
+                    font-weight: bold;
+                }}
+                QPushButton:hover {{
+                    background-color: {BUTTON_HOVER};
+                    color: black;
+                }}
+            """)
+            self._back_btn.clicked.connect(self.hide_full_image)
+            
+            # Show widgets
+            self._full_lbl.show()
+            self._back_btn.show()
+            
+            # Raise to top to ensure they're visible
+            self._full_lbl.raise_()
+            self._back_btn.raise_()
+            
+            print("[INFO] Full image view activated")
+            
+        except Exception as e:
+            print(f"[ERROR] Failed to show full image: {e}")
+            # Fallback: restore normal view
+            if hasattr(self, '_full_lbl'):
+                self._full_lbl.hide()
+            if hasattr(self, '_back_btn'):
+                self._back_btn.hide()
+            self.tab_widget.show()
+
     def hide_full_image(self):
-         pass
-        
-         # remove full-screen image and back button
-         self._full_lbl.hide()
-         self._back_btn.hide()
-         # restore main UI
-         self.tab_widget.show()
+        """Remove full-screen image and back button, restore main UI"""
+        try:
+            # Remove full-screen image and back button
+            if hasattr(self, '_full_lbl'):
+                self._full_lbl.hide()
+                self._full_lbl.deleteLater()
+                delattr(self, '_full_lbl')
+                
+            if hasattr(self, '_back_btn'):
+                self._back_btn.hide()
+                self._back_btn.deleteLater()
+                delattr(self, '_back_btn')
+            
+            # Restore main UI
+            self.tab_widget.show()
+            
+            print("[INFO] Returned to normal view")
+            
+        except Exception as e:
+            print(f"[ERROR] Failed to hide full image: {e}")
+            # Force restore main UI
+            self.tab_widget.show()
 
     def run_detector(self):
         """Main detector processing loop"""
@@ -1825,25 +1251,27 @@ QPushButton#danger_btn:hover {
             try:
                 frame = self.frame_queue.get(timeout=0.1)
                 
-                # Use the server-acknowledged and locally cached configuration
+                # Use the server-acknowledged config (applied settings) instead of live UI
                 if self.active_config_for_detector is None:
-                    config = self.camera_settings.get_config() # Fallback, not ideal
+                    config = self.camera_settings.get_config() # Fallback only
+                    print("[DEBUG] Using fallback config (no applied config yet)")
                 else:
-                    config = self.active_config_for_detector # CORRECT: Use cached config
+                    config = self.active_config_for_detector # Use last applied config
+                    print("[DEBUG] Using applied config from last Apply Config press")
                 
                 is_cropped = config.get('cropped', False)
+                print(f"[DEBUG] Applied config: cropped={is_cropped}, crop_factor={config.get('crop_factor')}")
                 
                 original_height = None
                 if is_cropped:
                     current_height = frame.shape[0]
-                    crop_factor = config.get('crop_factor') # This is set in camera_settings.get_config()
+                    crop_factor = config.get('crop_factor')
                     
-                    # Ensure crop_factor is valid and positive before division
-                    if crop_factor is not None and crop_factor > 0.001: # MIN_CROP_FACTOR is likely 0.1
-                        original_height = int(current_height / crop_factor)
+                    if crop_factor is not None and crop_factor > 1.0:
+                        original_height = int(current_height * crop_factor)
+                        print(f"[DEBUG] Using applied crop factor {crop_factor}: {current_height}px -> {original_height}px original")
                     else:
-                        # Fallback if crop_factor is somehow invalid (should not happen with current setup)
-                        print(f"[WARNING] Invalid crop_factor: {crop_factor} during detection. Using current_height as original_height.")
+                        print(f"[WARNING] Invalid crop_factor: {crop_factor}")
                         original_height = current_height 
                 
                 # Process frame with detector
@@ -1855,6 +1283,11 @@ QPushButton#danger_btn:hover {
                             is_cropped=is_cropped,
                             original_height=original_height
                         )
+                        
+                        # Add crosshairs to detector output if enabled
+                        if self.show_crosshairs:
+                            analysed = self.draw_crosshairs(analysed)
+                            
                     else:
                         analysed, pose = detector4.detect_and_draw(frame, return_pose=True)
                 
@@ -1863,36 +1296,54 @@ QPushButton#danger_btn:hover {
                     self.latencyUpdated.emit(latency_ms)
                     bridge.analysed_frame.emit(analysed)
 
-                    # only update graphs if needed
-                    if self.should_update_graphs() and self.graph_section.graph_widget and pose:
+                    # 1) always update all calculators
+                    if pose:
                         rvec, tvec = pose
-                        ts = time.time()
+                        self.spin_plotter    .update(rvec, tvec)
+                        self.distance_plotter.update(rvec, tvec)
+                        self.angular_plotter .update(rvec, tvec)
 
-                        # ── start patch ──
-                        now = time.time()
-                        if now - self._last_graph_draw >= self._graph_update_interval:
-                            self._last_graph_draw = now
-                            self.graph_section.graph_widget.update(rvec, tvec, ts)
-                        # ── end patch
+                        # 2) update the three small live‐value labels WITH UNITS
+                        self.graph_section.live_labels["SPIN MODE"]             \
+                            .setText(f"{self.spin_plotter.current_angle:.3f}°")  # Added degree symbol
+                        self.graph_section.live_labels["DISTANCE MEASURING MODE"] \
+                            .setText(f"{self.distance_plotter.current_distance:.3f}m")  # Added meter unit
+                        self.graph_section.live_labels["SCANNING MODE"]         \
+                            .setText(f"{self.angular_plotter.current_ang:.3f}°")  # Added degree symbol
 
-                        # always record every data point
-                        value = None
-                        mode = self.graph_section.current_graph_mode
-                        widget = self.graph_section.graph_widget
-                        if mode == "DISTANCE MEASURING MODE" and hasattr(widget, 'current_distance'):
+                        # 2b) update the big "detail" label for the active graph WITH UNITS
+                        detail = getattr(self.graph_section, "current_detail_label", None)
+                        mode   = getattr(self.graph_section, "current_graph_mode", None)
+                        if detail and mode:
+                            if mode == "SPIN MODE":
+                                v = self.spin_plotter.current_angle
+                                detail.setText(f"{v:.3f}°")  # Added degree symbol
+                            elif mode == "DISTANCE MEASURING MODE":
+                                v = self.distance_plotter.current_distance
+                                detail.setText(f"{v:.3f}m")  # Added meter unit
+                            else:  # SCANNING MODE
+                                v = self.angular_plotter.current_ang
+                                detail.setText(f"{v:.3f}°")  # Added degree symbol
 
-                            value = widget.current_distance
-                        elif mode == "SCANNIGN MODE" and hasattr(widget, 'current_ang'):
-                            value = widget.current_ang
-                        elif mode == "SPIN MODE" and hasattr(widget, 'current_angle'):
-                            value = widget.current_angle
+                            # ── if we're recording, grab that same label value ─────────────────
+                            if self.graph_section.is_recording:
+                                # timestamp + float value from the detail label (extract number only)
+                                ts = time.time()
+                                try:
+                                    # Extract numeric value (remove units)
+                                    text_val = detail.text().rstrip('°m')  # Remove degree and meter symbols
+                                    val = float(text_val)
+                                    self.graph_section.add_data_point(ts, val)
+                                except ValueError:
+                                    pass
+                
 
-                        if value is not None:
-                            self.graph_section.add_data_point(ts, value)
+                        # 3) continue with your throttled redraw / recording logic…
+                        if self.should_update_graphs() and self.graph_section.graph_widget and pose:
+                            self.graph_section.graph_widget.update(rvec, tvec, None)
+                            # … recording code …
                 except Exception as e:
                     print(f"[ERROR] Detector processing error: {e}")
-                    bridge.analysed_frame.emit(frame)
-
             except queue.Empty:
                 continue
             except Exception as e:
@@ -2139,7 +1590,7 @@ def check_all_calibrations():
     else:
         print(f"⚠️  Missing {total - found} calibrations")
 
-##############################################################################
+############################################################################
 #                              MAIN EXECUTION                               #
 ##############################################################################
 

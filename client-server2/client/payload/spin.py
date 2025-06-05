@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 from collections import deque
 import time
 import cv2
+from PyQt6.QtCore import QTimer
 from theme import (
     BACKGROUND, BOX_BACKGROUND, PLOT_BACKGROUND, STREAM_BACKGROUND,
     TEXT_COLOR, TEXT_SECONDARY, BOX_TITLE_COLOR, LABEL_COLOR,
@@ -73,8 +74,27 @@ class AngularPositionPlotter(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.canvas)
         self.setLayout(layout)
-        self.redraw() 
-        
+
+        # ── setup, but don’t start the timer yet ───────────────
+        self._redraw_timer = QTimer(self)
+        self._redraw_timer.timeout.connect(self.redraw)
+        self._redraw_interval_ms = 100  # default 10 Hz
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # only once we’re about to be displayed do we start redrawing
+        self._redraw_timer.start(self._redraw_interval_ms)
+
+    def hideEvent(self, event):
+        # stop redrawing as soon as we’re hidden
+        self._redraw_timer.stop()
+        super().hideEvent(event)
+
+    def set_redraw_rate(self, rate_hz: float):
+        interval = max(1, int(1000.0 / rate_hz))
+        self._redraw_interval_ms = interval
+        self._redraw_timer.setInterval(interval)
+
     def update(self, rvec, tvec, timestamp=None):
         if timestamp is None:
             timestamp = time.time()
@@ -85,7 +105,7 @@ class AngularPositionPlotter(QWidget):
         self.current_angle = yaw  # Add this line to update current_angle
         self.time_data.append(elapsed)
         self.data.append(yaw)
-        self.redraw()
+        # now redraw happens on the timer, decoupled from data rate
 
     def redraw(self):
         self.ax.clear()
