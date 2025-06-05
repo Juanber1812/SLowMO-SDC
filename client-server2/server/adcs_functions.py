@@ -102,8 +102,9 @@ MPU_Init()
 orientation = 0
 
 # Orientation tracking
-start_time = time.time()
+start_time = time.perf_counter()
 intial_time = None
+prev_ref = False
 while True:
         elapsed = time.time() - start_time
         acc_x = read_raw_data(ACCEL_XOUT_H)
@@ -121,17 +122,20 @@ while True:
         velocity = Gz
         dt = 0.1
         orientation += velocity * dt
-######## RPM sensing, needs editing ############
+	#RPM sensing
 	if GPIO.input(Motor1E) == GPIO.HIGH:
-	    if GPIO.input(17) == GPIO.HIGH: 
+	    if GPIO.input(17) == GPIO.HIGH and prev_ref == False: 
             	if initial_time is None:  
-           		initial_time = time.time()
+           		initial_time = time.perf_counter()
+           		prev_ref = True
         	else:
-                	current_time = time.time()
-                        period = current_time - last_time
-			rpm = fraction_rev*(60/period) #Must change for final fraction choice
-                        initial_time = current_time  
-	    time.sleep(0.01)  
+                	current_time = time.perf_counter()
+                        period = current_time - initial_time
+			rpm = 60/period 
+                        initial_time = current_time
+                        prev_ref = True
+            if GPIO.input(17) == GPIO.LOW:
+                prev_ref = False
 	else:
 		rpm = 0
 
