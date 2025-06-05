@@ -23,11 +23,11 @@ GPIO.setup(Motor1E,GPIO.OUT)
 pwm = GPIO.PWM(Motor1E, 100)  # Set PWM frequency to 100Hz
 pwm.start(50)  # Start PWM with 50% duty cycle
 def motor_forward(speed):
-    GPIO.output(Motor1A, GPIO.HIGH)
-    GPIO.output(Motor1B, GPIO.LOW)
+	GPIO.output(Motor1A, GPIO.HIGH)
+	GPIO.output(Motor1B, GPIO.LOW)
     pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
 def stop_motor():
-    pwm.ChangeDutyCycle(0)  # Stop motor
+	pwm.ChangeDutyCycle(0)  # Stop motor
 
 # Setting up rpm sensor
 GPIO.setmode(GPIO.BCM)  #Use Broadcom pin numbering
@@ -79,17 +79,17 @@ def read_raw_data(addr):
 
 # Setting PD controller
 class PDController:
-    def __init__(self, Kp, Kd):
-        self.Kp = Kp
-        self.Kd = Kd
-        self.previous_error = 0
+	def __init__(self, Kp, Kd):
+        	self.Kp = Kp
+        	self.Kd = Kd
+        	self.previous_error = 0
     
-    def compute(self, desired_orientation, actual_orientation, dt):
-        error = desired_orientation - actual_orientation
-        derivative = (error - self.previous_error) / dt if dt > 0 else 0
-        control_output = self.Kp * error + self.Kd * derivative
-        self.previous_error = error
-        return control_output
+	def compute(self, desired_orientation, actual_orientation, dt):
+		error = desired_orientation - actual_orientation
+        	derivative = (error - self.previous_error) / dt if dt > 0 else 0
+        	control_output = self.Kp * error + self.Kd * derivative
+        	self.previous_error = error
+        	return control_output
 
 # Beginning initialisation of motion sensor
 MPU_Init()
