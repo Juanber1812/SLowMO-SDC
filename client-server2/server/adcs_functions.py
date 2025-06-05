@@ -1,16 +1,5 @@
-## As it stands, this code can be run directly on the pi with a monitor, and the adcs can be controlled with inputs to the pi. This needs to be changed so that inputs to another laptop call functions to be ran on the pi.
-
-
 # Required libraries
-import time
-import RPi.GPIO as GPIO
-import board
-import busio
-import adafruit_tca9548a  # Multiplexer library
-import adafruit_veml7700
-import smbus
-from tkinter import *
-import tkinter.messagebox as box
+import time, RPi.GPIO as GPIO, board, busio, adafruit_tca9548a, adafruit_veml7700, smbus 
 
 # Setting up motor
 GPIO.setmode(GPIO.BOARD)
@@ -235,7 +224,6 @@ def automatic_orientation_mode():
         		return
         def start_rotation():
                 rotation(float(entry.get()))
-
 
 # Creating detumbling mode function
 def detumbling_mode():
