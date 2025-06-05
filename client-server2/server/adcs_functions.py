@@ -121,18 +121,18 @@ while True:
         orientation += velocity * dt
 	#RPM sensing
 	if GPIO.input(Motor1E) == GPIO.HIGH:
-	    if GPIO.input(17) == GPIO.HIGH and prev_ref == False: 
-            	if initial_time is None:  
-           		initial_time = time.perf_counter()
-           		prev_ref = True
-        	else:
-                	current_time = time.perf_counter()
-                        period = current_time - initial_time
-			rpm = 60/period 
-                        initial_time = current_time
-                        prev_ref = True
-            if GPIO.input(17) == GPIO.LOW:
-                prev_ref = False
+		if GPIO.input(17) == GPIO.HIGH and prev_ref == False: 
+            		if initial_time is None:  
+           			initial_time = time.perf_counter()
+           			prev_ref = True
+        		else:
+                		current_time = time.perf_counter()
+                        	period = current_time - initial_time
+				rpm = 60/period 
+                        	initial_time = current_time
+                        	prev_ref = True
+            	if GPIO.input(17) == GPIO.LOW:
+                	prev_ref = False
 	else:
 		rpm = 0
 
@@ -189,24 +189,24 @@ def environmental_calibration_mode():
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 	else:
-        	motor_forward(50)
+        	#Removed motor_forward(50) as that will change angle again, could put back in
         	orientation += velocity * dt
         	return		
         time.sleep(0.1)
 
 # Creating manual orientation mode function
 def manual_orientation_mode():
-    #Creating commands for motor
-    def startstop_cw():
-        if speed == 50:
-            motor_forward(75)
-        elif speed =! 50:
-            motor_forward(50)
-    def startstop_ccw():
-        if speed == 50:
-            motor_forward(25)
-        elif speed =! 50:
-            motorforward(50)
+	#Creating commands for motor
+	def startstop_cw():
+        	if speed == 50:
+            		motor_forward(75)
+        		elif speed =! 50:
+            		motor_forward(50)
+    	def startstop_ccw():
+        	if speed == 50:
+            		motor_forward(25)
+        	elif speed =! 50:
+            		motorforward(50)
 
 # Creating automatic orientation mode function
 def automatic_orientation_mode():
@@ -217,56 +217,48 @@ def automatic_orientation_mode():
                 pd_controller = PDController(Kp=1600, Kd=80)
                 # Running controller
                 while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
-                        control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-                        GPIO.output(Motor1A,GPIO.HIGH)
-                        GPIO.output(Motor1B,GPIO.LOW)
-                        GPIO.output(Motor1E,GPIO.HIGH)
-                        actual_orientation = orientation
-                else:
-                        GPIO.output(Motor1E,GPIO.LOW)
-                        GPIO.cleanup()
+                       	control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+			# Mapping PD output to motor speed (ensure values are within valid range)
+        		motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
+			#Adjust motor direction based on control signal sign
+			if control_signal > 0:
+				motor_forward(50+motor_speed)
+				orientation += velocity * dt
+        			actual_orientation = orientation  # Update actual orientation in real-time
+			else:
+				motor_forward(50-motor_speed)
+				orientation += velocity * dt
+        			actual_orientation = orientation  # Update actual orientation in real-time
+		else:
+        		#Removed motor_forward(50) as that will change angle again, could put back in
+        		orientation += velocity * dt
+        		return
         def start_rotation():
                 rotation(float(entry.get()))
-        #Setting up interface
-        window_aom = Tk()
-        window_aom.title('Automatic Orientation Mode')
-        frame = Frame(window_aom)
-        entry = Entry(frame)
-        btn = Button(frame, text = 'Enter Desired Orientation', command=start_rotation)
-        btn.pack(side = RIGHT, padx=5)
-        entry.pack(side=LEFT)
-        frame.pack(padx=20, pady=20)
-        window_aom.mainloop()
+
 
 # Creating detumbling mode function
 def detumbling_mode():
-    desired_orientation = 0  
-    actual_orientation = orientation
-    dt = 0.1
-    pd_controller = PDController(Kp=1600, Kd=80)
-    while abs(actual_orientation - desired_orientation) > 0.1:
-        control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-        GPIO.output(Motor1A,GPIO.HIGH)
-        GPIO.output(Motor1B,GPIO.LOW)
-        GPIO.output(Motor1E,GPIO.HIGH)
-        actual_orientation = orientation
-    else:
-        GPIO.output(Motor1E,GPIO.LOW)
-        GPIO.cleanup()  
+	desired_orientation = 0  
+	actual_orientation = orientation
+	dt = 0.1
+	pd_controller = PDController(Kp=1600, Kd=80)
+	while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
+        	control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+		# Mapping PD output to motor speed (ensure values are within valid range)
+        	motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
+		#Adjust motor direction based on control signal sign
+		if control_signal > 0:
+			motor_forward(50+motor_speed)
+			orientation += velocity * dt
+        		actual_orientation = orientation  # Update actual orientation in real-time
+		else:
+			motor_forward(50-motor_speed)
+			orientation += velocity * dt
+        		actual_orientation = orientation  # Update actual orientation in real-time
+	else:
+        	#Removed motor_forward(50) as that will change angle again, could put back in
+        	orientation += velocity * dt
+        	return
     
-# Intefacing
-window_adcs = Tk()
-window_adcs.title('ADCS Control Inteface')
-btn_ecm = Button(window_adcs, text = 'Environmental Calibration', command=environmental_calibration_mode())
-btn_mom = Button(window_adcs, text = 'Manual Orientation', command=manual_orientation_mode())
-btn_aom = Button(window_adcs, text = 'Automatic Orientation', command=automatic_orientation_mode())
-btn_dm = Button(window_adcs, text = 'Detumble', command=detumbling_mode())
-btn_adcs_end = Button(window_adcs, text = 'Close', command=exit)
 
-btn_ecm.pack(padx = 120, pady = 20)
-btn_mom.pack(padx = 120, pady = 20)
-btn_aom.pack(padx = 120, pady = 20)
-btn_dm.pack(padx = 120, pady = 20)
-btn_adcs_end.pack(padx = 120, pady = 20)
-
-window_adcs.mainloop()
