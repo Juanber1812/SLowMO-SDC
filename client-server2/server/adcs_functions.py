@@ -21,7 +21,7 @@ GPIO.setup(Motor1A,GPIO.OUT)
 GPIO.setup(Motor1B,GPIO.OUT)
 GPIO.setup(Motor1E,GPIO.OUT)
 pwm = GPIO.PWM(Motor1E, 100)  # Set PWM frequency to 100Hz
-pwm.start(100)  # Start PWM with 0% duty cycle
+pwm.start(50)  # Start PWM with 50% duty cycle
 def motor_forward(speed):
     GPIO.output(Motor1A, GPIO.HIGH)
     GPIO.output(Motor1B, GPIO.LOW)
@@ -142,7 +142,7 @@ def environmental_calibration_mode():
 	light_intensity_1 = []
 	light_intensity_2 = []
 	light_intensity_3 = []
-	motor_forward(100)
+	motor_forward(75)
 	pd_controller = PDController(Kp=1600, Kd=80)
 	calibration = False
 	dt = 0.1
@@ -198,19 +198,15 @@ def environmental_calibration_mode():
 def manual_orientation_mode():
     #Creating commands for motor
     def startstop_cw():
-        GPIO.output(Motor1A,GPIO.HIGH)
-        GPIO.output(Motor1B,GPIO.LOW)
-        if GPIO.input(Motor1E) == GPIO.HIGH:
-            GPIO.output(Motor1E,GPIO.LOW)
-        elif GPIO.input(Motor1E) == GPIO.LOW:
-            GPIO.output(Motor1E,GPIO.HIGH)
+        if speed == 50:
+            motor_forward(75)
+        elif speed =! 50:
+            motor_forward(50)
     def startstop_ccw():
-        GPIO.output(Motor1A,GPIO.LOW)
-        GPIO.output(Motor1B,GPIO.HIGH)
-        if GPIO.input(Motor1E) == GPIO.HIGH:
-            GPIO.output(Motor1E,GPIO.LOW)
-        elif GPIO.input(Motor1E) == GPIO.LOW:
-            GPIO.output(Motor1E,GPIO.HIGH)
+        if speed == 50:
+            motor_forward(25)
+        elif speed =! 50:
+            motorforward(50)
 
 # Creating automatic orientation mode function
 def automatic_orientation_mode():
