@@ -14,7 +14,7 @@ pwm.start(50)  # Start PWM with 50% duty cycle
 def motor_forward(speed):
 	GPIO.output(Motor1A, GPIO.HIGH)
 	GPIO.output(Motor1B, GPIO.LOW)
-    pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
+    	pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
 def stop_motor():
 	pwm.ChangeDutyCycle(0)  # Stop motor
 
