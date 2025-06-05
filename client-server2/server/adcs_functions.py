@@ -26,10 +26,6 @@ def motor_forward(speed):
     GPIO.output(Motor1A, GPIO.HIGH)
     GPIO.output(Motor1B, GPIO.LOW)
     pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
-def motor_backward(speed):
-    GPIO.output(Motor1A, GPIO.LOW)
-    GPIO.output(Motor1B, GPIO.HIGH)
-    pwm.ChangeDutyCycle(speed)
 def stop_motor():
     pwm.ChangeDutyCycle(0)  # Stop motor
 
@@ -97,6 +93,7 @@ class PDController:
 
 # Beginning initialisation of motion sensor
 MPU_Init()
+motor_forward(50)
 
 # Initial orientation
 orientation = 0
@@ -181,18 +178,18 @@ def environmental_calibration_mode():
 	while calibration == True and abs(desired_orientation - orientation) > 0.01:
        		control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
 		# Mapping PD output to motor speed (ensure values are within valid range)
-        	motor_speed = max(min(abs(control_signal), 1000), 0)  # Limiting to realistic values
+        	motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
 		#Adjust motor direction based on control signal sign
 		if control_signal > 0:
-			motor_forward(motor_speed)
+			motor_forward(50+motor_speed)
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 		else:
-			motor_backward(motor_speed)
+			motor_forward(50-motor_speed)
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 	else:
-        	stop_motor()
+        	motor_forward(50)
         	orientation += velocity * dt
         	return		
         time.sleep(0.1)
@@ -214,19 +211,6 @@ def manual_orientation_mode():
             GPIO.output(Motor1E,GPIO.LOW)
         elif GPIO.input(Motor1E) == GPIO.LOW:
             GPIO.output(Motor1E,GPIO.HIGH)
-    #Setting up interface
-    window_mom = Tk()
-    window_mom.title('Manual Orientation Mode')
-    def close_program():
-            GPIO.cleanup()
-            window_mom.destroy()
-    btn_mom_end = Button(window_mom, text = 'Close', command=close_program)
-    btn_cw = Button(window_mom, text = 'CW', command=startstop_cw)
-    btn_ccw = Button(window_mom, text = 'CCW', command=startstop_ccw)
-    btn_cw.pack(padx = 120, pady = 20)
-    btn_ccw.pack(padx = 120, pady = 20)
-    btn_mom_end.pack(padx = 120, pady = 20)
-    window_mom.mainloop()
 
 # Creating automatic orientation mode function
 def automatic_orientation_mode():
