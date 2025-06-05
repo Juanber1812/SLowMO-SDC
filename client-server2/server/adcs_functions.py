@@ -17,6 +17,20 @@ def motor_forward(speed):
     	pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
 def stop_motor():
 	pwm.ChangeDutyCycle(0)  # Stop motor
+def accelerate_motor(step=5, delay=0.1):############################################Look at incoporating this into code
+    while True:
+	if speed == 99:
+		break
+        speed += step
+        pwm.ChangeDutyCycle(speed)
+        time.sleep(delay)
+def accelerate_motor(step=5, delay=0.1):
+    while True:
+	if speed == 1:
+		break
+        speed -= step
+        pwm.ChangeDutyCycle(speed)
+        time.sleep(delay)
 
 # Setting up rpm sensor
 GPIO.setmode(GPIO.BCM)  #Use Broadcom pin numbering
@@ -109,7 +123,7 @@ while True:
         dt = 0.1
         orientation += velocity * dt
 	#RPM sensing
-	if GPIO.input(Motor1E) == GPIO.HIGH:
+	if GPIO.input(Motor1E) != GPIO.LOW:
 		if GPIO.input(17) == GPIO.HIGH and prev_ref == False: 
             		if initial_time is None:  
            			initial_time = time.perf_counter()
@@ -131,7 +145,7 @@ def environmental_calibration_mode():
 	light_intensity_1 = []
 	light_intensity_2 = []
 	light_intensity_3 = []
-	motor_forward(75)
+	motor_accelerate()
 	pd_controller = PDController(Kp=1600, Kd=80)
 	calibration = False
 	dt = 0.1
@@ -145,7 +159,7 @@ def environmental_calibration_mode():
         	light_intensity_3.append(light3)
         	timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
         	if len(light_intensity_1) > 2 or len(light_intensity_2) > 2 or len(light_intensity_3) > 2:
-			stop_motor()
+			stop_motor()#########################################################################Shouldn't be here
                 	if np.sign(light_intensity_1[-2]-light_intensity_1[-3]) == -np.sign(light_intensity_1[-1]-light_intensity_1[-2]):
                 		orientation = 0
                 		orientation += velocity * dt
@@ -170,11 +184,11 @@ def environmental_calibration_mode():
         	motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
 		#Adjust motor direction based on control signal sign
 		if control_signal > 0:
-			motor_forward(50+motor_speed)
+			motor_forward(50+motor_speed)##############################################Not right
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 		else:
-			motor_forward(50-motor_speed)
+			motor_forward(50-motor_speed)##############################################Not right
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 	else:
@@ -188,14 +202,14 @@ def manual_orientation_mode():
 	#Creating commands for motor
 	def startstop_cw():
         	if speed == 50:
-            		motor_forward(75)
+            		accelerate_motor()
         		elif speed =! 50:
-            		motor_forward(50)
+            		motor_forward(speed)
     	def startstop_ccw():
         	if speed == 50:
-            		motor_forward(25)
+            		deaccelerate_motor()
         	elif speed =! 50:
-            		motorforward(50)
+            		motor_forward(speed)
 
 # Creating automatic orientation mode function
 def automatic_orientation_mode():
@@ -211,11 +225,11 @@ def automatic_orientation_mode():
         		motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
 			#Adjust motor direction based on control signal sign
 			if control_signal > 0:
-				motor_forward(50+motor_speed)
+				motor_forward(50+motor_speed)#########################Not right
 				orientation += velocity * dt
         			actual_orientation = orientation  # Update actual orientation in real-time
 			else:
-				motor_forward(50-motor_speed)
+				motor_forward(50-motor_speed)########################Not right
 				orientation += velocity * dt
         			actual_orientation = orientation  # Update actual orientation in real-time
 		else:
@@ -237,11 +251,11 @@ def detumbling_mode():
         	motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
 		#Adjust motor direction based on control signal sign
 		if control_signal > 0:
-			motor_forward(50+motor_speed)
+			motor_forward(50+motor_speed)########################Not right
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 		else:
-			motor_forward(50-motor_speed)
+			motor_forward(50-motor_speed)########################## Not right
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 	else:
