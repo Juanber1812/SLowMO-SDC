@@ -147,11 +147,3 @@ class LidarWidget(QWidget):
         """Force stop the lidar stream"""
         if self.is_streaming:
             self.toggle_lidar()
-
-if __name__ == '__main__':
-    from PyQt6.QtWidgets import QApplication
-    from PyQt6.QtGui import QPainter
-    app = QApplication(sys.argv)
-    window = LidarWidget()
-    window.show()
-    sys.exit(app.exec())

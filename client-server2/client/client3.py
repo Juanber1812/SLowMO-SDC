@@ -66,6 +66,7 @@ from widgets.adcs import ADCSSection
 from widgets.detector_settings_widget import DetectorSettingsWidget
 from payload.detector4 import detector_instance
 from data_analysis import DataAnalysisTab
+from widgets.lidar_client import LidarWidget
 
 # Theme and styling
 from theme import (
@@ -540,16 +541,25 @@ class MainWindow(QWidget):
         lidar_layout = QVBoxLayout()
         lidar_layout.setSpacing(2)
         lidar_layout.setContentsMargins(5, 15, 5, 5) # Adjusted margins for title space
-        lidar_placeholder = QLabel("LIDAR Placeholder") # Placeholder text
-        lidar_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        lidar_placeholder.setStyleSheet(f"background: {self.COLOR_BOX_BG}; color: {TEXT_SECONDARY}; border: 1px dashed #555; border-radius: {BORDER_RADIUS}px; font-size: {FONT_SIZE_NORMAL}pt;")
+
+        # ── REPLACE PLACEHOLDER WITH LIDARWIDGET ──────────────────────────────
+        # Remove the placeholder:
+        # lidar_placeholder = QLabel("LIDAR Placeholder") # Placeholder text
+        # lidar_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # lidar_placeholder.setStyleSheet(f"background: {self.COLOR_BOX_BG}; color: {TEXT_SECONDARY}; border: 1px dashed #555; border-radius: {BORDER_RADIUS}px; font-size: {FONT_SIZE_NORMAL}pt;")
+        # lidar_layout.addWidget(lidar_placeholder, stretch=1) # Allow placeholder to expand
+
+        # Add the LidarWidget:
+        self.lidar_widget = LidarWidget()
+        lidar_layout.addWidget(self.lidar_widget)
+        # ─────────────────────────────────────────────────────────────────────
+
         # Adjust LIDAR group's height or the graph section's if they look misaligned.
         # To make LIDAR group take similar height as graph:
         lidar_group.setFixedHeight(self.graph_section.height()) # Match graph height
         # Or allow it to expand:
         # lidar_group.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
-        lidar_layout.addWidget(lidar_placeholder, stretch=1) # Allow placeholder to expand
         lidar_group.setLayout(lidar_layout)
         self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
         # Set a fixed width for LIDAR or let it expand. Example fixed width:

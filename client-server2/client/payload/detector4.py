@@ -85,32 +85,19 @@ class AprilTagDetector:
         if is_cropped and original_height is not None:
             current_height = frame.shape[0] # Height of the cropped image
             
-            print(f"[DEBUG] CROP ANALYSIS:")
-            print(f"[DEBUG]   Original height: {original_height}px")
-            print(f"[DEBUG]   Current height:  {current_height}px")
-            print(f"[DEBUG]   Crop factor implied: {original_height/current_height:.2f}")
-            print(f"[DEBUG]   Original cy: {self.mtx[1,2]:.2f}")
             
             # Calculate how many rows were removed from the top (center crop)
             total_removed = original_height - current_height
             crop_offset_from_top = total_removed // 2  # Half removed from top, half from bottom
             
-            print(f"[DEBUG]   Total pixels removed: {total_removed}")
-            print(f"[DEBUG]   Removed from top: {crop_offset_from_top}")
-            print(f"[DEBUG]   Removed from bottom: {total_removed - crop_offset_from_top}")
-            
+
             # Adjust principal point Y (cy) for the crop offset from top
             mtx[1, 2] -= crop_offset_from_top 
             
-            print(f"[DEBUG]   Adjusted cy: {mtx[1,2]:.2f}")
-            print(f"[DEBUG]   Cy adjustment: -{crop_offset_from_top}px")
-            
+
             # Sanity check - where should cy be proportionally?
             original_cy_ratio = self.mtx[1,2] / original_height
             expected_new_cy = original_cy_ratio * current_height
-            print(f"[DEBUG]   Expected cy (proportional): {expected_new_cy:.2f}")
-            print(f"[DEBUG]   Our calculated cy: {mtx[1,2]:.2f}")
-            print(f"[DEBUG]   Difference: {abs(expected_new_cy - mtx[1,2]):.2f}px")
         else:
             print(f"[DEBUG] NO CROP - is_cropped: {is_cropped}, original_height: {original_height}")
         
