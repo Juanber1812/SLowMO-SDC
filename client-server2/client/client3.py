@@ -565,12 +565,6 @@ class MainWindow(QWidget):
         lidar_layout.addWidget(self.lidar_widget)
         # ────────────────────────────────────────────────────────────────
 
-        self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
-        if hasattr(self.lidar_widget, 'lidar_start_requested'):
-            self.lidar_widget.lidar_start_requested.connect(self.start_lidar_streaming)
-        if hasattr(self.lidar_widget, 'lidar_stop_requested'):
-            self.lidar_widget.lidar_stop_requested.connect(self.stop_lidar_streaming)
-         
 
         # Adjust LIDAR group's height or the graph section's if they look misaligned.
         # To make LIDAR group take similar height as graph:
