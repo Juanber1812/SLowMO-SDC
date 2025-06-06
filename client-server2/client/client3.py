@@ -554,17 +554,17 @@ class MainWindow(QWidget):
         # lidar_placeholder.setStyleSheet(f"background: {self.COLOR_BOX_BG}; color: {TEXT_SECONDARY}; border: 1px dashed #555; border-radius: {BORDER_RADIUS}px; font-size: {FONT_SIZE_NORMAL}pt;")
         # lidar_layout.addWidget(lidar_placeholder, stretch=1) # Allow placeholder to expand
 
-        # Add the LidarWidget and connect signals:
+        # Add the LidarWidget:
         self.lidar_widget = LidarWidget()
-        
-        # Connect LIDAR control signals to server communication
-        self.lidar_widget.lidar_start_requested.connect(self.start_lidar_streaming)
-        self.lidar_widget.lidar_stop_requested.connect(self.stop_lidar_streaming)
-        self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
-            
         lidar_layout.addWidget(self.lidar_widget)
         # ────────────────────────────────────────────────────────────────
 
+        self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
+        if hasattr(self.lidar_widget, 'lidar_start_requested'):
+            self.lidar_widget.lidar_start_requested.connect(self.start_lidar_streaming)
+        if hasattr(self.lidar_widget, 'lidar_stop_requested'):
+            self.lidar_widget.lidar_stop_requested.connect(self.stop_lidar_streaming)
+         
 
         # Adjust LIDAR group's height or the graph section's if they look misaligned.
         # To make LIDAR group take similar height as graph:
@@ -994,7 +994,6 @@ class MainWindow(QWidget):
         if sio.connected:
             print("[INFO] Requesting LIDAR streaming start")
             sio.emit("start_lidar")
-            print("[DEBUG] start_lidar event emitted to server")
         else:
             print("[WARNING] Cannot start LIDAR - not connected to server")
 
@@ -1003,22 +1002,8 @@ class MainWindow(QWidget):
         if sio.connected:
             print("[INFO] Requesting LIDAR streaming stop")
             sio.emit("stop_lidar")
-            print("[DEBUG] stop_lidar event emitted to server")
         else:
             print("[WARNING] Cannot stop LIDAR - not connected to server")
-
-    def handle_lidar_back_button(self):
-        """Handles the back button click from the LidarWidget."""
-        try:
-            # Stop LIDAR streaming on server
-            if self.lidar_widget.is_streaming:
-                self.stop_lidar_streaming()
-            
-            # Stop local widget
-            self.lidar_widget.stop_lidar()
-            print("Back button clicked in LidarWidget - streaming stopped")
-        except Exception as e:
-            print(f"[ERROR] Failed to handle LIDAR back button: {e}")
 
     def delayed_server_setup(self):
         """Called shortly after connect—override if needed."""

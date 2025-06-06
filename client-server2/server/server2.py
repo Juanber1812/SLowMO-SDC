@@ -43,76 +43,24 @@ def handle_frame(data):
 
 @socketio.on('start_camera')
 def handle_start_camera():
-    """Handle camera start request from client"""
     global camera_state
     try:
-        print("[INFO] Camera start requested from client")
-        
-        # Start the camera streaming thread if not already running
-        if hasattr(camera, 'start_camera_streaming'):
-            camera.start_camera_streaming()
-        elif hasattr(camera.streamer, 'start_streaming'):
-            camera.streamer.start_streaming()
-        else:
-            # Fallback - use existing start method
-            camera.start_stream()
-        
+        emit('start_camera', {}, broadcast=True)
         camera_state = "Streaming"
-        
-        # Send status update to all clients
-        emit('camera_status', {
-            'status': camera_state,
-            'streaming': True,
-            'message': 'Camera streaming started'
-        }, broadcast=True)
-        
-        print("[INFO] ✓ Camera streaming started")
-        
+        socketio.emit('camera_status', {'status': camera_state})
     except Exception as e:
-        print(f"[ERROR] start_camera handler: {e}")
-        camera_state = "Error"
-        emit('camera_status', {
-            'status': camera_state,
-            'streaming': False,
-            'error': str(e)
-        }, broadcast=True)
+        print(f"[ERROR] start_camera: {e}")
+
 
 @socketio.on('stop_camera')
 def handle_stop_camera():
-    """Handle camera stop request from client"""
     global camera_state
     try:
-        print("[INFO] Camera stop requested from client")
-        
-        # Stop the camera streaming thread
-        if hasattr(camera, 'stop_camera_streaming'):
-            camera.stop_camera_streaming()
-        elif hasattr(camera.streamer, 'stop_streaming'):
-            camera.streamer.stop_streaming()
-        else:
-            # Fallback - set streaming flag to False
-            if hasattr(camera.streamer, 'streaming'):
-                camera.streamer.streaming = False
-        
+        emit('stop_camera', {}, broadcast=True)
         camera_state = "Idle"
-        
-        # Send status update to all clients
-        emit('camera_status', {
-            'status': camera_state,
-            'streaming': False,
-            'message': 'Camera streaming stopped'
-        }, broadcast=True)
-        
-        print("[INFO] ✓ Camera streaming stopped")
-        
+        socketio.emit('camera_status', {'status': camera_state})
     except Exception as e:
-        print(f"[ERROR] stop_camera handler: {e}")
-        camera_state = "Error"
-        emit('camera_status', {
-            'status': camera_state,
-            'streaming': False,
-            'error': str(e)
-        }, broadcast=True)
+        print(f"[ERROR] stop_camera: {e}")
 
 
 @socketio.on('camera_config')
@@ -142,27 +90,8 @@ def handle_camera_status(data):
 
 @socketio.on('get_camera_status')
 def handle_get_camera_status():
-    """Get current camera status"""
-    try:
-        # Check if camera is currently streaming
-        is_streaming = False
-        if hasattr(camera.streamer, 'streaming'):
-            is_streaming = camera.streamer.streaming
-        elif camera_state == "Streaming":
-            is_streaming = True
-        
-        emit('camera_status', {
-            'status': camera_state,
-            'streaming': is_streaming
-        })
-        
-    except Exception as e:
-        print(f"[ERROR] get_camera_status: {e}")
-        emit('camera_status', {
-            'status': 'error',
-            'streaming': False,
-            'error': str(e)
-        })
+    # Send the current camera state to the requesting client
+    emit('camera_status', {'status': camera_state})
 
 
 @socketio.on("camera_info")
@@ -213,91 +142,12 @@ def handle_capture_image(data):
             "error": f"Server error: {str(e)}"
         }, broadcast=True)
 
-@socketio.on('start_lidar')
-def handle_start_lidar():
-    """Handle LIDAR start request from client"""
-    try:
-        print("[INFO] LIDAR start requested from client")
-        
-        # Call the LIDAR module's start function
-        # Since lidar.py is a separate process, we need to emit the signal to it
-        sio_to_lidar = socketio.Client()
-        try:
-            sio_to_lidar.connect("http://localhost:5000")
-            sio_to_lidar.emit("start_lidar")
-            sio_to_lidar.disconnect()
-        except:
-            # If direct connection fails, try calling the function if available
-            if hasattr(lidar, 'handle_start_lidar'):
-                lidar.handle_start_lidar()
-        
-        # Send status update to all clients
-        emit("lidar_status", {
-            "status": "started", 
-            "streaming": True,
-            "message": "LIDAR streaming started"
-        }, broadcast=True)
-        
-        print("[INFO] ✓ LIDAR streaming started")
-        
-    except Exception as e:
-        print(f"[ERROR] start_lidar handler: {e}")
-        emit("lidar_status", {
-            "status": "error",
-            "streaming": False, 
-            "error": str(e)
-        }, broadcast=True)
-
-@socketio.on('stop_lidar')
-def handle_stop_lidar():
-    """Handle LIDAR stop request from client"""
-    try:
-        print("[INFO] LIDAR stop requested from client")
-        
-        # Call the LIDAR module's stop function
-        # Since lidar.py is a separate process, we need to emit the signal to it
-        sio_to_lidar = socketio.Client()
-        try:
-            sio_to_lidar.connect("http://localhost:5000")
-            sio_to_lidar.emit("stop_lidar")
-            sio_to_lidar.disconnect()
-        except:
-            # If direct connection fails, try calling the function if available
-            if hasattr(lidar, 'handle_stop_lidar'):
-                lidar.handle_stop_lidar()
-        
-        # Send status update to all clients
-        emit("lidar_status", {
-            "status": "stopped",
-            "streaming": False,
-            "message": "LIDAR streaming stopped"
-        }, broadcast=True)
-        
-        print("[INFO] ✓ LIDAR streaming stopped")
-        
-    except Exception as e:
-        print(f"[ERROR] stop_lidar handler: {e}")
-        emit("lidar_status", {
-            "status": "error",
-            "streaming": False,
-            "error": str(e)
-        }, broadcast=True)
-
 @socketio.on("lidar_data")
 def handle_lidar_data(data):
-    """Relay LIDAR data from lidar.py to all clients"""
     try:
         emit("lidar_broadcast", data, broadcast=True)
     except Exception as e:
-        print(f"[ERROR] lidar_data relay: {e}")
-
-@socketio.on("lidar_status")
-def handle_lidar_status_relay(data):
-    """Relay LIDAR status from lidar.py to all clients"""
-    try:
-        emit("lidar_status", data, broadcast=True)
-    except Exception as e:
-        print(f"[ERROR] lidar_status relay: {e}")
+        print(f"[ERROR] lidar_data: {e}")
 
 
 @socketio.on('download_image')
