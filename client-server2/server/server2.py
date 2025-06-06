@@ -150,6 +150,88 @@ def handle_lidar_data(data):
         print(f"[ERROR] lidar_data: {e}")
 
 
+@socketio.on('start_lidar')
+def handle_start_lidar():
+    """Handle LIDAR start request from client"""
+    try:
+        print("[INFO] LIDAR start requested from client")
+        # Start the LIDAR thread if not already running
+        if hasattr(lidar, 'start_lidar_streaming'):
+            lidar.start_lidar_streaming()
+        else:
+            # Fallback if different function name
+            lidar.start_lidar()
+        
+        # Send status update to all clients
+        emit("lidar_status", {
+            "status": "started", 
+            "streaming": True,
+            "message": "LIDAR streaming started"
+        }, broadcast=True)
+        
+        print("[INFO] ✓ LIDAR streaming started")
+        
+    except Exception as e:
+        print(f"[ERROR] start_lidar handler: {e}")
+        emit("lidar_status", {
+            "status": "error",
+            "streaming": False, 
+            "error": str(e)
+        }, broadcast=True)
+
+@socketio.on('stop_lidar')
+def handle_stop_lidar():
+    """Handle LIDAR stop request from client"""
+    try:
+        print("[INFO] LIDAR stop requested from client")
+        # Stop the LIDAR thread
+        if hasattr(lidar, 'stop_lidar_streaming'):
+            lidar.stop_lidar_streaming()
+        else:
+            # Fallback if different function name
+            lidar.stop_lidar()
+        
+        # Send status update to all clients
+        emit("lidar_status", {
+            "status": "stopped",
+            "streaming": False,
+            "message": "LIDAR streaming stopped"
+        }, broadcast=True)
+        
+        print("[INFO] ✓ LIDAR streaming stopped")
+        
+    except Exception as e:
+        print(f"[ERROR] stop_lidar handler: {e}")
+        emit("lidar_status", {
+            "status": "error",
+            "streaming": False,
+            "error": str(e)
+        }, broadcast=True)
+
+@socketio.on('get_lidar_status')
+def handle_get_lidar_status():
+    """Get current LIDAR status"""
+    try:
+        # Check if LIDAR is currently streaming
+        is_streaming = False
+        if hasattr(lidar, 'is_streaming'):
+            is_streaming = lidar.is_streaming
+        elif hasattr(lidar, 'streaming'):
+            is_streaming = lidar.streaming
+        
+        emit("lidar_status", {
+            "status": "streaming" if is_streaming else "idle",
+            "streaming": is_streaming
+        })
+        
+    except Exception as e:
+        print(f"[ERROR] get_lidar_status: {e}")
+        emit("lidar_status", {
+            "status": "error",
+            "streaming": False,
+            "error": str(e)
+        })
+
 @socketio.on('download_image')
 def handle_download_image(data):
     """Send captured image to client for local storage"""

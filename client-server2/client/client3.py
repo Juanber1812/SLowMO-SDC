@@ -423,9 +423,6 @@ class MainWindow(QWidget):
 
         main_layout.addWidget(self.tab_widget)
 
-        self.lidar_widget = LidarWidget()
-        self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
-        
     def handle_lidar_back_button(self):
         """Handles the back button click from the LidarWidget."""
         self.lidar_widget.stop_lidar()
@@ -557,10 +554,23 @@ class MainWindow(QWidget):
         # lidar_placeholder.setStyleSheet(f"background: {self.COLOR_BOX_BG}; color: {TEXT_SECONDARY}; border: 1px dashed #555; border-radius: {BORDER_RADIUS}px; font-size: {FONT_SIZE_NORMAL}pt;")
         # lidar_layout.addWidget(lidar_placeholder, stretch=1) # Allow placeholder to expand
 
-        # Add the LidarWidget:
+        # Add the LidarWidget and connect signals:
         self.lidar_widget = LidarWidget()
+        
+        # Connect LIDAR control signals to server communication
+        self.lidar_widget.lidar_start_requested.connect(self.start_lidar_streaming)
+        self.lidar_widget.lidar_stop_requested.connect(self.stop_lidar_streaming)
+        self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
+            
         lidar_layout.addWidget(self.lidar_widget)
-        # ─────────────────────────────────────────────────────────────────────
+        # ────────────────────────────────────────────────────────────────
+
+        self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
+        if hasattr(self.lidar_widget, 'lidar_start_requested'):
+            self.lidar_widget.lidar_start_requested.connect(self.start_lidar_streaming)
+        if hasattr(self.lidar_widget, 'lidar_stop_requested'):
+            self.lidar_widget.lidar_stop_requested.connect(self.stop_lidar_streaming)
+         
 
         # Adjust LIDAR group's height or the graph section's if they look misaligned.
         # To make LIDAR group take similar height as graph:
@@ -575,31 +585,9 @@ class MainWindow(QWidget):
 
         row2.addWidget(lidar_group)
         
-        # ── DO NOT PRESS Button ──
-        self.danger_btn = QPushButton("DO NOT PRESS")
-        self.danger_btn.setObjectName("danger_btn")     # give it a unique ID
-
-
-        # fill its cell
-        self.danger_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.danger_btn.clicked.connect(self.show_full_image)
-        row2.addWidget(self.danger_btn)
         
         parent_layout.addLayout(row2)
 
-        self.danger_btn.setStyleSheet("""
-QPushButton#danger_btn {
-    background-color: #555555;
-    color: white;
-    font-size: 50pt;
-    padding: 40px;
-    border: 4px solid #222;
-}
-QPushButton#danger_btn:hover {
-    background-color: #ff3333;
-    color: black;
-}
-""")
         
     def draw_crosshairs(self, frame):
         """Draw crosshairs at the center of the frame"""
@@ -974,14 +962,69 @@ QPushButton#danger_btn:hover {
         def on_image_download(data):
             self.handle_image_download(data)
 
-        @sio.on("lidar_data")
-        def on_lidar_data(self, data):
+        @sio.on("lidar_broadcast")
+        def on_lidar_broadcast(data):
             """Handles incoming LIDAR data from the server."""
-            distance = data.get('distance_cm')  # Extract distance from the data
-            print(f"[DEBUG] Received LIDAR data: {distance}")  # Add this line
-            if distance is not None:
-                self.lidar_widget.set_distances([distance])  # Update the LidarWidget
+            try:
+                distance = data.get('distance_cm')
+                if distance is not None:
+                    print(f"[DEBUG] Received LIDAR data: {distance} cm")
+                    # Send data to LIDAR widget
+                    self.lidar_widget.set_distances([distance])
+                else:
+                    print("[WARNING] Received LIDAR data without distance_cm field")
+            except Exception as e:
+                print(f"[ERROR] Failed to process LIDAR data: {e}")
 
+        @sio.on("lidar_status")
+        def on_lidar_status(data):
+            """Handle LIDAR status updates from server"""
+            try:
+                status = data.get('status', 'unknown')
+                streaming = data.get('streaming', False)
+                print(f"[INFO] LIDAR Status: {status}, Streaming: {streaming}")
+                
+                # Update LIDAR widget streaming state if needed
+                if hasattr(self.lidar_widget, 'is_streaming'):
+                    if streaming != self.lidar_widget.is_streaming:
+                        # Sync widget state with server state
+                        self.lidar_widget.is_streaming = streaming
+                        self.lidar_widget.start_stop_button.setText(
+                            "Stop LIDAR" if streaming else "Start LIDAR"
+                        )
+            except Exception as e:
+                print(f"[ERROR] Failed to process LIDAR status: {e}")
+
+    def start_lidar_streaming(self):
+        """Start LIDAR data streaming from server"""
+        if sio.connected:
+            print("[INFO] Requesting LIDAR streaming start")
+            sio.emit("start_lidar")
+            print("[DEBUG] start_lidar event emitted to server")
+        else:
+            print("[WARNING] Cannot start LIDAR - not connected to server")
+
+    def stop_lidar_streaming(self):
+        """Stop LIDAR data streaming from server"""
+        if sio.connected:
+            print("[INFO] Requesting LIDAR streaming stop")
+            sio.emit("stop_lidar")
+            print("[DEBUG] stop_lidar event emitted to server")
+        else:
+            print("[WARNING] Cannot stop LIDAR - not connected to server")
+
+    def handle_lidar_back_button(self):
+        """Handles the back button click from the LidarWidget."""
+        try:
+            # Stop LIDAR streaming on server
+            if self.lidar_widget.is_streaming:
+                self.stop_lidar_streaming()
+            
+            # Stop local widget
+            self.lidar_widget.stop_lidar()
+            print("Back button clicked in LidarWidget - streaming stopped")
+        except Exception as e:
+            print(f"[ERROR] Failed to handle LIDAR back button: {e}")
 
     def delayed_server_setup(self):
         """Called shortly after connect—override if needed."""
@@ -1114,7 +1157,6 @@ QPushButton#danger_btn:hover {
         
         # Store the applied configuration for detector use
         self.active_config_for_detector = config.copy()
-        print(f"[DEBUG] Stored applied config: cropped={config.get('cropped')}, crop_factor={config.get('crop_factor')}")
         
         # Update detector calibration
         self.update_detector_calibration(config)
@@ -1144,7 +1186,6 @@ QPushButton#danger_btn:hover {
             calibration_path = config.get('calibration_file', 'calibrations/calibration_default.npz')
             preset_type = config.get('preset_type', 'standard')
             
-            print(f"[DEBUG] Updating detector calibration to: {calibration_path}")
             
             if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
                 success = detector4.detector_instance.update_calibration(calibration_path)
@@ -1153,7 +1194,6 @@ QPushButton#danger_btn:hover {
                     # Verify the calibration was actually loaded
                     if hasattr(detector4.detector_instance, 'mtx'):
                         cy = detector4.detector_instance.mtx[1, 2] if detector4.detector_instance.mtx is not None else "None"
-                        print(f"[DEBUG] New calibration cy: {cy}")
                 else:
                     print(f"[WARNING] ❌ Failed to update detector calibration")
             else:
@@ -1282,13 +1322,10 @@ QPushButton#danger_btn:hover {
                 # Use the server-acknowledged config (applied settings) instead of live UI
                 if self.active_config_for_detector is None:
                     config = self.camera_settings.get_config() # Fallback only
-                    print("[DEBUG] Using fallback config (no applied config yet)")
                 else:
                     config = self.active_config_for_detector # Use last applied config
-                    print("[DEBUG] Using applied config from last Apply Config press")
                 
                 is_cropped = config.get('cropped', False)
-                print(f"[DEBUG] Applied config: cropped={is_cropped}, crop_factor={config.get('crop_factor')}")
                 
                 original_height = None
                 if is_cropped:
@@ -1297,7 +1334,6 @@ QPushButton#danger_btn:hover {
                     
                     if crop_factor is not None and crop_factor > 1.0:
                         original_height = int(current_height * crop_factor)
-                        print(f"[DEBUG] Using applied crop factor {crop_factor}: {current_height}px -> {original_height}px original")
                     else:
                         print(f"[WARNING] Invalid crop_factor: {crop_factor}")
                         original_height = current_height 

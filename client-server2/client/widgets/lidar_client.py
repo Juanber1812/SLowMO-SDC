@@ -2,6 +2,7 @@ import sys
 import time
 import numpy as np
 import logging
+import pyqtgraph as pg
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSizePolicy,
@@ -9,7 +10,6 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import pyqtSignal, QTimer, Qt, QMutex, QMutexLocker, QMargins
 from PyQt6.QtGui import QFont, QColor, QPainter
-from PyQt6.QtCharts import QChartView, QChart, QLineSeries, QValueAxis
 
 # Import theme elements
 from theme import (
@@ -26,58 +26,64 @@ from theme import (
 class LidarWidget(QWidget):
     lidar_data_received = pyqtSignal(list)
     back_button_clicked = pyqtSignal()
+    lidar_start_requested = pyqtSignal()  # Signal to start LIDAR
+    lidar_stop_requested = pyqtSignal()   # Signal to stop LIDAR
 
     def __init__(self):
         super().__init__()
 
         self.is_streaming = False
         self.distances = []
-        self.distance_history = []  # Keep history of readings
-        self.max_history = 50  # Keep last 50 readings
+        self.distance_history = []
+        self.max_history = 50
         self.data_mutex = QMutex()
 
+        # Initialize plot first, then UI
+        self.init_plot()
         self.init_ui()
-        self.init_chart()
         
         # Connect the signal to update method
         self.lidar_data_received.connect(self.update_distances_slot)
 
-    def init_chart(self):
-        self.chart = QChart()
-        self.chart.setBackgroundBrush(QColor(PLOT_BACKGROUND))
-        self.chart.setTitleBrush(QColor(TEXT_COLOR))
-        # Remove title to save space
-        # self.chart.setTitle("LIDAR Distance Measurements")
-        self.chart.legend().setVisible(False)
+    def init_plot(self):
+        """Initialize PyQtGraph plot widget"""
+        # Set global PyQtGraph options
+        pg.setConfigOptions(antialias=True)
         
-        # Reduce margins to maximize plot area
-        self.chart.setMargins(QMargins(5, 5, 5, 5))
-
-        # Series
-        self.series = QLineSeries()
-        self.series.setColor(QColor(PLOT_LINE_PRIMARY))
-        self.chart.addSeries(self.series)
-
-        # X Axis
-        self.x_axis = QValueAxis()
-        self.x_axis.setLabelFormat("%i")
-        self.x_axis.setTitleText("Time Index")
-        self.x_axis.setTitleBrush(QColor(TEXT_COLOR))
-        self.x_axis.setLabelsColor(QColor(TICK_COLOR))
-        self.x_axis.setGridLineColor(QColor(GRID_COLOR))
-        self.chart.addAxis(self.x_axis, Qt.AlignmentFlag.AlignBottom)
-        self.series.attachAxis(self.x_axis)
-
-        # Y Axis
-        self.y_axis = QValueAxis()
-        self.y_axis.setTitleText("Distance (cm)")
-        self.y_axis.setTitleBrush(QColor(TEXT_COLOR))
-        self.y_axis.setLabelsColor(QColor(TICK_COLOR))
-        self.y_axis.setGridLineColor(QColor(GRID_COLOR))
-        self.chart.addAxis(self.y_axis, Qt.AlignmentFlag.AlignLeft)
-        self.series.attachAxis(self.y_axis)
-
-        self.chart_view.setChart(self.chart)
+        # Create plot widget
+        self.plot_widget = pg.PlotWidget()
+        self.plot_widget.setBackground(PLOT_BACKGROUND)
+        
+        # Configure plot
+        self.plot_widget.setLabel('left', 'Distance (cm)', color=TEXT_COLOR, size='12pt')
+        self.plot_widget.setLabel('bottom', 'Time Index', color=TEXT_COLOR, size='12pt')
+        self.plot_widget.showGrid(x=True, y=True, alpha=0.3)
+        
+        # Style the plot
+        self.plot_widget.getAxis('left').setPen(color=TICK_COLOR, width=1)
+        self.plot_widget.getAxis('bottom').setPen(color=TICK_COLOR, width=1)
+        self.plot_widget.getAxis('left').setTextPen(color=TICK_COLOR)
+        self.plot_widget.getAxis('bottom').setTextPen(color=TICK_COLOR)
+        
+        # Set grid color
+        self.plot_widget.getAxis('left').setGrid(128)  # Grid opacity
+        self.plot_widget.getAxis('bottom').setGrid(128)
+        
+        # Create plot curve
+        self.plot_curve = self.plot_widget.plot(
+            pen=pg.mkPen(color=PLOT_LINE_PRIMARY, width=2),
+            symbol='o',
+            symbolSize=4,
+            symbolBrush=PLOT_LINE_PRIMARY,
+            name='Distance'
+        )
+        
+        # Set initial ranges
+        self.plot_widget.setXRange(0, 10, padding=0)
+        self.plot_widget.setYRange(0, 100, padding=0.1)
+        
+        # Enable auto-ranging
+        self.plot_widget.enableAutoRange('xy', True)
 
     def init_ui(self):
         # Main layout
@@ -131,17 +137,15 @@ class LidarWidget(QWidget):
         chart_controls_layout = QHBoxLayout()
         chart_controls_layout.setSpacing(5)
 
-        # Chart area (left side - takes most space)
-        self.chart_view = QChartView()
-        self.chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        self.chart_view.setStyleSheet(f"""
-            QChartView {{
+        # Plot area (left side - takes most space)
+        self.plot_widget.setStyleSheet(f"""
+            QWidget {{
                 border: 1px solid {BORDER_COLOR};
                 border-radius: {BORDER_RADIUS}px;
                 background-color: {PLOT_BACKGROUND};
             }}
         """)
-        chart_controls_layout.addWidget(self.chart_view, stretch=3)  # Takes 3/4 of space
+        chart_controls_layout.addWidget(self.plot_widget, stretch=3)  # Takes 3/4 of space
 
         # Control buttons panel (right side)
         controls_panel = QWidget()
@@ -156,43 +160,7 @@ class LidarWidget(QWidget):
             }}
         """)
         
-        # Start/Stop button
-        self.start_stop_button = QPushButton("Start LIDAR")
-        self.start_stop_button.clicked.connect(self.toggle_lidar_streaming)
-        self.start_stop_button.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {BUTTON_COLOR};
-                color: {BUTTON_TEXT};
-                border: 1px solid {BORDER_COLOR};
-                border-radius: {BORDER_RADIUS}px;
-                padding: 8px 12px;
-                font-family: {FONT_FAMILY};
-                font-size: {FONT_SIZE_NORMAL}px;
-                min-height: 30px;
-            }}
-            QPushButton:hover {{
-                background-color: {BUTTON_HOVER};
-            }}
-        """)
         
-        # Clear button
-        self.clear_button = QPushButton("Clear History")
-        self.clear_button.clicked.connect(self.clear_history)
-        self.clear_button.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {WARNING_COLOR};
-                color: white;
-                border: 1px solid {BORDER_COLOR};
-                border-radius: {BORDER_RADIUS}px;
-                padding: 8px 12px;
-                font-family: {FONT_FAMILY};
-                font-size: {FONT_SIZE_NORMAL}px;
-                min-height: 30px;
-            }}
-            QPushButton:hover {{
-                background-color: #e68a00;
-            }}
-        """)
         
         # Back button
         self.back_button = QPushButton("Back")
@@ -214,13 +182,11 @@ class LidarWidget(QWidget):
         """)
 
         # Add buttons to controls layout with spacing
-        controls_layout.addWidget(self.start_stop_button)
-        controls_layout.addWidget(self.clear_button)
         controls_layout.addStretch()  # Push back button to bottom
         controls_layout.addWidget(self.back_button)
         
         # Set fixed width for controls panel
-        controls_panel.setFixedWidth(120)
+        controls_panel.setFixedWidth(300)
         
         chart_controls_layout.addWidget(controls_panel)  # Takes 1/4 of space
 
@@ -276,44 +242,38 @@ class LidarWidget(QWidget):
         print(f"[DEBUG] toggle_lidar_streaming: is_streaming = {streaming_state}")
         
         if streaming_state:
-            self.start_stop_button.setText("Stop LIDAR")
-            self.start_stop_button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {ERROR_COLOR};
-                    color: white;
-                    border: 1px solid {BORDER_COLOR};
-                    border-radius: {BORDER_RADIUS}px;
-                    padding: 8px 16px;
-                    font-family: {FONT_FAMILY};
-                    font-size: {FONT_SIZE_NORMAL}px;
-                }}
-                QPushButton:hover {{
-                    background-color: #cc0000;
-                }}
-            """)
+            # Emit signal to request server start streaming
+            self.lidar_start_requested.emit()
             print("[DEBUG] LIDAR streaming started")
         else:
-            self.start_stop_button.setText("Start LIDAR")
-            self.start_stop_button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {BUTTON_COLOR};
-                    color: {BUTTON_TEXT};
-                    border: 1px solid {BORDER_COLOR};
-                    border-radius: {BORDER_RADIUS}px;
-                    padding: 8px 16px;
-                    font-family: {FONT_FAMILY};
-                    font-size: {FONT_SIZE_NORMAL}px;
-                }}
-                QPushButton:hover {{
-                    background-color: {BUTTON_HOVER};
-                }}
-            """)
+            # Emit signal to request server stop streaming
+            self.lidar_stop_requested.emit()
             print("[DEBUG] LIDAR streaming stopped")
 
-    # Keep the existing methods but update toggle_lidar to use new method
+    def show_lidar_interface(self):
+        """Switch to the LIDAR interface and start streaming"""
+        print("[DEBUG] Switching to LIDAR interface")
+        self.stacked_widget.setCurrentWidget(self.lidar_page)
+        # Auto-start streaming when interface is shown
+        if not self.is_streaming:
+            self.toggle_lidar_streaming()
+
+    def show_button_interface(self):
+        """Switch back to the button interface and stop streaming"""
+        print("[DEBUG] Switching to button interface")
+        if self.is_streaming:
+            self.toggle_lidar_streaming()  # Stop streaming
+        self.stacked_widget.setCurrentWidget(self.button_page)
+
+    # Keep the existing methods
     def toggle_lidar(self):
         """Legacy method - redirect to new method"""
         self.toggle_lidar_streaming()
+
+    def set_distances(self, distances):
+        print(f"[DEBUG] Setting distances via signal: {distances}")
+        # Emit signal instead of directly setting
+        self.lidar_data_received.emit(distances.copy() if distances else [])
 
     def set_distances(self, distances):
         print(f"[DEBUG] Setting distances via signal: {distances}")
@@ -353,19 +313,15 @@ class LidarWidget(QWidget):
             
         print(f"[DEBUG] update_plot called - streaming: {self.is_streaming}, distances count: {len(current_distances)}")
         
-        # Remove the streaming check for now to force plotting
-        # if not self.is_streaming:
-        #     print("[DEBUG] Not streaming, skipping plot update")
-        #     return
-
-        self.series.clear()
-
         if current_distances:
             print(f"[DEBUG] Plotting {len(current_distances)} distances: {current_distances}")
             
-            # Add all points to the series
-            for i, distance in enumerate(current_distances):
-                self.series.append(i, distance)
+            # Create x and y data arrays
+            x_data = np.arange(len(current_distances))
+            y_data = np.array(current_distances)
+            
+            # Update the plot curve with new data
+            self.plot_curve.setData(x_data, y_data)
             
             # Update text display with latest readings and statistics
             latest_reading = current_distances[-1]
@@ -377,31 +333,15 @@ class LidarWidget(QWidget):
                 f"Streaming: {self.is_streaming}"
             )
 
-            # Adjust axis ranges
-            if len(current_distances) > 1:
-                max_distance = max(current_distances)
-                min_distance = min(current_distances)
-                padding = (max_distance - min_distance) * 0.1 if max_distance != min_distance else 5
-            else:
-                max_distance = current_distances[0] + 10
-                min_distance = current_distances[0] - 10
-                padding = 5
+            # Auto-range the plot to fit the data
+            self.plot_widget.autoRange()
             
-            self.x_axis.setRange(0, max(len(current_distances) - 1, 1))
-            self.y_axis.setRange(min_distance - padding, max_distance + padding)
-            
-            print(f"[DEBUG] Chart updated - X: 0 to {len(current_distances)-1}, Y: {min_distance-padding} to {max_distance+padding}")
-            
-            # Force chart refresh
-            self.chart.update()
-            self.chart_view.repaint()
-            self.chart_view.update()
+            print(f"[DEBUG] PyQtGraph plot updated with {len(current_distances)} points")
             
         else:
             print("[DEBUG] No distances to plot")
             self.distance_display.setText("No data available")
-            self.x_axis.setRange(0, 10)
-            self.y_axis.setRange(0, 100)
+            self.plot_curve.clear()
 
     def stop_lidar(self):
         """Force stop the lidar stream"""
@@ -413,6 +353,7 @@ class LidarWidget(QWidget):
         print("[DEBUG] Clearing LIDAR history")
         self.distance_history.clear()
         self.distances.clear()
+        self.plot_curve.clear()  # Clear the plot curve
         self.distance_display.setText("History cleared - waiting for new data")
         if self.is_streaming:
             print("[DEBUG] Calling update_plot after clearing history")
