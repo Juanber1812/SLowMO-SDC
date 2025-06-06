@@ -423,6 +423,14 @@ class MainWindow(QWidget):
 
         main_layout.addWidget(self.tab_widget)
 
+        self.lidar_widget = LidarWidget()
+        self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
+        
+    def handle_lidar_back_button(self):
+        """Handles the back button click from the LidarWidget."""
+        self.lidar_widget.stop_lidar()
+        print("Back button clicked in LidarWidget")
+
     def setup_main_tab(self):
         """Setup the main mission control interface"""
         tab_layout = QHBoxLayout(self.main_tab)
@@ -957,6 +965,7 @@ QPushButton#danger_btn:hover {
         def on_camera_status(data):
             self.update_camera_status(data)
 
+
         @sio.on("image_captured")
         def on_image_captured(data):
             self.handle_image_capture_response(data)
@@ -964,6 +973,15 @@ QPushButton#danger_btn:hover {
         @sio.on("image_download")
         def on_image_download(data):
             self.handle_image_download(data)
+
+        @sio.on("lidar_data")
+        def on_lidar_data(self, data):
+            """Handles incoming LIDAR data from the server."""
+            distance = data.get('distance_cm')  # Extract distance from the data
+            print(f"[DEBUG] Received LIDAR data: {distance}")  # Add this line
+            if distance is not None:
+                self.lidar_widget.set_distances([distance])  # Update the LidarWidget
+
 
     def delayed_server_setup(self):
         """Called shortly after connect—override if needed."""

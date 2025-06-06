@@ -55,11 +55,7 @@ class AprilTagDetector:
             calibration = np.load(abs_calibration_file)
             self.mtx = calibration['mtx']
             self.dist = calibration['dist']
-            # --- ADD THIS DEBUG PRINT ---
-            print(f"[INFO] DETECTOR LOADED CALIBRATION: {abs_calibration_file}")
-            print(f"[INFO] DETECTOR MTX (first row): {self.mtx[0]}")
-            print(f"[INFO] DETECTOR MTX (cx, cy): ({self.mtx[0,2]:.2f}, {self.mtx[1,2]:.2f})")
-            # --- END DEBUG PRINT ---
+
             return True
             
         except Exception as e:
@@ -98,8 +94,7 @@ class AprilTagDetector:
             # Sanity check - where should cy be proportionally?
             original_cy_ratio = self.mtx[1,2] / original_height
             expected_new_cy = original_cy_ratio * current_height
-        else:
-            print(f"[DEBUG] NO CROP - is_cropped: {is_cropped}, original_height: {original_height}")
+
         
         frame = cv2.undistort(frame, mtx, self.dist)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -191,7 +186,6 @@ class AprilTagDetector:
     def update_tag_size(self, new_size):
         """Update the AprilTag size."""
         self.tag_size = new_size
-        print(f"[INFO] AprilTag size updated to {new_size:.4f} meters")
 
 
 # Create global detector instance
