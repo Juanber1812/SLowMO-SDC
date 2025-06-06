@@ -1,16 +1,5 @@
-## As it stands, this code can be run directly on the pi with a monitor, and the adcs can be controlled with inputs to the pi. This needs to be changed so that inputs to another laptop call functions to be ran on the pi.
-
-
 # Required libraries
-import time
-import RPi.GPIO as GPIO
-import board
-import busio
-import adafruit_tca9548a  # Multiplexer library
-import adafruit_veml7700
-import smbus
-from tkinter import *
-import tkinter.messagebox as box
+import time, RPi.GPIO as GPIO, board, busio, adafruit_tca9548a, adafruit_veml7700, smbus 
 
 # Setting up motor
 GPIO.setmode(GPIO.BOARD)
@@ -21,17 +10,27 @@ GPIO.setup(Motor1A,GPIO.OUT)
 GPIO.setup(Motor1B,GPIO.OUT)
 GPIO.setup(Motor1E,GPIO.OUT)
 pwm = GPIO.PWM(Motor1E, 100)  # Set PWM frequency to 100Hz
-pwm.start(100)  # Start PWM with 0% duty cycle
+pwm.start(50)  # Start PWM with 50% duty cycle
 def motor_forward(speed):
-    GPIO.output(Motor1A, GPIO.HIGH)
-    GPIO.output(Motor1B, GPIO.LOW)
-    pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
-def motor_backward(speed):
-    GPIO.output(Motor1A, GPIO.LOW)
-    GPIO.output(Motor1B, GPIO.HIGH)
-    pwm.ChangeDutyCycle(speed)
+	GPIO.output(Motor1A, GPIO.HIGH)
+	GPIO.output(Motor1B, GPIO.LOW)
+    	pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
 def stop_motor():
-    pwm.ChangeDutyCycle(0)  # Stop motor
+	pwm.ChangeDutyCycle(0)  # Stop motor
+def accelerate_motor(step=5, delay=0.1):############################################Look at incoporating this into code
+    while True:
+	if speed == 99:
+		break
+        speed += step
+        pwm.ChangeDutyCycle(speed)
+        time.sleep(delay)
+def accelerate_motor(step=5, delay=0.1):
+    while True:
+	if speed == 1:
+		break
+        speed -= step
+        pwm.ChangeDutyCycle(speed)
+        time.sleep(delay)
 
 # Setting up rpm sensor
 GPIO.setmode(GPIO.BCM)  #Use Broadcom pin numbering
@@ -83,20 +82,21 @@ def read_raw_data(addr):
 
 # Setting PD controller
 class PDController:
-    def __init__(self, Kp, Kd):
-        self.Kp = Kp
-        self.Kd = Kd
-        self.previous_error = 0
+	def __init__(self, Kp, Kd):
+        	self.Kp = Kp
+        	self.Kd = Kd
+        	self.previous_error = 0
     
-    def compute(self, desired_orientation, actual_orientation, dt):
-        error = desired_orientation - actual_orientation
-        derivative = (error - self.previous_error) / dt if dt > 0 else 0
-        control_output = self.Kp * error + self.Kd * derivative
-        self.previous_error = error
-        return control_output
+	def compute(self, desired_orientation, actual_orientation, dt):
+		error = desired_orientation - actual_orientation
+        	derivative = (error - self.previous_error) / dt if dt > 0 else 0
+        	control_output = self.Kp * error + self.Kd * derivative
+        	self.previous_error = error
+        	return control_output
 
 # Beginning initialisation of motion sensor
 MPU_Init()
+motor_forward(50)
 
 # Initial orientation
 orientation = 0
@@ -123,19 +123,19 @@ while True:
         dt = 0.1
         orientation += velocity * dt
 	#RPM sensing
-	if GPIO.input(Motor1E) == GPIO.HIGH:
-	    if GPIO.input(17) == GPIO.HIGH and prev_ref == False: 
-            	if initial_time is None:  
-           		initial_time = time.perf_counter()
-           		prev_ref = True
-        	else:
-                	current_time = time.perf_counter()
-                        period = current_time - initial_time
-			rpm = 60/period 
-                        initial_time = current_time
-                        prev_ref = True
-            if GPIO.input(17) == GPIO.LOW:
-                prev_ref = False
+	if GPIO.input(Motor1E) != GPIO.LOW:
+		if GPIO.input(17) == GPIO.HIGH and prev_ref == False: 
+            		if initial_time is None:  
+           			initial_time = time.perf_counter()
+           			prev_ref = True
+        		else:
+                		current_time = time.perf_counter()
+                        	period = current_time - initial_time
+				rpm = 60/period 
+                        	initial_time = current_time
+                        	prev_ref = True
+            	if GPIO.input(17) == GPIO.LOW:
+                	prev_ref = False
 	else:
 		rpm = 0
 
@@ -145,7 +145,7 @@ def environmental_calibration_mode():
 	light_intensity_1 = []
 	light_intensity_2 = []
 	light_intensity_3 = []
-	motor_forward(100)
+	motor_accelerate()
 	pd_controller = PDController(Kp=1600, Kd=80)
 	calibration = False
 	dt = 0.1
@@ -159,7 +159,7 @@ def environmental_calibration_mode():
         	light_intensity_3.append(light3)
         	timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
         	if len(light_intensity_1) > 2 or len(light_intensity_2) > 2 or len(light_intensity_3) > 2:
-			stop_motor()
+			stop_motor()#########################################################################Shouldn't be here
                 	if np.sign(light_intensity_1[-2]-light_intensity_1[-3]) == -np.sign(light_intensity_1[-1]-light_intensity_1[-2]):
                 		orientation = 0
                 		orientation += velocity * dt
@@ -181,52 +181,35 @@ def environmental_calibration_mode():
 	while calibration == True and abs(desired_orientation - orientation) > 0.01:
        		control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
 		# Mapping PD output to motor speed (ensure values are within valid range)
-        	motor_speed = max(min(abs(control_signal), 1000), 0)  # Limiting to realistic values
+        	motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
 		#Adjust motor direction based on control signal sign
 		if control_signal > 0:
-			motor_forward(motor_speed)
+			motor_forward(50+motor_speed)##############################################Not right
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 		else:
-			motor_backward(motor_speed)
+			motor_forward(50-motor_speed)##############################################Not right
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 	else:
-        	stop_motor()
+        	#Removed motor_forward(50) as that will change angle again, could put back in
         	orientation += velocity * dt
         	return		
         time.sleep(0.1)
 
 # Creating manual orientation mode function
 def manual_orientation_mode():
-    #Creating commands for motor
-    def startstop_cw():
-        GPIO.output(Motor1A,GPIO.HIGH)
-        GPIO.output(Motor1B,GPIO.LOW)
-        if GPIO.input(Motor1E) == GPIO.HIGH:
-            GPIO.output(Motor1E,GPIO.LOW)
-        elif GPIO.input(Motor1E) == GPIO.LOW:
-            GPIO.output(Motor1E,GPIO.HIGH)
-    def startstop_ccw():
-        GPIO.output(Motor1A,GPIO.LOW)
-        GPIO.output(Motor1B,GPIO.HIGH)
-        if GPIO.input(Motor1E) == GPIO.HIGH:
-            GPIO.output(Motor1E,GPIO.LOW)
-        elif GPIO.input(Motor1E) == GPIO.LOW:
-            GPIO.output(Motor1E,GPIO.HIGH)
-    #Setting up interface
-    window_mom = Tk()
-    window_mom.title('Manual Orientation Mode')
-    def close_program():
-            GPIO.cleanup()
-            window_mom.destroy()
-    btn_mom_end = Button(window_mom, text = 'Close', command=close_program)
-    btn_cw = Button(window_mom, text = 'CW', command=startstop_cw)
-    btn_ccw = Button(window_mom, text = 'CCW', command=startstop_ccw)
-    btn_cw.pack(padx = 120, pady = 20)
-    btn_ccw.pack(padx = 120, pady = 20)
-    btn_mom_end.pack(padx = 120, pady = 20)
-    window_mom.mainloop()
+	#Creating commands for motor
+	def startstop_cw():
+        	if speed == 50:
+            		accelerate_motor()
+        		elif speed =! 50:
+            		motor_forward(speed)
+    	def startstop_ccw():
+        	if speed == 50:
+            		deaccelerate_motor()
+        	elif speed =! 50:
+            		motor_forward(speed)
 
 # Creating automatic orientation mode function
 def automatic_orientation_mode():
@@ -237,56 +220,47 @@ def automatic_orientation_mode():
                 pd_controller = PDController(Kp=1600, Kd=80)
                 # Running controller
                 while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
-                        control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-                        GPIO.output(Motor1A,GPIO.HIGH)
-                        GPIO.output(Motor1B,GPIO.LOW)
-                        GPIO.output(Motor1E,GPIO.HIGH)
-                        actual_orientation = orientation
-                else:
-                        GPIO.output(Motor1E,GPIO.LOW)
-                        GPIO.cleanup()
+                       	control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+			# Mapping PD output to motor speed (ensure values are within valid range)
+        		motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
+			#Adjust motor direction based on control signal sign
+			if control_signal > 0:
+				motor_forward(50+motor_speed)#########################Not right
+				orientation += velocity * dt
+        			actual_orientation = orientation  # Update actual orientation in real-time
+			else:
+				motor_forward(50-motor_speed)########################Not right
+				orientation += velocity * dt
+        			actual_orientation = orientation  # Update actual orientation in real-time
+		else:
+        		#Removed motor_forward(50) as that will change angle again, could put back in
+        		orientation += velocity * dt
+        		return
         def start_rotation():
                 rotation(float(entry.get()))
-        #Setting up interface
-        window_aom = Tk()
-        window_aom.title('Automatic Orientation Mode')
-        frame = Frame(window_aom)
-        entry = Entry(frame)
-        btn = Button(frame, text = 'Enter Desired Orientation', command=start_rotation)
-        btn.pack(side = RIGHT, padx=5)
-        entry.pack(side=LEFT)
-        frame.pack(padx=20, pady=20)
-        window_aom.mainloop()
 
 # Creating detumbling mode function
 def detumbling_mode():
-    desired_orientation = 0  
-    actual_orientation = orientation
-    dt = 0.1
-    pd_controller = PDController(Kp=1600, Kd=80)
-    while abs(actual_orientation - desired_orientation) > 0.1:
-        control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-        GPIO.output(Motor1A,GPIO.HIGH)
-        GPIO.output(Motor1B,GPIO.LOW)
-        GPIO.output(Motor1E,GPIO.HIGH)
-        actual_orientation = orientation
-    else:
-        GPIO.output(Motor1E,GPIO.LOW)
-        GPIO.cleanup()  
+	desired_orientation = 0  
+	actual_orientation = orientation
+	dt = 0.1
+	pd_controller = PDController(Kp=1600, Kd=80)
+	while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
+        	control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+		# Mapping PD output to motor speed (ensure values are within valid range)
+        	motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
+		#Adjust motor direction based on control signal sign
+		if control_signal > 0:
+			motor_forward(50+motor_speed)########################Not right
+			orientation += velocity * dt
+        		actual_orientation = orientation  # Update actual orientation in real-time
+		else:
+			motor_forward(50-motor_speed)########################## Not right
+			orientation += velocity * dt
+        		actual_orientation = orientation  # Update actual orientation in real-time
+	else:
+        	#Removed motor_forward(50) as that will change angle again, could put back in
+        	orientation += velocity * dt
+        	return
     
-# Intefacing
-window_adcs = Tk()
-window_adcs.title('ADCS Control Inteface')
-btn_ecm = Button(window_adcs, text = 'Environmental Calibration', command=environmental_calibration_mode())
-btn_mom = Button(window_adcs, text = 'Manual Orientation', command=manual_orientation_mode())
-btn_aom = Button(window_adcs, text = 'Automatic Orientation', command=automatic_orientation_mode())
-btn_dm = Button(window_adcs, text = 'Detumble', command=detumbling_mode())
-btn_adcs_end = Button(window_adcs, text = 'Close', command=exit)
 
-btn_ecm.pack(padx = 120, pady = 20)
-btn_mom.pack(padx = 120, pady = 20)
-btn_aom.pack(padx = 120, pady = 20)
-btn_dm.pack(padx = 120, pady = 20)
-btn_adcs_end.pack(padx = 120, pady = 20)
-
-window_adcs.mainloop()
