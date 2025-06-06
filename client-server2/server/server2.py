@@ -43,24 +43,76 @@ def handle_frame(data):
 
 @socketio.on('start_camera')
 def handle_start_camera():
+    """Handle camera start request from client"""
     global camera_state
     try:
-        emit('start_camera', {}, broadcast=True)
+        print("[INFO] Camera start requested from client")
+        
+        # Start the camera streaming thread if not already running
+        if hasattr(camera, 'start_camera_streaming'):
+            camera.start_camera_streaming()
+        elif hasattr(camera.streamer, 'start_streaming'):
+            camera.streamer.start_streaming()
+        else:
+            # Fallback - use existing start method
+            camera.start_stream()
+        
         camera_state = "Streaming"
-        socketio.emit('camera_status', {'status': camera_state})
+        
+        # Send status update to all clients
+        emit('camera_status', {
+            'status': camera_state,
+            'streaming': True,
+            'message': 'Camera streaming started'
+        }, broadcast=True)
+        
+        print("[INFO] ✓ Camera streaming started")
+        
     except Exception as e:
-        print(f"[ERROR] start_camera: {e}")
-
+        print(f"[ERROR] start_camera handler: {e}")
+        camera_state = "Error"
+        emit('camera_status', {
+            'status': camera_state,
+            'streaming': False,
+            'error': str(e)
+        }, broadcast=True)
 
 @socketio.on('stop_camera')
 def handle_stop_camera():
+    """Handle camera stop request from client"""
     global camera_state
     try:
-        emit('stop_camera', {}, broadcast=True)
+        print("[INFO] Camera stop requested from client")
+        
+        # Stop the camera streaming thread
+        if hasattr(camera, 'stop_camera_streaming'):
+            camera.stop_camera_streaming()
+        elif hasattr(camera.streamer, 'stop_streaming'):
+            camera.streamer.stop_streaming()
+        else:
+            # Fallback - set streaming flag to False
+            if hasattr(camera.streamer, 'streaming'):
+                camera.streamer.streaming = False
+        
         camera_state = "Idle"
-        socketio.emit('camera_status', {'status': camera_state})
+        
+        # Send status update to all clients
+        emit('camera_status', {
+            'status': camera_state,
+            'streaming': False,
+            'message': 'Camera streaming stopped'
+        }, broadcast=True)
+        
+        print("[INFO] ✓ Camera streaming stopped")
+        
     except Exception as e:
-        print(f"[ERROR] stop_camera: {e}")
+        print(f"[ERROR] stop_camera handler: {e}")
+        camera_state = "Error"
+        emit('camera_status', {
+            'status': camera_state,
+            'streaming': False,
+            'error': str(e)
+        }, broadcast=True)
 
 
 @socketio.on('camera_config')
@@ -90,8 +142,27 @@ def handle_camera_status(data):
 
 @socketio.on('get_camera_status')
 def handle_get_camera_status():
-    # Send the current camera state to the requesting client
-    emit('camera_status', {'status': camera_state})
+    """Get current camera status"""
+    try:
+        # Check if camera is currently streaming
+        is_streaming = False
+        if hasattr(camera.streamer, 'streaming'):
+            is_streaming = camera.streamer.streaming
+        elif camera_state == "Streaming":
+            is_streaming = True
+        
+        emit('camera_status', {
+            'status': camera_state,
+            'streaming': is_streaming
+        })
+        
+    except Exception as e:
+        print(f"[ERROR] get_camera_status: {e}")
+        emit('camera_status', {
+            'status': 'error',
+            'streaming': False,
+            'error': str(e)
+        })
 
 
 @socketio.on("camera_info")
