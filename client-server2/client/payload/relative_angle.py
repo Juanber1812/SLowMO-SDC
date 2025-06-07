@@ -1,8 +1,9 @@
 # relative_angle_plotter.py
 import numpy as np
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
+import pyqtgraph as pg
+from PyQt6.QtWidgets import QFrame, QVBoxLayout, QSizePolicy
+from PyQt6.QtCore import QTimer
+from PyQt6.QtGui import QFont
 from collections import deque
 import time
 from theme import (
@@ -14,149 +15,205 @@ from theme import (
     FONT_FAMILY, FONT_SIZE_NORMAL, FONT_SIZE_LABEL, FONT_SIZE_TITLE,
     ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR, GRAPH_MODE_COLORS
 )
-from PyQt6.QtCore import QTimer
 
 # === Font size configuration ===
-AXIS_LABEL_SIZE = 9      # Change this value to adjust axis label font size
-AXIS_NUMBER_SIZE = 9     # Change this value to adjust axis number/tick font size
+AXIS_LABEL_SIZE = 9      # Adjust axis label font size
+AXIS_NUMBER_SIZE = 9     # Adjust axis number/tick font size
 
-class RelativeAnglePlotter(QWidget):
+# === Angle Plot Configuration ===
+ANGLE_Y_MIN = -30        # Minimum Y-axis value (degrees)
+ANGLE_Y_MAX = 30         # Maximum Y-axis value (degrees)
+ANGLE_X_WINDOW = 10      # Time window in seconds
+AVERAGE_TIME_WINDOW = 5.0  # Time window for calculating averages (seconds)
+
+class RelativeAnglePlotter(QFrame):
     def __init__(self):
         super().__init__()
-        # --- Customizable style variables ---
+        pg.setConfigOptions(antialias=True)
+        
         self.axis_label_size = AXIS_LABEL_SIZE
         self.axis_number_size = AXIS_NUMBER_SIZE
-        self.subplot_left = 0.14
-        self.subplot_right = 0.94
-        self.subplot_top = 0.93
-        self.subplot_bottom = 0.18
+
+        self.y_axis_min = ANGLE_Y_MIN
+        self.y_axis_max = ANGLE_Y_MAX
+        self.x_axis_window = ANGLE_X_WINDOW
+        self.average_time_window = AVERAGE_TIME_WINDOW
+
         self.bg_color = PLOT_BACKGROUND
         self.line_color = GRAPH_MODE_COLORS["SCANNING MODE"]
-        self.tick_color = self.line_color
-        self.grid_color = self.line_color
 
-        # --- Customizable axis limits ---
-        self.y_axis_min = -30      # Minimum value for y-axis
-        self.y_axis_max = 30       # Maximum value for y-axis
-        self.x_axis_window = 10    # Width of the x-axis window in seconds
+        # Current values and average metrics
+        self.current_ang = 0.0
+        self.average_angle = 0.0
 
-        self.data = deque(maxlen=100)
-        self.time_data = deque(maxlen=100)
+        # Recording attributes
+        self.is_recording = False
+        self.recorded_data = []
+
+        # Data storage
+        self.data = deque(maxlen=500)
+        self.time_data = deque(maxlen=500)
         self.start_time = time.time()
-        self.current_ang = 0.0  # Initialize current angle  
 
-        self.figure = Figure(facecolor=self.bg_color)
-        self.canvas = FigureCanvas(self.figure)
-        self.canvas.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.ax = self.figure.add_subplot(111)
-        self.ax.set_facecolor(self.bg_color)
-        self.ax.tick_params(colors=self.tick_color, labelsize=self.axis_number_size, width=0.5)
-        self.ax.xaxis.label.set_color(self.tick_color)
-        self.ax.yaxis.label.set_color(self.tick_color)
-        self.ax.title.set_color(self.tick_color)
-        self.ax.grid(True, color=self.grid_color, linestyle='--', linewidth=0.5, alpha=0.2)
-        self.figure.subplots_adjust(
-            left=self.subplot_left,
-            right=self.subplot_right,
-            top=self.subplot_top,
-            bottom=self.subplot_bottom
+        # Variables for average calculation
+        self.last_angle = None
+        self.last_time = None
+
+        self.setMinimumSize(384, 216)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.setStyleSheet(f"background-color: {self.bg_color}; border: none;")
+
+        # Create layout and plot widget
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(5, 5, 10, 20)
+        layout.setSpacing(2)
+
+        self.plot_widget = pg.PlotWidget()
+        self.plot_widget.setBackground(self.bg_color)
+        self.setup_plot()
+        layout.addWidget(self.plot_widget)
+
+        # Create angle plot curve (left Y-axis)
+        self.plot_curve = self.plot_widget.plot(
+            pen=pg.mkPen(color=self.line_color, width=4),
+            symbol=None,
+            symbolSize=3,
+            symbolBrush=self.line_color,
+            name='Angle (deg)'
         )
 
-         
-        
-        self.ax.set_xlabel("Time (s)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
-        self.ax.set_ylabel("Angle (deg)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
 
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self.canvas)
-        self.setLayout(layout)
-
-        # ── setup redraw timer (don't start until shown) ───────────────
+        # Setup redraw timer
         self._redraw_timer = QTimer(self)
         self._redraw_timer.timeout.connect(self.redraw)
-        self._redraw_interval_ms = 100  # default 10 Hz
+        self._redraw_interval_ms = 10   # 100 Hz (10 ms)
+        
+        self.redraw()
+
+    def setup_plot(self):
+        """Configure the PyQtGraph plot appearance"""
+        self.plot_widget.setLabel('left', 'Angle (deg)', color=TICK_COLOR, size=f'{self.axis_label_size}pt')
+        self.plot_widget.setLabel('bottom', 'Time (s)', color=TICK_COLOR, size=f'{self.axis_label_size}pt')
+        self.plot_widget.showGrid(x=True, y=True, alpha=0.3)
+        
+        self.plot_widget.getAxis('left').setPen(color=TICK_COLOR, width=1)
+        self.plot_widget.getAxis('bottom').setPen(color=TICK_COLOR, width=1)
+        self.plot_widget.getAxis('left').setTextPen(color=TICK_COLOR)
+        self.plot_widget.getAxis('bottom').setTextPen(color=TICK_COLOR)
+        
+        font = QFont(FONT_FAMILY, self.axis_number_size)
+        self.plot_widget.getAxis('left').setTickFont(font)
+        self.plot_widget.getAxis('bottom').setTickFont(font)
+        
+        self.plot_widget.setYRange(self.y_axis_min, self.y_axis_max, padding=0)
+        self.plot_widget.setXRange(0, self.x_axis_window, padding=0)
+        self.plot_widget.setLimits(yMin=self.y_axis_min, yMax=self.y_axis_max)
+        self.plot_widget.getViewBox().setMouseEnabled(x=True, y=False)
+        self.plot_widget.getAxis('left').setTickSpacing(major=10, minor=5)
+        self.plot_widget.getAxis('bottom').setTickSpacing(major=2.0, minor=1.0)
 
     def showEvent(self, event):
         super().showEvent(event)
-        # start throttled redraws when widget appears
+        self.plot_widget.getViewBox().sigResized.connect(self.redraw)
         self._redraw_timer.start(self._redraw_interval_ms)
 
     def hideEvent(self, event):
-        # stop redraws immediately when widget is hidden
         self._redraw_timer.stop()
         super().hideEvent(event)
 
+    def calculate_average_angle(self):
+        """Calculate average angle for values within the averaging time window"""
+        if len(self.time_data) == 0 or len(self.data) == 0:
+            return 0.0
+        
+        current_time = self.time_data[-1]
+        window_ago = current_time - self.average_time_window
+        
+        recent_angles = []
+        for i in range(len(self.time_data) - 1, -1, -1):
+            if self.time_data[i] >= window_ago:
+                recent_angles.append(self.data[i])
+            else:
+                break
+        
+        if len(recent_angles) == 0:
+            return self.current_ang
+        return float(np.mean(recent_angles))
+    
     def update(self, rvec, tvec, timestamp=None):
+        """Update the plot with new angle data"""
         if timestamp is None:
             timestamp = time.time()
-        elapsed = timestamp - self.start_time
-        angle_rad = np.arctan2(tvec[0], tvec[2])
-        angle_deg = np.degrees(angle_rad)
-        
-        self.current_ang = float(angle_deg)
+        elapsed = float(timestamp - self.start_time)
+        angle_rad = np.arctan2(float(tvec[0]), float(tvec[2]))
+        angle_deg = float(np.degrees(angle_rad))
+        self.current_ang = angle_deg
         self.time_data.append(elapsed)
         self.data.append(angle_deg)
-        # now redraw only happens at timer intervals
+        self.last_angle = angle_deg
+        self.last_time = elapsed
+
+        self.average_angle = self.calculate_average_angle()
+        # Redraw will be triggered by the timer
+
+    def redraw(self):
+        """Redraw the plot with current angle data"""
+        if len(self.time_data) > 0 and len(self.data) > 0:
+            time_array = np.array(self.time_data, dtype=float).flatten()
+            data_array = np.array(self.data, dtype=float).flatten()
+            
+            self.plot_curve.setData(time_array, data_array)
+            
+            if time_array[-1] > self.x_axis_window:
+                x_min = time_array[-1] - self.x_axis_window
+                x_max = time_array[-1]
+                self.plot_widget.setXRange(x_min, x_max, padding=0)
+            else:
+                self.plot_widget.setXRange(0, self.x_axis_window, padding=0)
+            
+            self.plot_widget.setYRange(self.y_axis_min, self.y_axis_max, padding=0)
+        else:
+            self.plot_curve.clear()
+            self.plot_widget.setXRange(0, self.x_axis_window, padding=0)
+            self.plot_widget.setYRange(self.y_axis_min, self.y_axis_max, padding=0)
+
+    def set_average_time_window(self, window_seconds):
+        self.average_time_window = window_seconds
 
     def set_redraw_rate(self, rate_hz: float):
-        """Adjust the redraw frequency (Hz)."""
         interval = max(1, int(1000.0 / rate_hz))
         self._redraw_interval_ms = interval
         self._redraw_timer.setInterval(interval)
 
-    def redraw(self):
-        try:
-            self.ax.clear()
-            self.ax.set_facecolor(self.bg_color)
-            self.ax.tick_params(colors=self.tick_color, labelsize=self.axis_number_size, width=0.5)
-            self.ax.xaxis.label.set_color(self.tick_color)
-            self.ax.yaxis.label.set_color(self.tick_color)
-            self.ax.title.set_color(self.tick_color)
-            self.ax.grid(True, color=self.grid_color, linestyle='--', linewidth=0.5, alpha=0.2)
-            
-            self.figure.subplots_adjust(
-                left=self.subplot_left,
-                right=self.subplot_right,
-                top=self.subplot_top,
-                bottom=self.subplot_bottom
-            )
-            
-            self.ax.set_xlabel("Time (s)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
-            self.ax.set_ylabel("Angle (deg)", fontsize=self.axis_label_size, fontfamily='Segoe UI')
-            
-            # Only plot if we have data
-            if self.time_data and self.data:
-                self.ax.plot(self.time_data, self.data, color=self.line_color, linewidth=2)
-            
-            self.ax.set_ylim(self.y_axis_min, self.y_axis_max)
-            
-            if self.time_data:
-                xmax = max(self.time_data[-1], self.x_axis_window)
-                xmin = xmax - self.x_axis_window
-                self.ax.set_xlim(xmin, xmax)
-            else:
-                self.ax.set_xlim(0, self.x_axis_window)
+    def clear_data(self):
+        self.data.clear()
+        self.time_data.clear()
+        self.current_ang = 0.0
+        self.average_angle = 0.0
+        self.last_angle = None
+        self.last_time = None
+        self.start_time = time.time()
+        self.plot_curve.clear()
 
-            # Add current angle display - with safety check
-            try:
-                self.ax.text(0.98, 0.95, f'{float(self.current_ang):.3f}°', 
-                            transform=self.ax.transAxes,
-                            fontsize=self.axis_label_size,
-                            fontweight='bold',
-                            fontfamily='Segoe UI',
-                            color=self.line_color,
-                            bbox=dict(boxstyle='round,pad=0.3', 
-                                     facecolor=self.bg_color, 
-                                     edgecolor=self.line_color, 
-                                     alpha=0.8),
-                            horizontalalignment='right',
-                            verticalalignment='top')
-            except Exception as text_error:
-                print(f"[RelativeAngle] Text error: {text_error}")
-            
-            self.canvas.draw()
-            
-        except Exception as e:
-            print(f"[RelativeAngle] Redraw error: {e}")
-            import traceback; traceback.print_exc()
+    def start_recording(self):
+        self.is_recording = True
+        self.recorded_data = []
+
+    def stop_recording(self):
+        self.is_recording = False
+        return self.recorded_data.copy()
+
+    def set_y_range(self, y_min, y_max):
+        self.y_axis_min = y_min
+        self.y_axis_max = y_max
+        self.plot_widget.setYRange(self.y_axis_min, self.y_axis_max, padding=0)
+        self.plot_widget.setLimits(yMin=self.y_axis_min, yMax=self.y_axis_max)
+
+    def set_x_window(self, window_seconds):
+        self.x_axis_window = window_seconds
+
+    def get_angle_metrics(self):
+        return {
+            'current': self.current_ang,
+            'average': self.average_angle,
+        }

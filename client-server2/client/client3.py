@@ -534,7 +534,7 @@ class MainWindow(QWidget):
         self.duration_dropdown.setVisible(False)
 
         self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
-        self.graph_section.setFixedSize(560, 280) # Existing size
+        self.graph_section.setFixedSize(620, 280) # Existing size
         self.graph_section.graph_display_layout.setSpacing(1)
         self.graph_section.graph_display_layout.setContentsMargins(1, 1, 1, 1)
         self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
@@ -542,7 +542,7 @@ class MainWindow(QWidget):
         row2.addWidget(self.graph_section)
 
         # LIDAR section (moved here)
-        lidar_group = QGroupBox("LIDAR") # Title for the LIDAR group
+        lidar_group = QGroupBox() # Title for the LIDAR group
         lidar_layout = QVBoxLayout()
         lidar_layout.setSpacing(2)
         lidar_layout.setContentsMargins(5, 15, 5, 5) # Adjusted margins for title space
@@ -575,7 +575,7 @@ class MainWindow(QWidget):
         lidar_group.setLayout(lidar_layout)
         self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
         # Set a fixed width for LIDAR or let it expand. Example fixed width:
-        lidar_group.setFixedWidth(200) # Adjust as needed, e.g., to fill remaining space if graph_section has fixed width
+        lidar_group.setFixedWidth(600) # Adjust as needed, e.g., to fill remaining space if graph_section has fixed width
 
         row2.addWidget(lidar_group)
         
@@ -589,9 +589,9 @@ class MainWindow(QWidget):
         center_x, center_y = width // 2, height // 2
         
         # Draw horizontal line
-        cv2.line(frame, (0, center_y), (width, center_y), (0, 255, 0), 2)
+        cv2.line(frame, (0, center_y), (width, center_y), (0, 255, 0), 1)
         # Draw vertical line  
-        cv2.line(frame, (center_x, 0), (center_x, height), (0, 255, 0), 2)
+        cv2.line(frame, (center_x, 0), (center_x, height), (0, 255, 0), 1)
         
         return frame
 
@@ -861,11 +861,15 @@ class MainWindow(QWidget):
                 if self.frame_queue.qsize() < 5:
                     self.frame_queue.put(frame.copy())
                 return
-            
+                    # Apply crosshairs AFTER all processing, just before display
+            display_frame = frame.copy()
+            if self.show_crosshairs:
+                display_frame = self.draw_crosshairs(display_frame)
+        
             # Display raw frame when detector is off
             height, width, channel = frame.shape
             bytes_per_line = 3 * width
-            q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888).rgbSwapped()
+            q_image = QImage(display_frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888).rgbSwapped()
             
             # Scale to fit display
             scaled = q_image.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -883,10 +887,16 @@ class MainWindow(QWidget):
             # Only display analyzed frames when detector is active
             if not self.detector_active:
                 return
-                
+
+              # Apply crosshairs AFTER all processing, just before display
+            display_frame = frame.copy()
+            if self.show_crosshairs:
+                display_frame = self.draw_crosshairs(display_frame)
+            
+
             height, width, channel = frame.shape
             bytes_per_line = 3 * width
-            q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888).rgbSwapped()
+            q_image = QImage(display_frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888).rgbSwapped()
             
             # Scale to fit display
             scaled = q_image.scaled(self.video_label.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -962,7 +972,6 @@ class MainWindow(QWidget):
             try:
                 distance = data.get('distance_cm')
                 if distance is not None:
-                    print(f"[DEBUG] Received LIDAR data: {distance} cm")
                     # Send data to LIDAR widget
                     self.lidar_widget.set_distances([distance])
                 else:
@@ -1015,9 +1024,6 @@ class MainWindow(QWidget):
             arr = np.frombuffer(data, np.uint8)
             frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
             if frame is not None:
-                # Add crosshairs if manual orientation is enabled
-                if self.show_crosshairs:
-                    frame = self.draw_crosshairs(frame)
                     
                 self.current_frame_size = len(data)
                 self.frame_counter += 1
@@ -1319,6 +1325,10 @@ class MainWindow(QWidget):
                 
                 # Process frame with detector
                 try:
+                    latency_ms = 0.0  # Default value
+                    pose = None       # Default value
+                    analysed = frame  # Default to original frame if detection fails early
+
                     if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
                         analysed, pose, latency_ms = detector4.detector_instance.detect_and_draw(
                             frame,
@@ -1326,67 +1336,117 @@ class MainWindow(QWidget):
                             is_cropped=is_cropped,
                             original_height=original_height
                         )
-                        
-                        # Add crosshairs to detector output if enabled
-                        if self.show_crosshairs:
-                            analysed = self.draw_crosshairs(analysed)
-                            
                     else:
-                        analysed, pose = detector4.detect_and_draw(frame, return_pose=True)
-                
-
+                        # This branch is taken if detector_instance is None or not found.
+                        # The global detector4.detect_and_draw will then also find detector_instance to be None
+                        # and likely return 2 values: (frame, None).
+                        # If detector4.detect_and_draw's return is inconsistent (sometimes 2, sometimes 3 values in this path),
+                        # this unpacking needs to be more robust or the global function made consistent.
+                        # Assuming 2-value return if hasattr(detector4, 'detector_instance') is false:
+                        _result = detector4.detect_and_draw(frame, return_pose=True)
+                        if isinstance(_result, tuple) and len(_result) == 2:
+                            analysed, pose = _result
+                            # latency_ms remains 0.0 as it's not provided by a 2-value return
+                        elif isinstance(_result, tuple) and len(_result) == 3: # Handle unexpected 3-value return
+                            analysed, pose, latency_ms = _result
+                            print("[WARNING] detector4.detect_and_draw returned 3 values in an unexpected path.")
+                        else: # Fallback if return is not as expected
+                            analysed = frame 
+                            pose = None
+                            print("[ERROR] Unexpected return type/length from detector4.detect_and_draw in else branch.")
                 
                     self.latencyUpdated.emit(latency_ms)
                     bridge.analysed_frame.emit(analysed)
 
                     # 1) always update all calculators
-                    if pose:
+                    # Apply your recommended safe check structure here
+                    if pose is not None and isinstance(pose, (list, tuple)) and len(pose) == 2:
                         rvec, tvec = pose
-                        self.spin_plotter    .update(rvec, tvec)
-                        self.distance_plotter.update(rvec, tvec)
-                        self.angular_plotter .update(rvec, tvec)
+                        # Further check rvec and tvec for robustness
+                        if (rvec is not None and isinstance(rvec, np.ndarray) and rvec.size > 0 and
+                            tvec is not None and isinstance(tvec, np.ndarray) and tvec.size > 0):
+                            
+                            # All clear to use rvec and tvec
+                            self.spin_plotter.update(rvec, tvec) # Pass only rvec, timestamp will default to time.time()
+                            self.distance_plotter.update(rvec, tvec)
+                            self.angular_plotter.update(rvec, tvec)
 
-                        # 2) update the three small live‐value labels WITH UNITS
-                        self.graph_section.live_labels["SPIN MODE"]             \
-                            .setText(f"{self.spin_plotter.current_angle:.3f}°")  # Added degree symbol
-                        self.graph_section.live_labels["DISTANCE MEASURING MODE"] \
-                            .setText(f"{self.distance_plotter.current_distance:.3f}m")  # Added meter unit
-                        self.graph_section.live_labels["SCANNING MODE"]         \
-                            .setText(f"{self.angular_plotter.current_ang:.3f}°")  # Added degree symbol
+                            # 2) update the three small live‐value labels WITH UNITS
+                            self.graph_section.live_labels["SPIN MODE"]             \
+                                .setText(f"{self.spin_plotter.current_angle:.3f}°")  # Added degree symbol
+                            self.graph_section.live_labels["DISTANCE MEASURING MODE"] \
+                                .setText(f"{self.distance_plotter.current_distance:.3f}m")  # Added meter unit
+                            self.graph_section.live_labels["SCANNING MODE"]         \
+                                .setText(f"{self.angular_plotter.current_ang:.3f}°")  # Added degree symbol
 
-                        # 2b) update the big "detail" label for the active graph WITH UNITS
-                        detail = getattr(self.graph_section, "current_detail_label", None)
-                        mode   = getattr(self.graph_section, "current_graph_mode", None)
-                        if detail and mode:
-                            if mode == "SPIN MODE":
-                                v = self.spin_plotter.current_angle
-                                detail.setText(f"{v:.3f}°")  # Added degree symbol
-                            elif mode == "DISTANCE MEASURING MODE":
-                                v = self.distance_plotter.current_distance
-                                detail.setText(f"{v:.3f}m")  # Added meter unit
-                            else:  # SCANNING MODE
-                                v = self.angular_plotter.current_ang
-                                detail.setText(f"{v:.3f}°")  # Added degree symbol
+                            # 2b) update the big "detail" label for the active graph WITH UNITS
+                            detail = getattr(self.graph_section, "current_detail_label", None)
+                            mode   = getattr(self.graph_section, "current_graph_mode", None)
+                            if detail and mode:
+                                if mode == "SPIN MODE":
+                                    metrics = self.spin_plotter.get_spin_metrics()
+                                    detail.setText(
+                                        f"Live: {metrics['current']:.3f}°\n"
+                                        f"Avg:  {metrics['average']:.3f}°\n"
+                                    )
+                                elif mode == "DISTANCE MEASURING MODE":
+                                    metrics = self.distance_plotter.get_distance_metrics()
+                                    detail.setText(
+                                        f"Live: {metrics['current']:.3f}m\n"
+                                        f"Avg:  {metrics['average']:.3f}m\n"
+                                        f"Live: {metrics['current_velocity']:.3f}m/s\n"
+                                        f"Avg:  {metrics['average_velocity']:.3f}m/s"
+                                    )
+                                else:  # SCANNING MODE (RelativeAnglePlotter)
+                                    metrics = self.angular_plotter.get_angle_metrics()
+                                    detail.setText(
+                                        f"Live: {metrics['current']:.3f}°\n"
+                                        f"Avg:  {metrics['average']:.3f}°\n"
+                                    )
 
-                            # ── if we're recording, grab that same label value ─────────────────
-                            if self.graph_section.is_recording:
-                                # timestamp + float value from the detail label (extract number only)
-                                ts = time.time()
-                                try:
-                                    # Extract numeric value (remove units)
-                                    text_val = detail.text().rstrip('°m')  # Remove degree and meter symbols
-                                    val = float(text_val)
-                                    self.graph_section.add_data_point(ts, val)
-                                except ValueError:
-                                    pass
+                                # ── if we're recording, grab that same label value ─────────────────
+                                if self.graph_section.is_recording:
+                                    # timestamp + float value from the detail label (extract number only)
+                                    ts = time.time()
+                                    try:
+                                        # Extract numeric value (remove units)
+                                        text_val = detail.text().rstrip('°m')  # Remove degree and meter symbols
+                                        val = float(text_val)
+                                        self.graph_section.add_data_point(ts, val)
+                                    except ValueError:
+                                        pass
                 
+                            # 3) continue with your throttled redraw / recording logic…
+                            if self.should_update_graphs() and self.graph_section.graph_widget:
+                                # Call update on the active graph_widget with appropriate arguments
+                                current_mode = self.graph_section.current_graph_mode
+                                if current_mode == "SPIN MODE":
+                                    # AngularPositionPlotter.update(self, rvec, timestamp=None)
+                                    # We want to use the default timestamping within the plotter
+                                    self.graph_section.graph_widget.update(rvec, tvec) 
+                                elif current_mode == "DISTANCE MEASURING MODE":
+                                    # RelativeDistancePlotter.update(self, rvec, tvec, timestamp=None)
+                                    self.graph_section.graph_widget.update(rvec, tvec)
+                                elif current_mode == "SCANNING MODE":
+                                    # RelativeAnglePlotter.update(self, rvec, tvec, timestamp=None)
+                                    self.graph_section.graph_widget.update(rvec, tvec)
+                                else:
+                                    print(f"[WARNING] Unknown graph mode for update: {current_mode}")
+                                # … recording code …
+                        else:
+                            # This case means pose was a 2-element tuple, but rvec/tvec were invalid
+                            if rvec is None or not isinstance(rvec, np.ndarray) or not rvec.size > 0:
+                                print(f"[WARNING] rvec is invalid after unpacking. Type: {type(rvec)}, Value: {rvec}")
+                            if tvec is None or not isinstance(tvec, np.ndarray) or not tvec.size > 0:
+                                print(f"[WARNING] tvec is invalid after unpacking. Type: {type(tvec)}, Value: {tvec}")
+                    elif pose is not None: # pose was not None, but not a 2-element tuple
+                        print(f"[WARNING] Pose is not None but has unexpected structure: {type(pose)}, value: {pose}")
+                    # If pose is None, normal operation (no detection), calculations are skipped.
 
-                        # 3) continue with your throttled redraw / recording logic…
-                        if self.should_update_graphs() and self.graph_section.graph_widget and pose:
-                            self.graph_section.graph_widget.update(rvec, tvec, None)
-                            # … recording code …
                 except Exception as e:
                     print(f"[ERROR] Detector processing error: {e}")
+                    import traceback
+                    traceback.print_exc() # Add traceback for better debugging
             except queue.Empty:
                 continue
             except Exception as e:

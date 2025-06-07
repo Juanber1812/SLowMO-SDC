@@ -193,15 +193,18 @@ class GraphSection(QGroupBox):
         # ── Detail live‐value label for the selected mode ───────────────
         color = GRAPH_MODE_COLORS[mode]
         detail_label = QLabel("0.0")
-        detail_label.setFixedWidth(60)                  # same width as small labels
+        detail_label.setFixedWidth(120)  # Increased from 60 to accommodate more text
+        detail_label.setFixedHeight(160)  # Increased height for multiple lines
         detail_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        detail_label.setWordWrap(True)   # Enable word wrapping for multi-line text
         detail_label.setStyleSheet(f"""
             background-color: {BOX_BACKGROUND};
             border: {BORDER_WIDTH}px solid {color};
             border-radius: {BORDER_RADIUS}px;
             color: {color};
             font-size: {FONT_SIZE_LABEL}pt;
-            padding: 2px;
+            font-family: {FONT_FAMILY};
+            padding: 4px;
         """)
         # keep for updates
         self.current_detail_label = detail_label
@@ -265,23 +268,23 @@ class GraphSection(QGroupBox):
         self.record_btn.setText("Record")
         self.is_recording = False
         self.record_btn.setFixedHeight(int(BUTTON_HEIGHT))
+        self.record_btn.setFixedWidth(120)  # Increased from default
         self.record_btn.setStyleSheet(button_style)
         btn_layout.addWidget(self.record_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.duration_dropdown.setFixedHeight(int(BUTTON_HEIGHT))
+        self.duration_dropdown.setFixedWidth(120)  # Increased from default
         # self.duration_dropdown.setStyleSheet(button_style) # Apply similar style if visible
         btn_layout.addWidget(self.duration_dropdown, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # Graph Update Frequency Control
-
-
         self.freq_spinbox = QDoubleSpinBox() 
-        self.freq_spinbox.setRange(0.1, 30.0)
-        self.freq_spinbox.setSingleStep(0.1)   
+        self.freq_spinbox.setRange(1, 50.0)
+        self.freq_spinbox.setSingleStep(1)   
         self.freq_spinbox.setDecimals(1)       
-        self.freq_spinbox.setValue(2.0)        
+        self.freq_spinbox.setValue(30.0)        
         self.freq_spinbox.setSuffix(" Hz")
-        
+
         # Apply the "modern" spinbox style from camera_settings.py:
         self.freq_spinbox.setStyleSheet(f"""
             QDoubleSpinBox {{
@@ -330,25 +333,21 @@ class GraphSection(QGroupBox):
             }}
         """)
 
-        # preserve the fixed height and signal:
+        # Increased width for frequency spinbox
         self.freq_spinbox.setFixedHeight(int(BUTTON_HEIGHT))
-        self.freq_spinbox.setFixedWidth(72)  # ← make it narrower (adjust as needed)
+        self.freq_spinbox.setFixedWidth(120)  # Increased from 72
         self.freq_spinbox.valueChanged.connect(self.on_frequency_changed)
         btn_layout.addWidget(self.freq_spinbox, alignment=Qt.AlignmentFlag.AlignLeft)
-        # restore the 12px for the rest
-        btn_layout.setSpacing(12)
 
         # emit once to kick off the initial rate on our new widget
         self.on_frequency_changed(self.freq_spinbox.value())
 
-
         self.exit_graph_btn = QPushButton("← Back")
         self.exit_graph_btn.setFixedHeight(int(BUTTON_HEIGHT))
+        self.exit_graph_btn.setFixedWidth(120)  # Increased from default
         self.exit_graph_btn.setStyleSheet(button_style)
         self.exit_graph_btn.clicked.connect(self.exit_graph)
         btn_layout.addWidget(self.exit_graph_btn, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        self.exit_graph_btn.setSizePolicy(self.record_btn.sizePolicy())
 
         # Add the button layout (right)
         graph_and_btns_layout.addLayout(btn_layout)

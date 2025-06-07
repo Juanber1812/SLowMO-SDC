@@ -1,0 +1,9 @@
+2025-06-06 19:51:49,234 - ERROR - Reconnect failed
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client3.py", line 1500, in reconnect_socket
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 159, in connect
+    raise exceptions.ConnectionError(exc.args[0]) from None
+socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749235904.2255862 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001F334905BA0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-06 21:15:37,987 - ERROR - packet queue is empty, aborting
