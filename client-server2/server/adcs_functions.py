@@ -17,15 +17,17 @@ def motor_forward(speed):
     	pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
 def stop_motor():
 	pwm.ChangeDutyCycle(0)  # Stop motor
-def accelerate_motor(step=5, delay=0.1):############################################Look at incoporating this into code
-    while True:
+def accelerate_motor(step=5, delay=0.1):
+	accel_state = True
+    while accel_state == True:
 	if speed == 99:
 		break
         speed += step
         pwm.ChangeDutyCycle(speed)
         time.sleep(delay)
-def accelerate_motor(step=5, delay=0.1):
-    while True:
+def deccelerate_motor(step=5, delay=0.1):
+	accel_state = True
+    while accel_state == True:
 	if speed == 1:
 		break
         speed -= step
@@ -106,7 +108,7 @@ start_time = time.perf_counter()
 intial_time = None
 prev_ref = False
 while True:
-        elapsed = time.time() - start_time
+        elapsed = time.perf_counter() - start_time
         acc_x = read_raw_data(ACCEL_XOUT_H)
         acc_y = read_raw_data(ACCEL_YOUT_H)
         acc_z = read_raw_data(ACCEL_ZOUT_H)
@@ -120,7 +122,7 @@ while True:
         Gy = gyro_y/131.0
         Gz = gyro_z/131.0
         velocity = Gz
-        dt = 0.1
+        dt = 0.1############Update for update rate
         orientation += velocity * dt
 	#RPM sensing
 	if GPIO.input(Motor1E) != GPIO.LOW:
@@ -134,7 +136,7 @@ while True:
 				rpm = 60/period 
                         	initial_time = current_time
                         	prev_ref = True
-            	if GPIO.input(17) == GPIO.LOW:
+            	elif GPIO.input(17) == GPIO.LOW:
                 	prev_ref = False
 	else:
 		rpm = 0
@@ -159,7 +161,7 @@ def environmental_calibration_mode():
         	light_intensity_3.append(light3)
         	timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
         	if len(light_intensity_1) > 2 or len(light_intensity_2) > 2 or len(light_intensity_3) > 2:
-			stop_motor()#########################################################################Shouldn't be here
+			accel_state = False
                 	if np.sign(light_intensity_1[-2]-light_intensity_1[-3]) == -np.sign(light_intensity_1[-1]-light_intensity_1[-2]):
                 		orientation = 0
                 		orientation += velocity * dt
@@ -181,18 +183,17 @@ def environmental_calibration_mode():
 	while calibration == True and abs(desired_orientation - orientation) > 0.01:
        		control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
 		# Mapping PD output to motor speed (ensure values are within valid range)
-        	motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
+        	motor_speed = max(min(abs(control_signal), 50), 0)  # Limiting to realistic values
 		#Adjust motor direction based on control signal sign
 		if control_signal > 0:
-			motor_forward(50+motor_speed)##############################################Not right
+			motor_forward(50+motor_speed)
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 		else:
-			motor_forward(50-motor_speed)##############################################Not right
+			motor_forward(50-motor_speed)
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 	else:
-        	#Removed motor_forward(50) as that will change angle again, could put back in
         	orientation += velocity * dt
         	return		
         time.sleep(0.1)
@@ -207,7 +208,7 @@ def manual_orientation_mode():
             		motor_forward(speed)
     	def startstop_ccw():
         	if speed == 50:
-            		deaccelerate_motor()
+            		deccelerate_motor()
         	elif speed =! 50:
             		motor_forward(speed)
 
@@ -222,18 +223,17 @@ def automatic_orientation_mode():
                 while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
                        	control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
 			# Mapping PD output to motor speed (ensure values are within valid range)
-        		motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
+        		motor_speed = max(min(abs(control_signal), 50), 0)  # Limiting to realistic values
 			#Adjust motor direction based on control signal sign
 			if control_signal > 0:
-				motor_forward(50+motor_speed)#########################Not right
+				motor_forward(50+motor_speed)
 				orientation += velocity * dt
         			actual_orientation = orientation  # Update actual orientation in real-time
 			else:
-				motor_forward(50-motor_speed)########################Not right
+				motor_forward(50-motor_speed)
 				orientation += velocity * dt
         			actual_orientation = orientation  # Update actual orientation in real-time
 		else:
-        		#Removed motor_forward(50) as that will change angle again, could put back in
         		orientation += velocity * dt
         		return
         def start_rotation():
@@ -248,18 +248,17 @@ def detumbling_mode():
 	while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
         	control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
 		# Mapping PD output to motor speed (ensure values are within valid range)
-        	motor_speed = max(min(abs(control_signal), 6000), 0)  # Limiting to realistic values
+        	motor_speed = max(min(abs(control_signal), 500), 0)  # Limiting to realistic values
 		#Adjust motor direction based on control signal sign
 		if control_signal > 0:
-			motor_forward(50+motor_speed)########################Not right
+			motor_forward(50+motor_speed)
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 		else:
-			motor_forward(50-motor_speed)########################## Not right
+			motor_forward(50-motor_speed)
 			orientation += velocity * dt
         		actual_orientation = orientation  # Update actual orientation in real-time
 	else:
-        	#Removed motor_forward(50) as that will change angle again, could put back in
         	orientation += velocity * dt
         	return
     
