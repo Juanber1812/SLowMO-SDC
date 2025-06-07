@@ -21,9 +21,9 @@ AXIS_LABEL_SIZE = 9      # Adjust axis label font size
 AXIS_NUMBER_SIZE = 9     # Adjust axis number/tick font size
 
 # === Spin Plot Configuration ===
-SPIN_Y_MIN = -180        # Minimum Y-axis value (degrees)
-SPIN_Y_MAX = 180         # Maximum Y-axis value (degrees)
-SPIN_X_WINDOW = 10       # Time window in seconds
+SPIN_Y_MIN = -80        # Minimum Y-axis value (degrees)
+SPIN_Y_MAX = 80         # Maximum Y-axis value (degrees)
+SPIN_X_WINDOW = 5       # Time window in seconds
 AVERAGE_TIME_WINDOW = 5.0  # Time window for calculating averages (seconds)
 
 class AngularPositionPlotter(QFrame):
@@ -51,8 +51,8 @@ class AngularPositionPlotter(QFrame):
         self.recorded_data = []
 
         # Data storage
-        self.data = deque(maxlen=500)
-        self.time_data = deque(maxlen=500)
+        self.data = deque(maxlen=200)
+        self.time_data = deque(maxlen=200)
         self.start_time = time.time()
         
         # Variables for calculating differences (if needed later)

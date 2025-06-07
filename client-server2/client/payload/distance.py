@@ -25,7 +25,7 @@ DISTANCE_Y_MIN = 0       # Minimum Y-axis value (meters)
 DISTANCE_Y_MAX = 2       # Maximum Y-axis value (meters)
 VELOCITY_Y_MIN = -5      # Minimum velocity Y-axis value (m/s)
 VELOCITY_Y_MAX = 5       # Maximum velocity Y-axis value (m/s)
-DISTANCE_X_WINDOW = 10   # Time window in seconds
+DISTANCE_X_WINDOW = 5   # Time window in seconds
 AVERAGE_TIME_WINDOW = 5.0  # Time window for calculating averages (seconds)
 
 class RelativeDistancePlotter(QFrame):
@@ -66,9 +66,9 @@ class RelativeDistancePlotter(QFrame):
         self.recorded_data = []
 
         # === Data storage ===
-        self.data = deque(maxlen=500)
-        self.velocity_data = deque(maxlen=500)
-        self.time_data = deque(maxlen=500)
+        self.data = deque(maxlen=200)
+        self.velocity_data = deque(maxlen=200)
+        self.time_data = deque(maxlen=200)
         self.start_time = time.time()
         
         # === Velocity calculation variables ===

@@ -970,14 +970,19 @@ class MainWindow(QWidget):
         def on_lidar_broadcast(data):
             """Handles incoming LIDAR data from the server."""
             try:
-                distance = data.get('distance_cm')
-                if distance is not None:
-                    # Send data to LIDAR widget
-                    self.lidar_widget.set_distances([distance])
+                # The 'data' received from the server should be the dictionary:
+                # {"live_distance_cm": ..., "average_distance_cm_5s": ...}
+                # or whatever keys your server-side lidar.py is emitting with "lidar_metrics"
+                if isinstance(data, dict) and ("live_distance_cm" in data or "average_distance_cm_5s" in data) : # Check if data is a dict with expected keys
+                    if hasattr(self, 'lidar_widget') and self.lidar_widget:
+                        # Call the new method 'set_metrics' with the received dictionary
+                        self.lidar_widget.set_metrics(data)
                 else:
-                    print("[WARNING] Received LIDAR data without distance_cm field")
+                    print(f"[WARNING] Received LIDAR data in unexpected format: {data}")
             except Exception as e:
                 print(f"[ERROR] Failed to process LIDAR data: {e}")
+                import traceback
+                traceback.print_exc()
 
         @sio.on("lidar_status")
         def on_lidar_status(data):
@@ -1406,15 +1411,29 @@ class MainWindow(QWidget):
 
                                 # ── if we're recording, grab that same label value ─────────────────
                                 if self.graph_section.is_recording:
-                                    # timestamp + float value from the detail label (extract number only)
                                     ts = time.time()
+                                    val = None
                                     try:
-                                        # Extract numeric value (remove units)
-                                        text_val = detail.text().rstrip('°m')  # Remove degree and meter symbols
-                                        val = float(text_val)
-                                        self.graph_section.add_data_point(ts, val)
-                                    except ValueError:
-                                        pass
+                                        if mode == "SPIN MODE":
+                                            val = self.spin_plotter.current_angle
+                                        elif mode == "DISTANCE MEASURING MODE":
+                                            # Assuming you want to record the live distance.
+                                            # If you want to record velocity, use self.distance_plotter.current_velocity
+                                            val = self.distance_plotter.current_distance
+                                        elif mode == "SCANNING MODE": # RelativeAnglePlotter
+                                            val = self.angular_plotter.current_ang
+                                        
+                                        if val is not None:
+                                            self.graph_section.add_data_point(ts, float(val))
+                                        else:
+                                            print(f"[WARNING] No value to record for mode: {mode}")
+                                            
+                                    except AttributeError as e:
+                                        print(f"[ERROR] Could not get value for recording from plotter: {e}")
+                                    except ValueError as e:
+                                        print(f"[ERROR] Value from plotter could not be converted to float for recording: {val}, Error: {e}")
+                                    except Exception as e:
+                                        print(f"[ERROR] Unexpected error during data preparation for recording: {e}")
                 
                             # 3) continue with your throttled redraw / recording logic…
                             if self.should_update_graphs() and self.graph_section.graph_widget:

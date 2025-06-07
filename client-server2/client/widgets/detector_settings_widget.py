@@ -27,7 +27,7 @@ class DetectorSettingsWidget(QGroupBox):
         # Threads
         self.threads_slider = QSlider(Qt.Orientation.Horizontal)
         self.threads_slider.setRange(1, 16)
-        self.threads_slider.setValue(16)
+        self.threads_slider.setValue(4)
         self.threads_slider.setSingleStep(1)
         self.threads_label = QLabel(str(self.threads_slider.value()))
         self.threads_slider.valueChanged.connect(

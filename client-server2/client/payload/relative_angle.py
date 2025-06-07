@@ -21,9 +21,9 @@ AXIS_LABEL_SIZE = 9      # Adjust axis label font size
 AXIS_NUMBER_SIZE = 9     # Adjust axis number/tick font size
 
 # === Angle Plot Configuration ===
-ANGLE_Y_MIN = -30        # Minimum Y-axis value (degrees)
-ANGLE_Y_MAX = 30         # Maximum Y-axis value (degrees)
-ANGLE_X_WINDOW = 10      # Time window in seconds
+ANGLE_Y_MIN = -40        # Minimum Y-axis value (degrees)
+ANGLE_Y_MAX = 40         # Maximum Y-axis value (degrees)
+ANGLE_X_WINDOW = 5      # Time window in seconds
 AVERAGE_TIME_WINDOW = 5.0  # Time window for calculating averages (seconds)
 
 class RelativeAnglePlotter(QFrame):
@@ -51,8 +51,8 @@ class RelativeAnglePlotter(QFrame):
         self.recorded_data = []
 
         # Data storage
-        self.data = deque(maxlen=500)
-        self.time_data = deque(maxlen=500)
+        self.data = deque(maxlen=200)
+        self.time_data = deque(maxlen=200)
         self.start_time = time.time()
 
         # Variables for average calculation

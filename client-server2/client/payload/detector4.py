@@ -10,8 +10,8 @@ class AprilTagDetector:
         # 1) store config in a dict
         self.config = {
             'families':   'tag25h9',
-            'nthreads':   16,
-            'quad_decimate':    1,
+            'nthreads':   4,
+            'quad_decimate':    0.5,
             'quad_sigma':       0,
             'refine_edges':     4,
             'decode_sharpening':0.25
