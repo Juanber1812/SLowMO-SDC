@@ -3,13 +3,13 @@
 #                         Satellite Control Interface                       #
 ##############################################################################
 
-import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os
+import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os # Ensure logging is imported
 import pandas as pd
 import traceback
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea,
-    QTabWidget, QFileDialog
+    QTabWidget, QFileDialog, QTextEdit # <<< Added QTextEdit here
 )
 
 import matplotlib
@@ -34,7 +34,7 @@ class SafeStreamHandler(logging.StreamHandler):
 
 # Configure logging properly at the module level
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.INFO, # You can set the desired default level here
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler('client_log.txt'),
@@ -80,11 +80,12 @@ from theme import (
     BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE, BUTTON_HEIGHT
 )
 
+
 ##############################################################################
 #                            CONFIGURATION                                  #
 ##############################################################################
 
-logging.basicConfig(filename='client_log.txt', level=logging.DEBUG)
+# logging.basicConfig(filename='client_log.txt', level=logging.DEBUG) # <<< This line is redundant if the above config is used.
 SERVER_URL = "http://192.168.1.146:5000"
 
 ##############################################################################
@@ -92,6 +93,24 @@ SERVER_URL = "http://192.168.1.146:5000"
 ##############################################################################
 
 sio = socketio.Client()
+
+# <<< Step 2: Define QtLogHandler >>>
+class QtLogHandler(logging.Handler, QObject):
+    """
+    Custom logging handler that emits a signal for each log record.
+    """
+    new_log_message = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        logging.Handler.__init__(self)
+        QObject.__init__(self, parent)
+        # Set a default formatter, can be customized
+        self.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+
+    def emit(self, record):
+        if record:
+            msg = self.format(record)
+            self.new_log_message.emit(msg)
 
 class Bridge(QObject):
     frame_received = pyqtSignal(np.ndarray)
@@ -104,6 +123,7 @@ bridge = Bridge()
 ##############################################################################
 
 class MainWindow(QWidget):
+    # ... (your existing signals and theme configuration) ...
     speedtest_result = pyqtSignal(float, float)  # upload_mbps, max_frame_size_kb
     latencyUpdated = pyqtSignal(float)
 
@@ -195,14 +215,14 @@ class MainWindow(QWidget):
     STREAM_HEIGHT = 216
     MARGIN = 10
 
+
     #=========================================================================
     #                           INITIALIZATION                               
     #=========================================================================
 
     def __init__(self):
         super().__init__()
-        self.show_crosshairs = False  # Add this line
-        # Set global styling
+        self.show_crosshairs = False
         self.setStyleSheet(f"""
             QWidget {{
                 background-color: {BACKGROUND};
@@ -212,10 +232,8 @@ class MainWindow(QWidget):
             }}
         """)
         self.smooth_mode = None
-        # Window configuration
         self.setWindowTitle("SLowMO Client")
         
-        # Initialize state variables
         self.streaming = False
         self.detector_active = False
         self.frame_queue = queue.Queue()
@@ -223,43 +241,53 @@ class MainWindow(QWidget):
         self.shared_start_time = None
         self.calibration_change_time = None
 
-        # Performance tracking
         self.last_frame_time = time.time()
         self.frame_counter = 0
         self.current_fps = 0
         self.current_frame_size = 0
 
-
-        # display‐FPS counters
         self.display_frame_counter = 0
         self.current_display_fps   = 0
-        # ── end patch ──
-
-        # ── start patch ──
-        # throttle graph redraws
+        
         self._last_graph_draw = 0.0
-        # Initialize with a default (e.g., 2 Hz). This will be updated by GraphSection's signal.
         self._graph_update_interval = 1.0 / 2.0 
-        # ── end patch ──
-
-        # ── instantiate plotters early ─────────────────────────────
+        
         self.spin_plotter     = AngularPositionPlotter()
         self.distance_plotter = RelativeDistancePlotter()
         self.angular_plotter  = RelativeAnglePlotter()
-        # ── end instantiation ───────────────────────────────────────
 
-        # Setup UI and connections
-        self.setup_ui() # self.camera_settings and self.graph_section are created here
+        # <<< Step 3: Initialize Log Display and Handler >>>
+        self.log_display_widget = QTextEdit()
+        self.log_display_widget.setReadOnly(True)
+        # Use theme variables for styling if available, otherwise fallbacks
+        log_text_color = getattr(self, 'TEXT_COLOR', 'white')
+        log_border_color = getattr(self, 'BORDER_COLOR', '#333333')
+        log_font_family = getattr(self, 'FONT_FAMILY', 'Consolas, "Courier New", monospace')
+        
+        self.log_display_widget.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: #1A1A1A; 
+                color: {log_text_color};
+                font-family: {log_font_family};
+                font-size: 9pt;
+                border: 1px solid {log_border_color};
+                border-radius: {getattr(self, 'BORDER_RADIUS', 3)}px;
+            }}
+        """)
 
-        # ── Hook the graph‐rate spinbox to each plotter’s redraw rate ─────────
+        self.qt_log_handler = QtLogHandler(self) # Pass self as parent
+        self.qt_log_handler.new_log_message.connect(self.append_log_message)
+        logging.getLogger().addHandler(self.qt_log_handler)
+        # Optional: Set a specific level for the GUI log handler if different from root
+        # self.qt_log_handler.setLevel(logging.DEBUG)
+
+
+        self.setup_ui() 
+
         if hasattr(self, 'graph_section') and self.graph_section:
-            # spinbox emits graph_update_frequency_changed(float Hz)
             self.graph_section.graph_update_frequency_changed.connect(self.spin_plotter.set_redraw_rate)
             self.graph_section.graph_update_frequency_changed.connect(self.distance_plotter.set_redraw_rate)
             self.graph_section.graph_update_frequency_changed.connect(self.angular_plotter.set_redraw_rate)
-
-            # initialize each plotter to the spinbox's default
-            # only pull the initial freq if the spinbox already exists
             spin = getattr(self.graph_section, 'freq_spinbox', None)
             if spin is not None:
                 try:
@@ -271,21 +299,26 @@ class MainWindow(QWidget):
                 except Exception:
                     pass
 
-        # Initialize active_config_for_detector with the initial UI settings
-        # This will be updated upon server acknowledgment of config changes
         if hasattr(self, 'camera_settings') and self.camera_settings is not None:
              self.active_config_for_detector = self.camera_settings.get_config()
         else:
-             # Fallback if camera_settings isn't ready for some reason.
              self.active_config_for_detector = None
-             print("[WARNING] MainWindow.__init__: camera_settings not available for initial active_config_for_detector.")
+             logging.warning("[MainWindow.__init__] camera_settings not available for initial active_config_for_detector.")
 
         self.setup_socket_events()
         self.setup_signals()
         self.setup_timers()
         self.tab_widget.currentChanged.connect(self._on_tab_changed)
-        # Graph window reference
         self.graph_window = None
+
+    # <<< Step 4: Add append_log_message method >>>
+    # @pyqtSignal(str) # Decorator not strictly needed here as it's a direct connection
+    def append_log_message(self, message: str):
+        """Appends a message to the log display widget and auto-scrolls."""
+        self.log_display_widget.append(message)
+        scrollbar = self.log_display_widget.verticalScrollBar()
+        if scrollbar: # Check if scrollbar exists
+            scrollbar.setValue(scrollbar.maximum())
 
     def setup_signals(self):
         """Connect internal signals"""
@@ -320,6 +353,7 @@ class MainWindow(QWidget):
             self._graph_update_interval = 1.0 / 1.0 # 1 Hz
             print(f"[MainWindow] Warning: Invalid graph update frequency ({frequency_hz} Hz). Defaulting to 1 Hz.")
             
+
 
     def setup_timers(self):
         """Initialize performance timers"""
@@ -525,52 +559,69 @@ class MainWindow(QWidget):
         parent_layout.addLayout(row1)
 
     def setup_graph_display_row(self, parent_layout):
-        """Setup graph display section and LIDAR section"""
+        """Setup graph display section, LIDAR section, and Log Display"""
         row2 = QHBoxLayout()
-        row2.setSpacing(2) # Keep spacing consistent, adjust if needed
+        row2.setSpacing(2) 
         row2.setContentsMargins(2, 2, 2, 2)
-        row2.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop) # Align top for differing heights
+        row2.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
-        # Graph section with recording capabilities
+        # Graph section
         self.record_btn = QPushButton("Record")
         self.duration_dropdown = QComboBox()
-        # ← hide the dropdown so it never shows up
         self.duration_dropdown.setVisible(False)
-
         self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
-        self.graph_section.setFixedSize(620, 280) # Existing size
+        self.graph_section.setFixedSize(620, 280)
         self.graph_section.graph_display_layout.setSpacing(1)
         self.graph_section.graph_display_layout.setContentsMargins(1, 1, 1, 1)
         self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
-        
         row2.addWidget(self.graph_section)
 
         # LIDAR section
-        # Remove lidar_group and lidar_layout
-        # lidar_group = QGroupBox() 
-        # lidar_layout = QVBoxLayout()
-        # lidar_layout.setSpacing(2)
-        # lidar_layout.setContentsMargins(5, 15, 5, 5) 
-
         self.lidar_widget = LidarWidget()
-        # lidar_layout.addWidget(self.lidar_widget) # Add directly to row2 later
-
         self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
         if hasattr(self.lidar_widget, 'lidar_start_requested'):
             self.lidar_widget.lidar_start_requested.connect(self.start_lidar_streaming)
         if hasattr(self.lidar_widget, 'lidar_stop_requested'):
             self.lidar_widget.lidar_stop_requested.connect(self.stop_lidar_streaming)
-         
-        # Apply sizing directly to self.lidar_widget
-        self.lidar_widget.setFixedHeight(self.graph_section.height()) # Match graph height
-        self.lidar_widget.setFixedWidth(250) # Adjust as needed
+        self.lidar_widget.setFixedHeight(self.graph_section.height()) 
+        self.lidar_widget.setFixedWidth(250) 
+        # Note: LidarWidget is a QGroupBox, so apply_groupbox_style might be called within its __init__
+        # or you can call it here if it's not styled internally and needs the standard group box look.
+        # For now, assuming it handles its own title and basic group box styling.
+        # If it needs the standard border/title from MainWindow's theme:
+        # self.apply_groupbox_style(self.lidar_widget, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
+        row2.addWidget(self.lidar_widget)
+        
+        # <<< Step 5: Add Log Display GroupBox to row2 >>>
+        log_display_group = QGroupBox("Console Log")
+        log_display_layout = QVBoxLayout() # Use a different name if 'log_display_layout' is used elsewhere
+        log_display_layout.setContentsMargins(5, 5, 5, 5)
+        log_display_layout.setSpacing(2)
+        
+        # self.log_display_widget was created in __init__
+        log_display_layout.addWidget(self.log_display_widget)
+        log_display_group.setLayout(log_display_layout)
 
-        # Remove styling for lidar_group
-        # lidar_group.setLayout(lidar_layout)
-        # self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
-        
-        row2.addWidget(self.lidar_widget) # Add LidarWidget directly to row2
-        
+        # Use theme variables for styling the log group box
+        log_group_border_color = getattr(self, 'COLOR_BOX_BORDER_RIGHT', self.BORDER_COLOR)
+        log_group_bg_color = getattr(self, 'COLOR_BOX_BG_RIGHT', self.BOX_BACKGROUND) # Or a specific log bg
+        log_group_title_color = getattr(self, 'COLOR_BOX_TITLE_RIGHT', self.BOX_TITLE_COLOR)
+
+        self.apply_groupbox_style(
+            log_display_group, 
+            log_group_border_color, 
+            bg_color=log_group_bg_color, 
+            title_color=log_group_title_color,
+            is_part_of_right_column=True # Assuming it's styled like other right column items
+        )
+        log_display_group.setFixedHeight(self.graph_section.height()) # Match row height
+        log_display_group.setFixedWidth(350) # Adjust width as needed, or use stretch factor
+
+        row2.addWidget(log_display_group)
+        # Optional: Add stretch factor if you want other widgets to take precedence in width
+        # row2.setStretchFactor(self.graph_section, 2)
+        # row2.setStretchFactor(self.lidar_widget, 1)
+        # row2.setStretchFactor(log_display_group, 1)
         
         parent_layout.addLayout(row2)
 
@@ -1611,7 +1662,6 @@ class MainWindow(QWidget):
             # Check if the original intent was to stream (was_streaming was true)
             # This requires was_streaming to be accessible, e.g. by making it an instance var if needed,
             # or by always attempting to restart if self.streaming is false here.
-            # For simplicity, assuming if self.streaming is false now, we try to restart.
             logging.info("Restarting stream after reconnect...")
             sio.emit("start_camera")
             self.streaming = True # Update state
@@ -1751,6 +1801,7 @@ def check_all_calibrations():
 ############################################################################
 #                              MAIN EXECUTION                               #
 ##############################################################################
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
