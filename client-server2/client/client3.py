@@ -299,6 +299,10 @@ class MainWindow(QWidget):
         self.graph_section.graph_update_frequency_changed.connect(self.distance_plotter.set_redraw_rate)
         self.graph_section.graph_update_frequency_changed.connect(self.angular_plotter.set_redraw_rate)
 
+        self.graph_section.payload_recording_started.connect(self.lidar_widget.start_recording)
+        self.graph_section.payload_recording_stopped.connect(self.lidar_widget.stop_recording)
+
+
     def _on_tab_changed(self, index):
         """When the current tab switches, refresh the Data Analysis plots if needed."""
         from data_analysis import DataAnalysisTab
@@ -541,23 +545,15 @@ class MainWindow(QWidget):
         
         row2.addWidget(self.graph_section)
 
-        # LIDAR section (moved here)
-        lidar_group = QGroupBox() # Title for the LIDAR group
-        lidar_layout = QVBoxLayout()
-        lidar_layout.setSpacing(2)
-        lidar_layout.setContentsMargins(5, 15, 5, 5) # Adjusted margins for title space
+        # LIDAR section
+        # Remove lidar_group and lidar_layout
+        # lidar_group = QGroupBox() 
+        # lidar_layout = QVBoxLayout()
+        # lidar_layout.setSpacing(2)
+        # lidar_layout.setContentsMargins(5, 15, 5, 5) 
 
-        # ── REPLACE PLACEHOLDER WITH LIDARWIDGET ──────────────────────────────
-        # Remove the placeholder:
-        # lidar_placeholder = QLabel("LIDAR Placeholder") # Placeholder text
-        # lidar_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # lidar_placeholder.setStyleSheet(f"background: {self.COLOR_BOX_BG}; color: {TEXT_SECONDARY}; border: 1px dashed #555; border-radius: {BORDER_RADIUS}px; font-size: {FONT_SIZE_NORMAL}pt;")
-        # lidar_layout.addWidget(lidar_placeholder, stretch=1) # Allow placeholder to expand
-
-        # Add the LidarWidget:
         self.lidar_widget = LidarWidget()
-        lidar_layout.addWidget(self.lidar_widget)
-        # ────────────────────────────────────────────────────────────────
+        # lidar_layout.addWidget(self.lidar_widget) # Add directly to row2 later
 
         self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
         if hasattr(self.lidar_widget, 'lidar_start_requested'):
@@ -565,19 +561,15 @@ class MainWindow(QWidget):
         if hasattr(self.lidar_widget, 'lidar_stop_requested'):
             self.lidar_widget.lidar_stop_requested.connect(self.stop_lidar_streaming)
          
+        # Apply sizing directly to self.lidar_widget
+        self.lidar_widget.setFixedHeight(self.graph_section.height()) # Match graph height
+        self.lidar_widget.setFixedWidth(250) # Adjust as needed
 
-        # Adjust LIDAR group's height or the graph section's if they look misaligned.
-        # To make LIDAR group take similar height as graph:
-        lidar_group.setFixedHeight(self.graph_section.height()) # Match graph height
-        # Or allow it to expand:
-        # lidar_group.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        # Remove styling for lidar_group
+        # lidar_group.setLayout(lidar_layout)
+        # self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
         
-        lidar_group.setLayout(lidar_layout)
-        self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
-        # Set a fixed width for LIDAR or let it expand. Example fixed width:
-        lidar_group.setFixedWidth(600) # Adjust as needed, e.g., to fill remaining space if graph_section has fixed width
-
-        row2.addWidget(lidar_group)
+        row2.addWidget(self.lidar_widget) # Add LidarWidget directly to row2
         
         
         parent_layout.addLayout(row2)
@@ -968,19 +960,39 @@ class MainWindow(QWidget):
 
         @sio.on("lidar_broadcast")
         def on_lidar_broadcast(data):
-            """Handles incoming LIDAR data from the server."""
+            """Handles incoming LIDAR data from the server on 'lidar_broadcast'."""
             try:
-                # The 'data' received from the server should be the dictionary:
-                # {"live_distance_cm": ..., "average_distance_cm_5s": ...}
-                # or whatever keys your server-side lidar.py is emitting with "lidar_metrics"
-                if isinstance(data, dict) and ("live_distance_cm" in data or "average_distance_cm_5s" in data) : # Check if data is a dict with expected keys
+                if isinstance(data, dict):
+                    processed_data = {}
+                    # Check if the server is sending the new detailed format
+                    if "live_distance_cm" in data:
+                        processed_data["live_distance_cm"] = data.get("live_distance_cm")
+                        processed_data["average_distance_cm_5s"] = data.get("average_distance_cm_5s") # Will be None if not present
+                    # Else, check if the server is sending the simple format {'distance_cm': ...}
+                    elif "distance_cm" in data:
+                        processed_data["live_distance_cm"] = data.get("distance_cm")
+                        # Since server only sent live distance, average is not available from this message
+                        processed_data["average_distance_cm_5s"] = None
+                    else:
+                        # Data is a dictionary, but doesn't contain expected keys
+                        print(f"[WARNING] Received LIDAR data on 'lidar_broadcast' with unrecognized keys: {data}")
+                        return # Stop processing if format is unknown
+
+                    # Ensure we have at least live_distance_cm to proceed
+                    if "live_distance_cm" not in processed_data or processed_data["live_distance_cm"] is None:
+                        print(f"[WARNING] Could not extract a valid live_distance_cm from LIDAR data: {data}")
+                        return
+
                     if hasattr(self, 'lidar_widget') and self.lidar_widget:
-                        # Call the new method 'set_metrics' with the received dictionary
-                        self.lidar_widget.set_metrics(data)
+                        self.lidar_widget.set_metrics(processed_data)
+                    else:
+                        # This case should ideally not happen if lidar_widget is initialized
+                        print("[WARNING] LidarWidget instance not found when trying to set metrics.")
                 else:
-                    print(f"[WARNING] Received LIDAR data in unexpected format: {data}")
+                    # Data received is not a dictionary
+                    print(f"[WARNING] Received LIDAR data on 'lidar_broadcast' that was not a dictionary: {data}")
             except Exception as e:
-                print(f"[ERROR] Failed to process LIDAR data: {e}")
+                print(f"[ERROR] Failed to process LIDAR data from 'lidar_broadcast': {e}")
                 import traceback
                 traceback.print_exc()
 
@@ -1565,23 +1577,47 @@ class MainWindow(QWidget):
         """Handle socket reconnection logic"""
         was_streaming = self.streaming
         try:
-            if was_streaming:
+            if was_streaming: # if it was streaming, stop it first
                 self.streaming = False
                 self.camera_controls.toggle_btn.setText("Start Stream")
                 sio.emit("stop_camera")
-                time.sleep(0.5)
+                time.sleep(0.5) # give server time to process
             sio.disconnect()
-        except:
-            pass
+        except Exception as e: # Catch specific socketio errors if possible, or general Exception
+            logging.error(f"Error during disconnect phase of reconnect: {e}")
+            # pass # Or log the error
+        
         try:
+            logging.info(f"Attempting to reconnect to {SERVER_URL}...")
             sio.connect(SERVER_URL, wait_timeout=5)
-            self.apply_config()
-            if was_streaming:
-                sio.emit("start_camera")
-                self.streaming = True
-                self.camera_controls.toggle_btn.setText("Stop Stream")
+            # If connect is successful, connect() handler should be called by socketio
+            # which in turn calls self.apply_config()
+            # self.apply_config() # This might be redundant if 'connect' event handler does it.
+                                # However, if 'connect' handler isn't reliably called or if
+                                # apply_config needs to happen immediately after this specific reconnect, keep it.
+            
+            if was_streaming: # if it was streaming before, restart it
+                # Add a small delay to ensure server is ready after (re)connection and config
+                QTimer.singleShot(500, self._restart_stream_after_reconnect)
+                
+        except socketio.exceptions.ConnectionError as e:
+            logging.error(f"Reconnect failed: ConnectionError - {e}")
         except Exception as e:
-            logging.exception("Reconnect failed")
+            logging.exception(f"Reconnect failed with an unexpected error: {e}")
+
+    def _restart_stream_after_reconnect(self):
+        """Helper to restart stream after a delay, ensuring it's still desired."""
+        if self.streaming == False and hasattr(self, 'camera_controls'): # Check if it wasn't already restarted and if UI is available
+            # Check if the original intent was to stream (was_streaming was true)
+            # This requires was_streaming to be accessible, e.g. by making it an instance var if needed,
+            # or by always attempting to restart if self.streaming is false here.
+            # For simplicity, assuming if self.streaming is false now, we try to restart.
+            logging.info("Restarting stream after reconnect...")
+            sio.emit("start_camera")
+            self.streaming = True # Update state
+            self.camera_controls.toggle_btn.setText("Stop Stream")
+        elif self.streaming:
+            logging.info("Stream already running after reconnect or restart not needed.")
 
     def show_message(self, title, message, icon=QMessageBox.Icon.Information):
         """Display styled message box"""

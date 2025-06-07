@@ -21,6 +21,7 @@ from theme import (
     GRAPH_MODE_COLORS,
     BUTTON_HEIGHT, BORDER_WIDTH, BORDER_RADIUS
 )
+import csv # Ensure csv is imported if not already
 
 def sci_fi_button_style(color):
     return f"""
@@ -48,6 +49,8 @@ class GraphSection(QGroupBox):
     # new signal: emits the full path to the CSV just saved
     recording_saved = pyqtSignal(str)
     graph_update_frequency_changed = pyqtSignal(float) # Changed to float for QDoubleSpinBox
+    payload_recording_started = pyqtSignal(str) # New: Emits current_graph_mode
+    payload_recording_stopped = pyqtSignal()    # New: Signals recording has stopped
 
     def __init__(self, record_btn: QPushButton, duration_dropdown: QComboBox, parent=None): # Or load_graph if style is there
         super().__init__(parent)
@@ -389,6 +392,7 @@ class GraphSection(QGroupBox):
             self.recorded_data = []  # Reset the log
             self.recording_start_time = time.time()
             print(f"[INFO] 🔴 Started recording: {self.current_graph_mode}")
+            self.payload_recording_started.emit(self.current_graph_mode) # Emit signal
             
             # Start the recording timer if graph widget exists
             if self.graph_widget and hasattr(self.graph_widget, 'start_recording'):
@@ -412,6 +416,7 @@ class GraphSection(QGroupBox):
                 }}
             """)
             print(f"[INFO] ⏹ Recording stopped: {self.current_graph_mode}")
+            self.payload_recording_stopped.emit() # Emit signal
             
             # Stop the recording timer if graph widget exists
             if self.graph_widget and hasattr(self.graph_widget, 'stop_recording'):
@@ -433,10 +438,12 @@ class GraphSection(QGroupBox):
 
     def save_recording_to_csv(self):
         """Save out recorded_data → CSV and then emit signal."""
-        if not getattr(self, "recorded_data", None):
+        # Ensure self.recorded_data exists and is not empty before proceeding
+        if not hasattr(self, 'recorded_data') or not self.recorded_data:
+            print("[WARNING] No data recorded for payload or 'recorded_data' attribute missing. CSV not saved.")
             return
 
-        import os, time, csv
+        # import os, time, csv # Already imported or should be at the top
         rec_dir = os.path.normpath(
             os.path.join(os.path.dirname(__file__), "..", "recordings")
         )
@@ -447,35 +454,70 @@ class GraphSection(QGroupBox):
             "SCANNING MODE":     "angle_02",
             "SPIN MODE":   "spin_03",
         }
+        
+        mode_str = str(self.current_graph_mode) if self.current_graph_mode else "unknown_mode"
         code = MODE_CODES.get(
-            self.current_graph_mode,
-            self.current_graph_mode.lower().replace(" ", "_")
+            self.current_graph_mode, 
+            mode_str.lower().replace(" ", "_")
         )
-        timestr = time.strftime("%Y-%m-%d_%H-%M", time.localtime())
+        # Recommended: Add seconds to timestr for more unique filenames
+        timestr = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()) 
         fname = f"{code}_{timestr}.csv"
         fullpath = os.path.join(rec_dir, fname)
 
-        with open(fullpath, "w", newline="") as csvf:
-            writer = csv.writer(csvf)
-            writer.writerow(["timestamp", "value"])
-            for entry in self.recorded_data:
-                # handle dict entries
-                if isinstance(entry, dict):
-                    ts = entry.get("timestamp")
-                    val = entry.get("value")
-                # or sequence entries
-                elif isinstance(entry, (list, tuple)) and len(entry) >= 2:
-                    ts, val = entry[:2]
-                else:
-                    continue
+        rows_written = 0
+        try:
+            with open(fullpath, "w", newline="") as csvf:
+                writer = csv.writer(csvf)
+                # Determine headers dynamically or use fixed ones
+                # For simplicity, using fixed "timestamp", "value" as per original structure
+                # If your add_data_point adds more keys, you'd need to adjust headers
+                headers = ["timestamp", "value"]
+                if self.recorded_data and isinstance(self.recorded_data[0], dict):
+                    # Attempt to get more complete headers from the first data point
+                    # This assumes all data points have similar structure
+                    all_keys = list(self.recorded_data[0].keys())
+                    # Ensure 'timestamp' and 'value' are first if they exist
+                    if 'timestamp' in all_keys:
+                        all_keys.pop(all_keys.index('timestamp'))
+                        all_keys.insert(0, 'timestamp')
+                    if 'value' in all_keys:
+                        all_keys.pop(all_keys.index('value'))
+                        # Insert 'value' after 'timestamp' if 'timestamp' is present and first
+                        insert_idx = 1 if headers[0] == 'timestamp' and 'timestamp' in all_keys else 0
+                        all_keys.insert(insert_idx, 'value')
+                    headers = all_keys
+                
+                writer.writerow(headers)
 
-                try:
-                    writer.writerow([float(ts), float(val)])
-                except Exception:
-                    continue
+                for entry in self.recorded_data:
+                    if isinstance(entry, dict):
+                        # Write row based on header order
+                        row_to_write = [entry.get(h) for h in headers]
+                        writer.writerow(row_to_write)
+                        rows_written +=1
+                    elif isinstance(entry, (list, tuple)) and len(entry) >= 2 and headers == ["timestamp", "value"]: # Fallback for old list format
+                        ts, val = entry[:2]
+                        try:
+                            writer.writerow([float(ts), float(val)])
+                            rows_written +=1
+                        except (ValueError, TypeError):
+                            print(f"[DEBUG] Skipping malformed list/tuple entry during CSV save: {entry}")
+                            continue
+                    else:
+                        print(f"[DEBUG] Skipping malformed entry during CSV save: {entry}")
+                        continue
+            
+            if rows_written > 0:
+                print(f"[INFO] ✅ Payload recording saved to {fullpath} with {rows_written} data points.")
+                self.recording_saved.emit(fullpath)
+            else:
+                print(f"[WARNING] Payload CSV file created at {fullpath}, but no valid data points were written.")
 
-        print(f"[INFO] ✅ Recording saved to {fullpath}")
-        self.recording_saved.emit(fullpath)
+        except IOError as e:
+            print(f"[ERROR] Could not write payload to CSV file {fullpath}: {e}")
+        except Exception as e:
+            print(f"[ERROR] An unexpected error occurred during payload CSV saving: {e}")
 
     def exit_graph(self):
         # Stop recording if active

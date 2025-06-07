@@ -129,31 +129,51 @@ class RelativeDistancePlotter(QFrame):
 
     def setup_plot(self):
         """Configure the PyQtGraph plot appearance"""
-        # Configure plot labels
-        self.plot_widget.setLabel('left', 'Distance (m)', color=self.tick_color, size=f'{self.axis_label_size}pt')
-        self.plot_widget.setLabel('right', 'Velocity (m/s)', color=self.velocity_line_color, size=f'{self.axis_label_size}pt')
-        self.plot_widget.setLabel('bottom', 'Time (s)', color=self.tick_color, size=f'{self.axis_label_size}pt')
+        
+        # Font for the main axis labels ("Distance (m)", "Velocity (m/s)", "Time (s)")
+        axis_label_font = QFont(FONT_FAMILY, self.axis_label_size)
+
+        # Configure Left Axis Label (Distance)
+        self.plot_widget.setLabel('left', 'Distance (m)', color=self.tick_color) # Set text and color
+        left_axis = self.plot_widget.getAxis('left')
+        if hasattr(left_axis, 'label') and left_axis.label is not None:
+            left_axis.label.setFont(axis_label_font) # Apply the font (family and size)
+
+        # Configure Right Axis Label (Velocity)
+        self.plot_widget.setLabel('right', 'Velocity (m/s)', color=self.velocity_line_color) # Set text and color
+        right_axis = self.plot_widget.getAxis('right')
+        if hasattr(right_axis, 'label') and right_axis.label is not None:
+            right_axis.label.setFont(axis_label_font) # Apply the font (family and size)
+
+        # Configure Bottom Axis Label (Time)
+        self.plot_widget.setLabel('bottom', 'Time (s)', color=self.tick_color) # Set text and color
+        bottom_axis = self.plot_widget.getAxis('bottom')
+        if hasattr(bottom_axis, 'label') and bottom_axis.label is not None:
+            bottom_axis.label.setFont(axis_label_font) # Apply the font (family and size)
         
         # Show grid
         self.plot_widget.showGrid(x=True, y=True, alpha=0.3)
         
-        # Style the axes
+        # Style the axes pens
         self.plot_widget.getAxis('left').setPen(color=self.tick_color, width=1)
         self.plot_widget.getAxis('right').setPen(color=self.velocity_line_color, width=1)
         self.plot_widget.getAxis('bottom').setPen(color=self.tick_color, width=1)
+        
+        # Style the axes text (tick numbers) color
         self.plot_widget.getAxis('left').setTextPen(color=self.tick_color)
         self.plot_widget.getAxis('right').setTextPen(color=self.velocity_line_color)
         self.plot_widget.getAxis('bottom').setTextPen(color=self.tick_color)
         
-        # Set tick font size
-        font = QFont(FONT_FAMILY, self.axis_number_size)
-        self.plot_widget.getAxis('left').setTickFont(font)
-        self.plot_widget.getAxis('right').setTickFont(font)
-        self.plot_widget.getAxis('bottom').setTickFont(font)
+        # Set tick font (family and size for tick numbers)
+        tick_font = QFont(FONT_FAMILY, self.axis_number_size)
+        self.plot_widget.getAxis('left').setTickFont(tick_font)
+        self.plot_widget.getAxis('right').setTickFont(tick_font)
+        self.plot_widget.getAxis('bottom').setTickFont(tick_font)
         
         # Set fixed Y-axis ranges
         self.plot_widget.setYRange(self.y_axis_min, self.y_axis_max, padding=0)
-        self.plot_widget.setXRange(0, self.x_axis_window, padding=0)
+        # X-axis range is dynamic for scrolling window, initial setup
+        self.plot_widget.setXRange(0, self.x_axis_window, padding=0) 
         
         # Lock Y-axis range and enable X-axis auto-scrolling
         self.plot_widget.setLimits(yMin=self.y_axis_min, yMax=self.y_axis_max)

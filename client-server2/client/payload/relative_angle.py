@@ -65,7 +65,7 @@ class RelativeAnglePlotter(QFrame):
 
         # Create layout and plot widget
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(5, 5, 10, 20)
+        layout.setContentsMargins(5, 5, 10, 32)
         layout.setSpacing(2)
 
         self.plot_widget = pg.PlotWidget()
@@ -92,18 +92,33 @@ class RelativeAnglePlotter(QFrame):
 
     def setup_plot(self):
         """Configure the PyQtGraph plot appearance"""
-        self.plot_widget.setLabel('left', 'Angle (deg)', color=TICK_COLOR, size=f'{self.axis_label_size}pt')
-        self.plot_widget.setLabel('bottom', 'Time (s)', color=TICK_COLOR, size=f'{self.axis_label_size}pt')
+        
+        # Font for the main axis labels ("Angle (deg)", "Time (s)")
+        axis_label_font = QFont(FONT_FAMILY, self.axis_label_size)
+
+        # Configure Left Axis Label
+        self.plot_widget.setLabel('left', 'Angle (deg)', color=TICK_COLOR) # Set text and color
+        left_axis = self.plot_widget.getAxis('left')
+        if hasattr(left_axis, 'label') and left_axis.label is not None: # 'label' is the TextItem
+            left_axis.label.setFont(axis_label_font) # Apply the font (family and size)
+
+        # Configure Bottom Axis Label
+        self.plot_widget.setLabel('bottom', 'Time (s)', color=TICK_COLOR) # Set text and color
+        bottom_axis = self.plot_widget.getAxis('bottom')
+        if hasattr(bottom_axis, 'label') and bottom_axis.label is not None: # 'label' is the TextItem
+            bottom_axis.label.setFont(axis_label_font) # Apply the font (family and size)
+
         self.plot_widget.showGrid(x=True, y=True, alpha=0.3)
         
         self.plot_widget.getAxis('left').setPen(color=TICK_COLOR, width=1)
         self.plot_widget.getAxis('bottom').setPen(color=TICK_COLOR, width=1)
-        self.plot_widget.getAxis('left').setTextPen(color=TICK_COLOR)
-        self.plot_widget.getAxis('bottom').setTextPen(color=TICK_COLOR)
         
-        font = QFont(FONT_FAMILY, self.axis_number_size)
-        self.plot_widget.getAxis('left').setTickFont(font)
-        self.plot_widget.getAxis('bottom').setTickFont(font)
+        # For axis tick numbers - this part was already correct
+        tick_font = QFont(FONT_FAMILY, self.axis_number_size)
+        self.plot_widget.getAxis('left').setTickFont(tick_font)
+        self.plot_widget.getAxis('left').setTextPen(color=TICK_COLOR) # Ensure tick text color is set
+        self.plot_widget.getAxis('bottom').setTickFont(tick_font)
+        self.plot_widget.getAxis('bottom').setTextPen(color=TICK_COLOR) # Ensure tick text color is set
         
         self.plot_widget.setYRange(self.y_axis_min, self.y_axis_max, padding=0)
         self.plot_widget.setXRange(0, self.x_axis_window, padding=0)

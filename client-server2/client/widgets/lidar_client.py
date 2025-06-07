@@ -1,8 +1,8 @@
 import sys
 import time
-# import numpy as np # No longer needed for plotting
+import csv # Make sure csv is imported
+import os  # Make sure os is imported
 import logging
-# import pyqtgraph as pg # No longer needed
 from collections import deque
 
 from PyQt6.QtWidgets import (
@@ -30,26 +30,27 @@ from theme import (
 # X-axis fixed to 10 seconds range
 
 class LidarWidget(QWidget):
-    lidar_metrics_received = pyqtSignal(dict) # Changed signal to accept a dictionary
+    lidar_metrics_received = pyqtSignal(dict)
     back_button_clicked = pyqtSignal()
     lidar_start_requested = pyqtSignal()
     lidar_stop_requested = pyqtSignal()
+    recording_saved = pyqtSignal(str) # New signal for when CSV is saved
 
     def __init__(self):
         super().__init__()
 
         self.is_streaming = False
-        # Deques for history are no longer needed here as server sends average
-        # self.distance_history = deque(maxlen=50)
-        # self.timestamp_history = deque(maxlen=50)
         self.data_mutex = QMutex()
+
+        self.live_distance_history = deque(maxlen=70) 
 
         # Recording attributes
         self.is_recording = False
-        # Store (timestamp, live_distance_cm, average_distance_cm_5s)
+        self.recording_start_time = 0 # To store the start time of a recording session
+        # Store (relative_timestamp_seconds, live_distance_cm)
         self.recorded_data = [] 
 
-        # Initialize UI (plot initialization is removed)
+        # Initialize UI
         self.init_ui()
         
         # Connect the signal to update method
@@ -70,27 +71,33 @@ class LidarWidget(QWidget):
         self.button_page = QWidget()
         button_layout = QVBoxLayout(self.button_page)
         button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.big_lidar_button = QPushButton("LIDAR\nMetrics Monitor") # Updated button text
+        self.big_lidar_button = QPushButton("LIDAR\nMetrics Monitor")
         self.big_lidar_button.setObjectName("big_lidar_button")
         self.big_lidar_button.clicked.connect(self.show_lidar_interface)
-        self.big_lidar_button.setMinimumSize(300, 200)
+        self.big_lidar_button.setMinimumSize(180, 90) 
+
+        accent_color_big_button = BUTTON_COLOR 
+        
         self.big_lidar_button.setStyleSheet(f"""
             QPushButton#big_lidar_button {{
-                background-color: {BUTTON_COLOR};
-                color: {BUTTON_TEXT};
-                border: 2px solid {BORDER_COLOR};
-                border-radius: {BORDER_RADIUS}px;
+                background-color: {BOX_BACKGROUND};
+                color: {TEXT_COLOR};
+                border: 2px solid {accent_color_big_button}; /* Accent color for border */
+                border-radius: 2px; 
+                padding: 8px 14px; 
                 font-family: {FONT_FAMILY};
-                font-size: 18px;
-                font-weight: bold;
-                padding: {PADDING_LARGE}px;
+                font-size: {FONT_SIZE_NORMAL}pt; 
+                font-weight: bold; 
             }}
-            QPushButton#big_lidar_button:hover {{
+            QPushButton#big_lidar_button:hover, QPushButton#big_lidar_button:pressed {{
                 background-color: {BUTTON_HOVER};
-                border-color: {BORDER_HIGHLIGHT};
+                color: black; /* Text color for hover/pressed */
+                border: 2px solid {BUTTON_HOVER}; /* Optional: change border on hover too */
             }}
-            QPushButton#big_lidar_button:pressed {{
-                background-color: {PLOT_LINE_PRIMARY};
+            QPushButton#big_lidar_button:disabled {{
+                background-color: {BUTTON_DISABLED};
+                color: #777; /* Disabled text color from CameraControlsWidget */
+                border: 2px solid #555; /* Disabled border color from CameraControlsWidget */
             }}
         """)
         button_layout.addWidget(self.big_lidar_button)
@@ -101,31 +108,30 @@ class LidarWidget(QWidget):
         main_lidar_layout = QVBoxLayout(self.lidar_page)
         main_lidar_layout.setSpacing(PADDING_NORMAL)
         main_lidar_layout.setContentsMargins(PADDING_NORMAL, PADDING_NORMAL, PADDING_NORMAL, PADDING_NORMAL)
-        main_lidar_layout.setAlignment(Qt.AlignmentFlag.AlignCenter) # Center the metrics panel
+        main_lidar_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # Metrics display panel
         metrics_panel = QWidget()
         metrics_layout = QVBoxLayout(metrics_panel)
-        metrics_layout.setSpacing(PADDING_NORMAL + 5) # Increased spacing
-        metrics_layout.setContentsMargins(PADDING_LARGE, PADDING_LARGE, PADDING_LARGE, PADDING_LARGE) # More padding
+        metrics_layout.setSpacing(PADDING_NORMAL + 5) 
+        metrics_layout.setContentsMargins(PADDING_LARGE, PADDING_LARGE, PADDING_LARGE, PADDING_LARGE) 
         metrics_panel.setStyleSheet(f"""
             QWidget {{
-                background-color: {BOX_BACKGROUND};
+                background-color: {BACKGROUND}; 
                 border: {BORDER_WIDTH}px solid {BORDER_COLOR};
                 border-radius: {BORDER_RADIUS}px;
             }}
         """)
-        metrics_panel.setMinimumWidth(300) # Ensure a decent width
-        metrics_panel.setMaximumWidth(400) # Prevent it from becoming too wide
+        metrics_panel.setMinimumWidth(200) 
+        metrics_panel.setMaximumWidth(200) 
 
         metric_label_style = f"""
             QLabel {{
                 color: {TEXT_COLOR};
                 font-family: {FONT_FAMILY};
-                font-size: {FONT_SIZE_TITLE - 2}pt; /* Slightly larger font */
+                font-size: {FONT_SIZE_TITLE - 2}pt; 
                 padding: 5px;
-                background-color: transparent; /* Ensure no double background */
-                border: none; /* Ensure no double border */
+                background-color: transparent; 
+                border: none; 
             }}
         """
 
@@ -139,20 +145,30 @@ class LidarWidget(QWidget):
         
         self.back_button = QPushButton("Back")
         self.back_button.clicked.connect(self.show_button_interface)
-        self.back_button.setFixedHeight(BUTTON_HEIGHT)
+        self.back_button.setFixedHeight(BUTTON_HEIGHT+10) 
+
+        accent_color_back_button = ERROR_COLOR 
+
         self.back_button.setStyleSheet(f"""
             QPushButton {{
-                background-color: {ERROR_COLOR};
-                color: white;
-                border: {BORDER_WIDTH}px solid {BORDER_COLOR};
-                border-radius: {BORDER_RADIUS}px;
-                padding: 4px 8px;
+                background-color: {BOX_BACKGROUND};
+                color: {TEXT_COLOR};
+                border: 2px solid {accent_color_back_button}; /* Accent color for border */
+                border-radius: 2px; 
+                padding: 8px 14px; 
                 font-family: {FONT_FAMILY};
-                font-size: {FONT_SIZE_NORMAL - 1}px;
-                margin-top: {PADDING_NORMAL}px; /* Add some space above the back button */
+                font-size: {FONT_SIZE_NORMAL}pt; 
+                margin-top: {PADDING_NORMAL}px; 
             }}
-            QPushButton:hover {{
-                background-color: #cc0000;
+            QPushButton:hover, QPushButton:pressed {{
+                background-color: {BUTTON_HOVER}; /* Or a hover color related to ERROR_COLOR if desired */
+                color: black; /* Text color for hover/pressed */
+                border: 2px solid {BUTTON_HOVER}; /* Optional: change border on hover too */
+            }}
+            QPushButton:disabled {{
+                background-color: {BUTTON_DISABLED};
+                color: #777; /* Disabled text color from CameraControlsWidget */
+                border: 2px solid #555; /* Disabled border color from CameraControlsWidget */
             }}
         """)
         
@@ -200,62 +216,91 @@ class LidarWidget(QWidget):
             self.lidar_metrics_received.emit(metrics_data)
 
     def update_metrics_slot(self, metrics: dict):
-        """Update display labels with new metrics data."""
-        if not self.is_streaming: # Don't update if not supposed to be streaming
+        """Update display labels with new metrics data.
+        Calculates 5s average client-side if not provided by server.
+        Records live distance with relative timestamp if recording is active.
+        """
+        if not self.is_streaming: 
             return
 
         live_distance = metrics.get("live_distance_cm")
-        avg_distance = metrics.get("average_distance_cm_5s")
-        timestamp = time.time() # For recording
+        server_avg_distance = metrics.get("average_distance_cm_5s")
+        
+        current_time = time.time() # Get current time for potential recording
+        current_displayed_average = None
 
         if live_distance is not None:
             self.live_distance_label.setText(f"Live Distance: {live_distance:.2f} cm")
+            with QMutexLocker(self.data_mutex):
+                self.live_distance_history.append(live_distance)
         else:
             self.live_distance_label.setText("Live Distance: N/A")
 
-        if avg_distance is not None:
-            self.average_distance_label.setText(f"5s Average: {avg_distance:.2f} cm")
+        if server_avg_distance is not None:
+            current_displayed_average = server_avg_distance
+        else:
+            with QMutexLocker(self.data_mutex):
+                if self.live_distance_history: 
+                    current_displayed_average = sum(self.live_distance_history) / len(self.live_distance_history)
+
+        if current_displayed_average is not None:
+            self.average_distance_label.setText(f"5s Average: {current_displayed_average:.2f} cm")
         else:
             self.average_distance_label.setText("5s Average: N/A")
 
-        if self.is_recording and live_distance is not None: # Also check avg_distance if you want to ensure both are present for recording
+        if self.is_recording and live_distance is not None:
             with QMutexLocker(self.data_mutex):
-                self.recorded_data.append((timestamp, live_distance, avg_distance if avg_distance is not None else -1.0)) # Store -1 if avg is None
+                # Calculate relative timestamp
+                relative_timestamp = current_time - self.recording_start_time
+                self.recorded_data.append((relative_timestamp, live_distance))
 
     # update_plot method is removed
 
     def start_recording(self):
-        if self.is_streaming:
+        if self.is_streaming: 
             with QMutexLocker(self.data_mutex):
                 self.is_recording = True
-                self.recorded_data = []
-                logging.info("LIDAR metrics recording started.")
+                self.recorded_data = [] 
+                self.recording_start_time = time.time() # Set recording start time
+                logging.info("LIDAR metrics recording started (live data only, relative timestamps).")
+        else:
+            logging.warning("LIDAR not streaming. Cannot start recording metrics.")
 
     def stop_recording(self):
         data_to_save = []
+        was_recording = False 
         with QMutexLocker(self.data_mutex):
+            was_recording = self.is_recording 
             self.is_recording = False
             if hasattr(self, 'recorded_data'):
                 data_to_save = self.recorded_data.copy()
-                self.recorded_data = []
+                self.recorded_data = [] 
         
-        if data_to_save:
+        if was_recording and data_to_save: 
             self.save_lidar_recording(data_to_save)
-        else:
-            logging.info("No LIDAR metrics data to save.")
+        elif was_recording: 
+            logging.info("LIDAR metrics recording stopped. No data to save.")
 
 
     def save_lidar_recording(self, data):
-        import csv
-        # Consider making filename more dynamic or configurable
-        filename = "lidar_metrics_recording.csv" 
+        rec_dir = os.path.normpath(
+            os.path.join(os.path.dirname(__file__), "..", "recordings") 
+        )
+        os.makedirs(rec_dir, exist_ok=True)
+
+        timestr = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()) 
+        fname = f"lidar_{timestr}.csv" 
+        fullpath = os.path.join(rec_dir, fname)
+
         try:
-            with open(filename, "w", newline="") as f:
+            with open(fullpath, "w", newline="") as f:
                 writer = csv.writer(f)
-                writer.writerow(["Timestamp", "Live Distance (cm)", "5s Average (cm)"])
-                for row_data in data: # Ensure row_data is a tuple/list
+                # Updated headers for relative timestamp and live distance only
+                writer.writerow(["timestamp", "value"])
+                for row_data in data: 
                     writer.writerow(row_data)
-            logging.info(f"LIDAR metrics recording saved to {filename}")
+            logging.info(f"LIDAR metrics recording saved to {fullpath}")
+            self.recording_saved.emit(fullpath) 
         except Exception as e:
             logging.error(f"Error saving LIDAR metrics recording: {e}")
 
@@ -263,12 +308,11 @@ class LidarWidget(QWidget):
         if self.is_streaming:
             self.toggle_lidar_streaming()
 
-    def clear_history(self): # This method might be less relevant now
+    def clear_history(self):
         with QMutexLocker(self.data_mutex):
-            # self.distance_history.clear() # Removed
-            # self.timestamp_history.clear() # Removed
-            if hasattr(self, 'recorded_data'): # Clear any pending recorded data if needed
+            self.live_distance_history.clear() # Clear the client-side history
+            if hasattr(self, 'recorded_data'): 
                  self.recorded_data = []
         self.live_distance_label.setText("Live Distance: -- cm")
         self.average_distance_label.setText("5s Average: -- cm")
-        logging.info("LIDAR metrics display cleared.")
+        logging.info("LIDAR metrics display and history cleared.")
