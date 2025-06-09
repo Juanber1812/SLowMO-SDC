@@ -3,13 +3,13 @@
 #                         Satellite Control Interface                       #
 ##############################################################################
 
-import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os # Ensure logging is imported
+import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os
 import pandas as pd
 import traceback
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea,
-    QTabWidget, QFileDialog, QTextEdit # <<< Added QTextEdit here
+    QTabWidget, QFileDialog, QTextEdit
 )
 
 import matplotlib
@@ -34,7 +34,7 @@ class SafeStreamHandler(logging.StreamHandler):
 
 # Configure logging properly at the module level
 logging.basicConfig(
-    level=logging.INFO, # You can set the desired default level here
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler('client_log.txt'),
@@ -80,12 +80,10 @@ from theme import (
     BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE, BUTTON_HEIGHT
 )
 
-
 ##############################################################################
 #                            CONFIGURATION                                  #
 ##############################################################################
 
-# logging.basicConfig(filename='client_log.txt', level=logging.DEBUG) # <<< This line is redundant if the above config is used.
 SERVER_URL = "http://192.168.1.146:5000"
 
 ##############################################################################
@@ -94,7 +92,6 @@ SERVER_URL = "http://192.168.1.146:5000"
 
 sio = socketio.Client()
 
-# <<< Step 2: Define QtLogHandler >>>
 class QtLogHandler(logging.Handler, QObject):
     """
     Custom logging handler that emits a signal for each log record.
@@ -105,11 +102,13 @@ class QtLogHandler(logging.Handler, QObject):
         logging.Handler.__init__(self)
         QObject.__init__(self, parent)
         # Set a default formatter, can be customized
-        self.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        self.setFormatter(logging.Formatter('%(message)s'))
 
     def emit(self, record):
         if record:
             msg = self.format(record)
+            print(f"[DEBUG QtLogHandler.emit] Emitting: {msg}") # <<< ADD THIS DEBUG PRINT
+
             self.new_log_message.emit(msg)
 
 class Bridge(QObject):
@@ -123,7 +122,6 @@ bridge = Bridge()
 ##############################################################################
 
 class MainWindow(QWidget):
-    # ... (your existing signals and theme configuration) ...
     speedtest_result = pyqtSignal(float, float)  # upload_mbps, max_frame_size_kb
     latencyUpdated = pyqtSignal(float)
 
@@ -215,14 +213,14 @@ class MainWindow(QWidget):
     STREAM_HEIGHT = 216
     MARGIN = 10
 
-
     #=========================================================================
     #                           INITIALIZATION                               
     #=========================================================================
 
     def __init__(self):
         super().__init__()
-        self.show_crosshairs = False
+        self.show_crosshairs = False  # Add this line
+        # Set global styling
         self.setStyleSheet(f"""
             QWidget {{
                 background-color: {BACKGROUND};
@@ -232,8 +230,10 @@ class MainWindow(QWidget):
             }}
         """)
         self.smooth_mode = None
+        # Window configuration
         self.setWindowTitle("SLowMO Client")
         
+        # Initialize state variables
         self.streaming = False
         self.detector_active = False
         self.frame_queue = queue.Queue()
@@ -241,22 +241,32 @@ class MainWindow(QWidget):
         self.shared_start_time = None
         self.calibration_change_time = None
 
+        # Performance tracking
         self.last_frame_time = time.time()
         self.frame_counter = 0
         self.current_fps = 0
         self.current_frame_size = 0
 
+
+        # display‐FPS counters
         self.display_frame_counter = 0
         self.current_display_fps   = 0
-        
+        # ── end patch ──
+
+        # ── start patch ──
+        # throttle graph redraws
         self._last_graph_draw = 0.0
+        # Initialize with a default (e.g., 2 Hz). This will be updated by GraphSection's signal.
         self._graph_update_interval = 1.0 / 2.0 
-        
+        # ── end patch ──
+
+        # ── instantiate plotters early ─────────────────────────────
         self.spin_plotter     = AngularPositionPlotter()
         self.distance_plotter = RelativeDistancePlotter()
         self.angular_plotter  = RelativeAnglePlotter()
+        # ── end instantiation ───────────────────────────────────────
 
-        # <<< Step 3: Initialize Log Display and Handler >>>
+        # Setup Log Display Widget
         self.log_display_widget = QTextEdit()
         self.log_display_widget.setReadOnly(True)
         # Use theme variables for styling if available, otherwise fallbacks
@@ -266,28 +276,35 @@ class MainWindow(QWidget):
         
         self.log_display_widget.setStyleSheet(f"""
             QTextEdit {{
-                background-color: #1A1A1A; 
-                color: {log_text_color};
-                font-family: {log_font_family};
+                background-color: {SECOND_COLUMN}; 
+                color: {TEXT_COLOR};
+                font-family: {FONT_FAMILY};
                 font-size: 9pt;
-                border: 1px solid {log_border_color};
-                border-radius: {getattr(self, 'BORDER_RADIUS', 3)}px;
+                border: 0px solid {BORDER_COLOR};
             }}
         """)
 
+        # Setup custom log handler
         self.qt_log_handler = QtLogHandler(self) # Pass self as parent
         self.qt_log_handler.new_log_message.connect(self.append_log_message)
+        
+        # <<< ADD THIS LINE to explicitly set the handler's level >>>
+        self.qt_log_handler.setLevel(logging.INFO) # Or logging.DEBUG for more detail
+        
         logging.getLogger().addHandler(self.qt_log_handler)
-        # Optional: Set a specific level for the GUI log handler if different from root
-        # self.qt_log_handler.setLevel(logging.DEBUG)
 
+        # Setup UI and connections
+        self.setup_ui() # self.camera_settings and self.graph_section are created here
 
-        self.setup_ui() 
-
+        # ── Hook the graph‐rate spinbox to each plotter’s redraw rate ─────────
         if hasattr(self, 'graph_section') and self.graph_section:
+            # spinbox emits graph_update_frequency_changed(float Hz)
             self.graph_section.graph_update_frequency_changed.connect(self.spin_plotter.set_redraw_rate)
             self.graph_section.graph_update_frequency_changed.connect(self.distance_plotter.set_redraw_rate)
             self.graph_section.graph_update_frequency_changed.connect(self.angular_plotter.set_redraw_rate)
+
+            # initialize each plotter to the spinbox's default
+            # only pull the initial freq if the spinbox already exists
             spin = getattr(self.graph_section, 'freq_spinbox', None)
             if spin is not None:
                 try:
@@ -299,22 +316,30 @@ class MainWindow(QWidget):
                 except Exception:
                     pass
 
+        # Initialize active_config_for_detector with the initial UI settings
+        # This will be updated upon server acknowledgment of config changes
         if hasattr(self, 'camera_settings') and self.camera_settings is not None:
              self.active_config_for_detector = self.camera_settings.get_config()
         else:
+             # Fallback if camera_settings isn't ready for some reason.
              self.active_config_for_detector = None
-             logging.warning("[MainWindow.__init__] camera_settings not available for initial active_config_for_detector.")
+             logging("[WARNING] MainWindow.__init__: camera_settings not available for initial active_config_for_detector.")
 
         self.setup_socket_events()
         self.setup_signals()
         self.setup_timers()
         self.tab_widget.currentChanged.connect(self._on_tab_changed)
+        # Graph window reference
         self.graph_window = None
 
-    # <<< Step 4: Add append_log_message method >>>
-    # @pyqtSignal(str) # Decorator not strictly needed here as it's a direct connection
+            # ... (inside MainWindow class) ...
+        # Graph window reference
+        self.graph_window = None
+
     def append_log_message(self, message: str):
         """Appends a message to the log display widget and auto-scrolls."""
+        print(f"[DEBUG MainWindow.append_log_message] Received for GUI: {message}") # <<< ADD THIS DEBUG PRINT
+
         self.log_display_widget.append(message)
         scrollbar = self.log_display_widget.verticalScrollBar()
         if scrollbar: # Check if scrollbar exists
@@ -347,13 +372,12 @@ class MainWindow(QWidget):
         """Slot to update the graph update interval when GraphSection's spinbox changes."""
         if frequency_hz > 0:
             self._graph_update_interval = 1.0 / frequency_hz
-            print(f"[MainWindow] Graph update interval changed to {self._graph_update_interval:.3f}s ({frequency_hz} Hz)")
+            logging.info(f"Graph update interval changed to {self._graph_update_interval:.3f}s ({frequency_hz} Hz)")
         else:
             # Fallback to a sensible default if frequency is zero or negative
             self._graph_update_interval = 1.0 / 1.0 # 1 Hz
-            print(f"[MainWindow] Warning: Invalid graph update frequency ({frequency_hz} Hz). Defaulting to 1 Hz.")
+            logging.warning(f"Invalid graph update frequency ({frequency_hz} Hz). Defaulting to 1 Hz.")
             
-
 
     def setup_timers(self):
         """Initialize performance timers"""
@@ -464,7 +488,7 @@ class MainWindow(QWidget):
     def handle_lidar_back_button(self):
         """Handles the back button click from the LidarWidget."""
         self.lidar_widget.stop_lidar()
-        print("Back button clicked in LidarWidget")
+        logging.info("Back button clicked in LidarWidget")
 
     def setup_main_tab(self):
         """Setup the main mission control interface"""
@@ -559,69 +583,75 @@ class MainWindow(QWidget):
         parent_layout.addLayout(row1)
 
     def setup_graph_display_row(self, parent_layout):
-        """Setup graph display section, LIDAR section, and Log Display"""
+        """Setup graph display section and LIDAR section"""
         row2 = QHBoxLayout()
-        row2.setSpacing(2) 
+        row2.setSpacing(2) # Keep spacing consistent, adjust if needed
         row2.setContentsMargins(2, 2, 2, 2)
-        row2.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        row2.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop) # Align top for differing heights
 
-        # Graph section
+        # Graph section with recording capabilities
         self.record_btn = QPushButton("Record")
         self.duration_dropdown = QComboBox()
+        # ← hide the dropdown so it never shows up
         self.duration_dropdown.setVisible(False)
+
         self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
-        self.graph_section.setFixedSize(620, 280)
+        self.graph_section.setFixedSize(620, 280) # Existing size
         self.graph_section.graph_display_layout.setSpacing(1)
         self.graph_section.graph_display_layout.setContentsMargins(1, 1, 1, 1)
         self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
+        
         row2.addWidget(self.graph_section)
 
         # LIDAR section
+        # Remove lidar_group and lidar_layout
+        # lidar_group = QGroupBox() 
+        # lidar_layout = QVBoxLayout()
+        # lidar_layout.setSpacing(2)
+        # lidar_layout.setContentsMargins(5, 15, 5, 5) 
+
         self.lidar_widget = LidarWidget()
+        # lidar_layout.addWidget(self.lidar_widget) # Add directly to row2 later
+
         self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
         if hasattr(self.lidar_widget, 'lidar_start_requested'):
             self.lidar_widget.lidar_start_requested.connect(self.start_lidar_streaming)
         if hasattr(self.lidar_widget, 'lidar_stop_requested'):
             self.lidar_widget.lidar_stop_requested.connect(self.stop_lidar_streaming)
-        self.lidar_widget.setFixedHeight(self.graph_section.height()) 
-        self.lidar_widget.setFixedWidth(250) 
-        # Note: LidarWidget is a QGroupBox, so apply_groupbox_style might be called within its __init__
-        # or you can call it here if it's not styled internally and needs the standard group box look.
-        # For now, assuming it handles its own title and basic group box styling.
-        # If it needs the standard border/title from MainWindow's theme:
-        # self.apply_groupbox_style(self.lidar_widget, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
-        row2.addWidget(self.lidar_widget)
+         
+        # Apply sizing directly to self.lidar_widget
+        self.lidar_widget.setFixedHeight(self.graph_section.height()) # Match graph height
+        self.lidar_widget.setFixedWidth(250) # Adjust as needed
+
+        # Remove styling for lidar_group
+        # lidar_group.setLayout(lidar_layout)
+        # self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
         
-        # <<< Step 5: Add Log Display GroupBox to row2 >>>
-        log_display_group = QGroupBox("Console Log")
-        log_display_layout = QVBoxLayout() # Use a different name if 'log_display_layout' is used elsewhere
-        log_display_layout.setContentsMargins(5, 5, 5, 5)
-        log_display_layout.setSpacing(2)
+        row2.addWidget(self.lidar_widget) # Add LidarWidget directly to row2
+        
+        # Console Log Display Section
+        log_display_group = QGroupBox()
+        log_display_layout = QVBoxLayout() 
+        log_display_layout.setContentsMargins(0, 0, 0, 0)
+        log_display_layout.setSpacing(1)
         
         # self.log_display_widget was created in __init__
         log_display_layout.addWidget(self.log_display_widget)
         log_display_group.setLayout(log_display_layout)
 
         # Use theme variables for styling the log group box
-        log_group_border_color = getattr(self, 'COLOR_BOX_BORDER_RIGHT', self.BORDER_COLOR)
-        log_group_bg_color = getattr(self, 'COLOR_BOX_BG_RIGHT', self.BOX_BACKGROUND) # Or a specific log bg
-        log_group_title_color = getattr(self, 'COLOR_BOX_TITLE_RIGHT', self.BOX_TITLE_COLOR)
+        log_group_border_color = getattr(self, 'COLOR_BOX_BORDER_RIGHT', self.COLOR_BOX_BORDER) 
+        log_group_bg_color = getattr(self, 'COLOR_BOX_BG_RIGHT', self.COLOR_BOX_BG) 
+        log_group_title_color = getattr(self, 'COLOR_BOX_TITLE_RIGHT', self.COLOR_BOX_TITLE_RIGHT) # Changed self.BOX_TITLE_COLOR to self.COLOR_BOX_TITLE_RIGHT
 
         self.apply_groupbox_style(
             log_display_group, 
             log_group_border_color, 
-            bg_color=log_group_bg_color, 
-            title_color=log_group_title_color,
-            is_part_of_right_column=True # Assuming it's styled like other right column items
+            log_group_bg_color, 
+            log_group_title_color,
+            is_part_of_right_column=False # Explicitly flag as right column item
         )
-        log_display_group.setFixedHeight(self.graph_section.height()) # Match row height
-        log_display_group.setFixedWidth(350) # Adjust width as needed, or use stretch factor
-
         row2.addWidget(log_display_group)
-        # Optional: Add stretch factor if you want other widgets to take precedence in width
-        # row2.setStretchFactor(self.graph_section, 2)
-        # row2.setStretchFactor(self.lidar_widget, 1)
-        # row2.setStretchFactor(log_display_group, 1)
         
         parent_layout.addLayout(row2)
 
@@ -644,10 +674,10 @@ class MainWindow(QWidget):
         
         if self.show_crosshairs:
             self.camera_controls.orientation_btn.setText("Hide Crosshairs")
-            print("[INFO] Manual orientation crosshairs enabled")
+            logging.info("Manual orientation crosshairs enabled")
         else:
-            self.camera_controls.orientation_btn.setText("Manual Orientation")
-            print("[INFO] Manual orientation crosshairs disabled")
+            self.camera_controls.orientation_btn.setText("Show Crosshairs")
+            logging.info("Manual orientation crosshairs disabled")
         
     def setup_subsystem_controls_row(self, parent_layout):
         """Setup ADCS controls using ADCSSection widget"""
@@ -675,16 +705,7 @@ class MainWindow(QWidget):
         row3.addWidget(self.adcs_control_widget)
         parent_layout.addLayout(row3)
 
-    # Optional: Add handler methods in client3.py if you connect signals from ADCSSection
-    # def handle_adcs_mode_selection(self, mode_index, mode_name):
-    #     print(f"[Client3] ADCS Mode selected: Index {mode_index}, Name '{mode_name}'")
-    #     # Add logic here to respond to ADCS mode changes
-
-    # def handle_adcs_command(self, mode_name, command_name):
-    #     print(f"[Client3] ADCS Command: Mode '{mode_name}', Command '{command_name}'")
-    #     # Here you would typically emit a socketio event to the server
-    #     # sio.emit("adcs_command", {"mode": mode_name, "command": command_name})
-
+   
     def setup_system_info_panel(self):
         """Setup right column system information panel"""
         info_container = QWidget()
@@ -780,7 +801,7 @@ class MainWindow(QWidget):
                 f"Health report exported to:\n{file_path}",
                 QMessageBox.Icon.Information
             )
-            print(f"[INFO] Health report exported to: {file_path}")
+            logging(f"[INFO] Health report exported to: {file_path}")
 
         except Exception as e:
             self.show_message(
@@ -788,7 +809,7 @@ class MainWindow(QWidget):
                 f"Failed to export health report:\n{e}",
                 QMessageBox.Icon.Critical
             )
-            print(f"[ERROR] Health report export failed: {e}")
+            logging(f"[ERROR] Health report export failed: {e}")
 
     def setup_system_performance_group(self, parent_layout):
         """Setup system performance monitoring group"""
@@ -922,7 +943,7 @@ class MainWindow(QWidget):
             # ── patch ──
             self.display_frame_counter += 1
         except Exception as e:
-            print(f"[ERROR] Failed to update image: {e}")
+            logging.error(f"Failed to update image: {e}")
 
     def update_analysed_image(self, frame):
         """Update video display with analyzed frame"""
@@ -947,7 +968,7 @@ class MainWindow(QWidget):
             self.video_label.setPixmap(pixmap)
             self.display_frame_counter += 1
         except Exception as e:
-            print(f"[ERROR] Failed to update analyzed image: {e}")
+            logging.error(f"Failed to update analyzed image: {e}")
 
     #=========================================================================
     #                          SOCKET COMMUNICATION                          
@@ -958,7 +979,7 @@ class MainWindow(QWidget):
         
         @sio.event
         def connect():
-            print("[INFO] ✓ Connected to server")
+            logging.info("Connected to server")
             self.comms_status_label.setText("Status: Connected")
             self.camera_controls.toggle_btn.setEnabled(True)
             self.detector_controls.detector_btn.setEnabled(True)
@@ -974,7 +995,7 @@ class MainWindow(QWidget):
 
         @sio.event
         def disconnect(reason=None):
-            print(f"[INFO] ❌ Disconnected from server: {reason}")
+            logging.info(f"Disconnected from server: {reason}")
             self.comms_status_label.setText("Status: Disconnected")
             self.camera_controls.toggle_btn.setEnabled(False)
             self.detector_controls.detector_btn.setEnabled(False)
@@ -1026,24 +1047,24 @@ class MainWindow(QWidget):
                         processed_data["average_distance_cm_5s"] = None
                     else:
                         # Data is a dictionary, but doesn't contain expected keys
-                        print(f"[WARNING] Received LIDAR data on 'lidar_broadcast' with unrecognized keys: {data}")
+                        logging.warning(f"Received LIDAR data on 'lidar_broadcast' with unrecognized keys: {data}")
                         return # Stop processing if format is unknown
 
                     # Ensure we have at least live_distance_cm to proceed
                     if "live_distance_cm" not in processed_data or processed_data["live_distance_cm"] is None:
-                        print(f"[WARNING] Could not extract a valid live_distance_cm from LIDAR data: {data}")
+                        logging.warning(f"Could not extract a valid live_distance_cm from LIDAR data: {data}")
                         return
 
                     if hasattr(self, 'lidar_widget') and self.lidar_widget:
                         self.lidar_widget.set_metrics(processed_data)
                     else:
                         # This case should ideally not happen if lidar_widget is initialized
-                        print("[WARNING] LidarWidget instance not found when trying to set metrics.")
+                        logging.warning("LidarWidget instance not found when trying to set metrics.")
                 else:
                     # Data received is not a dictionary
-                    print(f"[WARNING] Received LIDAR data on 'lidar_broadcast' that was not a dictionary: {data}")
+                    logging.warning(f"Received LIDAR data on 'lidar_broadcast' that was not a dictionary: {data}")
             except Exception as e:
-                print(f"[ERROR] Failed to process LIDAR data from 'lidar_broadcast': {e}")
+                logging.error(f"Failed to process LIDAR data from 'lidar_broadcast': {e}")
                 import traceback
                 traceback.print_exc()
 
@@ -1053,7 +1074,7 @@ class MainWindow(QWidget):
             try:
                 status = data.get('status', 'unknown')
                 streaming = data.get('streaming', False)
-                print(f"[INFO] LIDAR Status: {status}, Streaming: {streaming}")
+                logging.info(f"LIDAR Status: {status}, Streaming: {streaming}")
                 
                 # Update LIDAR widget streaming state if needed
                 if hasattr(self.lidar_widget, 'is_streaming'):
@@ -1064,23 +1085,23 @@ class MainWindow(QWidget):
                             "Stop LIDAR" if streaming else "Start LIDAR"
                         )
             except Exception as e:
-                print(f"[ERROR] Failed to process LIDAR status: {e}")
+                logging.error(f"Failed to process LIDAR status: {e}")
 
     def start_lidar_streaming(self):
         """Start LIDAR data streaming from server"""
         if sio.connected:
-            print("[INFO] Requesting LIDAR streaming start")
+            logging.info("Requesting LIDAR streaming start")
             sio.emit("start_lidar")
         else:
-            print("[WARNING] Cannot start LIDAR - not connected to server")
+            logging.warning("Cannot start LIDAR - not connected to server")
 
     def stop_lidar_streaming(self):
         """Stop LIDAR data streaming from server"""
         if sio.connected:
-            print("[INFO] Requesting LIDAR streaming stop")
+            logging.info("Requesting LIDAR streaming stop")
             sio.emit("stop_lidar")
         else:
-            print("[WARNING] Cannot stop LIDAR - not connected to server")
+            logging.warning("Cannot stop LIDAR - not connected to server")
 
     def delayed_server_setup(self):
         """Called shortly after connect—override if needed."""
@@ -1097,9 +1118,9 @@ class MainWindow(QWidget):
                 self.frame_counter += 1
                 bridge.frame_received.emit(frame)
             else:
-                print("[WARNING] Frame decode failed")
+                logging.warning("Frame decode failed")
         except Exception as e:
-            print(f"[ERROR] Frame processing error: {e}")
+            logging.error(f"Frame processing error: {e}")
 
     def update_sensor_display(self, data):
         """Update sensor information display"""
@@ -1109,7 +1130,7 @@ class MainWindow(QWidget):
             self.info_labels["temp"].setText(f"Temp: {temp:.1f} °C")
             self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
         except Exception as e:
-            print(f"[ERROR] Sensor update error: {e}")
+            logging.error(f"Sensor update error: {e}")
 
     def update_camera_status(self, data):
         """Update camera status display"""
@@ -1127,18 +1148,18 @@ class MainWindow(QWidget):
                 self.camera_ready_label.setStyleSheet("color: #f00;")
                 
         except Exception as e:
-            print(f"[ERROR] Camera status update error: {e}")
+            logging.error(f"Camera status update error: {e}")
 
     def handle_image_capture_response(self, data):
         """Handle server response to image capture request"""
         try:
             if data["success"]:
-                print(f"[INFO] ✓ Image captured: {data['path']} ({data['size_mb']} MB)")
+                logging.info(f"Image captured: {data['path']} ({data['size_mb']} MB)")
                 self.download_captured_image(data['path'])
             else:
-                print(f"[ERROR] ❌ Image capture failed: {data['error']}")
+                logging.error(f"Image capture failed: {data['error']}")
         except Exception as e:
-            print(f"[ERROR] Failed to handle capture response: {e}")
+            logging.error(f"Failed to handle capture response: {e}")
 
     def handle_image_download(self, data):
         """Handle downloaded image from server"""
@@ -1153,12 +1174,12 @@ class MainWindow(QWidget):
                 with open(local_path, 'wb') as f:
                     f.write(image_data)
                 
-                print(f"[INFO] ✅ Image saved: {local_path} ({data['size']/1024:.1f} KB)")
+                logging.info(f"Image saved: {local_path} ({data['size']/1024:.1f} KB)")
             else:
-                print(f"[ERROR] ❌ Image download failed: {data['error']}")
+                logging.error(f"Image download failed: {data['error']}")
                 
         except Exception as e:
-            print(f"[ERROR] Failed to save downloaded image: {e}")
+            logging.error(f"Failed to save downloaded image: {e}")
 
     #=========================================================================
     #                        CAMERA AND DETECTION                           
@@ -1174,7 +1195,7 @@ class MainWindow(QWidget):
 
     def apply_config(self):
         """Apply camera configuration changes"""
-        print("[INFO] Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.")
+        logging.info("Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.")
         
         # Capture current streaming state for this specific call
         was_streaming_for_this_call = self.streaming
@@ -1188,7 +1209,7 @@ class MainWindow(QWidget):
                 sio.emit("stop_camera")
                 self.streaming = False
                 self.camera_controls.toggle_btn.setText("Start Stream")
-                print("[INFO] Stream paused for config application.")
+                logging.info("Stream paused for config application.")
 
 
         # 2. Initiate graph pause immediately
@@ -1202,7 +1223,7 @@ class MainWindow(QWidget):
 
     def _execute_config_application_after_pause(self, was_streaming_at_call_time):
         """Helper method to get/send config and update detector after the initial 0.5s pause."""
-        print(f"[INFO] 0.5s pause complete. Getting/sending configuration (stream was {was_streaming_at_call_time}).")
+        logging.info(f"0.5s pause complete. Getting/sending configuration (stream was {was_streaming_at_call_time}).")
         
         # Get and send configuration
         config = self.camera_settings.get_config()
@@ -1222,7 +1243,7 @@ class MainWindow(QWidget):
                     sio.emit("start_camera")
                     self.streaming = True
                     self.camera_controls.toggle_btn.setText("Stop Stream")
-                    print("[INFO] Stream restart scheduled (if it was on before apply_config).")
+                    logging.info("Stream restart scheduled (if it was on before apply_config).")
 
             threading.Timer(0.2, restart_stream_if_needed).start()
         
@@ -1243,17 +1264,17 @@ class MainWindow(QWidget):
             if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
                 success = detector4.detector_instance.update_calibration(calibration_path)
                 if success:
-                    print(f"[INFO] ✓ Detector calibration updated: {calibration_path}")
+                    logging.info(f"Detector calibration updated: {calibration_path}")
                     # Verify the calibration was actually loaded
                     if hasattr(detector4.detector_instance, 'mtx'):
                         cy = detector4.detector_instance.mtx[1, 2] if detector4.detector_instance.mtx is not None else "None"
                 else:
-                    print(f"[WARNING] ❌ Failed to update detector calibration")
+                    logging.info(f"[WARNING] ❌ Failed to update detector calibration")
             else:
-                print(f"[WARNING] Detector instance not available for calibration update")
+                logging.info(f"[WARNING] Detector instance not available for calibration update")
             
         except Exception as e:
-            print(f"[ERROR] Calibration update failed: {e}")
+            logging.info(f"[ERROR] Calibration update failed: {e}")
 
     def toggle_detector(self):
         """Toggle object detection on/off"""
@@ -1261,10 +1282,10 @@ class MainWindow(QWidget):
         self.detector_controls.detector_btn.setText("Stop Detector" if self.detector_active else "Start Detector")
         
         if self.detector_active:
-            print("[INFO] 🚀 Starting detector...")
+            logging.info("[INFO] 🚀 Starting detector...")
             threading.Thread(target=self.run_detector, daemon=True).start()
         else:
-            print("[INFO] 🛑 Stopping detector...")
+            logging.info("[INFO] 🛑 Stopping detector...")
             self.clear_queue()
 
     def show_full_image(self):
@@ -1293,15 +1314,17 @@ class MainWindow(QWidget):
                     self._full_lbl.setPixmap(scaled_pix)
                     self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 else:
-                    print(f"[ERROR] Failed to load image: {image_path}")
+                    logging.info(f"[ERROR] Failed to load image: {image_path}")
                     self._full_lbl.setText("Failed to load image")
                     self._full_lbl.setStyleSheet(f"background-color: black; color: {TEXT_COLOR}; font-size: 24pt;")
                     self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                    self._full_lbl.show()
             else:
-                print(f"[ERROR] Image file not found: {image_path}")
+                logging.info(f"[ERROR] Image file not found: {image_path}")
                 self._full_lbl.setText("Image file not found")
                 self._full_lbl.setStyleSheet(f"background-color: black; color: {TEXT_COLOR}; font-size: 24pt;")
                 self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                self._full_lbl.show()
             
             # Create back button
             self._back_btn = QPushButton("← Back", self)
@@ -1331,10 +1354,10 @@ class MainWindow(QWidget):
             self._full_lbl.raise_()
             self._back_btn.raise_()
             
-            print("[INFO] Full image view activated")
+            logging.info("[INFO] Full image view activated")
             
         except Exception as e:
-            print(f"[ERROR] Failed to show full image: {e}")
+            logging.info(f"[ERROR] Failed to show full image: {e}")
             # Fallback: restore normal view
             if hasattr(self, '_full_lbl'):
                 self._full_lbl.hide()
@@ -1359,10 +1382,10 @@ class MainWindow(QWidget):
             # Restore main UI
             self.tab_widget.show()
             
-            print("[INFO] Returned to normal view")
+            logging.info("[INFO] Returned to normal view")
             
         except Exception as e:
-            print(f"[ERROR] Failed to hide full image: {e}")
+            logging.info(f"[ERROR] Failed to hide full image: {e}")
             # Force restore main UI
             self.tab_widget.show()
 
@@ -1388,7 +1411,7 @@ class MainWindow(QWidget):
                     if crop_factor is not None and crop_factor > 1.0:
                         original_height = int(current_height * crop_factor)
                     else:
-                        print(f"[WARNING] Invalid crop_factor: {crop_factor}")
+                        logging.info(f"[WARNING] Invalid crop_factor: {crop_factor}")
                         original_height = current_height 
                 
                 # Process frame with detector
@@ -1417,11 +1440,11 @@ class MainWindow(QWidget):
                             # latency_ms remains 0.0 as it's not provided by a 2-value return
                         elif isinstance(_result, tuple) and len(_result) == 3: # Handle unexpected 3-value return
                             analysed, pose, latency_ms = _result
-                            print("[WARNING] detector4.detect_and_draw returned 3 values in an unexpected path.")
+                            logging.info("[WARNING] detector4.detect_and_draw returned 3 values in an unexpected path.")
                         else: # Fallback if return is not as expected
                             analysed = frame 
                             pose = None
-                            print("[ERROR] Unexpected return type/length from detector4.detect_and_draw in else branch.")
+                            logging.info("[ERROR] Unexpected return type/length from detector4.detect_and_draw in else branch.")
                 
                     self.latencyUpdated.emit(latency_ms)
                     bridge.analysed_frame.emit(analysed)
@@ -1489,14 +1512,14 @@ class MainWindow(QWidget):
                                         if val is not None:
                                             self.graph_section.add_data_point(ts, float(val))
                                         else:
-                                            print(f"[WARNING] No value to record for mode: {mode}")
+                                            logging.info(f"[WARNING] No value to record for mode: {mode}")
                                             
                                     except AttributeError as e:
-                                        print(f"[ERROR] Could not get value for recording from plotter: {e}")
+                                        logging.info(f"[ERROR] Could not get value for recording from plotter: {e}")
                                     except ValueError as e:
-                                        print(f"[ERROR] Value from plotter could not be converted to float for recording: {val}, Error: {e}")
+                                        logging.info(f"[ERROR] Value from plotter could not be converted to float for recording: {val}, Error: {e}")
                                     except Exception as e:
-                                        print(f"[ERROR] Unexpected error during data preparation for recording: {e}")
+                                        logging.info(f"[ERROR] Unexpected error during data preparation for recording: {e}")
                 
                             # 3) continue with your throttled redraw / recording logic…
                             if self.should_update_graphs() and self.graph_section.graph_widget:
@@ -1513,26 +1536,26 @@ class MainWindow(QWidget):
                                     # RelativeAnglePlotter.update(self, rvec, tvec, timestamp=None)
                                     self.graph_section.graph_widget.update(rvec, tvec)
                                 else:
-                                    print(f"[WARNING] Unknown graph mode for update: {current_mode}")
+                                    logging.info(f"[WARNING] Unknown graph mode for update: {current_mode}")
                                 # … recording code …
                         else:
                             # This case means pose was a 2-element tuple, but rvec/tvec were invalid
                             if rvec is None or not isinstance(rvec, np.ndarray) or not rvec.size > 0:
-                                print(f"[WARNING] rvec is invalid after unpacking. Type: {type(rvec)}, Value: {rvec}")
+                                logging.info(f"[WARNING] rvec is invalid after unpacking. Type: {type(rvec)}, Value: {rvec}")
                             if tvec is None or not isinstance(tvec, np.ndarray) or not tvec.size > 0:
-                                print(f"[WARNING] tvec is invalid after unpacking. Type: {type(tvec)}, Value: {tvec}")
+                                logging.info(f"[WARNING] tvec is invalid after unpacking. Type: {type(tvec)}, Value: {tvec}")
                     elif pose is not None: # pose was not None, but not a 2-element tuple
-                        print(f"[WARNING] Pose is not None but has unexpected structure: {type(pose)}, value: {pose}")
+                        logging.info(f"[WARNING] Pose is not None but has unexpected structure: {type(pose)}, value: {pose}")
                     # If pose is None, normal operation (no detection), calculations are skipped.
 
                 except Exception as e:
-                    print(f"[ERROR] Detector processing error: {e}")
+                    logging.info(f"[ERROR] Detector processing error: {e}")
                     import traceback
                     traceback.print_exc() # Add traceback for better debugging
             except queue.Empty:
                 continue
             except Exception as e:
-                print(f"[ERROR] Detector thread error: {e}")
+                logging.info(f"[ERROR] Detector thread error: {e}")
 
     def should_update_graphs(self):
         """Check if graphs should be updated (not during calibration pause)"""
@@ -1544,14 +1567,14 @@ class MainWindow(QWidget):
     def capture_image(self):
         """Request image capture from server"""
         if not sio.connected:
-            print("[WARNING] Cannot capture image - not connected to server")
+            logging.info("[WARNING] Cannot capture image - not connected to server")
             return
         
         try:
             sio.emit("capture_image", {})
-            print("[INFO] 📸 Image capture requested")
+            logging.info("[INFO] 📸 Image capture requested")
         except Exception as e:
-            print(f"[ERROR] Failed to request image capture: {e}")
+            logging.info(f"[ERROR] Failed to request image capture: {e}")
 
     def download_captured_image(self, server_path):
         """Download captured image from server"""
@@ -1559,7 +1582,7 @@ class MainWindow(QWidget):
             filename = os.path.basename(server_path)
             sio.emit("download_image", {"server_path": server_path, "filename": filename})
         except Exception as e:
-            print(f"[ERROR] Failed to request image download: {e}")
+            logging.info(f"[ERROR] Failed to request image download: {e}")
 
     def clear_queue(self):
         """Clear the frame queue"""
@@ -1662,6 +1685,7 @@ class MainWindow(QWidget):
             # Check if the original intent was to stream (was_streaming was true)
             # This requires was_streaming to be accessible, e.g. by making it an instance var if needed,
             # or by always attempting to restart if self.streaming is false here.
+            # For simplicity, assuming if self.streaming is false now, we try to restart.
             logging.info("Restarting stream after reconnect...")
             sio.emit("start_camera")
             self.streaming = True # Update state
@@ -1730,29 +1754,38 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         """Handle application close event"""
         try:
-            print("[INFO] 🛑 Closing application...")
+            logging.info("[INFO] 🛑 Closing application...")
+            
+            # Remove QtLogHandler from logging FIRST to prevent RuntimeError at exit
+            if hasattr(self, 'qt_log_handler') and self.qt_log_handler is not None:
+                logging.getLogger().removeHandler(self.qt_log_handler)
+                self.qt_log_handler.close() # Good practice, though base Handler.close() is no-op
+                self.qt_log_handler = None # Clear reference
             
             if self.detector_active:
+               
                 self.detector_active = False
     
-            self.reset_camera_to_default()
+            self.reset_camera_to_default() # This might log
             time.sleep(0.5)
     
             if self.streaming:
-                sio.emit("stop_camera")
+                sio.emit("stop_camera") # This might log
                 self.streaming = False
-                self.camera_controls.toggle_btn.setText("Start Stream")
+                if hasattr(self, 'camera_controls'): # Check if camera_controls exists
+                    self.camera_controls.toggle_btn.setText("Start Stream")
                 time.sleep(0.5)
     
-            sio.emit("set_camera_idle")
+            sio.emit("set_camera_idle") # This might log
             time.sleep(0.5)
     
             if sio.connected:
-                sio.disconnect()
+                sio.disconnect() # This might log
                 time.sleep(0.2)
             
         except Exception as e:
-            print(f"[DEBUG] Cleanup error: {e}")
+            logging.info(f"[DEBUG] Cleanup error during closeEvent: {e}")
+            traceback.print_exc() # Add traceback for more details on cleanup errors
 
         event.accept()
 
@@ -1769,7 +1802,7 @@ class MainWindow(QWidget):
 
 def check_all_calibrations():
     """Check status of all calibration files"""
-    print("=== Calibration Status ===")
+    logging.info("=== Calibration Status ===")
     total = len(CALIBRATION_FILES)
     found = 0
     
@@ -1781,27 +1814,26 @@ def check_all_calibrations():
             filepath = filename
         if os.path.exists(filepath):
             if resolution == "legacy":
-                print(f"✓ OLD (Legacy) - {filename}")
+                logging.info(f"OLD (Legacy) - {filename}")
             else:
-                print(f"✓ {resolution[0]}x{resolution[1]} - {filename}")
+                logging.info(f"{resolution[0]}x{resolution[1]} - {filename}")
             found += 1
         else:
             if resolution == "legacy":
-                print(f"❌ OLD (Legacy) - {filename} (MISSING)")
+                logging.info(f"❌ OLD (Legacy) - {filename} (MISSING)")
             else:
-                               print(f"❌ {resolution[0]}x{resolution[1]} - {filename} (MISSING)")
+                               logging.info(f"❌ {resolution[0]}x{resolution[1]} - {filename} (MISSING)")
     
-    print(f"\nStatus: {found}/{total} calibrations available")
+    logging.info(f"\nStatus: {found}/{total} calibrations available")
     
     if found == total:
-        print("🎉 All calibrations complete!")
+        logging.info("🎉 All calibrations complete!")
     else:
-        print(f"⚠️  Missing {total - found} calibrations")
+        logging.info(f"⚠️  Missing {total - found} calibrations")
 
 ############################################################################
 #                              MAIN EXECUTION                               #
 ##############################################################################
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -1814,11 +1846,11 @@ if __name__ == "__main__":
     
     def connect_to_server():
         try:
-            print(f"[INFO] Attempting to connect to {SERVER_URL}")
+            logging.info(f"[INFO] Attempting to connect to {SERVER_URL}")
             sio.connect(SERVER_URL, wait_timeout=10)
-            print("[INFO] Successfully connected to server")
+            logging.info("[INFO] Successfully connected to server")
         except Exception as e:
-            print(f"[ERROR] Failed to connect to server: {e}")
+            logging.info(f"[ERROR] Failed to connect to server: {e}")
     
     threading.Thread(target=connect_to_server, daemon=True).start()
     

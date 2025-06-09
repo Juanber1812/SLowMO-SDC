@@ -22,6 +22,7 @@ from theme import (
     BUTTON_HEIGHT, BORDER_WIDTH, BORDER_RADIUS
 )
 import csv # Ensure csv is imported if not already
+import logging # <<< ADD THIS IMPORT
 
 def sci_fi_button_style(color):
     return f"""
@@ -217,7 +218,7 @@ class GraphSection(QGroupBox):
         QPushButton {{
             background-color: {BOX_BACKGROUND};
             color: {BUTTON_TEXT};
-            border: {BORDER_WIDTH}px solid {BUTTON_COLOR};
+            border: {BORDER_WIDTH}px solid {color};
             border-radius: {BORDER_RADIUS}px;
             padding: 6px 12px;
             font-family: {FONT_FAMILY};
@@ -244,7 +245,7 @@ class GraphSection(QGroupBox):
             QDoubleSpinBox {{
                 background-color: {BOX_BACKGROUND}; 
                 color: {TEXT_COLOR};
-                border: {BORDER_WIDTH}px solid {BUTTON_COLOR}; 
+                border: {BORDER_WIDTH}px solid {color}; 
                 border-radius: {BORDER_RADIUS}px;
                 padding: 1px 3px; /* Adjust padding as needed for text alignment */
                 font-family: {FONT_FAMILY};
@@ -293,7 +294,7 @@ class GraphSection(QGroupBox):
             QDoubleSpinBox {{
                 background-color: {BOX_BACKGROUND};
                 color: {TEXT_COLOR};
-                border: {BORDER_WIDTH}px solid {BUTTON_COLOR};
+                border: {BORDER_WIDTH}px solid {color};
                 border-radius: {BORDER_RADIUS}px;
                 padding: 1px 3px;
                 min-height: {BUTTON_HEIGHT - 2}px;
@@ -307,7 +308,7 @@ class GraphSection(QGroupBox):
             }}
             QDoubleSpinBox::up-button,
             QDoubleSpinBox::down-button {{
-                background-color: {BUTTON_COLOR};
+                background-color: {color};
                 border: none;
                 border-radius: {int(BORDER_RADIUS/2)}px;
                 width: 12px;
@@ -361,12 +362,12 @@ class GraphSection(QGroupBox):
     def on_frequency_changed(self, value_hz: float): # value_hz is now float
         """Emits the new frequency when the spinbox changes."""
         self.graph_update_frequency_changed.emit(value_hz) # Emitting float
-        print(f"[GraphSection] Update frequency set to: {value_hz:.1f} Hz via spinbox")
+        logging.info(f"[GraphSection] Update frequency set to: {value_hz:.1f} Hz via spinbox") # MODIFIED
 
     def toggle_recording(self):
         """Toggle recording state and update button text"""
         if not self.current_graph_mode:
-            print("[WARNING] No graph mode selected for recording")
+            logging.warning("[GraphSection] No graph mode selected for recording") # MODIFIED
             return
 
         self.is_recording = not self.is_recording
@@ -391,7 +392,7 @@ class GraphSection(QGroupBox):
             """)
             self.recorded_data = []  # Reset the log
             self.recording_start_time = time.time()
-            print(f"[INFO] 🔴 Started recording: {self.current_graph_mode}")
+            logging.info(f"[GraphSection] 🔴 Started recording: {self.current_graph_mode}") # MODIFIED
             self.payload_recording_started.emit(self.current_graph_mode) # Emit signal
             
             # Start the recording timer if graph widget exists
@@ -415,7 +416,7 @@ class GraphSection(QGroupBox):
                     color: black;
                 }}
             """)
-            print(f"[INFO] ⏹ Recording stopped: {self.current_graph_mode}")
+            logging.info(f"[GraphSection] ⏹ Recording stopped: {self.current_graph_mode}") # MODIFIED
             self.payload_recording_stopped.emit() # Emit signal
             
             # Stop the recording timer if graph widget exists
@@ -440,7 +441,7 @@ class GraphSection(QGroupBox):
         """Save out recorded_data → CSV and then emit signal."""
         # Ensure self.recorded_data exists and is not empty before proceeding
         if not hasattr(self, 'recorded_data') or not self.recorded_data:
-            print("[WARNING] No data recorded for payload or 'recorded_data' attribute missing. CSV not saved.")
+            logging.warning("[GraphSection] No data recorded for payload or 'recorded_data' attribute missing. CSV not saved.") # MODIFIED
             return
 
         # import os, time, csv # Already imported or should be at the top
@@ -502,22 +503,22 @@ class GraphSection(QGroupBox):
                             writer.writerow([float(ts), float(val)])
                             rows_written +=1
                         except (ValueError, TypeError):
-                            print(f"[DEBUG] Skipping malformed list/tuple entry during CSV save: {entry}")
+                            logging.debug(f"[GraphSection] Skipping malformed list/tuple entry during CSV save: {entry}") # MODIFIED
                             continue
                     else:
-                        print(f"[DEBUG] Skipping malformed entry during CSV save: {entry}")
+                        logging.debug(f"[GraphSection] Skipping malformed entry during CSV save: {entry}") # MODIFIED
                         continue
             
             if rows_written > 0:
-                print(f"[INFO] ✅ Payload recording saved to {fullpath} with {rows_written} data points.")
+                logging.info(f"[GraphSection] ✅ Payload recording saved to {fullpath} with {rows_written} data points.") # MODIFIED
                 self.recording_saved.emit(fullpath)
             else:
-                print(f"[WARNING] Payload CSV file created at {fullpath}, but no valid data points were written.")
+                logging.warning(f"[GraphSection] Payload CSV file created at {fullpath}, but no valid data points were written.") # MODIFIED
 
         except IOError as e:
-            print(f"[ERROR] Could not write payload to CSV file {fullpath}: {e}")
+            logging.error(f"[GraphSection] Could not write payload to CSV file {fullpath}: {e}") # MODIFIED
         except Exception as e:
-            print(f"[ERROR] An unexpected error occurred during payload CSV saving: {e}")
+            logging.error(f"[GraphSection] An unexpected error occurred during payload CSV saving: {e}") # MODIFIED
 
     def exit_graph(self):
         # Stop recording if active

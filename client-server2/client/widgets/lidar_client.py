@@ -74,7 +74,7 @@ class LidarWidget(QWidget):
         self.big_lidar_button = QPushButton("LIDAR\nMetrics Monitor")
         self.big_lidar_button.setObjectName("big_lidar_button")
         self.big_lidar_button.clicked.connect(self.show_lidar_interface)
-        self.big_lidar_button.setMinimumSize(180, 90) 
+        self.big_lidar_button.setMinimumSize(180, 250) 
 
         accent_color_big_button = BUTTON_COLOR 
         

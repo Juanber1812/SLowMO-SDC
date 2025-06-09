@@ -29,7 +29,7 @@ class CameraControlsWidget(QGroupBox):
         self.detector_btn = QPushButton("Start Detector")
         
         # Manual Orientation Button
-        self.orientation_btn = QPushButton("Manual Orientation")
+        self.orientation_btn = QPushButton("Show Crosshairs")
         self.show_crosshairs = False  # Track crosshair state
 
         # Define button style (thinner, same as Start Detector)

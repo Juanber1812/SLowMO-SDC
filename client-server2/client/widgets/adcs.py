@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import (
     QWidget, QGroupBox, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QStackedWidget, QLineEdit # Added QLineEdit
 )
 from PyQt6.QtCore import pyqtSignal, Qt
-
+import logging
 # Initialize with fallback styles in case import fails
 ADCS_BUTTON_STYLE = """
     QPushButton {
@@ -267,13 +267,13 @@ class ADCSSection(QGroupBox):
                 self._handle_detail_action_clicked("Automatic Orientation", "set_target_orientation", value_int)
                 self.orientation_input_field.clear()  # Clear input after sending
             except ValueError:
-                print(f"[ADCSSection] Invalid input: '{value_text}' is not an integer.")
+                logging.info(f"[ADCSSection] Invalid input: '{value_text}' is not an integer.")
                 # Optionally, provide visual feedback to the user (e.g., QToolTip or status label)
                 self.orientation_input_field.selectAll() # Make it easy for user to correct
 
     def _handle_detail_action_clicked(self, mode_name, command_name, value=None): # Added value parameter
         """Placeholder for handling clicks on detail action buttons. Emits a signal."""
-        print(f"[ADCSSection] Action for mode '{mode_name}': Command '{command_name}', Value: {value}")
+        logging.info(f"[ADCSSection] Action for mode '{mode_name}': Command '{command_name}', Value: {value}")
         self.adcs_command_sent.emit(mode_name, command_name, value)
 
 
@@ -284,14 +284,14 @@ class ADCSSection(QGroupBox):
 
     def switch_to_detail_view(self, mode_name):
         """Switches the ADCS view to the detail page, updates the label, and populates buttons."""
-        print(f"[ADCSSection] Displaying details for: {mode_name}")
+        logging.info(f"[ADCSSection] Displaying details for: {mode_name}")
         self.detail_label.setText(f"Details for: {mode_name}")
         self._populate_detail_buttons(mode_name) # Populate buttons for the current mode
         self.stacked_widget.setCurrentIndex(1) # Switch to the detail page view
 
     def switch_to_mode_selection_view(self):
         """Switches the ADCS view back to the mode selection page."""
-        print("[ADCSSection] Returning to ADCS Mode Selection.")
+        logging.info("[ADCSSection] Returning to ADCS Mode Selection.")
         self.stacked_widget.setCurrentIndex(0)
 
 # Example of how to use it (if run standalone, for testing)
@@ -330,7 +330,7 @@ if __name__ == '__main__':
     main_window.setCentralWidget(adcs_widget)
     
     def on_adcs_command(mode, command, val):
-        print(f"MAIN APP RECEIVED ADCS COMMAND: Mode='{mode}', Command='{command}', Value='{val}'")
+        logging.info(f"MAIN APP RECEIVED ADCS COMMAND: Mode='{mode}', Command='{command}', Value='{val}'")
     adcs_widget.adcs_command_sent.connect(on_adcs_command)
     
     main_window.setGeometry(300, 300, 500, 200)

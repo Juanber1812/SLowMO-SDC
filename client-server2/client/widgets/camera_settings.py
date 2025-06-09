@@ -1,3 +1,4 @@
+import logging
 from PyQt6.QtWidgets import QWidget, QGroupBox, QVBoxLayout, QLabel, QSlider, QComboBox, QPushButton, QHBoxLayout, QButtonGroup, QDoubleSpinBox
 from PyQt6.QtCore import Qt, pyqtSignal # Added pyqtSignal
 from theme import (
@@ -394,7 +395,7 @@ class CameraSettingsWidget(QGroupBox):
         self.cropped = self.crop_btn.isChecked() # Update internal state from button's check state
         self._update_crop_ui() # Update text and other dependent UI
         # Debug print to show the UI state change
-        print(f"[DEBUG] Crop button clicked. UI crop state set to: {self.cropped}. Current Factor in UI: {self.crop_factor_spinbox.value()}.")
+        logging.debug(f"Crop button clicked. UI crop state set to: {self.cropped}. Current Factor in UI: {self.crop_factor_spinbox.value()}.")
         # self.crop_config_requested.emit() # DO NOT emit here. Config is applied by the main "Apply Settings" button.
 
     def on_preset_changed(self, id):
@@ -415,7 +416,7 @@ class CameraSettingsWidget(QGroupBox):
         items_to_add = []
 
         if not self.current_presets:
-            print("[WARNING] _populate_res_dropdown: self.current_presets was None or empty. Attempting to default to RES_PRESETS_LOW.")
+            logging.warning("_populate_res_dropdown: self.current_presets was None or empty. Attempting to default to RES_PRESETS_LOW.")
             active_preset_button = self.preset_group.checkedButton()
             if active_preset_button == self.low_btn:
                 self.current_presets = RES_PRESETS_LOW
@@ -445,7 +446,7 @@ class CameraSettingsWidget(QGroupBox):
             elif self.res_dropdown.count() > 0:
                  self.res_dropdown.setCurrentIndex(0)
         else:
-            print(f"[ERROR] _populate_res_dropdown: No items to add to res_dropdown. self.current_presets: {self.current_presets}. Dropdown will be empty.")
+            logging.error(f"_populate_res_dropdown: No items to add to res_dropdown. self.current_presets: {self.current_presets}. Dropdown will be empty.")
 
         self.res_dropdown.blockSignals(False)
 
@@ -464,10 +465,10 @@ class CameraSettingsWidget(QGroupBox):
             preset_label_for_config, base_resolution_data = self.current_presets[res_idx]
         elif self.current_presets: 
             if res_idx == -1: 
-                print(f"[WARNING] Invalid res_idx {res_idx} from dropdown. Falling back to first preset in current_presets list.")
+                logging.warning(f"Invalid res_idx {res_idx} from dropdown. Falling back to first preset in current_presets list.") # MODIFIED
             preset_label_for_config, base_resolution_data = self.current_presets[0]
         else:
-            print("[ERROR] get_config: No resolution presets available (self.current_presets is empty/None). Using hardcoded default.")
+            logging.error("get_config: No resolution presets available (self.current_presets is empty/None). Using hardcoded default.") # MODIFIED
             return {
                 "jpeg_quality": self.jpeg_slider.value(),
                 "fps": self.fps_slider.value(),
@@ -520,7 +521,7 @@ class CameraSettingsWidget(QGroupBox):
         self.cropped = cropped
         self._update_crop_ui() 
         # Updated debug print
-        print(f"[DEBUG] Camera settings crop state programmatically set to: {self.cropped}. Current Factor in UI: {self.crop_factor_spinbox.value()}. Factor active for config: {self.cropped}")
+        logging.debug(f"Camera settings crop state programmatically set to: {self.cropped}. Current Factor in UI: {self.crop_factor_spinbox.value()}. Factor active for config: {self.cropped}") # MODIFIED
 
     def has_calibration(self, resolution):
         """Check if calibration file exists for given resolution."""
@@ -555,22 +556,24 @@ class CameraSettingsWidget(QGroupBox):
 
     def update_calibration_status(self):
         """Update the calibration status display."""
-        import os
+        import os # Keep os import here as it's used locally
         config = self.get_config()
         calibration_file = config.get('calibration_file', 'calibrations/calibration_default.npz')
         
         # Handle relative paths properly - resolve relative to client directory
         if not os.path.isabs(calibration_file):
-            client_dir = os.path.dirname(os.path.dirname(__file__))
+            # Assuming this file (camera_settings.py) is in client/widgets/
+            # client_dir should be the 'client' directory
+            client_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
             calibration_file = os.path.join(client_dir, calibration_file)
             calibration_file = os.path.normpath(calibration_file)
         
         if os.path.exists(calibration_file):
-            self.calibration_status_label.setText("Calibration: ✓ Available")
+            self.calibration_status_label.setText("Calibration: Available")
             self.calibration_status_label.setStyleSheet(f"color: {SUCCESS_COLOR};")
         else:
             self.calibration_status_label.setText("Calibration: ❌ Missing")
             self.calibration_status_label.setStyleSheet(f"color: {ERROR_COLOR};")
             
             # Debug: print the actual path being checked
-            print(f"[DEBUG] Calibration check - Looking for: {calibration_file}")
+            logging.debug(f"Calibration check - Looking for: {calibration_file}") # MODIFIED

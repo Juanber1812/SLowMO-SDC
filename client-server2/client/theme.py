@@ -10,7 +10,7 @@ BACKGROUND         = "#000000"  # Pure Black
 BOX_BACKGROUND     = "#050A1F"  # Very Dark Blue
 PLOT_BACKGROUND    = BACKGROUND
 STREAM_BACKGROUND  = "#000510"  # Deepest Blue-Black
-SECOND_COLUMN      = "#03071A"  # Dark Blue for sidebars
+SECOND_COLUMN      = "#1E2130"  # Dark Blue for sidebars
 
 # === Text Colors ===
 TEXT_COLOR         = "#00FFFF"  # Electric Cyan

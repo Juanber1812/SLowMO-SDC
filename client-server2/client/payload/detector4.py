@@ -3,6 +3,7 @@ import numpy as np
 import pyapriltags
 import os
 import time
+import logging # <<< ADD THIS IMPORT
 
 class AprilTagDetector:
     def __init__(self, calibration_file=None):
