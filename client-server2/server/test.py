@@ -3,7 +3,7 @@ import time
 
 LIDAR_ADDR = 0x62
 ACQ_COMMAND = 0x00
-MEASURE = 0x04  # Try 0x03 if this doesn't work
+MEASURE = 0x03  # Try 0x03 if this doesn't work
 DISTANCE_HIGH = 0x0f
 DISTANCE_LOW = 0x10
 
