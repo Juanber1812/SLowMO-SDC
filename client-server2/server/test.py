@@ -1,30 +1,36 @@
-from smbus2 import SMBus
+import pigpio
 import time
 
-LIDAR_ADDR = 0x62
-ACQ_COMMAND = 0x00
-MEASURE = 0x03  # Try 0x03 if this doesn't work
-DISTANCE_HIGH = 0x0f
-DISTANCE_LOW = 0x10
+PWM_GPIO = 18  # GPIO pin where LIDAR PWM is connected
+pi = pigpio.pi()
 
-def read_distance(bus):
-    try:
-        bus.write_byte_data(LIDAR_ADDR, ACQ_COMMAND, MEASURE)
-        time.sleep(0.02)
-        high = bus.read_byte_data(LIDAR_ADDR, DISTANCE_HIGH)
-        low = bus.read_byte_data(LIDAR_ADDR, DISTANCE_LOW)
-        return (high << 8) + low
-    except Exception as e:
-        print("[ERROR] Reading LIDAR:", e)
-        return None
+if not pi.connected:
+    print("❌ Cannot connect to pigpio daemon")
+    exit(1)
 
-with SMBus(1) as bus:
-    print("Starting LIDAR test...\n")
-    time.sleep(1)
-    for i in range(20):
-        dist = read_distance(bus)
-        if dist is not None:
-            print(f"Distance: {dist} cm")
-        else:
-            print("Failed to read distance.")
-        time.sleep(0.2)
+def cb_func(gpio, level, tick):
+    global start_tick, pulse_width_us
+    if level == 1:  # Rising edge
+        start_tick = tick
+    elif level == 0:  # Falling edge
+        if start_tick is not None:
+            pulse_width_us = pigpio.tickDiff(start_tick, tick)
+            distance_cm = pulse_width_us / 10.0
+            print(f"📏 Distance: {distance_cm:.2f} cm")
+
+start_tick = None
+pulse_width_us = 0
+
+# Set up callback
+pi.set_mode(PWM_GPIO, pigpio.INPUT)
+pi.set_pull_up_down(PWM_GPIO, pigpio.PUD_DOWN)
+cb = pi.callback(PWM_GPIO, pigpio.EITHER_EDGE, cb_func)
+
+print("📡 Listening for PWM pulses from LIDAR...")
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("\n[EXIT] Stopping PWM listener")
+    cb.cancel()
+    pi.stop()
