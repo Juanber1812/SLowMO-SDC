@@ -960,3 +960,535 @@ socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', po
 2025-06-08 12:03:36,329 - INFO - Manual orientation crosshairs enabled
 2025-06-08 12:03:36,444 - INFO - Manual orientation crosshairs disabled
 2025-06-08 12:03:38,634 - INFO - Disconnected from server: client disconnect
+2025-06-09 08:38:46,457 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-09 08:38:46,633 - INFO - Connected to server
+2025-06-09 08:38:46,635 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-09 08:38:46,636 - INFO - [INFO] Successfully connected to server
+2025-06-09 08:39:08,308 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-09 08:39:08,310 - INFO - Stream paused for config application.
+2025-06-09 08:39:08,813 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-09 08:39:08,818 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-09 08:39:09,021 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-09 08:39:12,496 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-09 08:39:12,500 - INFO - Stream paused for config application.
+2025-06-09 08:39:13,003 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-09 08:39:13,009 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-09 08:39:13,217 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-09 08:39:19,186 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-09 08:39:19,188 - INFO - Stream paused for config application.
+2025-06-09 08:39:19,691 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-09 08:39:19,695 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-09 08:39:19,898 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-09 08:39:24,602 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-09 08:39:27,198 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-09 08:39:46,553 - INFO - Manual orientation crosshairs enabled
+2025-06-09 08:39:53,099 - INFO - Manual orientation crosshairs disabled
+2025-06-09 08:39:54,161 - INFO - Manual orientation crosshairs enabled
+2025-06-09 08:40:02,058 - INFO - [ADCSSection] Displaying details for: Detumbling
+2025-06-09 08:40:02,854 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-09 08:40:03,469 - INFO - [ADCSSection] Displaying details for: Automatic Orientation
+2025-06-09 08:40:06,156 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-09 08:40:07,142 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-09 08:40:09,110 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-09 08:40:10,041 - INFO - [ADCSSection] Displaying details for: Environmental Calibration
+2025-06-09 08:40:11,798 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-09 08:40:18,620 - INFO - Manual orientation crosshairs disabled
+2025-06-09 08:40:19,105 - INFO - Manual orientation crosshairs enabled
+2025-06-09 08:40:20,239 - INFO - Manual orientation crosshairs disabled
+2025-06-09 08:40:54,126 - INFO - Disconnected from server: client disconnect
+2025-06-10 09:28:55,539 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 09:28:57,979 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 09:29:00,553 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749544135.5421565 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000002269B6B2CF0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-10 09:29:07,995 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-10 09:29:18,423 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 09:29:21,061 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 09:29:23,439 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749544158.4260392 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000021172652CF0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-10 09:29:23,633 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 09:29:26,226 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 09:29:28,732 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 09:53:55,730 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 09:54:00,742 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749545635.732393 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000027D80366CF0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-10 09:54:21,549 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-10 09:55:49,551 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 09:55:54,569 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749545749.5533752 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001A23BC06CF0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-10 09:57:25,926 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-10 09:59:18,689 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 09:59:23,696 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749545958.6916795 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000029141532E40>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-10 09:59:36,640 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-10 09:59:55,348 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 10:00:00,369 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749545995.3506775 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001D998DC2E40>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-10 10:02:54,097 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-10 10:03:00,003 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 10:03:04,272 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749546180.0067441 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000188447F6CF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-06-10 10:03:33,324 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-06-10 10:03:33,474 - INFO - Connected to server
+2025-06-10 10:03:33,475 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:04:44,252 - INFO - Disconnected from server: client disconnect
+2025-06-10 10:05:03,384 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 10:05:03,525 - INFO - Connected to server
+2025-06-10 10:05:03,526 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:05:03,528 - INFO - [INFO] Successfully connected to server
+2025-06-10 10:05:30,201 - INFO - Manual orientation crosshairs enabled
+2025-06-10 10:05:30,867 - INFO - Manual orientation crosshairs disabled
+2025-06-10 10:05:38,604 - INFO - Disconnected from server: client disconnect
+2025-06-10 10:06:20,256 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 10:06:20,425 - INFO - Connected to server
+2025-06-10 10:06:20,427 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:06:20,430 - INFO - [INFO] Successfully connected to server
+2025-06-10 10:06:27,102 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-10 10:06:28,616 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-10 10:06:30,828 - INFO - Disconnected from server: client disconnect
+2025-06-10 10:07:50,550 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 10:07:50,706 - INFO - Connected to server
+2025-06-10 10:07:50,708 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:07:50,709 - INFO - [INFO] Successfully connected to server
+2025-06-10 10:08:08,010 - INFO - Manual orientation crosshairs enabled
+2025-06-10 10:08:09,208 - INFO - Manual orientation crosshairs disabled
+2025-06-10 10:08:09,787 - INFO - Manual orientation crosshairs enabled
+2025-06-10 10:08:10,298 - INFO - Manual orientation crosshairs disabled
+2025-06-10 10:08:11,681 - INFO - Manual orientation crosshairs enabled
+2025-06-10 10:08:12,622 - INFO - Manual orientation crosshairs disabled
+2025-06-10 10:08:21,900 - INFO - Manual orientation crosshairs enabled
+2025-06-10 10:08:23,151 - INFO - Manual orientation crosshairs disabled
+2025-06-10 10:08:24,457 - INFO - Image captured: /home/slowmo/captures/image_20250610_100824.jpg (0.08 MB)
+2025-06-10 10:08:24,525 - INFO - Image saved: c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\captured_images\image_20250610_100824.jpg (79.6 KB)
+2025-06-10 10:08:29,968 - INFO - Disconnected from server: client disconnect
+2025-06-10 10:11:28,896 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 10:11:29,057 - INFO - Connected to server
+2025-06-10 10:11:29,059 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:11:29,060 - INFO - [INFO] Successfully connected to server
+2025-06-10 10:11:48,806 - INFO - Disconnected from server: client disconnect
+2025-06-10 10:12:16,538 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 10:12:16,691 - INFO - Connected to server
+2025-06-10 10:12:16,693 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:12:16,694 - INFO - [INFO] Successfully connected to server
+2025-06-10 10:12:27,870 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 10:16:13,688 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 10:17:10,185 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:17:10,187 - INFO - Stream paused for config application.
+2025-06-10 10:17:10,690 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:17:10,695 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:17:10,898 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:17:18,870 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:17:18,874 - INFO - Stream paused for config application.
+2025-06-10 10:17:19,377 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:17:19,382 - INFO - Detector calibration updated: calibrations/calibration_1024x576.npz
+2025-06-10 10:17:19,588 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:17:24,627 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 10:17:30,922 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:17:30,924 - INFO - Stream paused for config application.
+2025-06-10 10:17:31,485 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:17:31,490 - INFO - Detector calibration updated: calibrations/calibration_1024x576.npz
+2025-06-10 10:17:31,695 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:17:36,734 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:17:36,736 - INFO - Stream paused for config application.
+2025-06-10 10:17:37,266 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:17:37,270 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:17:37,473 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:20:49,862 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:20:49,864 - INFO - Stream paused for config application.
+2025-06-10 10:20:50,367 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:20:50,371 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:20:50,574 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:20:53,312 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:20:53,314 - INFO - Stream paused for config application.
+2025-06-10 10:20:53,817 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:20:53,822 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-10 10:20:54,025 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:20:58,123 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:20:58,129 - INFO - Stream paused for config application.
+2025-06-10 10:20:58,654 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:20:58,658 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:20:58,861 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:21:01,697 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:21:01,699 - INFO - Stream paused for config application.
+2025-06-10 10:21:02,202 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:21:02,209 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:21:02,414 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:21:11,323 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:21:11,324 - INFO - Stream paused for config application.
+2025-06-10 10:21:11,827 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:21:11,832 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:21:12,036 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:21:18,201 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:21:18,202 - INFO - Stream paused for config application.
+2025-06-10 10:21:18,705 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:21:18,709 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:21:18,912 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:22:20,292 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:22:20,294 - INFO - Stream paused for config application.
+2025-06-10 10:22:20,798 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:22:20,803 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:22:21,006 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:26:00,565 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:26:00,567 - INFO - Stream paused for config application.
+2025-06-10 10:26:01,069 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:26:01,074 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:26:01,288 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:26:08,096 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:26:08,101 - INFO - Stream paused for config application.
+2025-06-10 10:26:08,609 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:26:08,613 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:26:08,816 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:26:33,031 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:26:33,085 - INFO - Stream paused for config application.
+2025-06-10 10:26:33,589 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:26:33,596 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:26:33,799 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:26:38,295 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:26:38,297 - INFO - Stream paused for config application.
+2025-06-10 10:26:38,798 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:26:38,805 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:26:39,009 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:26:42,229 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:26:42,230 - INFO - Stream paused for config application.
+2025-06-10 10:26:42,732 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:26:42,737 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:26:42,941 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:28:18,723 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:28:18,724 - INFO - Stream paused for config application.
+2025-06-10 10:28:19,227 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:28:19,233 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-10 10:28:19,443 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:28:28,036 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:28:28,092 - INFO - Stream paused for config application.
+2025-06-10 10:28:28,596 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:28:28,601 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-10 10:28:28,806 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:28:33,502 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:28:33,505 - INFO - Stream paused for config application.
+2025-06-10 10:28:34,008 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:28:34,012 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-10 10:28:34,215 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:29:00,168 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:29:00,169 - INFO - Stream paused for config application.
+2025-06-10 10:29:00,672 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:29:00,676 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:29:00,879 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:29:09,714 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:29:09,716 - INFO - Stream paused for config application.
+2025-06-10 10:29:10,219 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:29:10,224 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:29:10,430 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:29:41,598 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:29:41,600 - INFO - Stream paused for config application.
+2025-06-10 10:29:42,104 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:29:42,110 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:29:42,314 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:29:53,275 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:29:53,277 - INFO - Stream paused for config application.
+2025-06-10 10:29:53,780 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:29:53,786 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-10 10:29:53,990 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:30:06,525 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:30:06,527 - INFO - Stream paused for config application.
+2025-06-10 10:30:07,029 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:30:07,034 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:30:07,238 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:30:19,185 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:30:19,189 - INFO - Stream paused for config application.
+2025-06-10 10:30:19,692 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:30:19,697 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-10 10:30:19,900 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:30:24,250 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:30:24,258 - INFO - Stream paused for config application.
+2025-06-10 10:30:24,766 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:30:24,771 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-10 10:30:24,975 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:30:27,741 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:30:27,756 - INFO - Stream paused for config application.
+2025-06-10 10:30:28,258 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:30:28,262 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-10 10:30:28,468 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:30:33,324 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:30:33,327 - INFO - Stream paused for config application.
+2025-06-10 10:30:33,830 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:30:33,835 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:30:34,040 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:30:52,563 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:30:52,566 - INFO - Stream paused for config application.
+2025-06-10 10:30:53,071 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:30:53,212 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-10 10:30:53,425 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:31:00,616 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:31:00,618 - INFO - Stream paused for config application.
+2025-06-10 10:31:01,121 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:31:01,126 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:31:01,331 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:31:16,372 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:31:16,378 - INFO - Stream paused for config application.
+2025-06-10 10:31:16,881 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:31:16,885 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:31:17,089 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:31:25,891 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:31:25,895 - INFO - Stream paused for config application.
+2025-06-10 10:31:26,400 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:31:26,405 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:31:26,611 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:31:32,917 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:31:32,923 - INFO - Stream paused for config application.
+2025-06-10 10:31:33,426 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:31:33,429 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:31:33,634 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:31:39,749 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:31:39,751 - INFO - Stream paused for config application.
+2025-06-10 10:31:40,254 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:31:40,258 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:31:40,462 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:31:51,994 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:31:51,997 - INFO - Stream paused for config application.
+2025-06-10 10:31:52,500 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:31:52,506 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:31:52,708 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:31:58,135 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:31:58,153 - INFO - Stream paused for config application.
+2025-06-10 10:31:58,660 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:31:58,664 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:31:58,868 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:32:11,228 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:32:11,230 - INFO - Stream paused for config application.
+2025-06-10 10:32:11,733 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:32:11,737 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:32:11,940 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:32:15,366 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:32:15,368 - INFO - Stream paused for config application.
+2025-06-10 10:32:15,871 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:32:15,875 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:32:16,078 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:32:21,873 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:32:21,875 - INFO - Stream paused for config application.
+2025-06-10 10:32:22,379 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:32:22,382 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:32:22,586 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:32:26,116 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:32:26,117 - INFO - Stream paused for config application.
+2025-06-10 10:32:26,620 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:32:26,624 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:32:26,827 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:32:31,671 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:32:31,672 - INFO - Stream paused for config application.
+2025-06-10 10:32:32,175 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:32:32,178 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:32:32,383 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:33:00,060 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:33:00,062 - INFO - Stream paused for config application.
+2025-06-10 10:33:00,564 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:33:00,570 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:33:00,775 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:33:05,932 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:33:05,934 - INFO - Stream paused for config application.
+2025-06-10 10:33:06,438 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:33:06,442 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:33:06,645 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:33:12,114 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:33:12,116 - INFO - Stream paused for config application.
+2025-06-10 10:33:12,618 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:33:12,622 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:33:12,825 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:34:31,497 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:34:31,498 - INFO - Stream paused for config application.
+2025-06-10 10:34:32,001 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:34:32,007 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:34:32,215 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:34:37,647 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:34:37,649 - INFO - Stream paused for config application.
+2025-06-10 10:34:38,155 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:34:38,187 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:34:38,392 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:34:42,331 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:34:42,333 - INFO - Stream paused for config application.
+2025-06-10 10:34:42,836 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:34:42,840 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:34:43,054 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:34:46,306 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:34:46,308 - INFO - Stream paused for config application.
+2025-06-10 10:34:46,810 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:34:46,815 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:34:47,017 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:34:53,935 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:34:53,937 - INFO - Stream paused for config application.
+2025-06-10 10:34:54,441 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:34:54,444 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:34:54,647 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:34:59,525 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:34:59,527 - INFO - Stream paused for config application.
+2025-06-10 10:35:00,030 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:35:00,037 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:35:00,242 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:35:03,854 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:35:03,856 - INFO - Stream paused for config application.
+2025-06-10 10:35:04,360 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:35:04,364 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:35:04,567 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:35:12,970 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:35:13,057 - INFO - Stream paused for config application.
+2025-06-10 10:35:13,622 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:35:13,626 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:35:13,829 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:37:18,013 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:37:18,027 - INFO - Stream paused for config application.
+2025-06-10 10:37:18,540 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:37:18,546 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 10:37:18,751 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:37:46,618 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:37:46,621 - INFO - Stream paused for config application.
+2025-06-10 10:37:47,124 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:37:47,128 - INFO - Detector calibration updated: calibrations/calibration_1024x576.npz
+2025-06-10 10:37:47,331 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:09,005 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:09,007 - INFO - Stream paused for config application.
+2025-06-10 10:38:09,510 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:38:09,513 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:38:09,717 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:21,162 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:21,164 - INFO - Stream paused for config application.
+2025-06-10 10:38:21,666 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:38:21,671 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:38:21,876 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:25,576 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:25,578 - INFO - Stream paused for config application.
+2025-06-10 10:38:26,081 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:38:26,085 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:38:26,289 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:29,260 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:29,261 - INFO - Stream paused for config application.
+2025-06-10 10:38:29,763 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:38:29,768 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:38:29,978 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:33,884 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:33,885 - INFO - Stream paused for config application.
+2025-06-10 10:38:34,388 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:38:34,393 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:38:34,599 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:37,758 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:37,759 - INFO - Stream paused for config application.
+2025-06-10 10:38:38,272 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:38:38,275 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-10 10:38:38,479 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:43,927 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:43,930 - INFO - Stream paused for config application.
+2025-06-10 10:38:44,433 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:38:44,436 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-10 10:38:44,643 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:50,702 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:50,706 - INFO - Stream paused for config application.
+2025-06-10 10:38:51,210 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:38:51,214 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-10 10:38:51,418 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:55,289 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:55,291 - INFO - Stream paused for config application.
+2025-06-10 10:38:55,794 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:38:55,797 - INFO - Detector calibration updated: calibrations/calibration_2560x1440.npz
+2025-06-10 10:38:56,000 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:38:59,564 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:38:59,566 - INFO - Stream paused for config application.
+2025-06-10 10:39:00,068 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:39:00,072 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-10 10:39:00,274 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:39:05,927 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:39:05,929 - INFO - Stream paused for config application.
+2025-06-10 10:39:06,432 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:39:06,439 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-10 10:39:06,642 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:39:29,287 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:39:29,289 - INFO - Stream paused for config application.
+2025-06-10 10:39:29,792 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:39:29,797 - INFO - Detector calibration updated: calibrations/calibration_3456x1944.npz
+2025-06-10 10:39:30,000 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:39:36,905 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:39:36,908 - INFO - Stream paused for config application.
+2025-06-10 10:39:37,411 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:39:37,415 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:39:37,618 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:39:59,151 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:39:59,153 - INFO - Stream paused for config application.
+2025-06-10 10:39:59,702 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:39:59,706 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:39:59,909 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:40:04,887 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:40:04,889 - INFO - Stream paused for config application.
+2025-06-10 10:40:05,392 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:40:05,396 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:40:05,599 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:40:10,286 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:40:10,289 - INFO - Stream paused for config application.
+2025-06-10 10:40:10,791 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:40:10,795 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:40:10,999 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:40:15,181 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:40:15,183 - INFO - Stream paused for config application.
+2025-06-10 10:40:15,684 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:40:15,690 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-10 10:40:15,896 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:40:25,577 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 10:40:25,579 - INFO - Stream paused for config application.
+2025-06-10 10:40:26,082 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 10:40:26,085 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-10 10:40:26,287 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 10:40:57,639 - INFO - Disconnected from server: client disconnect
+2025-06-10 12:57:57,249 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-10 12:58:02,262 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749556677.251291 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001ECE4A62E40>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-10 12:58:04,287 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-10 12:58:47,965 - INFO - [INFO] Attempting to connect to http://192.168.142.89:5000
+2025-06-10 12:58:48,171 - INFO - Connected to server
+2025-06-10 12:58:48,172 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 12:58:48,175 - INFO - [INFO] Successfully connected to server
+2025-06-10 12:59:30,428 - INFO - Disconnected from server: client disconnect
+2025-06-10 12:59:30,440 - INFO - Attempting to reconnect to http://192.168.142.89:5000...
+2025-06-10 12:59:30,666 - INFO - Connected to server
+2025-06-10 12:59:30,668 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 13:00:07,718 - INFO - Disconnected from server: client disconnect
+2025-06-10 13:01:06,284 - INFO - [INFO] Attempting to connect to http://192.168.142.89:5000
+2025-06-10 13:01:06,506 - INFO - Connected to server
+2025-06-10 13:01:06,508 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 13:01:06,511 - INFO - [INFO] Successfully connected to server
+2025-06-10 13:01:45,136 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-10 13:01:45,139 - INFO - Stream paused for config application.
+2025-06-10 13:01:45,641 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-10 13:01:45,647 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-10 13:01:45,857 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-10 13:02:03,756 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 13:02:08,524 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 13:02:15,228 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-10 13:06:12,717 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-10 13:06:18,690 - INFO - Manual orientation crosshairs enabled
+2025-06-10 13:06:59,387 - INFO - Manual orientation crosshairs disabled
+2025-06-10 13:07:04,799 - INFO - Disconnected from server: client disconnect
+2025-06-11 14:18:41,356 - INFO - [INFO] Attempting to connect to http://192.168.142.89:5000
+2025-06-11 14:18:46,365 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.142.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749647921.3592978 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001E3DA296E40>, 'Connection to 192.168.142.89 timed out. (connect timeout=5)'))
+2025-06-11 14:18:46,643 - INFO - Attempting to reconnect to http://192.168.142.89:5000...
+2025-06-11 14:18:51,641 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.142.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749647926.645211 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001E3DA2F9310>, 'Connection to 192.168.142.89 timed out. (connect timeout=5)'))
+2025-06-11 14:19:34,759 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-11 14:19:49,705 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-11 14:19:52,157 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749647989.7070458 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000029219C36E40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-06-11 14:19:53,483 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-06-11 14:19:55,553 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749647993.4856186 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000029219C98F50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-06-11 14:20:08,101 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-06-11 14:20:08,267 - INFO - Connected to server
+2025-06-11 14:20:08,270 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-11 14:20:32,782 - INFO - Manual orientation crosshairs enabled
+2025-06-11 14:20:45,134 - INFO - Requesting LIDAR streaming start
+2025-06-11 14:20:54,336 - INFO - Requesting LIDAR streaming stop
+2025-06-11 14:20:54,339 - INFO - Back button clicked in LidarWidget
+2025-06-11 14:20:55,365 - INFO - Requesting LIDAR streaming start
+2025-06-11 14:20:56,868 - INFO - Requesting LIDAR streaming stop
+2025-06-11 14:20:56,872 - INFO - Back button clicked in LidarWidget
+2025-06-11 14:21:00,279 - INFO - Manual orientation crosshairs disabled
+2025-06-11 14:21:00,775 - INFO - Manual orientation crosshairs enabled
+2025-06-11 14:21:02,473 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-11 14:21:50,017 - INFO - Requesting LIDAR streaming start
+2025-06-11 14:21:51,118 - INFO - Requesting LIDAR streaming stop
+2025-06-11 14:21:51,122 - INFO - Back button clicked in LidarWidget
+2025-06-11 14:22:04,560 - INFO - Requesting LIDAR streaming start
+2025-06-11 14:22:05,321 - INFO - Requesting LIDAR streaming stop
+2025-06-11 14:22:05,323 - INFO - Back button clicked in LidarWidget
+2025-06-11 14:22:17,192 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-11 14:22:17,195 - INFO - Stream paused for config application.
+2025-06-11 14:22:17,697 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-11 14:22:17,703 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-11 14:22:17,907 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-11 14:22:37,651 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-11 14:24:16,054 - INFO - Requesting LIDAR streaming start
+2025-06-11 14:24:17,078 - INFO - Requesting LIDAR streaming stop
+2025-06-11 14:24:17,082 - INFO - Back button clicked in LidarWidget
+2025-06-11 14:24:21,324 - INFO - Disconnected from server: client disconnect

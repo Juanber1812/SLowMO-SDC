@@ -21,12 +21,12 @@ class CameraControlsWidget(QGroupBox):
         self.setLayout(self.layout)
 
         # Camera Control Buttons
-        self.toggle_btn = QPushButton("Start Stream")
+        self.toggle_btn = QPushButton("Run Stream")
         self.reconnect_btn = QPushButton("Reconnect")
         self.capture_btn = QPushButton("Capture Image")
         
         # Detector Control Button
-        self.detector_btn = QPushButton("Start Detector")
+        self.detector_btn = QPushButton("Run Detector")
         
         # Manual Orientation Button
         self.orientation_btn = QPushButton("Show Crosshairs")
@@ -48,6 +48,14 @@ class CameraControlsWidget(QGroupBox):
             background-color: {BUTTON_HOVER};
             color: black;
         }}
+        QPushButton:checked {{
+            background-color: {PLOT_LINE_PRIMARY};
+            color: black;
+        }}
+            QPushButton:checked:hover {{
+        background-color: {BUTTON_HOVER};
+        color: black;
+        }}
         QPushButton:disabled {{
             background-color: {BUTTON_DISABLED};
             color: #777;
@@ -58,7 +66,21 @@ class CameraControlsWidget(QGroupBox):
         # Apply the same style to all buttons
         for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.detector_btn, self.orientation_btn):
             btn.setStyleSheet(self.BUTTON_STYLE)
+            
+        # Make the Start Detector button checkable and set it to stay pressed when toggled
+        self.detector_btn.setCheckable(True)
+        self.toggle_btn.setCheckable(True)
+        self.orientation_btn.setCheckable(True)
 
+        # Replace check_btn1, check_btn2, etc. with descriptive names
+        self.run_lidar_btn = QPushButton("Run LiDAR")
+        self.run_camera_btn = QPushButton("Run Camera")
+        self.run_something_btn = QPushButton("Run Something")
+        self.extra_option_btn = QPushButton("Extra Option")
+        for btn in (self.run_lidar_btn, self.run_camera_btn, self.run_something_btn, self.extra_option_btn):
+            btn.setCheckable(True)
+            btn.setStyleSheet(self.BUTTON_STYLE)
+            
         # Connect camera buttons to parent window methods if they exist
         if self.parent_window:
             if hasattr(self.parent_window, 'toggle_stream'):
@@ -78,11 +100,19 @@ class CameraControlsWidget(QGroupBox):
         self.detector_btn.setEnabled(False)  # Will be enabled when connected
 
         # Add to layout vertically (all buttons stacked)
+        self.layout.addWidget(self.run_camera_btn)
+        self.layout.addWidget(self.run_lidar_btn)
+        self.layout.addWidget(self.detector_btn)
         self.layout.addWidget(self.toggle_btn)
         self.layout.addWidget(self.reconnect_btn)
         self.layout.addWidget(self.capture_btn)
-        self.layout.addWidget(self.detector_btn)
-        self.layout.addWidget(self.orientation_btn)  # Add the new button
+
+        self.layout.addWidget(self.orientation_btn)
+
+        self.layout.addWidget(self.run_something_btn)
+        self.layout.addWidget(self.extra_option_btn)
+        # Add the new checkable buttons
+
         
         # Set layout spacing
         self.layout.setSpacing(WIDGET_SPACING)

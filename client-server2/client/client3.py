@@ -219,7 +219,7 @@ class MainWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.show_crosshairs = False  # Add this line
+        self.show_crosshairs = False 
         # Set global styling
         self.setStyleSheet(f"""
             QWidget {{
@@ -251,14 +251,9 @@ class MainWindow(QWidget):
         # display‐FPS counters
         self.display_frame_counter = 0
         self.current_display_fps   = 0
-        # ── end patch ──
-
-        # ── start patch ──
+  
         # throttle graph redraws
         self._last_graph_draw = 0.0
-        # Initialize with a default (e.g., 2 Hz). This will be updated by GraphSection's signal.
-        self._graph_update_interval = 1.0 / 2.0 
-        # ── end patch ──
 
         # ── instantiate plotters early ─────────────────────────────
         self.spin_plotter     = AngularPositionPlotter()
@@ -288,7 +283,6 @@ class MainWindow(QWidget):
         self.qt_log_handler = QtLogHandler(self) # Pass self as parent
         self.qt_log_handler.new_log_message.connect(self.append_log_message)
         
-        # <<< ADD THIS LINE to explicitly set the handler's level >>>
         self.qt_log_handler.setLevel(logging.INFO) # Or logging.DEBUG for more detail
         
         logging.getLogger().addHandler(self.qt_log_handler)
@@ -304,7 +298,6 @@ class MainWindow(QWidget):
             self.graph_section.graph_update_frequency_changed.connect(self.angular_plotter.set_redraw_rate)
 
             # initialize each plotter to the spinbox's default
-            # only pull the initial freq if the spinbox already exists
             spin = getattr(self.graph_section, 'freq_spinbox', None)
             if spin is not None:
                 try:
@@ -332,13 +325,9 @@ class MainWindow(QWidget):
         # Graph window reference
         self.graph_window = None
 
-            # ... (inside MainWindow class) ...
-        # Graph window reference
-        self.graph_window = None
-
     def append_log_message(self, message: str):
         """Appends a message to the log display widget and auto-scrolls."""
-        print(f"[DEBUG MainWindow.append_log_message] Received for GUI: {message}") # <<< ADD THIS DEBUG PRINT
+        print(f"[DEBUG MainWindow.append_log_message] Received for GUI: {message}") 
 
         self.log_display_widget.append(message)
         scrollbar = self.log_display_widget.verticalScrollBar()
@@ -382,10 +371,9 @@ class MainWindow(QWidget):
     def setup_timers(self):
         """Initialize performance timers"""
         self.fps_timer = self.startTimer(1000)
-        
         self.speed_timer = QTimer()
         self.speed_timer.timeout.connect(self.measure_speed)
-        self.speed_timer.start(10000)
+        self.speed_timer.start(5000)
 
     #=========================================================================
     #                          UI SETUP METHODS                             
@@ -592,23 +580,15 @@ class MainWindow(QWidget):
         # Graph section with recording capabilities
         self.record_btn = QPushButton("Record")
         self.duration_dropdown = QComboBox()
-        # ← hide the dropdown so it never shows up
         self.duration_dropdown.setVisible(False)
 
         self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
-        self.graph_section.setFixedSize(620, 280) # Existing size
+        self.graph_section.setFixedSize(620, 280) 
         self.graph_section.graph_display_layout.setSpacing(1)
         self.graph_section.graph_display_layout.setContentsMargins(1, 1, 1, 1)
         self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
         
         row2.addWidget(self.graph_section)
-
-        # LIDAR section
-        # Remove lidar_group and lidar_layout
-        # lidar_group = QGroupBox() 
-        # lidar_layout = QVBoxLayout()
-        # lidar_layout.setSpacing(2)
-        # lidar_layout.setContentsMargins(5, 15, 5, 5) 
 
         self.lidar_widget = LidarWidget()
         # lidar_layout.addWidget(self.lidar_widget) # Add directly to row2 later
@@ -623,10 +603,6 @@ class MainWindow(QWidget):
         self.lidar_widget.setFixedHeight(self.graph_section.height()) # Match graph height
         self.lidar_widget.setFixedWidth(250) # Adjust as needed
 
-        # Remove styling for lidar_group
-        # lidar_group.setLayout(lidar_layout)
-        # self.apply_groupbox_style(lidar_group, self.COLOR_BOX_BORDER_LIDAR, bg_color=self.COLOR_BOX_BG_LIDAR, title_color=self.COLOR_BOX_TEXT_LIDAR)
-        
         row2.addWidget(self.lidar_widget) # Add LidarWidget directly to row2
         
         # Console Log Display Section
@@ -673,10 +649,8 @@ class MainWindow(QWidget):
         self.show_crosshairs = not self.show_crosshairs
         
         if self.show_crosshairs:
-            self.camera_controls.orientation_btn.setText("Hide Crosshairs")
             logging.info("Manual orientation crosshairs enabled")
         else:
-            self.camera_controls.orientation_btn.setText("Show Crosshairs")
             logging.info("Manual orientation crosshairs disabled")
         
     def setup_subsystem_controls_row(self, parent_layout):
@@ -688,23 +662,18 @@ class MainWindow(QWidget):
 
         # ADCS section using the new ADCSSection widget
         self.adcs_control_widget = ADCSSection() # Instantiate your custom widget
-        
-        # Optional: Connect to signals from ADCSSection if needed
-        # self.adcs_control_widget.mode_selected.connect(self.handle_adcs_mode_selection)
-        # self.adcs_control_widget.adcs_command_sent.connect(self.handle_adcs_command)
-                                                                                   
+                                                                            
         self.apply_groupbox_style(self.adcs_control_widget, self.COLOR_BOX_BORDER_ADCS)
-        # ADCSSection is already a QGroupBox, so styling is applied directly.
-        # It will manage its own internal title ("ADCS").
-        
+
         # Adjust sizing as needed. For example, to make it expand:
         self.adcs_control_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        # Or set a fixed height if desired, e.g., to match other rows or content:
-        # self.adcs_control_widget.setFixedHeight(100) 
 
         row3.addWidget(self.adcs_control_widget)
         parent_layout.addLayout(row3)
 
+##########################################################################################
+#info panel
+#########################################################################################
    
     def setup_system_info_panel(self):
         """Setup right column system information panel"""
@@ -750,16 +719,11 @@ class MainWindow(QWidget):
             QWidget {{ min-width: 180px; background: {self.COLOR_BOX_BG_RIGHT}; }}
         """)
         info_container.setMinimumWidth(180)
-        # info_container.setMaximumWidth(220) # Allow info_container to fill the scroll_area width
 
-        # ── start patch ──
         # keep a handle to the container so we can walk its QGroupBoxes later
         self.info_container = info_container
-        # ── end patch ──
 
         return scroll_area
-
-
 
     def export_health_report(self):
         """Export health check report to a text file"""
@@ -824,12 +788,9 @@ class MainWindow(QWidget):
             "max_frame": QLabel("Max Frame: -- KB"),
             "fps":       QLabel("Live FPS: --"),
             "frame_size":QLabel("Frame Size: -- KB"),
-        }
-        
-        # ── start patch ──
-        # add display‐FPS label
-        self.info_labels["disp_fps"] = QLabel("Display FPS: --")
-        # ── end patch
+            "disp_fps" : QLabel("Display FPS: --")
+            }
+    
 
         # Corrected stylesheet application
         info_label_style = f"""
@@ -915,6 +876,8 @@ class MainWindow(QWidget):
                 is_part_of_right_column=True # Explicitly flag as right column item
             )
             parent_layout.addWidget(group)
+
+#'########################################################################################
 
     def update_image(self, frame):
         """Update video display with new frame"""
@@ -1190,7 +1153,6 @@ class MainWindow(QWidget):
         if not sio.connected:
             return
         self.streaming = not self.streaming
-        self.camera_controls.toggle_btn.setText("Stop Stream" if self.streaming else "Start Stream")
         sio.emit("start_camera" if self.streaming else "stop_camera")
 
     def apply_config(self):
@@ -1202,9 +1164,6 @@ class MainWindow(QWidget):
 
         # 1. Pause stream immediately if active
         if was_streaming_for_this_call:
-            # self.toggle_stream() # This stops the stream and updates self.streaming
-            # Avoid calling toggle_stream here if it has complex side effects or emits signals
-            # that might interfere with rapid calls. Instead, manage stream state directly for pause.
             if self.streaming: # Double check, as state might change
                 sio.emit("stop_camera")
                 self.streaming = False
@@ -1279,8 +1238,7 @@ class MainWindow(QWidget):
     def toggle_detector(self):
         """Toggle object detection on/off"""
         self.detector_active = not self.detector_active
-        self.detector_controls.detector_btn.setText("Stop Detector" if self.detector_active else "Start Detector")
-        
+
         if self.detector_active:
             logging.info("[INFO] 🚀 Starting detector...")
             threading.Thread(target=self.run_detector, daemon=True).start()

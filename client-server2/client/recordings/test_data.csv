@@ -1,4 +1,0 @@
-timestamp,sensor_type,data_type,avg_value,units,mode,time_range,data_points
-2025-06-05 08:13:05,Camera,Distance,0.8368837209302326,m,DISTANCE MEASURING MODE,0.0-12.0s,258
-2025-06-05 08:13:13,Camera,Distance,0.8368837209302326,m,DISTANCE MEASURING MODE,0.0-12.0s,258
-2025-06-05 08:13:16,Camera,Distance,0.8368837209302326,m,DISTANCE MEASURING MODE,0.0-12.0s,258

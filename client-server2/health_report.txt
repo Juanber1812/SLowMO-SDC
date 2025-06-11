@@ -1,19 +1,19 @@
-Temp: 29.2 °C
-CPU: 5.1 %
-Upload: -- Mbps
-Max Frame: -- KB
-Live FPS: 0
-Frame Size: 0.0 KB
-Display FPS: 0
+Temp: 40.9 °C
+CPU: 14.6 %
+Upload: Testing...
+Max Frame: ...
+Live FPS: 8
+Frame Size: 111.5 KB
+Display FPS: 8
 
 === System Info ===
-Temp: 29.2 °C
-CPU: 5.1 %
-Upload: -- Mbps
-Max Frame: -- KB
-Live FPS: 0
-Frame Size: 0.0 KB
-Display FPS: 0
+Temp: 40.9 °C
+CPU: 14.6 %
+Upload: Testing...
+Max Frame: ...
+Live FPS: 8
+Frame Size: 111.5 KB
+Display FPS: 8
 
 === Power Subsystem ===
 Battery Voltage: Pending...
@@ -40,8 +40,8 @@ Wheel Rpm: Pending...
 Status: Pending...
 
 === Payload Subsystem ===
-Camera: Pending...
-Status: Not Ready
+Camera: Streaming
+Status: Ready
 
 === Command & Data Handling Subsystem ===
 Memory Usage: Pending...

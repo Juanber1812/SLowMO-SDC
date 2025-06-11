@@ -251,7 +251,7 @@ class CameraSettingsWidget(QGroupBox):
                 color: black;
             }}
             QPushButton:checked {{ /* For preset buttons */
-                background-color: {BUTTON_COLOR};
+                background-color: {PLOT_LINE_PRIMARY};
                 color: black;
             }}
             QPushButton:checked:hover {{ /* For preset buttons */
@@ -353,7 +353,7 @@ class CameraSettingsWidget(QGroupBox):
             color: black;
         }}
         QPushButton:checked {{
-            background-color: {BUTTON_COLOR};
+            background-color: {PLOT_LINE_PRIMARY};
             color: black;
         }}
         QPushButton:checked:hover {{
