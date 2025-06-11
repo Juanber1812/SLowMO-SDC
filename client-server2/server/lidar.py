@@ -24,7 +24,7 @@ def disconnect():
 def read_distance(bus):
     try:
         bus.write_byte_data(LIDAR_ADDR, ACQ_COMMAND, MEASURE)
-        time.sleep(0.02)
+        time.sleep(0.01)
         high = bus.read_byte_data(LIDAR_ADDR, DISTANCE_HIGH)
         low = bus.read_byte_data(LIDAR_ADDR, DISTANCE_LOW)
         return (high << 8) + low

@@ -224,13 +224,14 @@ class LidarWidget(QWidget):
             return
 
         live_distance = metrics.get("live_distance_cm")
-        server_avg_distance = metrics.get("average_distance_cm_5s")
+        live_distance = live_distance/100.0 if live_distance is not None else None 
+        server_avg_distance = metrics.get("average_distance_m_5s")
         
         current_time = time.time() # Get current time for potential recording
         current_displayed_average = None
 
         if live_distance is not None:
-            self.live_distance_label.setText(f"Live Distance: {live_distance:.2f} cm")
+            self.live_distance_label.setText(f"Live Distance: {live_distance:.4f} m")
             with QMutexLocker(self.data_mutex):
                 self.live_distance_history.append(live_distance)
         else:
@@ -244,7 +245,7 @@ class LidarWidget(QWidget):
                     current_displayed_average = sum(self.live_distance_history) / len(self.live_distance_history)
 
         if current_displayed_average is not None:
-            self.average_distance_label.setText(f"5s Average: {current_displayed_average:.2f} cm")
+            self.average_distance_label.setText(f"5s Average: {current_displayed_average:.4f} m")
         else:
             self.average_distance_label.setText("5s Average: N/A")
 

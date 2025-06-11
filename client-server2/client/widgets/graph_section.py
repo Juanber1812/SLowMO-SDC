@@ -427,13 +427,14 @@ class GraphSection(QGroupBox):
             self.save_recording_to_csv()
 
     def add_data_point(self, timestamp, value, **kwargs):
-        """Add a data point to the recording if recording is active"""
+        """Add a data point to the recording if recording is active.
+           The timestamp is stored relative to the start of recording (0 at start)."""
         if self.is_recording:
+            rel_timestamp = timestamp - self.recording_start_time if self.recording_start_time else timestamp
             data_point = {
-                'timestamp': timestamp,
+                'timestamp': rel_timestamp,
                 'value': value,
-                'mode': self.current_graph_mode,
-                **kwargs  # Additional data like x, y coordinates, etc.
+                **kwargs  # Additional data such as x, y coordinates, etc.
             }
             self.recorded_data.append(data_point)
 
@@ -451,9 +452,9 @@ class GraphSection(QGroupBox):
         os.makedirs(rec_dir, exist_ok=True)
 
         MODE_CODES = {
-            "DISTANCE MEASURING MODE":  "distance_01",
-            "SCANNING MODE":     "angle_02",
-            "SPIN MODE":   "spin_03",
+            "DISTANCE MEASURING MODE":  "distance",
+            "SCANNING MODE":     "angle",
+            "SPIN MODE":   "spin",
         }
         
         mode_str = str(self.current_graph_mode) if self.current_graph_mode else "unknown_mode"

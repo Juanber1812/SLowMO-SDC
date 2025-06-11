@@ -73,13 +73,13 @@ class CameraControlsWidget(QGroupBox):
         self.orientation_btn.setCheckable(True)
 
         # Replace check_btn1, check_btn2, etc. with descriptive names
-        self.run_lidar_btn = QPushButton("Run LiDAR")
-        self.run_camera_btn = QPushButton("Run Camera")
-        self.run_something_btn = QPushButton("Run Something")
-        self.extra_option_btn = QPushButton("Extra Option")
-        for btn in (self.run_lidar_btn, self.run_camera_btn, self.run_something_btn, self.extra_option_btn):
-            btn.setCheckable(True)
-            btn.setStyleSheet(self.BUTTON_STYLE)
+        #self.run_lidar_btn = QPushButton("Run LiDAR")
+        #self.run_camera_btn = QPushButton("Run Camera")
+        #self.run_something_btn = QPushButton("Run Something")
+        #self.extra_option_btn = QPushButton("Extra Option")
+        #for btn in (self.run_lidar_btn, self.run_camera_btn, self.run_something_btn, self.extra_option_btn):
+        #    btn.setCheckable(True)
+        #    btn.setStyleSheet(self.BUTTON_STYLE)
             
         # Connect camera buttons to parent window methods if they exist
         if self.parent_window:
@@ -100,8 +100,8 @@ class CameraControlsWidget(QGroupBox):
         self.detector_btn.setEnabled(False)  # Will be enabled when connected
 
         # Add to layout vertically (all buttons stacked)
-        self.layout.addWidget(self.run_camera_btn)
-        self.layout.addWidget(self.run_lidar_btn)
+        #self.layout.addWidget(self.run_camera_btn)
+        #self.layout.addWidget(self.run_lidar_btn)
         self.layout.addWidget(self.detector_btn)
         self.layout.addWidget(self.toggle_btn)
         self.layout.addWidget(self.reconnect_btn)
@@ -109,8 +109,8 @@ class CameraControlsWidget(QGroupBox):
 
         self.layout.addWidget(self.orientation_btn)
 
-        self.layout.addWidget(self.run_something_btn)
-        self.layout.addWidget(self.extra_option_btn)
+        #self.layout.addWidget(self.run_something_btn)
+        #self.layout.addWidget(self.extra_option_btn)
         # Add the new checkable buttons
 
         

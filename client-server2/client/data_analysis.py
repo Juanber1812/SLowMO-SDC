@@ -412,7 +412,39 @@ class DataAnalysisTab(QWidget):
         self.record_velocity_btn.clicked.connect(self._record_velocity)
         self.record_velocity_btn.setEnabled(False)
         record_layout.addWidget(self.record_velocity_btn)
-
+        
+        # Add manual input box and submit button
+        manual_input_layout = QHBoxLayout()
+        manual_label = QLabel("Manual Input:")
+        manual_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+        manual_input_layout.addWidget(manual_label)
+        
+        self.manual_value_input = QLineEdit()
+        self.manual_value_input.setPlaceholderText("Enter value")
+        self.manual_value_input.setFixedWidth(100)
+        self.manual_value_input.setStyleSheet(f"""
+            QLineEdit {{
+                background-color: {BOX_BACKGROUND};
+                color: {TEXT_COLOR};
+                border: 1px solid {BORDER_COLOR};
+                border-radius: 4px;
+                padding: 4px;
+                font-family: {FONT_FAMILY};
+                font-size: {FONT_SIZE_NORMAL}pt;
+            }}
+            QLineEdit:focus {{
+                border: 2px solid {BUTTON_COLOR};
+            }}
+        """)
+        manual_input_layout.addWidget(self.manual_value_input)
+        
+        self.manual_submit_btn = QPushButton("Submit Manual")
+        style_button(self.manual_submit_btn)
+        self.manual_submit_btn.setFixedHeight(28)
+        self.manual_submit_btn.clicked.connect(self.manual_submit_manual_value)
+        manual_input_layout.addWidget(self.manual_submit_btn)
+        record_layout.addLayout(manual_input_layout)
+        
         metrics_layout.addWidget(record_buttons_widget)
 
         # CSV File Management
@@ -1194,19 +1226,7 @@ class DataAnalysisTab(QWidget):
             return
         
         avg_value = self.metrics[avg_distance_key]
-        mode_text = self.mode_combo.currentText()
-        
-        # Determine units
-        if mode_text == "DISTANCE MEASURING MODE":
-            data_type = "Distance"
-            units = "m"
-        elif mode_text == "SCANNING MODE":
-            data_type = "Relative Angle"
-            units = "°"
-        else:  # SPIN MODE
-            data_type = "Angular Position"
-            units = "°"
-        
+
         # Add to collection
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
         
@@ -1214,21 +1234,15 @@ class DataAnalysisTab(QWidget):
         sensor_type = self.sensor_type_combo.currentText()
         
         entry = {
-            "timestamp": timestamp,
             "sensor_type": sensor_type,  # Record sensor type
-            "data_type": data_type,
             "avg_value": avg_value,
-            "units": units,
-            "mode": mode_text,
-            "time_range": f"{self.start_spin.value():.1f}-{self.end_spin.value():.1f}s",
-            "data_points": self.metrics.get("Data Points", 0)
         }
         
         self.collection_data.append(entry)
         self._update_csv_display()
         self._auto_save_csv()
         
-        print(f"[INFO] Recorded distance: {avg_value:.4f} {units}")
+        print(f"[INFO] Recorded distance: {avg_value:.4f}")
 
     def _record_velocity(self):
         """Record the current average velocity to the collection CSV"""
@@ -1268,14 +1282,8 @@ class DataAnalysisTab(QWidget):
         sensor_type = self.sensor_type_combo.currentText()
         
         entry = {
-            "timestamp": timestamp,
             "sensor_type": sensor_type,  # Record sensor type
-            "data_type": data_type,
             "avg_value": avg_value,
-            "units": units,
-            "mode": mode_text,
-            "time_range": f"{self.start_spin.value():.1f}-{self.end_spin.value():.1f}s",
-            "data_points": self.metrics.get("Data Points", 0)
         }
         
         self.collection_data.append(entry)
@@ -1283,6 +1291,47 @@ class DataAnalysisTab(QWidget):
         self._auto_save_csv()
         
         print(f"[INFO] Recorded velocity: {avg_value:.4f} {units}")
+
+    def manual_submit_manual_value(self):
+        """Submit the manual input from the QLineEdit as a manual record."""
+        text = self.manual_value_input.text().strip()
+        if not text:
+            QMessageBox.warning(self, "Input Error", "Please enter a value.")
+            return
+        try:
+            value = float(text)
+        except ValueError:
+            QMessageBox.warning(self, "Input Error", "Invalid number format.")
+            return
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        mode_text = self.mode_combo.currentText() if hasattr(self, 'mode_combo') else ""
+        entry = {
+            "sensor_type": "manual",
+            "avg_value": value,
+        }
+        self.collection_data.append(entry)
+        self._update_csv_display()
+        self._auto_save_csv()
+        print(f"[INFO] Recorded manual value: {value}")
+        self.manual_value_input.clear()
+
+    def record_manual_input(self):
+        """Record a manual input value: sensor type 'manual' and input value as avg value."""
+        from PyQt6.QtWidgets import QInputDialog  # Ensure QInputDialog is imported
+        value, ok = QInputDialog.getDouble(self, "Manual Input", "Enter value:", decimals=4)
+        if not ok:
+            return
+        
+        entry = {
+            "sensor_type": "manual",
+            "avg_value": value,
+        }
+        
+        self.collection_data.append(entry)
+        self._update_csv_display()
+        self._auto_save_csv()
+        
+        print(f"[INFO] Recorded manual value: {value}")
 
     def _update_csv_display(self):
         """Update the CSV data display"""
@@ -1300,8 +1349,7 @@ class DataAnalysisTab(QWidget):
         for i, entry in enumerate(recent_data):
             entry_num = len(self.collection_data) - len(recent_data) + i + 1
             # Include sensor type in the display
-            lines.append(f"{entry_num:2d}. {entry['data_type']} ({entry['sensor_type']}): {entry['avg_value']:.4f} {entry['units']}")
-            lines.append(f"    {entry['mode']} | {entry['time_range']}")
+            lines.append(f" ({entry['sensor_type']}): {entry['avg_value']:.4f}")
         
         if len(self.collection_data) > 5:
             lines.insert(2, f"... (showing last 5 of {len(self.collection_data)})")
@@ -1324,7 +1372,7 @@ class DataAnalysisTab(QWidget):
                 with open(file_path, 'w', newline='', encoding='utf-8') as csvfile:
                     csv_writer = csv.writer(csvfile)
                     csv_writer.writerow([
-                        "sensor_type", "data_type", 
+                        "sensor_type", 
                         "avg_value"
                     ])
                 
@@ -1367,8 +1415,8 @@ class DataAnalysisTab(QWidget):
                 
                 # Write the header row
                 header = self.collection_data[0].keys() if self.collection_data else [
-                    "timestamp", "sensor_type", "data_type", 
-                    "avg_value", "units", "mode", "time_range", "data_points"
+                    "sensor_type", 
+                    "avg_value"
                 ]
                 csv_writer.writerow(header)
                 
