@@ -14,25 +14,30 @@ pwm.start(50)  # Start PWM with 50% duty cycle
 def motor_forward(speed):
 	GPIO.output(Motor1A, GPIO.HIGH)
 	GPIO.output(Motor1B, GPIO.LOW)
-    	pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
+	pwm.ChangeDutyCycle(speed)  # Adjust speed (0-100%)
+
 def stop_motor():
 	pwm.ChangeDutyCycle(0)  # Stop motor
+
 def accelerate_motor(step=5, delay=0.1):
 	accel_state = True
-    while accel_state == True:
-	if speed == 99:
-		break
-        speed += step
-        pwm.ChangeDutyCycle(speed)
-        time.sleep(delay)
+	speed = 50  # Initialize speed or pass as argument if needed
+	while accel_state == True:
+		if speed >= 99:
+			break
+		speed += step
+		pwm.ChangeDutyCycle(speed)
+		time.sleep(delay)
+
 def deccelerate_motor(step=5, delay=0.1):
 	accel_state = True
-    while accel_state == True:
-	if speed == 1:
-		break
-        speed -= step
-        pwm.ChangeDutyCycle(speed)
-        time.sleep(delay)
+	speed = 50  # Initialize speed or pass as argument if needed
+	while accel_state == True:
+		if speed <= 1:
+			break
+		speed -= step
+		pwm.ChangeDutyCycle(speed)
+		time.sleep(delay)
 
 # Setting up rpm sensor
 GPIO.setmode(GPIO.BCM)  #Use Broadcom pin numbering
@@ -75,26 +80,26 @@ def MPU_Init():
 
 # Creating function to read motion sensor's raw data
 def read_raw_data(addr):
-        high = bus.read_byte_data(Device_Address, addr)
-        low = bus.read_byte_data(Device_Address, addr+1)
-        value = ((high << 8) | low)
-        if(value > 32768):
-                value = value - 65536
-        return value
+	high = bus.read_byte_data(Device_Address, addr)
+	low = bus.read_byte_data(Device_Address, addr+1)
+	value = ((high << 8) | low)
+	if(value > 32768):
+		value = value - 65536
+	return value
 
 # Setting PD controller
 class PDController:
 	def __init__(self, Kp, Kd):
-        	self.Kp = Kp
-        	self.Kd = Kd
-        	self.previous_error = 0
-    
+		self.Kp = Kp
+		self.Kd = Kd
+		self.previous_error = 0
+
 	def compute(self, desired_orientation, actual_orientation, dt):
 		error = desired_orientation - actual_orientation
-        	derivative = (error - self.previous_error) / dt if dt > 0 else 0
-        	control_output = self.Kp * error + self.Kd * derivative
-        	self.previous_error = error
-        	return control_output
+		derivative = (error - self.previous_error) / dt if dt > 0 else 0
+		control_output = self.Kp * error + self.Kd * derivative
+		self.previous_error = error
+		return control_output
 
 # Beginning initialisation of motion sensor
 MPU_Init()
@@ -108,36 +113,37 @@ start_time = time.perf_counter()
 intial_time = None
 prev_ref = False
 while True:
-        elapsed = time.perf_counter() - start_time
-        acc_x = read_raw_data(ACCEL_XOUT_H)
-        acc_y = read_raw_data(ACCEL_YOUT_H)
-        acc_z = read_raw_data(ACCEL_ZOUT_H)
-        gyro_x = read_raw_data(GYRO_XOUT_H)
-        gyro_y = read_raw_data(GYRO_YOUT_H)
-        gyro_z = read_raw_data(GYRO_ZOUT_H)
-        Ax = acc_x/16384.0
-        Ay = acc_y/16384.0
-        Az = acc_z/16384.0
-        Gx = gyro_x/131.0
-        Gy = gyro_y/131.0
-        Gz = gyro_z/131.0
-        velocity = Gz
-        dt = 0.1############Update for update rate
-        orientation += velocity * dt
+	elapsed = time.perf_counter() - start_time
+	acc_x = read_raw_data(ACCEL_XOUT_H)
+	acc_y = read_raw_data(ACCEL_YOUT_H)
+	acc_z = read_raw_data(ACCEL_ZOUT_H)
+	gyro_x = read_raw_data(GYRO_XOUT_H)
+	gyro_y = read_raw_data(GYRO_YOUT_H)
+	gyro_z = read_raw_data(GYRO_ZOUT_H)
+	Ax = acc_x/16384.0
+	Ay = acc_y/16384.0
+	Az = acc_z/16384.0
+	Gx = gyro_x/131.0
+	Gy = gyro_y/131.0
+	Gz = gyro_z/131.0
+	velocity = Gz
+	dt = 0.1############Update for update rate
+	orientation += velocity * dt
 	#RPM sensing
 	if GPIO.input(Motor1E) != GPIO.LOW:
 		if GPIO.input(17) == GPIO.HIGH and prev_ref == False: 
-            		if initial_time is None:  
-           			initial_time = time.perf_counter()
-           			prev_ref = True
-        		else:
-                		current_time = time.perf_counter()
-                        	period = current_time - initial_time
+			if initial_time is None:  
+				initial_time = time.perf_counter()
+				prev_ref = True
+			else:
+				current_time = time.perf_counter()
+				period = current_time - initial_time
 				rpm = 60/period 
-                        	initial_time = current_time
-                        	prev_ref = True
-            	elif GPIO.input(17) == GPIO.LOW:
-                	prev_ref = False
+				initial_time = current_time
+				prev_ref = True
+		else:
+			rpm = 0
+			prev_ref = False
 	else:
 		rpm = 0
 
@@ -152,92 +158,92 @@ def environmental_calibration_mode():
 	calibration = False
 	dt = 0.1
 	while calibration == False:
-        	# Checking for light maximum
-        	light1 = veml7700_1.light
-        	light2 = veml7700_2.light
+		# Checking for light maximum
+		light1 = veml7700_1.light
+		light2 = veml7700_2.light
 		light3 = veml7700_3.light
-        	light_intensity_1.append(light1)
-        	light_intensity_2.append(light2)
-        	light_intensity_3.append(light3)
-        	timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        	if len(light_intensity_1) > 2 or len(light_intensity_2) > 2 or len(light_intensity_3) > 2:
+		light_intensity_1.append(light1)
+		light_intensity_2.append(light2)
+		light_intensity_3.append(light3)
+		timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+		if len(light_intensity_1) > 2 or len(light_intensity_2) > 2 or len(light_intensity_3) > 2:
 			accel_state = False
-                	if np.sign(light_intensity_1[-2]-light_intensity_1[-3]) == -np.sign(light_intensity_1[-1]-light_intensity_1[-2]):
-                		orientation = 0
-                		orientation += velocity * dt
-                		desired_orientation = 0
-                		actual_orientation = orientation
+			if np.sign(light_intensity_1[-2]-light_intensity_1[-3]) == -np.sign(light_intensity_1[-1]-light_intensity_1[-2]):
+				orientation = 0
+				orientation += velocity * dt
+				desired_orientation = 0
+				actual_orientation = orientation
 				calibration = True
 			elif np.sign(light_intensity_2[-2]-light_intensity_2[-3]) == -np.sign(light_intensity_2[-1]-light_intensity_2[-2]):
-                		orientation = -60
-                		orientation += velocity * dt
-                		desired_orientation = -60
-                		actual_orientation = orientation
+				orientation = -60
+				orientation += velocity * dt
+				desired_orientation = -60
+				actual_orientation = orientation
 				calibration = True
 			elif np.sign(light_intensity_3[-2]-light_intensity_3[-3]) == -np.sign(light_intensity_3[-1]-light_intensity_3[-2]):
-                		orientation = -120
-                		orientation += velocity * dt
-                		desired_orientation = -120
-                		actual_orientation = orientation
+				orientation = -120
+				orientation += velocity * dt
+				desired_orientation = -120
+				actual_orientation = orientation
 				calibration = True
 	while calibration == True and abs(desired_orientation - orientation) > 0.01:
-       		control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+		control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
 		# Mapping PD output to motor speed (ensure values are within valid range)
-        	motor_speed = max(min(abs(control_signal), 50), 0)  # Limiting to realistic values
+		motor_speed = max(min(abs(control_signal), 50), 0)  # Limiting to realistic values
 		#Adjust motor direction based on control signal sign
 		if control_signal > 0:
 			motor_forward(50+motor_speed)
 			orientation += velocity * dt
-        		actual_orientation = orientation  # Update actual orientation in real-time
+			actual_orientation = orientation  # Update actual orientation in real-time
 		else:
 			motor_forward(50-motor_speed)
 			orientation += velocity * dt
-        		actual_orientation = orientation  # Update actual orientation in real-time
+			actual_orientation = orientation  # Update actual orientation in real-time
 	else:
-        	orientation += velocity * dt
-        	return		
-        time.sleep(0.1)
+		orientation += velocity * dt
+		return        
+	time.sleep(0.1)
 
 # Creating manual orientation mode function
 def manual_orientation_mode():
 	#Creating commands for motor
 	def startstop_cw():
-        	if speed == 50:
-            		accelerate_motor()
-        		elif speed =! 50:
-            		motor_forward(speed)
-    	def startstop_ccw():
-        	if speed == 50:
-            		deccelerate_motor()
-        	elif speed =! 50:
-            		motor_forward(speed)
+		if speed == 50:
+			accelerate_motor()
+		elif speed != 50:
+			motor_forward(speed)
+	def startstop_ccw():
+		if speed == 50:
+			deccelerate_motor()
+		elif speed != 50:
+			motor_forward(speed)
 
 # Creating automatic orientation mode function
 def automatic_orientation_mode():
-        def rotation():
-                # Parameter setting
-                desired_orientation = float(entry.get())
-                actual_orientation = orientation
-                pd_controller = PDController(Kp=1600, Kd=80)
-                # Running controller
-                while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
-                       	control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+	def rotation():
+		# Parameter setting
+		desired_orientation = float(entry.get())
+		actual_orientation = orientation
+		pd_controller = PDController(Kp=1600, Kd=80)
+		# Running controller
+		while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
+			control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
 			# Mapping PD output to motor speed (ensure values are within valid range)
-        		motor_speed = max(min(abs(control_signal), 50), 0)  # Limiting to realistic values
+			motor_speed = max(min(abs(control_signal), 50), 0)  # Limiting to realistic values
 			#Adjust motor direction based on control signal sign
 			if control_signal > 0:
 				motor_forward(50+motor_speed)
 				orientation += velocity * dt
-        			actual_orientation = orientation  # Update actual orientation in real-time
+				actual_orientation = orientation  # Update actual orientation in real-time
 			else:
 				motor_forward(50-motor_speed)
 				orientation += velocity * dt
-        			actual_orientation = orientation  # Update actual orientation in real-time
+				actual_orientation = orientation  # Update actual orientation in real-time
 		else:
-        		orientation += velocity * dt
-        		return
-        def start_rotation():
-                rotation(float(entry.get()))
+			orientation += velocity * dt
+			return
+	def start_rotation():
+		rotation(float(entry.get()))
 
 # Creating detumbling mode function
 def detumbling_mode():
@@ -246,20 +252,20 @@ def detumbling_mode():
 	dt = 0.1
 	pd_controller = PDController(Kp=1600, Kd=80)
 	while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
-        	control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+		control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
 		# Mapping PD output to motor speed (ensure values are within valid range)
-        	motor_speed = max(min(abs(control_signal), 500), 0)  # Limiting to realistic values
+		motor_speed = max(min(abs(control_signal), 500), 0)  # Limiting to realistic values
 		#Adjust motor direction based on control signal sign
 		if control_signal > 0:
 			motor_forward(50+motor_speed)
 			orientation += velocity * dt
-        		actual_orientation = orientation  # Update actual orientation in real-time
+			actual_orientation = orientation  # Update actual orientation in real-time
 		else:
 			motor_forward(50-motor_speed)
 			orientation += velocity * dt
-        		actual_orientation = orientation  # Update actual orientation in real-time
+			actual_orientation = orientation  # Update actual orientation in real-time
 	else:
-        	orientation += velocity * dt
-        	return
+		orientation += velocity * dt
+		return
     
 

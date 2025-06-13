@@ -2186,3 +2186,4 @@ socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', po
 2025-06-13 16:14:00,759 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749827635.7519994 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000201C22027B0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
 2025-06-13 16:18:38,726 - INFO - [ADCSSection] Displaying details for: Environmental Calibration
 2025-06-13 16:18:40,259 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-13 17:01:02,571 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
