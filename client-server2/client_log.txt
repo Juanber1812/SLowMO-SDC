@@ -2096,3 +2096,93 @@ socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', po
 2025-06-11 20:52:48,775 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
 2025-06-11 20:53:55,977 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
 2025-06-11 20:54:11,704 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-11_20-54-11.csv
+2025-06-11 21:01:51,922 - INFO - Disconnected from server: client disconnect
+2025-06-11 21:02:14,891 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-11 21:02:15,059 - INFO - Connected to server
+2025-06-11 21:02:15,062 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-11 21:02:15,063 - INFO - [INFO] Successfully connected to server
+2025-06-11 21:02:32,979 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-11 21:02:32,982 - INFO - Stream paused for config application.
+2025-06-11 21:02:33,484 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-11 21:02:33,490 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-11 21:02:33,694 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-11 21:02:47,893 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-11 21:02:49,653 - INFO - Requesting LIDAR streaming start
+2025-06-11 21:03:23,616 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-11 21:03:34,387 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-11_21-03-34.csv
+2025-06-11 21:08:06,661 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-11 21:08:16,211 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-11_21-08-16.csv
+2025-06-11 21:08:31,490 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-11 21:08:39,452 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-11_21-08-39.csv
+2025-06-11 23:50:58,242 - INFO - Disconnected from server: transport error
+2025-06-12 16:56:49,013 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-12 19:46:10,646 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-12 19:46:10,808 - INFO - Connected to server
+2025-06-12 19:46:10,810 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-12 19:46:10,813 - INFO - [INFO] Successfully connected to server
+2025-06-12 20:02:46,058 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-12 20:02:46,266 - INFO - Connected to server
+2025-06-12 20:02:46,268 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-12 20:02:46,272 - INFO - [INFO] Successfully connected to server
+2025-06-12 20:02:56,731 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-12 20:02:56,734 - INFO - Stream paused for config application.
+2025-06-12 20:02:57,237 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-12 20:02:57,246 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-12 20:02:57,452 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-12 20:02:58,762 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-12 20:02:58,770 - INFO - Stream paused for config application.
+2025-06-12 20:02:59,291 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-12 20:02:59,300 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-12 20:02:59,505 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-12 20:03:02,444 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-12 20:03:04,184 - INFO - Requesting LIDAR streaming start
+2025-06-12 20:03:28,644 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-12 20:03:37,558 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-12_20-03-37.csv
+2025-06-12 20:08:09,534 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-12 20:08:09,537 - INFO - Stream paused for config application.
+2025-06-12 20:08:10,039 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-12 20:08:10,045 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-12 20:08:10,250 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-12 20:08:11,909 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-12 20:08:11,911 - INFO - Stream paused for config application.
+2025-06-12 20:08:12,432 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-12 20:08:12,436 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-12 20:08:12,641 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-12 20:08:17,932 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-12 20:08:17,937 - INFO - Stream paused for config application.
+2025-06-12 20:08:18,454 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-12 20:08:18,457 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-12 20:08:18,660 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-12 20:09:03,512 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-12 20:09:12,465 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-12_20-09-12.csv
+2025-06-12 20:09:33,692 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-12 20:09:47,343 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-12_20-09-47.csv
+2025-06-12 20:09:59,127 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-12 20:10:01,509 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-12_20-10-01.csv
+2025-06-12 20:19:49,394 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-12 20:19:56,800 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-12_20-19-56.csv
+2025-06-12 20:20:20,268 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-12 20:20:28,741 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-12_20-20-28.csv
+2025-06-12 20:20:40,801 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-12 20:20:48,855 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-12_20-20-48.csv
+2025-06-12 20:20:54,050 - INFO - Requesting LIDAR streaming stop
+2025-06-12 20:20:54,054 - INFO - Back button clicked in LidarWidget
+2025-06-12 20:37:45,836 - INFO - Disconnected from server: client disconnect
+2025-06-12 20:37:52,093 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-12 20:37:52,249 - INFO - Connected to server
+2025-06-12 20:37:52,254 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-12 20:37:52,257 - INFO - [INFO] Successfully connected to server
+2025-06-12 23:27:53,472 - INFO - Disconnected from server: transport error
+2025-06-13 15:47:37,842 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-13 15:47:46,021 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-13 15:47:51,031 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749826066.0225263 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000021FB51427B0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-13 15:55:54,229 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-13 15:56:00,683 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-13 15:56:04,528 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-13 15:58:55,603 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-13 15:59:00,614 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749826735.605457 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001F4B31B27B0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-13 16:13:50,721 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-13 16:13:55,750 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-13 16:14:00,759 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1749827635.7519994 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000201C22027B0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-06-13 16:18:38,726 - INFO - [ADCSSection] Displaying details for: Environmental Calibration
+2025-06-13 16:18:40,259 - INFO - [ADCSSection] Returning to ADCS Mode Selection.

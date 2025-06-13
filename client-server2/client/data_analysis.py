@@ -717,74 +717,6 @@ class DataAnalysisTab(QWidget):
         
         row += 1
         
-        # Kalman Filter
-        kalman_cb = QCheckBox("Kalman")
-        kalman_cb.setStyleSheet(f"""
-            QCheckBox {{
-                color: {TEXT_COLOR};
-                font-family: {FONT_FAMILY};
-                font-size: {FONT_SIZE_NORMAL}pt;
-                spacing: 8px;
-            }}
-            QCheckBox::indicator {{
-                width: 16px;
-                height: 16px;
-                border: 2px solid {BORDER_COLOR};
-                border-radius: 3px;
-                background-color: {BOX_BACKGROUND};
-            }}
-            QCheckBox::indicator:checked {{
-                background-color: {BUTTON_COLOR};
-                border-color: {BUTTON_COLOR};
-            }}
-            QCheckBox::indicator:hover {{
-                border-color: {BUTTON_HOVER};
-            }}
-        """)
-        kalman_cb.toggled.connect(lambda checked, ft=filter_type: self._toggle_filter(ft, 'kalman', checked))
-        filters_grid.addWidget(kalman_cb, row, 0)
-        
-        # Kalman parameters
-        kalman_params = QWidget()
-        kalman_layout = QHBoxLayout(kalman_params)
-        kalman_layout.setContentsMargins(0,0,0,0)
-        kalman_layout.setSpacing(6)  # Better spacing
-        
-        q_label = QLabel("Q:")
-        q_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
-        kalman_layout.addWidget(q_label)
-        kf_q = QDoubleSpinBox()
-        kf_q.setRange(1e-6, 1.0)
-        kf_q.setSingleStep(0.00001)
-        kf_q.setDecimals(6)  # More decimals for precision
-        kf_q.setValue(0.00001)
-        kf_q.setFixedWidth(90)  # Much wider for scientific notation
-        kf_q.setFixedHeight(28)  # Taller
-        style_modern_spinbox(kf_q)
-        kf_q.valueChanged.connect(self.update_plots)
-        kalman_layout.addWidget(kf_q)
-        
-        r_label = QLabel("R:")
-        r_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
-        kalman_layout.addWidget(r_label)
-        kf_r = QDoubleSpinBox()
-        kf_r.setRange(0.001, 1.0)
-        kf_r.setSingleStep(0.001)
-        kf_r.setDecimals(3)
-        kf_r.setValue(0.01)
-        kf_r.setFixedWidth(70)  # Wider
-        kf_r.setFixedHeight(28)  # Taller
-        style_modern_spinbox(kf_r)
-        kf_r.valueChanged.connect(self.update_plots)
-        kalman_layout.addWidget(kf_r)
-        
-        filters_grid.addWidget(kalman_params, row, 1)
-        
-        # Store references
-        setattr(self, f"{filter_type}_kalman_cb", kalman_cb)
-        setattr(self, f"{filter_type}_kf_q", kf_q)
-        setattr(self, f"{filter_type}_kf_r", kf_r)
-        
         # Set column stretches to make better use of space
         filters_grid.setColumnStretch(0, 0)  # Checkbox column: fixed width
         filters_grid.setColumnStretch(1, 1)  # Parameters column: stretch
@@ -1054,6 +986,11 @@ class DataAnalysisTab(QWidget):
             # Plot velocity
             ax2 = self.vel_fig.add_subplot(111)
             ax2.set_facecolor(PLOT_BACKGROUND)
+
+            # Plot full raw velocity as background
+            if len(full_ts) > 1:
+                full_vel = np.diff(full_v) / np.where(np.diff(full_ts) == 0, 1e-9, np.diff(full_ts))
+                ax2.plot(full_ts[1:], full_vel, color=PLOT_LINE_ALT, alpha=0.4, label="Full Velocity", linewidth=1)
 
             if len(ts) > 1 and len(raw_vel) > 0:
                 vel_ts = ts[1:len(raw_vel)+1]
