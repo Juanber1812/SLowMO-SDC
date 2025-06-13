@@ -44,6 +44,5 @@ def start_lidar():
         while True:
             distance = read_distance(bus)
             if distance is not None:
-                print(f"[DEBUG] LIDAR distance: {distance}")  # Add this line
                 sio.emit("lidar_data", {"distance_cm": distance})
             time.sleep(0.05)  # Adjust as needed
