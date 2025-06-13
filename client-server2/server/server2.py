@@ -7,6 +7,7 @@ import camera
 import sensors
 import lidar
 import threading
+import adcs_functions 
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -70,6 +71,57 @@ def handle_camera_config(data):
     except Exception as e:
         print(f"[ERROR] camera_config: {e}")
 
+@socketio.on("adcs_command")
+def handle_adcs_command(data):
+    try:
+        print(f"[SERVER] Received ADCS command: {data}")
+        command = data.get("command")
+        
+        if command == "environmental":
+            # Call environmental calibration mode.
+            from adcs_functions import environmental_calibration_mode
+            environmental_calibration_mode()
+        
+        elif command == "manual_clockwise_start":
+            # Start clockwise motor action (e.g., acceleration).
+            from adcs_functions import accelerate_motor
+            accelerate_motor()  # Adjust with parameters if needed.
+        
+        elif command == "manual_clockwise_stop":
+            # Stop the clockwise action. Replace with an appropriate stop function.
+            from adcs_functions import stop_motor
+            stop_motor()
+        
+        elif command == "manual_anticlockwise_start":
+            # Start anticlockwise action (e.g., deceleration or reverse logic).
+            from adcs_functions import deccelerate_motor
+            deccelerate_motor()  # Adjust with parameters if needed.
+        
+        elif command == "manual_anticlockwise_stop":
+            # Stop anticlockwise action, using a stop routine.
+            from adcs_functions import stop_motor
+            stop_motor()
+        
+        elif command == "set_target_orientation":
+            target = data.get("value")
+            # If you have a function to set the orientation, call it here.
+            print(f"[SERVER] Setting target orientation to: {target}")
+            # For example:
+            # from adcs_functions import set_target_orientation
+            # set_target_orientation(target)
+        
+        elif command == "detumbling":
+            # Call your detumbling routine if it exists.
+            print("[SERVER] Running detumbling procedure")
+            # For example:
+            # from adcs_functions import detumbling
+            # detumbling()
+        else:
+            print("[SERVER] Unknown ADCS command received.")
+        
+        emit("adcs_command_ack", {"status": "OK", "command": command}, broadcast=True)
+    except Exception as e:
+        print(f"[ERROR] ADCS command handling: {e}")
 
 @socketio.on("sensor_data")
 def handle_sensor_data(data):

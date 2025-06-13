@@ -26,6 +26,7 @@ def accelerate_motor(step=5, delay=0.1):
 		if speed >= 99:
 			break
 		speed += step
+		print(f"Accelerating: speed = {speed}")
 		pwm.ChangeDutyCycle(speed)
 		time.sleep(delay)
 
@@ -36,6 +37,7 @@ def deccelerate_motor(step=5, delay=0.1):
 		if speed <= 1:
 			break
 		speed -= step
+		print(f"Decelerating: speed = {speed}")
 		pwm.ChangeDutyCycle(speed)
 		time.sleep(delay)
 
@@ -149,6 +151,7 @@ while True:
 
 # Creating environmental calibration mode function
 def environmental_calibration_mode():
+	print("Signal: Environmental Calibration mode")
 	#Setting reference light readings
 	light_intensity_1 = []
 	light_intensity_2 = []
@@ -206,13 +209,16 @@ def environmental_calibration_mode():
 
 # Creating manual orientation mode function
 def manual_orientation_mode():
+	print("Signal: Manual Orientation mode")
 	#Creating commands for motor
 	def startstop_cw():
+		print("Signal: Manual Orientation mode - Clockwise command received")
 		if speed == 50:
 			accelerate_motor()
 		elif speed != 50:
 			motor_forward(speed)
 	def startstop_ccw():
+		print("Signal: Manual Orientation mode - Counter-clockwise command received")
 		if speed == 50:
 			deccelerate_motor()
 		elif speed != 50:
@@ -220,7 +226,9 @@ def manual_orientation_mode():
 
 # Creating automatic orientation mode function
 def automatic_orientation_mode():
+	print("Signal: Automatic Orientation mode")
 	def rotation():
+		print("Signal: Automatic Orientation mode - Rotation command received")
 		# Parameter setting
 		desired_orientation = float(entry.get())
 		actual_orientation = orientation

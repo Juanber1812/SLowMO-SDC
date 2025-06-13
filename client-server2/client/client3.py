@@ -1601,6 +1601,15 @@ class MainWindow(QWidget):
     #                          UTILITY METHODS                              
     #=========================================================================
 
+    def handle_adcs_command(self, mode_name, command_name, value):
+        data = {
+            "mode": mode_name,
+            "command": command_name,
+            "value": value
+        }
+        sio.emit("adcs_command", data)
+        print(f"[CLIENT] ADCS command sent: {data}")
+
     def try_reconnect(self):
         """Attempt to reconnect to server"""
         threading.Thread(target=self.reconnect_socket, daemon=True).start()

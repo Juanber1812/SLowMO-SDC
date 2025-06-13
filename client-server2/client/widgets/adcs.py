@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (
-    QWidget, QGroupBox, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QStackedWidget, QLineEdit # Added QLineEdit
+    QWidget, QGroupBox, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QStackedWidget, QLineEdit
 )
 from PyQt6.QtCore import pyqtSignal, Qt
 import logging
@@ -83,9 +83,9 @@ class ADCSSection(QGroupBox):
     A QGroupBox widget to manage ADCS controls using a QStackedWidget
     for different views (mode selection and detail view).
     """
-    mode_selected = pyqtSignal(int, str) # Emits mode_index, mode_name when a mode button is clicked
-    # Updated signal to carry a potential value along with the command
-    adcs_command_sent = pyqtSignal(str, str, object) # mode_name, command_name, value (can be None or int)
+    # Define signals for mode selection and commands
+    mode_selected = pyqtSignal(int, str)  # Emits mode_index, mode_name
+    adcs_command_sent = pyqtSignal(str, str, object)  # Emits mode_name, command_name, value (can be None)
 
     def __init__(self, parent=None):
         super().__init__("ADCS", parent)
@@ -98,16 +98,13 @@ class ADCSSection(QGroupBox):
         self.stacked_widget = QStackedWidget()
 
         # Define the main ADCS modes and their respective detail view buttons
-        # << YOU CAN CHANGE THE BUTTON NAMES FOR EACH MODE HERE >>
         self.adcs_modes_config = {
             "Environmental Calibration": ["hello"],
-            "Manual Orientation": ["Clockwise", "Anticlockwise"], # These will be press/hold
-            "Automatic Orientation": ["Set Value"], # This will trigger special widget creation
+            "Manual Orientation": ["Clockwise", "Anticlockwise"],  # These will be press/hold
+            "Automatic Orientation": ["Set Value"],  # This will trigger special widget creation
             "Detumbling": ["world"]
         }
-        # The order of these names will determine the order of the main mode buttons
         self.adcs_mode_names = list(self.adcs_modes_config.keys())
-
 
         # Page 1: Initial ADCS Mode Buttons
         mode_page = self._create_mode_selection_page()
@@ -116,7 +113,7 @@ class ADCSSection(QGroupBox):
         # Page 2: Detail View (structure created, content populated dynamically)
         detail_page_widget = self._create_detail_page_structure()
         self.stacked_widget.addWidget(detail_page_widget)
-        
+
         self._main_layout.addWidget(self.stacked_widget)
         self.stacked_widget.setCurrentIndex(0)
 
@@ -125,7 +122,7 @@ class ADCSSection(QGroupBox):
         page = QWidget()
         layout = QHBoxLayout(page)
         layout.setSpacing(6)
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(0, 0, 0, 0)
 
         self.adcs_mode_buttons = []
         # Use self.adcs_mode_names defined in __init__
@@ -167,92 +164,91 @@ class ADCSSection(QGroupBox):
         return page
 
     def _populate_detail_buttons(self, mode_name):
-        """Clears and populates the detail_button_row_layout with buttons specific to the given mode."""
+        """Clears and populates the detail_button_row_layout with buttons for the given mode."""
         
-        # 1. Safely remove the persistent back_button from its current parent/layout.
-        #    This ensures it's not accidentally deleted by the clearing loop below.
-        #    The self.back_button widget instance itself remains.
+        # Remove the persistent back_button from its current parent
         if self.back_button:
             self.back_button.setParent(None)
-
-        # 2. Clear all (now only old mode-specific) buttons from the layout and delete their widgets.
+        
+        # Clear existing buttons from the layout
         while self.detail_button_row_layout.count() > 0:
             item = self.detail_button_row_layout.takeAt(0)
             widget = item.widget()
             if widget:
-                widget.deleteLater() # These are the old mode-specific buttons
+                widget.deleteLater()
         
-        # Clear the list of references to the old action buttons
         if hasattr(self, 'adcs_detail_action_buttons'):
             self.adcs_detail_action_buttons.clear()
         else:
             self.adcs_detail_action_buttons = []
         
-        button_names_for_mode = self.adcs_modes_config.get(mode_name, [])
-
-        # 3. Add new mode-specific buttons for the current mode.
-        for name in button_names_for_mode:
-            if mode_name == "Automatic Orientation" and name == "Set Value":
-                # Create a container for the input field and send button
-                input_container = QWidget()
-                input_layout = QHBoxLayout(input_container)
-                input_layout.setContentsMargins(0, 0, 0, 0)
-                input_layout.setSpacing(5)
-
-                value_label = QLabel("Desired Value:")
-                value_label.setStyleSheet(ADCS_LABEL_STYLE)
-                input_layout.addWidget(value_label)
-
-                self.orientation_input_field = QLineEdit()
-                self.orientation_input_field.setPlaceholderText("Enter integer")
-                # Basic styling for QLineEdit, adapt as needed or use theme
-                self.orientation_input_field.setStyleSheet(f"""
-                    QLineEdit {{
-                        color: {TEXT_COLOR};
-                        background-color: #2D2D2D;
-                        border: 1px solid {BORDER_COLOR};
-                        border-radius: {BORDER_RADIUS}px;
-                        padding: 5px;
-                        font-family: {FONT_FAMILY};
-                        font-size: {FONT_SIZE_NORMAL}pt;
-                    }}
-                """)
-                self.orientation_input_field.setFixedHeight(ADCS_BUTTON_HEIGHT)
-                self.orientation_input_field.returnPressed.connect(self._handle_send_automatic_orientation_value)
-                input_layout.addWidget(self.orientation_input_field)
-
-                self.orientation_send_button = QPushButton("Send")
-                self.orientation_send_button.setStyleSheet(ADCS_BUTTON_STYLE)
-                self.orientation_send_button.setFixedHeight(ADCS_BUTTON_HEIGHT)
-                self.orientation_send_button.clicked.connect(self._handle_send_automatic_orientation_value)
-                input_layout.addWidget(self.orientation_send_button)
-                
-                self.detail_button_row_layout.addWidget(input_container)
-            elif mode_name == "Manual Orientation" and name in ["Clockwise", "Anticlockwise"]:
+        # Create independent buttons/signals based on the current mode
+        if mode_name == "Environmental Calibration":
+            btn = QPushButton("Environmental Calibration")
+            btn.setStyleSheet(ADCS_BUTTON_STYLE)
+            btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
+            btn.clicked.connect(lambda: self._handle_detail_action_clicked(mode_name, "environmental", None))
+            self.detail_button_row_layout.addWidget(btn)
+        
+        elif mode_name == "Manual Orientation":
+            # Create 'Clockwise' and 'Anticlockwise' buttons with press/release events
+            for name in ["Clockwise", "Anticlockwise"]:
                 btn = QPushButton(name)
                 btn.setStyleSheet(ADCS_BUTTON_STYLE)
                 btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-                
-                # Define command prefixes based on button name
-                command_prefix = "manual_clockwise" if name == "Clockwise" else "manual_anticlockwise"
-                
-                # Connect pressed and released signals
-                btn.pressed.connect(lambda m=mode_name, cmd_start=f"{command_prefix}_start": self._handle_detail_action_clicked(m, cmd_start, None))
-                btn.released.connect(lambda m=mode_name, cmd_stop=f"{command_prefix}_stop": self._handle_detail_action_clicked(m, cmd_stop, None))
-                
+                if name == "Clockwise":
+                    btn.pressed.connect(lambda m=mode_name, cmd_start="manual_clockwise_start": self._handle_detail_action_clicked(m, cmd_start, None))
+                    btn.released.connect(lambda m=mode_name, cmd_stop="manual_clockwise_stop": self._handle_detail_action_clicked(m, cmd_stop, None))
+                else:
+                    btn.pressed.connect(lambda m=mode_name, cmd_start="manual_anticlockwise_start": self._handle_detail_action_clicked(m, cmd_start, None))
+                    btn.released.connect(lambda m=mode_name, cmd_stop="manual_anticlockwise_stop": self._handle_detail_action_clicked(m, cmd_stop, None))
                 self.detail_button_row_layout.addWidget(btn)
                 self.adcs_detail_action_buttons.append(btn)
-            else:
-                btn = QPushButton(name)
-                btn.setStyleSheet(ADCS_BUTTON_STYLE)
-                btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-                # Pass None as the value for regular buttons
-                btn.clicked.connect(lambda checked, cmd=name, m=mode_name: self._handle_detail_action_clicked(m, cmd, None))
-                self.detail_button_row_layout.addWidget(btn)
-                self.adcs_detail_action_buttons.append(btn) # Keep track of newly added buttons
-
-        # 4. Add the persistent self.back_button instance back to the layout.
-        #    addWidget will correctly re-parent it.
+        
+        elif mode_name == "Automatic Orientation":
+            # Create container for setting a value
+            input_container = QWidget()
+            input_layout = QHBoxLayout(input_container)
+            input_layout.setContentsMargins(0, 0, 0, 0)
+            input_layout.setSpacing(5)
+            
+            value_label = QLabel("Desired Value:")
+            value_label.setStyleSheet(ADCS_LABEL_STYLE)
+            input_layout.addWidget(value_label)
+            
+            self.orientation_input_field = QLineEdit()
+            self.orientation_input_field.setPlaceholderText("Enter integer")
+            self.orientation_input_field.setStyleSheet(f"""
+                QLineEdit {{
+                    color: {TEXT_COLOR};
+                    background-color: #2D2D2D;
+                    border: 1px solid {BORDER_COLOR};
+                    border-radius: {BORDER_RADIUS}px;
+                    padding: 5px;
+                    font-family: {FONT_FAMILY};
+                    font-size: {FONT_SIZE_NORMAL}pt;
+                }}
+            """)
+            self.orientation_input_field.setFixedHeight(ADCS_BUTTON_HEIGHT)
+            self.orientation_input_field.returnPressed.connect(self._handle_send_automatic_orientation_value)
+            input_layout.addWidget(self.orientation_input_field)
+            
+            self.orientation_send_button = QPushButton("Send")
+            self.orientation_send_button.setStyleSheet(ADCS_BUTTON_STYLE)
+            self.orientation_send_button.setFixedHeight(ADCS_BUTTON_HEIGHT)
+            self.orientation_send_button.clicked.connect(self._handle_send_automatic_orientation_value)
+            input_layout.addWidget(self.orientation_send_button)
+            
+            self.detail_button_row_layout.addWidget(input_container)
+        
+        elif mode_name == "Detumbling":
+            btn = QPushButton("Detumbling")
+            btn.setStyleSheet(ADCS_BUTTON_STYLE)
+            btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
+            btn.clicked.connect(lambda: self._handle_detail_action_clicked(mode_name, "detumbling", None))
+            self.detail_button_row_layout.addWidget(btn)
+        
+        # Re-add the persistent back button
         if self.back_button:
             self.detail_button_row_layout.addWidget(self.back_button)
 
@@ -271,9 +267,10 @@ class ADCSSection(QGroupBox):
                 # Optionally, provide visual feedback to the user (e.g., QToolTip or status label)
                 self.orientation_input_field.selectAll() # Make it easy for user to correct
 
-    def _handle_detail_action_clicked(self, mode_name, command_name, value=None): # Added value parameter
+    def _handle_detail_action_clicked(self, mode_name, command_name, value=None):
         """Placeholder for handling clicks on detail action buttons. Emits a signal."""
         logging.info(f"[ADCSSection] Action for mode '{mode_name}': Command '{command_name}', Value: {value}")
+        # Emit the signal so that MainWindow (client3.py) can pick it up and send it via sio.emit
         self.adcs_command_sent.emit(mode_name, command_name, value)
 
 
