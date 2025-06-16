@@ -7,7 +7,6 @@ import camera
 import sensors
 import lidar
 import threading
-import adcs_functions 
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
