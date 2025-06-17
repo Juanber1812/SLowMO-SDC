@@ -1403,7 +1403,6 @@ class MainWindow(QWidget):
                             analysed = frame 
                             pose = None
                             logging.info("[ERROR] Unexpected return type/length from detector4.detect_and_draw in else branch.")
-                
                     self.latencyUpdated.emit(latency_ms)
                     bridge.analysed_frame.emit(analysed)
 
@@ -1422,11 +1421,11 @@ class MainWindow(QWidget):
 
                             # 2) update the three small live‐value labels WITH UNITS
                             self.graph_section.live_labels["SPIN MODE"]             \
-                                .setText(f"{self.spin_plotter.current_angle:.3f}°")  # Added degree symbol
+                                .setText(f"{self.spin_plotter.current_angle:.0f}°")  # Added degree symbol
                             self.graph_section.live_labels["DISTANCE MEASURING MODE"] \
                                 .setText(f"{self.distance_plotter.current_distance:.3f}m")  # Added meter unit
                             self.graph_section.live_labels["SCANNING MODE"]         \
-                                .setText(f"{self.angular_plotter.current_ang:.3f}°")  # Added degree symbol
+                                .setText(f"{self.angular_plotter.current_ang:.1f}°")  # Added degree symbol
 
                             # 2b) update the big "detail" label for the active graph WITH UNITS
                             detail = getattr(self.graph_section, "current_detail_label", None)
@@ -1435,8 +1434,8 @@ class MainWindow(QWidget):
                                 if mode == "SPIN MODE":
                                     metrics = self.spin_plotter.get_spin_metrics()
                                     detail.setText(
-                                        f"Live: {metrics['current']:.3f}°\n"
-                                        f"Avg:  {metrics['average']:.3f}°\n"
+                                        f"Live: {metrics['current']:.0f}°\n"
+                                        f"Avg:  {metrics['average']:.0f}°\n"
                                     )
                                 elif mode == "DISTANCE MEASURING MODE":
                                     metrics = self.distance_plotter.get_distance_metrics()
@@ -1449,8 +1448,8 @@ class MainWindow(QWidget):
                                 else:  # SCANNING MODE (RelativeAnglePlotter)
                                     metrics = self.angular_plotter.get_angle_metrics()
                                     detail.setText(
-                                        f"Live: {metrics['current']:.3f}°\n"
-                                        f"Avg:  {metrics['average']:.3f}°\n"
+                                        f"Live: {metrics['current']:.1f}°\n"
+                                        f"Avg:  {metrics['average']:.1f}°\n"
                                     )
 
                                 # ── if we're recording, grab that same label value ─────────────────

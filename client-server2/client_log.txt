@@ -2221,3 +2221,1015 @@ socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', po
 2025-06-16 19:44:39,790 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1750099477.690062 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000029171832A50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
 2025-06-16 19:45:16,152 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
 2025-06-16 19:45:18,215 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1750099516.154066 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000029171890A50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-06-16 19:47:26,060 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-06-16 19:47:26,550 - INFO - Connected to server
+2025-06-16 19:47:26,553 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 19:47:38,344 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-16 19:47:45,614 - INFO - Requesting LIDAR streaming start
+2025-06-16 19:47:58,156 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 19:47:58,158 - INFO - Stream paused for config application.
+2025-06-16 19:47:58,660 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 19:47:58,664 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-16 19:47:58,867 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 19:48:41,638 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 19:48:41,640 - INFO - Stream paused for config application.
+2025-06-16 19:48:42,142 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 19:48:42,146 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-16 19:48:42,351 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 19:49:07,763 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 19:49:07,765 - INFO - Stream paused for config application.
+2025-06-16 19:49:08,267 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 19:49:08,274 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 19:49:08,476 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 19:49:12,522 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-16 19:49:30,520 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-16 19:50:01,951 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 19:50:01,954 - INFO - Stream paused for config application.
+2025-06-16 19:50:02,458 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 19:50:02,465 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 19:50:02,673 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 20:33:24,761 - ERROR - packet queue is empty, aborting
+2025-06-16 20:44:17,526 - INFO - Disconnected from server: transport error
+2025-06-16 20:54:43,156 - INFO - Connected to server
+2025-06-16 20:54:43,158 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 20:54:48,412 - INFO - Disconnected from server: client disconnect
+2025-06-16 20:54:48,419 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-06-16 20:54:48,789 - INFO - Connected to server
+2025-06-16 20:54:48,791 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 20:54:54,487 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 20:54:54,490 - INFO - Stream paused for config application.
+2025-06-16 20:54:55,001 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 20:54:55,006 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 20:54:55,210 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 20:55:29,856 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 20:55:29,860 - INFO - Stream paused for config application.
+2025-06-16 20:55:30,374 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 20:55:30,378 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 20:55:30,584 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 20:55:33,788 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 20:55:33,791 - INFO - Stream paused for config application.
+2025-06-16 20:55:34,295 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 20:55:34,299 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 20:55:34,502 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 20:57:48,492 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 20:57:58,029 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_20-57-58.csv
+2025-06-16 20:58:14,591 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 20:58:30,309 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_20-58-30.csv
+2025-06-16 20:58:38,954 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 20:58:45,976 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_20-58-45.csv
+2025-06-16 20:58:49,825 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 20:59:38,896 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_20-59-38.csv
+2025-06-16 20:59:56,808 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 21:00:05,766 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_21-00-05.csv
+2025-06-16 21:26:16,461 - INFO - Disconnected from server: client disconnect
+2025-06-16 21:26:25,292 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-16 21:26:25,441 - INFO - Connected to server
+2025-06-16 21:26:25,443 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 21:26:25,445 - INFO - [INFO] Successfully connected to server
+2025-06-16 21:26:27,668 - INFO - Requesting LIDAR streaming start
+2025-06-16 21:26:28,214 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-16 21:26:44,781 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 21:26:44,782 - INFO - Stream paused for config application.
+2025-06-16 21:26:45,288 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 21:26:45,292 - INFO - Detector calibration updated: calibrations/calibration_1024x576.npz
+2025-06-16 21:26:45,495 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 21:26:50,609 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 21:26:50,611 - INFO - Stream paused for config application.
+2025-06-16 21:26:51,114 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 21:26:51,117 - INFO - Detector calibration updated: calibrations/calibration_1024x576.npz
+2025-06-16 21:26:51,377 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 21:27:25,269 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 21:27:35,163 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_21-27-35.csv
+2025-06-16 21:53:34,039 - INFO - Disconnected from server: client disconnect
+2025-06-16 21:54:14,111 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-16 21:54:14,528 - INFO - Connected to server
+2025-06-16 21:54:14,530 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 21:54:14,531 - INFO - [INFO] Successfully connected to server
+2025-06-16 21:54:27,596 - INFO - Requesting LIDAR streaming start
+2025-06-16 21:54:28,660 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-16 21:54:29,702 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 21:54:31,414 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_21-54-31.csv
+2025-06-16 21:54:31,419 - WARNING - [GraphSection] No data recorded for payload or 'recorded_data' attribute missing. CSV not saved.
+2025-06-16 21:55:53,102 - INFO - Disconnected from server: client disconnect
+2025-06-16 21:59:24,142 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-16 21:59:24,478 - INFO - Connected to server
+2025-06-16 21:59:24,481 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 21:59:24,483 - INFO - [INFO] Successfully connected to server
+2025-06-16 22:09:40,958 - INFO - Disconnected from server: client disconnect
+2025-06-16 22:09:46,554 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-16 22:09:46,837 - INFO - Connected to server
+2025-06-16 22:09:46,839 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 22:09:46,841 - INFO - [INFO] Successfully connected to server
+2025-06-16 22:11:52,067 - INFO - Requesting LIDAR streaming start
+2025-06-16 22:12:06,896 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-16 22:12:09,007 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:12:14,275 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-12-14.csv
+2025-06-16 22:12:14,279 - WARNING - [GraphSection] No data recorded for payload or 'recorded_data' attribute missing. CSV not saved.
+2025-06-16 22:12:56,653 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:12:57,265 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-12-57.csv
+2025-06-16 22:12:57,268 - WARNING - [GraphSection] No data recorded for payload or 'recorded_data' attribute missing. CSV not saved.
+2025-06-16 22:13:20,182 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 22:13:20,185 - INFO - Stream paused for config application.
+2025-06-16 22:13:20,687 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 22:13:20,693 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 22:13:20,897 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 22:13:59,467 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 22:13:59,470 - INFO - Stream paused for config application.
+2025-06-16 22:13:59,982 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 22:13:59,987 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 22:14:00,189 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 22:16:15,672 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:16:39,198 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-16-39.csv
+2025-06-16 22:16:42,060 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:17:00,054 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-17-00.csv
+2025-06-16 22:17:04,386 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:17:13,064 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-17-13.csv
+2025-06-16 22:17:19,541 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:17:30,432 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-17-30.csv
+2025-06-16 22:17:36,915 - INFO - Requesting LIDAR streaming stop
+2025-06-16 22:17:36,919 - INFO - Back button clicked in LidarWidget
+2025-06-16 22:17:37,783 - INFO - Requesting LIDAR streaming start
+2025-06-16 22:18:40,981 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:18:50,623 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-18-50.csv
+2025-06-16 22:18:57,800 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:19:06,486 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-19-06.csv
+2025-06-16 22:19:12,506 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:19:21,958 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-19-21.csv
+2025-06-16 22:19:29,634 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:19:41,993 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-19-41.csv
+2025-06-16 22:19:50,666 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:19:58,889 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-19-58.csv
+2025-06-16 22:20:08,017 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 22:20:18,783 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_22-20-18.csv
+2025-06-16 22:58:19,272 - INFO - Disconnected from server: client disconnect
+2025-06-16 23:16:34,466 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-16 23:16:34,944 - INFO - Connected to server
+2025-06-16 23:16:34,946 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:16:34,950 - INFO - [INFO] Successfully connected to server
+2025-06-16 23:16:36,295 - INFO - Requesting LIDAR streaming start
+2025-06-16 23:16:37,148 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-16 23:16:51,323 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:16:51,827 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-16 23:16:51,831 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 23:17:47,472 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:17:47,475 - INFO - Stream paused for config application.
+2025-06-16 23:17:47,987 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:17:47,991 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 23:17:48,193 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:17:54,269 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:17:54,271 - INFO - Stream paused for config application.
+2025-06-16 23:17:54,780 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:17:54,784 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 23:17:54,987 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:20:51,101 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:20:51,103 - INFO - Stream paused for config application.
+2025-06-16 23:20:51,606 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:20:51,610 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 23:20:51,814 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:20:57,723 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:20:57,725 - INFO - Stream paused for config application.
+2025-06-16 23:20:58,228 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:20:58,233 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-16 23:20:58,442 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:21:20,743 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:21:20,745 - INFO - Stream paused for config application.
+2025-06-16 23:21:21,248 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:21:21,252 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-16 23:21:21,454 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:21:30,388 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:21:30,391 - INFO - Stream paused for config application.
+2025-06-16 23:21:30,978 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:21:30,981 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-16 23:21:31,183 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:21:31,634 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:21:31,636 - INFO - Stream paused for config application.
+2025-06-16 23:21:32,138 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:21:32,142 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-16 23:21:32,345 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:25:22,319 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:25:22,321 - INFO - Stream paused for config application.
+2025-06-16 23:25:22,825 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:25:22,829 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-16 23:25:23,031 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:25:33,201 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:25:33,202 - INFO - Stream paused for config application.
+2025-06-16 23:25:33,706 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:25:33,709 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-16 23:25:33,911 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:25:34,018 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:25:34,021 - INFO - Stream paused for config application.
+2025-06-16 23:25:34,523 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:25:34,527 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-16 23:25:34,731 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:26:01,662 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:26:01,664 - INFO - Stream paused for config application.
+2025-06-16 23:26:02,166 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:26:02,169 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-16 23:26:02,372 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:28:23,163 - INFO - Manual orientation crosshairs enabled
+2025-06-16 23:28:35,244 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,265 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,524 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,560 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,595 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,618 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,636 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,665 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,682 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,717 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,735 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,752 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,781 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,806 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,844 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,862 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,888 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,914 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,933 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,957 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,977 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:35,997 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,029 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,046 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,077 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,094 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,112 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,129 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,158 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,176 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,199 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,226 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,249 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,267 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,284 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,310 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,328 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,347 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,364 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,393 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,419 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,437 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,461 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,482 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,502 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,518 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,544 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,564 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,583 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,612 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,634 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,650 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,666 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,691 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,708 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,726 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,741 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,764 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,781 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,797 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,812 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,836 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,853 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,870 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,886 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,911 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,929 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,946 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,961 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:36,985 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,003 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,020 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,049 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,065 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,084 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,100 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,125 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,146 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,165 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,178 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,207 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,231 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,250 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,281 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,295 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,312 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,326 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,354 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,375 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,398 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,418 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,451 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,476 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,494 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,509 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,538 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,560 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,577 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,608 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,623 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,643 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,657 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,686 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,704 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,717 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,732 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,759 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,775 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,794 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,809 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,836 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,850 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,868 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,883 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,913 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,929 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,949 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,964 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:37,993 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,013 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,029 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,044 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,075 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,095 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,115 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,147 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,161 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,177 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,194 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,224 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,243 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,262 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,295 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,311 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,327 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,342 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,370 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,388 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,408 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,422 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,455 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,474 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,492 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,506 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,540 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,557 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,575 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,591 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,622 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,647 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,664 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,697 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,720 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,737 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,771 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,796 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,813 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,849 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,866 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,887 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,904 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,936 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,961 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,981 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:38,996 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,033 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,052 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,071 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,089 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,128 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,146 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,163 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,197 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,217 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,266 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,285 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,316 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,332 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:28:39,333 - INFO - Stream paused for config application.
+2025-06-16 23:28:39,336 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,379 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,404 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,424 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,462 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,486 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,505 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,537 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,552 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,575 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:39,850 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:28:39,852 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-16 23:28:40,056 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:28:40,623 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,683 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,710 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,750 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,792 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,826 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,847 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,864 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,904 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,927 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,945 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:40,986 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,006 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,026 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,042 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,081 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,100 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,144 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,163 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,183 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,219 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,239 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,281 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,303 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,342 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,358 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:28:41,360 - INFO - Stream paused for config application.
+2025-06-16 23:28:41,362 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,402 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,429 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,448 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,489 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,517 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,534 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,571 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,597 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,616 - INFO - [WARNING] Invalid crop_factor: 1.0
+2025-06-16 23:28:41,876 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:28:41,889 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-16 23:28:42,097 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:28:47,608 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:28:47,611 - INFO - Stream paused for config application.
+2025-06-16 23:28:48,119 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:28:48,121 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-16 23:28:48,326 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:28:51,464 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:28:51,466 - INFO - Stream paused for config application.
+2025-06-16 23:28:51,973 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:28:51,977 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 23:28:52,196 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:28:56,277 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:28:56,279 - INFO - Stream paused for config application.
+2025-06-16 23:28:56,782 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:28:56,785 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-16 23:28:56,987 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:29:06,613 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:29:06,615 - INFO - Stream paused for config application.
+2025-06-16 23:29:07,117 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:29:07,121 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-16 23:29:07,324 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:29:24,463 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:29:24,464 - INFO - Stream paused for config application.
+2025-06-16 23:29:24,974 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:29:24,978 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-16 23:29:25,181 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:29:29,511 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:29:29,512 - INFO - Stream paused for config application.
+2025-06-16 23:29:30,029 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:29:30,034 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-16 23:29:30,236 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:29:46,265 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:29:46,267 - INFO - Stream paused for config application.
+2025-06-16 23:29:46,770 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:29:46,774 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-16 23:29:46,977 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:29:54,919 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:29:54,924 - INFO - Stream paused for config application.
+2025-06-16 23:29:55,427 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:29:55,430 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-16 23:29:55,634 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:30:00,707 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:30:00,710 - INFO - Stream paused for config application.
+2025-06-16 23:30:01,213 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:30:01,217 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-16 23:30:01,421 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:30:06,845 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:30:06,846 - INFO - Stream paused for config application.
+2025-06-16 23:30:07,349 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:30:07,352 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-16 23:30:07,555 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:30:10,902 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-16 23:30:10,904 - INFO - Stream paused for config application.
+2025-06-16 23:30:11,415 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-16 23:30:11,419 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-16 23:30:11,621 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-16 23:31:04,258 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:31:33,714 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-31-33.csv
+2025-06-16 23:31:56,224 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:32:11,844 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-32-11.csv
+2025-06-16 23:32:24,588 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:32:33,630 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-32-33.csv
+2025-06-16 23:32:39,504 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:32:50,273 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-32-50.csv
+2025-06-16 23:33:02,178 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:33:09,856 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-33-09.csv
+2025-06-16 23:33:21,780 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:33:30,858 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-33-30.csv
+2025-06-16 23:36:06,391 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:36:14,519 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-36-14.csv
+2025-06-16 23:37:09,672 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:37:18,860 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-37-18.csv
+2025-06-16 23:37:32,433 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:37:41,043 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-37-41.csv
+2025-06-16 23:37:57,279 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:37:59,711 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-37-59.csv
+2025-06-16 23:38:11,539 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:38:20,167 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-38-20.csv
+2025-06-16 23:40:51,990 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:41:00,011 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-41-00.csv
+2025-06-16 23:41:09,170 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:41:17,619 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-41-17.csv
+2025-06-16 23:41:26,810 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:41:34,040 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-41-34.csv
+2025-06-16 23:41:42,327 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:41:50,653 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-41-50.csv
+2025-06-16 23:42:05,987 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-16 23:42:13,802 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-16_23-42-13.csv
+2025-06-17 00:00:58,078 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-17 00:01:06,384 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-17_00-01-06.csv
+2025-06-17 00:01:21,707 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-17 00:01:30,632 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-17_00-01-30.csv
+2025-06-17 00:01:45,723 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-17 00:01:54,160 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-17_00-01-54.csv
+2025-06-17 00:02:13,612 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-17 00:02:21,081 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-17_00-02-21.csv
+2025-06-17 00:02:32,783 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-17 00:02:40,323 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-17_00-02-40.csv
+2025-06-17 00:11:38,571 - INFO - Disconnected from server: client disconnect
+2025-06-17 15:31:38,246 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 15:31:38,416 - INFO - Connected to server
+2025-06-17 15:31:38,419 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:31:38,422 - INFO - [INFO] Successfully connected to server
+2025-06-17 15:31:44,083 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:31:44,085 - INFO - Stream paused for config application.
+2025-06-17 15:31:44,588 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:31:44,594 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 15:31:44,797 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:31:45,914 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:31:45,917 - INFO - Stream paused for config application.
+2025-06-17 15:31:46,419 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:31:46,425 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 15:31:46,638 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:31:48,446 - INFO - Manual orientation crosshairs enabled
+2025-06-17 15:32:35,048 - INFO - Requesting LIDAR streaming start
+2025-06-17 15:34:12,642 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 15:43:51,643 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:43:51,649 - INFO - Stream paused for config application.
+2025-06-17 15:43:52,163 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:43:52,167 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 15:43:52,371 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:43:55,322 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:43:55,323 - INFO - Stream paused for config application.
+2025-06-17 15:43:55,824 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:43:55,828 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 15:43:56,031 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:44:00,277 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:44:00,278 - INFO - Stream paused for config application.
+2025-06-17 15:44:00,786 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:44:00,789 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 15:44:00,992 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:44:04,949 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:44:04,950 - INFO - Stream paused for config application.
+2025-06-17 15:44:05,454 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:44:05,457 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 15:44:05,660 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:44:12,421 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:44:12,422 - INFO - Stream paused for config application.
+2025-06-17 15:44:12,925 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:44:12,928 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-17 15:44:13,129 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:44:43,141 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:44:43,144 - INFO - Stream paused for config application.
+2025-06-17 15:44:43,652 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:44:43,653 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 15:44:43,856 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:44:51,126 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:44:51,128 - INFO - Stream paused for config application.
+2025-06-17 15:44:51,629 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:44:51,633 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 15:44:51,837 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:45:04,123 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:45:04,124 - INFO - Stream paused for config application.
+2025-06-17 15:45:04,626 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:45:04,629 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 15:45:04,832 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:45:08,914 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:45:08,916 - INFO - Stream paused for config application.
+2025-06-17 15:45:09,425 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:45:09,428 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 15:45:09,630 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:45:48,984 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:45:48,986 - INFO - Stream paused for config application.
+2025-06-17 15:45:49,489 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:45:49,493 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 15:45:49,696 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:45:53,828 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:45:53,829 - INFO - Stream paused for config application.
+2025-06-17 15:45:54,332 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:45:54,336 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-17 15:45:54,541 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:46:11,361 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:46:11,363 - INFO - Stream paused for config application.
+2025-06-17 15:46:11,865 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:46:11,870 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 15:46:12,074 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:46:16,813 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:46:16,815 - INFO - Stream paused for config application.
+2025-06-17 15:46:17,315 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:46:17,319 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 15:46:17,522 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:46:19,545 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:46:19,547 - INFO - Stream paused for config application.
+2025-06-17 15:46:20,048 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:46:20,051 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 15:46:20,254 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:46:55,074 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:46:55,075 - INFO - Stream paused for config application.
+2025-06-17 15:46:55,576 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:46:55,579 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 15:46:55,781 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:47:01,138 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:47:01,139 - INFO - Stream paused for config application.
+2025-06-17 15:47:01,645 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:47:01,648 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-17 15:47:01,851 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:47:33,340 - INFO - Disconnected from server: client disconnect
+2025-06-17 15:48:40,667 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 15:48:40,862 - INFO - Connected to server
+2025-06-17 15:48:40,864 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:48:40,868 - INFO - [INFO] Successfully connected to server
+2025-06-17 15:48:53,545 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:48:53,547 - INFO - Stream paused for config application.
+2025-06-17 15:48:54,047 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:48:54,051 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 15:48:54,254 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:48:59,465 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:48:59,470 - INFO - Stream paused for config application.
+2025-06-17 15:48:59,974 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:48:59,978 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 15:49:00,181 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:49:05,666 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 15:55:27,600 - INFO - Manual orientation crosshairs enabled
+2025-06-17 15:56:00,078 - INFO - Requesting LIDAR streaming start
+2025-06-17 15:56:19,341 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-06-17 15:56:43,321 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-06-17_15-56-43.csv
+2025-06-17 15:57:27,212 - ERROR - Frame processing error: a bytes-like object is required, not 'str'
+2025-06-17 15:57:51,180 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 15:57:51,424 - INFO - Connected to server
+2025-06-17 15:57:51,425 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:57:51,427 - INFO - [INFO] Successfully connected to server
+2025-06-17 15:58:03,186 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:58:03,194 - INFO - Stream paused for config application.
+2025-06-17 15:58:03,696 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:58:03,700 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 15:58:03,905 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 15:58:08,831 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 15:58:08,841 - INFO - Stream paused for config application.
+2025-06-17 15:58:09,341 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 15:58:09,345 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 15:58:09,549 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:05:02,348 - ERROR - packet queue is empty, aborting
+2025-06-17 16:05:17,401 - INFO - Disconnected from server: transport error
+2025-06-17 16:05:18,994 - INFO - Connected to server
+2025-06-17 16:05:18,996 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:05:18,998 - INFO - Stream paused for config application.
+2025-06-17 16:06:05,246 - INFO - Disconnected from server: client disconnect
+2025-06-17 16:06:10,669 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 16:06:10,837 - INFO - Connected to server
+2025-06-17 16:06:10,839 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:06:10,840 - INFO - [INFO] Successfully connected to server
+2025-06-17 16:06:21,293 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:06:21,296 - INFO - Stream paused for config application.
+2025-06-17 16:06:21,799 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:06:21,805 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 16:06:22,010 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:06:29,007 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 16:06:59,882 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:09:30,792 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 16:09:31,002 - INFO - Connected to server
+2025-06-17 16:09:31,003 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:09:31,005 - INFO - [INFO] Successfully connected to server
+2025-06-17 16:09:36,313 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:09:36,838 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-17 16:09:36,841 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 16:09:44,659 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:09:45,183 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-17 16:09:45,185 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 16:09:51,021 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:09:51,022 - INFO - Stream paused for config application.
+2025-06-17 16:09:51,528 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:09:51,569 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 16:09:51,779 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:09:53,338 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 16:10:01,481 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:10:01,482 - INFO - Stream paused for config application.
+2025-06-17 16:10:01,984 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:10:01,988 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 16:10:02,193 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:10:09,093 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:10:09,094 - INFO - Stream paused for config application.
+2025-06-17 16:10:09,595 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:10:09,600 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 16:10:09,806 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:10:16,012 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:11:15,538 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:11:38,910 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:12:25,014 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:13:02,962 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:20:16,379 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:24:50,572 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:24:50,574 - INFO - Stream paused for config application.
+2025-06-17 16:24:51,076 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:24:51,079 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 16:24:51,282 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:24:54,579 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:24:54,580 - INFO - Stream paused for config application.
+2025-06-17 16:24:55,081 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:24:55,086 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 16:24:55,289 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:24:57,712 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:24:57,714 - INFO - Stream paused for config application.
+2025-06-17 16:24:58,216 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:24:58,219 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 16:24:58,422 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:25:10,729 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:25:42,328 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:27:28,924 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:27:28,926 - INFO - Stream paused for config application.
+2025-06-17 16:27:29,427 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:27:29,430 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 16:27:29,635 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:27:31,813 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:27:31,814 - INFO - Stream paused for config application.
+2025-06-17 16:27:32,316 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:27:32,320 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 16:27:32,524 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:28:23,040 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:29:38,870 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:29:38,873 - INFO - Stream paused for config application.
+2025-06-17 16:29:39,375 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:29:39,378 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 16:29:39,580 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:29:42,874 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:29:49,593 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:29:49,594 - INFO - Stream paused for config application.
+2025-06-17 16:29:50,095 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:29:50,099 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 16:29:50,305 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:29:53,283 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:29:53,285 - INFO - Stream paused for config application.
+2025-06-17 16:29:53,787 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:29:53,790 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 16:29:53,992 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:30:24,731 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:30:29,353 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:31:32,241 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:32:04,939 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:32:04,941 - INFO - Stream paused for config application.
+2025-06-17 16:32:05,443 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:32:05,446 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 16:32:05,650 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:32:43,216 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:32:43,218 - INFO - Stream paused for config application.
+2025-06-17 16:32:43,722 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:32:43,724 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 16:32:43,930 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:32:50,491 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:32:50,493 - INFO - Stream paused for config application.
+2025-06-17 16:32:50,994 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:32:50,997 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 16:32:51,199 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:33:58,351 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:33:58,353 - INFO - Stream paused for config application.
+2025-06-17 16:33:58,865 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:33:58,868 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 16:33:59,071 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:34:09,087 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:34:09,090 - INFO - Stream paused for config application.
+2025-06-17 16:34:09,607 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:34:09,610 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 16:34:09,813 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:34:30,614 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:34:30,615 - INFO - Stream paused for config application.
+2025-06-17 16:34:31,117 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:34:31,121 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-17 16:34:31,322 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:34:44,895 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:34:44,897 - INFO - Stream paused for config application.
+2025-06-17 16:34:45,399 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:34:45,402 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-17 16:34:45,604 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:34:59,715 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:34:59,717 - INFO - Stream paused for config application.
+2025-06-17 16:35:00,219 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:35:00,224 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-17 16:35:00,428 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:35:07,095 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:35:07,098 - INFO - Stream paused for config application.
+2025-06-17 16:35:07,600 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:35:07,605 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-17 16:35:07,809 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:35:19,555 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:35:19,556 - INFO - Stream paused for config application.
+2025-06-17 16:35:20,057 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:35:20,061 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 16:35:20,264 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:35:29,053 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:35:29,056 - INFO - Stream paused for config application.
+2025-06-17 16:35:29,559 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:35:29,561 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-17 16:35:29,764 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:35:39,820 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:35:39,821 - INFO - Stream paused for config application.
+2025-06-17 16:35:40,324 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:35:40,327 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-17 16:35:40,530 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:38:24,511 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:38:24,513 - INFO - Stream paused for config application.
+2025-06-17 16:38:25,016 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:38:25,020 - INFO - Detector calibration updated: calibrations/calibration_2304x1296.npz
+2025-06-17 16:38:25,224 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:38:51,783 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:46:35,630 - INFO - Disconnected from server: client disconnect
+2025-06-17 16:46:39,911 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 16:46:40,212 - INFO - Connected to server
+2025-06-17 16:46:40,214 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:46:40,221 - INFO - [INFO] Successfully connected to server
+2025-06-17 16:46:44,380 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:46:44,382 - INFO - Stream paused for config application.
+2025-06-17 16:46:44,884 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:46:44,889 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 16:46:45,102 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:46:53,329 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 16:47:14,920 - INFO - Disconnected from server: client disconnect
+2025-06-17 16:47:19,814 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 16:47:19,985 - INFO - Connected to server
+2025-06-17 16:47:19,987 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:47:19,989 - INFO - [INFO] Successfully connected to server
+2025-06-17 16:47:30,433 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 16:48:08,259 - INFO - Disconnected from server: client disconnect
+2025-06-17 16:48:12,392 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 16:48:12,661 - INFO - Connected to server
+2025-06-17 16:48:12,663 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:48:12,671 - INFO - [INFO] Successfully connected to server
+2025-06-17 16:48:22,586 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:48:22,587 - INFO - Stream paused for config application.
+2025-06-17 16:48:23,089 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:48:23,092 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 16:48:23,293 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:48:23,838 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:48:23,840 - INFO - Stream paused for config application.
+2025-06-17 16:48:24,341 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:48:24,346 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 16:48:24,555 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:48:25,031 - INFO - Requesting LIDAR streaming start
+2025-06-17 16:48:26,615 - INFO - Requesting LIDAR streaming stop
+2025-06-17 16:48:26,618 - INFO - Back button clicked in LidarWidget
+2025-06-17 16:48:31,558 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 16:49:07,557 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:49:07,560 - INFO - Stream paused for config application.
+2025-06-17 16:49:08,062 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:49:08,065 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 16:49:08,270 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:49:11,990 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:49:11,991 - INFO - Stream paused for config application.
+2025-06-17 16:49:12,492 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:49:12,496 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 16:49:12,708 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:49:14,991 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:49:15,003 - INFO - Stream paused for config application.
+2025-06-17 16:49:15,506 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 16:49:15,509 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-17 16:49:15,713 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 16:49:46,059 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:51:02,088 - INFO - Disconnected from server: client disconnect
+2025-06-17 16:51:48,500 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 16:51:48,945 - INFO - Connected to server
+2025-06-17 16:51:48,947 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:51:48,954 - INFO - [INFO] Successfully connected to server
+2025-06-17 16:51:54,885 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 16:53:06,623 - INFO - Disconnected from server: client disconnect
+2025-06-17 16:53:11,059 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 16:53:11,237 - INFO - Connected to server
+2025-06-17 16:53:11,239 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 16:53:11,241 - INFO - [INFO] Successfully connected to server
+2025-06-17 16:53:15,227 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 16:53:19,658 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 16:53:50,722 - INFO - Disconnected from server: client disconnect
+2025-06-17 17:00:47,588 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 17:00:47,986 - INFO - Connected to server
+2025-06-17 17:00:47,988 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:00:47,989 - INFO - [INFO] Successfully connected to server
+2025-06-17 17:00:49,432 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 17:01:26,374 - INFO - Disconnected from server: client disconnect
+2025-06-17 17:01:31,691 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 17:01:31,926 - INFO - Connected to server
+2025-06-17 17:01:31,928 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:01:31,930 - INFO - [INFO] Successfully connected to server
+2025-06-17 17:01:35,422 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 17:01:41,336 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 17:01:50,276 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 17:01:54,316 - INFO - Disconnected from server: client disconnect
+2025-06-17 17:04:11,900 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 17:04:12,051 - INFO - Connected to server
+2025-06-17 17:04:12,053 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:04:12,055 - INFO - [INFO] Successfully connected to server
+2025-06-17 17:04:15,567 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 17:05:17,392 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-17 17:05:17,797 - INFO - Connected to server
+2025-06-17 17:05:17,803 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:05:17,806 - INFO - [INFO] Successfully connected to server
+2025-06-17 17:05:54,940 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 17:06:00,536 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:06:05,374 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:14:16,940 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 17:14:18,891 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:15:25,763 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:17:18,018 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:18:21,891 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:18:21,892 - INFO - Stream paused for config application.
+2025-06-17 17:18:22,393 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:18:22,397 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 17:18:22,602 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:18:26,020 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:18:26,021 - INFO - Stream paused for config application.
+2025-06-17 17:18:26,523 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:18:26,526 - INFO - Detector calibration updated: calibrations/calibration_1920x1080.npz
+2025-06-17 17:18:26,729 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:18:47,099 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:20:05,229 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-17 17:20:06,295 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:20:22,060 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:21:08,043 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:24:39,526 - INFO - Manual orientation crosshairs enabled
+2025-06-17 17:25:11,903 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:25:47,885 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:26:14,185 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:26:56,169 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:27:12,218 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:27:46,872 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:28:10,174 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:28:29,405 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:30:34,459 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:31:01,570 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:32:47,296 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:33:30,776 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:34:08,821 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:34:14,995 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:34:24,368 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:36:21,027 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:36:21,030 - INFO - Stream paused for config application.
+2025-06-17 17:36:21,535 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:36:21,547 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 17:36:21,757 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:36:24,241 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:36:24,243 - INFO - Stream paused for config application.
+2025-06-17 17:36:24,744 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:36:24,749 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 17:36:24,954 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:36:27,368 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:36:27,370 - INFO - Stream paused for config application.
+2025-06-17 17:36:27,871 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:36:27,875 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-17 17:36:28,078 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:36:58,830 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:37:05,011 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:37:23,710 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:37:36,319 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:40:04,954 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:40:04,955 - INFO - Stream paused for config application.
+2025-06-17 17:40:05,457 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:40:05,463 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-17 17:40:05,677 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:40:10,701 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:40:10,703 - INFO - Stream paused for config application.
+2025-06-17 17:40:11,206 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:40:11,209 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-17 17:40:11,413 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:40:23,561 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:40:23,563 - INFO - Stream paused for config application.
+2025-06-17 17:40:24,064 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:40:24,067 - INFO - Detector calibration updated: calibrations/calibration_2880x1620.npz
+2025-06-17 17:40:24,269 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:40:52,546 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:41:18,980 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:41:53,865 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:42:20,185 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:43:53,069 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:43:53,070 - INFO - Stream paused for config application.
+2025-06-17 17:43:53,572 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:43:53,574 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 17:43:53,776 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:45:28,255 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:45:28,256 - INFO - Stream paused for config application.
+2025-06-17 17:45:28,757 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:45:28,760 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 17:45:28,962 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:45:33,188 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-17 17:45:33,189 - INFO - Stream paused for config application.
+2025-06-17 17:45:33,695 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-17 17:45:33,699 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-17 17:45:33,901 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-17 17:46:42,932 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-06-17 17:49:35,274 - INFO - Disconnected from server: client disconnect

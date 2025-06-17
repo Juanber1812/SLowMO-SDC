@@ -296,10 +296,12 @@ class LidarWidget(QWidget):
         try:
             with open(fullpath, "w", newline="") as f:
                 writer = csv.writer(f)
-                # Updated headers for relative timestamp and live distance only
+                # Write headers
                 writer.writerow(["timestamp", "value"])
-                for row_data in data: 
-                    writer.writerow(row_data)
+                for row_data in data:
+                    # Format the timestamp with 6 decimal places
+                    formatted_timestamp = f"{row_data[0]:.6f}"
+                    writer.writerow([formatted_timestamp, row_data[1]])
             logging.info(f"LIDAR metrics recording saved to {fullpath}")
             self.recording_saved.emit(fullpath) 
         except Exception as e:

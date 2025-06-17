@@ -542,7 +542,7 @@ class DataAnalysisTab(QWidget):
         """Create a filter group for distance or velocity filters"""
         filter_container = QWidget()
         filter_layout = QVBoxLayout(filter_container)
-        filter_layout.setContentsMargins(0,0,0,0)
+        filter_layout.setContentsMargins(0, 0, 0, 0)
         filter_layout.setSpacing(8)  # Better spacing
 
         # Title
@@ -560,10 +560,10 @@ class DataAnalysisTab(QWidget):
         filters_widget = QWidget()
         filters_grid = QGridLayout(filters_widget)
         filters_grid.setSpacing(8)  # Increased spacing
-        filters_grid.setContentsMargins(0,0,0,0)
+        filters_grid.setContentsMargins(0, 0, 0, 0)
 
         row = 0
-        
+
         # SavGol Filter
         savgol_cb = QCheckBox("SavGol")
         savgol_cb.setStyleSheet(f"""
@@ -590,13 +590,13 @@ class DataAnalysisTab(QWidget):
         """)
         savgol_cb.toggled.connect(lambda checked, ft=filter_type: self._toggle_filter(ft, 'savgol', checked))
         filters_grid.addWidget(savgol_cb, row, 0)
-        
+
         # SavGol parameters
         savgol_params = QWidget()
         savgol_layout = QHBoxLayout(savgol_params)
-        savgol_layout.setContentsMargins(0,0,0,0)
+        savgol_layout.setContentsMargins(0, 0, 0, 0)
         savgol_layout.setSpacing(6)  # Better spacing
-        
+
         win_label = QLabel("Win:")
         win_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
         savgol_layout.addWidget(win_label)
@@ -609,7 +609,7 @@ class DataAnalysisTab(QWidget):
         style_modern_spinbox(sg_win)
         sg_win.valueChanged.connect(self.update_plots)
         savgol_layout.addWidget(sg_win)
-        
+
         poly_label = QLabel("Poly:")
         poly_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
         savgol_layout.addWidget(poly_label)
@@ -621,16 +621,16 @@ class DataAnalysisTab(QWidget):
         style_modern_spinbox(sg_poly)
         sg_poly.valueChanged.connect(self.update_plots)
         savgol_layout.addWidget(sg_poly)
-        
+
         filters_grid.addWidget(savgol_params, row, 1)
-        
-        # Store references
+
+        # Store references for savgol filter
         setattr(self, f"{filter_type}_savgol_cb", savgol_cb)
         setattr(self, f"{filter_type}_sg_win", sg_win)
         setattr(self, f"{filter_type}_sg_poly", sg_poly)
-        
+
         row += 1
-        
+
         # Butterworth Filter
         butter_cb = QCheckBox("Butter")
         butter_cb.setStyleSheet(f"""
@@ -657,13 +657,13 @@ class DataAnalysisTab(QWidget):
         """)
         butter_cb.toggled.connect(lambda checked, ft=filter_type: self._toggle_filter(ft, 'butter', checked))
         filters_grid.addWidget(butter_cb, row, 0)
-        
+
         # Butterworth parameters
         butter_params = QWidget()
         butter_layout = QHBoxLayout(butter_params)
-        butter_layout.setContentsMargins(0,0,0,0)
+        butter_layout.setContentsMargins(0, 0, 0, 0)
         butter_layout.setSpacing(6)  # Better spacing
-        
+
         bw_type = QComboBox()
         bw_type.addItems(["Low", "High"])
         bw_type.setFixedWidth(65)  # Wider
@@ -680,7 +680,7 @@ class DataAnalysisTab(QWidget):
         """)
         bw_type.currentTextChanged.connect(self.update_plots)
         butter_layout.addWidget(bw_type)
-        
+
         fc_label = QLabel("fc:")
         fc_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
         butter_layout.addWidget(fc_label)
@@ -694,7 +694,7 @@ class DataAnalysisTab(QWidget):
         style_modern_spinbox(bw_fc)
         bw_fc.valueChanged.connect(self.update_plots)
         butter_layout.addWidget(bw_fc)
-        
+
         ord_label = QLabel("Ord:")
         ord_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
         butter_layout.addWidget(ord_label)
@@ -706,17 +706,56 @@ class DataAnalysisTab(QWidget):
         style_modern_spinbox(bw_ord)
         bw_ord.valueChanged.connect(self.update_plots)
         butter_layout.addWidget(bw_ord)
-        
+
         filters_grid.addWidget(butter_params, row, 1)
-        
-        # Store references
+
+        # Store references for butter filter
         setattr(self, f"{filter_type}_butter_cb", butter_cb)
         setattr(self, f"{filter_type}_bw_type", bw_type)
         setattr(self, f"{filter_type}_bw_fc", bw_fc)
         setattr(self, f"{filter_type}_bw_ord", bw_ord)
-        
+
         row += 1
-        
+
+        # For velocity filters only, add two spin boxes for min and max velocity filtering
+        if filter_type == "velocity":
+            y_range_container = QWidget()
+            y_range_layout = QHBoxLayout(y_range_container)
+            y_range_layout.setContentsMargins(0, 0, 0, 0)
+            y_range_layout.setSpacing(4)
+            
+            # Min velocity spin box
+            y_min_label = QLabel("Vel Min:")
+            y_min_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+            y_range_layout.addWidget(y_min_label)
+            self.velocity_min_spin = QDoubleSpinBox()
+            self.velocity_min_spin.setRange(-360.0, 360.0)
+            self.velocity_min_spin.setSingleStep(0.1)
+            self.velocity_min_spin.setDecimals(1)
+            self.velocity_min_spin.setValue(-100.0)  # default minimum threshold
+            self.velocity_min_spin.setFixedWidth(70)
+            self.velocity_min_spin.setFixedHeight(28)
+            style_modern_spinbox(self.velocity_min_spin)
+            self.velocity_min_spin.valueChanged.connect(self.update_plots)
+            y_range_layout.addWidget(self.velocity_min_spin)
+            
+            # Max velocity spin box
+            y_max_label = QLabel("Vel Max:")
+            y_max_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+            y_range_layout.addWidget(y_max_label)
+            self.velocity_max_spin = QDoubleSpinBox()
+            self.velocity_max_spin.setRange(-360.0, 360.0)
+            self.velocity_max_spin.setSingleStep(0.1)
+            self.velocity_max_spin.setDecimals(1)
+            self.velocity_max_spin.setValue(100.0)  # default maximum threshold
+            self.velocity_max_spin.setFixedWidth(70)
+            self.velocity_max_spin.setFixedHeight(28)
+            style_modern_spinbox(self.velocity_max_spin)
+            self.velocity_max_spin.valueChanged.connect(self.update_plots)
+            y_range_layout.addWidget(self.velocity_max_spin)
+            
+            filter_layout.addWidget(y_range_container)
+
         # Set column stretches to make better use of space
         filters_grid.setColumnStretch(0, 0)  # Checkbox column: fixed width
         filters_grid.setColumnStretch(1, 1)  # Parameters column: stretch
@@ -936,7 +975,7 @@ class DataAnalysisTab(QWidget):
             fs = 1.0/np.mean(dt0) if len(dt0) > 0 and np.mean(dt0) != 0 else 1.0
             vals = self._apply_filters(raw, 'distance', fs)
 
-            # Calculate velocity
+            # Calculate velocity from filtered distance data
             dts = np.diff(ts)
             dvs = np.diff(vals)
             dts_safe = np.where(dts == 0, 1e-9, dts)
@@ -947,76 +986,89 @@ class DataAnalysisTab(QWidget):
             fs_vel = 1.0 / mean_dt
             vel = self._apply_filters(raw_vel, 'velocity', fs_vel)
 
-            # Determine labels based on mode
-            current_mode_text = self.mode_combo.currentText()
-            if current_mode_text == "DISTANCE MEASURING MODE":
-                y_raw_label, y_vel_label = "Distance (m)", "Velocity (m/s)"
-            elif current_mode_text == "SCANNING MODE":
-                y_raw_label, y_vel_label = "Relative Angle (°)", "Rate of Change (°/s)"
+            # Now apply velocity range filtering using the spin box values
+            if hasattr(self, "velocity_min_spin") and hasattr(self, "velocity_max_spin") and len(raw_vel) > 0:
+                min_val = self.velocity_min_spin.value()
+                max_val = self.velocity_max_spin.value()
+                vel_ts = ts[1:len(raw_vel)+1]  # timestamps corresponding to velocity data
+                mask = (raw_vel >= min_val) & (raw_vel <= max_val)
+                raw_vel_masked = raw_vel[mask]
+                vel_ts_masked = vel_ts[mask]
+                # For the processed velocity (if its length equals raw_vel), mask it too
+                if len(vel) == len(raw_vel):
+                    vel_masked = vel[mask]
+                else:
+                    vel_masked = vel
+                # Plot filtered velocity
+                ax2 = self.vel_fig.add_subplot(111)
+                ax2.set_facecolor(PLOT_BACKGROUND)
+                ax2.plot(vel_ts_masked, raw_vel_masked, color=PLOT_LINE_SECONDARY, alpha=0.6, label="Raw Velocity", linewidth=1)
+                if len(vel_masked) > 0:
+                    ax2.plot(vel_ts_masked, vel_masked, color=PLOT_LINE_PRIMARY, linewidth=2, label="Filtered Velocity")
             else:
-                y_raw_label, y_vel_label = "Angular Position (°)", "Spin Rate (°/s)"
+                # Fallback: plot without additional velocity range filtering
+                ax2 = self.vel_fig.add_subplot(111)
+                ax2.set_facecolor(PLOT_BACKGROUND)
+                if len(ts) > 1 and len(raw_vel) > 0:
+                    vel_ts = ts[1:len(raw_vel)+1]
+                    ax2.plot(vel_ts, raw_vel, color=PLOT_LINE_SECONDARY, alpha=0.6, label="Raw Velocity", linewidth=1)
+                    if len(vel) > 0:
+                        ax2.plot(vel_ts[:len(vel)], vel, color=PLOT_LINE_PRIMARY, linewidth=2, label="Filtered Velocity")
 
-            # Plot raw data
+            # Plot raw data (distance/angle)
             ax1 = self.raw_fig.add_subplot(111)
             ax1.set_facecolor(PLOT_BACKGROUND)
-            
-            # Plot full data as background
             ax1.plot(full_ts, full_v, color=PLOT_LINE_ALT, alpha=0.4, label="Full Data", linewidth=1)
-            
-            # Plot raw data in selected range
             ax1.plot(ts, raw, color=PLOT_LINE_SECONDARY, alpha=0.6, label="Raw", linewidth=1)
-            
-            # Plot filtered data
             ax1.plot(ts, vals, color=PLOT_LINE_PRIMARY, linewidth=2, label="Filtered")
-            
-            # Add time range markers
             ax1.axvline(s, color=SUCCESS_COLOR, linestyle='--', alpha=0.7, label=f"Start: {s:.1f}s")
             ax1.axvline(e, color=ERROR_COLOR, linestyle='--', alpha=0.7, label=f"End: {e:.1f}s")
-            
             ax1.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=FONT_SIZE_LABEL-2)
+            # Determine ylabel based on mode
+            current_mode_text = self.mode_combo.currentText()
+            if current_mode_text == "DISTANCE MEASURING MODE":
+                y_raw_label = "Distance (m)"
+            elif current_mode_text == "SCANNING MODE":
+                y_raw_label = "Relative Angle (°)"
+            else:
+                y_raw_label = "Angular Pos. (°)"
             ax1.set_ylabel(y_raw_label, color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=FONT_SIZE_LABEL-2)
             ax1.tick_params(axis='both', colors=TICK_COLOR, labelsize=FONT_SIZE_LABEL-3)
             for spine in ax1.spines.values():
                 spine.set_edgecolor(TICK_COLOR)
-            
             ax1.grid(True, color=GRID_COLOR, linestyle=':', linewidth=0.5, alpha=0.3)
             ax1.legend(facecolor=BOX_BACKGROUND, labelcolor=TEXT_COLOR, edgecolor=BORDER_COLOR, fontsize=FONT_SIZE_LABEL-3)
             self.raw_fig.subplots_adjust(left=0.1, right=0.95, top=0.9, bottom=0.15)
-
-            # Plot velocity
-            ax2 = self.vel_fig.add_subplot(111)
-            ax2.set_facecolor(PLOT_BACKGROUND)
-
-            # Plot full raw velocity as background
-            if len(full_ts) > 1:
-                full_vel = np.diff(full_v) / np.where(np.diff(full_ts) == 0, 1e-9, np.diff(full_ts))
-                ax2.plot(full_ts[1:], full_vel, color=PLOT_LINE_ALT, alpha=0.4, label="Full Velocity", linewidth=1)
-
-            if len(ts) > 1 and len(raw_vel) > 0:
-                vel_ts = ts[1:len(raw_vel)+1]
-                ax2.plot(vel_ts, raw_vel, color=PLOT_LINE_SECONDARY, alpha=0.6, label="Raw Velocity", linewidth=1)
-                
-                if len(vel) > 0:
-                    ax2.plot(vel_ts[:len(vel)], vel, color=PLOT_LINE_PRIMARY, linewidth=2, label="Filtered Velocity")
             
-            # Add time range markers
-            ax2.axvline(s, color=SUCCESS_COLOR, linestyle='--', alpha=0.7)
-            ax2.axvline(e, color=ERROR_COLOR, linestyle='--', alpha=0.7)
-
+            # Velocity axes labels based on mode
+            if current_mode_text == "DISTANCE MEASURING MODE":
+                y_vel_label = "Velocity (m/s)"
+            elif current_mode_text == "SCANNING MODE":
+                y_vel_label = "Rate of Change (°/s)"
+            else:
+                y_vel_label = "Spin Rate (°/s)"
             ax2.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=FONT_SIZE_LABEL-2)
             ax2.set_ylabel(y_vel_label, color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=FONT_SIZE_LABEL-2)
             ax2.tick_params(axis='both', colors=TICK_COLOR, labelsize=FONT_SIZE_LABEL-3)
             for spine in ax2.spines.values():
                 spine.set_edgecolor(TICK_COLOR)
-
             ax2.grid(True, color=GRID_COLOR, linestyle=':', linewidth=0.5, alpha=0.3)
             ax2.legend(facecolor=BOX_BACKGROUND, labelcolor=TEXT_COLOR, edgecolor=BORDER_COLOR, fontsize=FONT_SIZE_LABEL-3)
-            self.vel_fig.subplots_adjust(left=0.1, right=0.95, top=0.9, bottom=0.15)
-
             self.raw_canvas.draw()
             self.vel_canvas.draw()
 
-            self._compute_metrics(vals, vel, dts, current_mode_text)
+            # Compute metrics from filtered data:
+            # For distance: use 'vals'
+            # For velocity: if mask exists use filtered raw_vel, otherwise vel
+            if hasattr(self, "velocity_min_spin") and hasattr(self, "velocity_max_spin") and len(raw_vel) > 0:
+                min_val = self.velocity_min_spin.value()
+                max_val = self.velocity_max_spin.value()
+                mask = (raw_vel >= min_val) & (raw_vel <= max_val)
+                filtered_vel_for_metrics = raw_vel[mask]
+            else:
+                filtered_vel_for_metrics = vel
+
+            self._compute_metrics(vals, filtered_vel_for_metrics, dts, current_mode_text)
             
         except Exception as e:
             print(f"Plot error in DataAnalysisTab.update_plots: {e}\n{traceback.format_exc()}")
@@ -1025,11 +1077,9 @@ class DataAnalysisTab(QWidget):
     def _compute_metrics(self, vals, vel, dts, mode_text):
         """Compute and display analysis metrics"""
         try:
-            # Basic statistics
             pts = len(vals)
             dur = self.end_spin.value() - self.start_spin.value()
-            
-            # Dynamic labels based on mode
+            # Determine labels based on mode_text
             if mode_text == "DISTANCE MEASURING MODE":
                 P_label, D_label = "Distance", "Velocity"
             elif mode_text == "SCANNING MODE":
@@ -1037,7 +1087,6 @@ class DataAnalysisTab(QWidget):
             else:  # SPIN MODE
                 P_label, D_label = "Angl. Pos.", "Spin Rate"
 
-            # Store metrics
             self.metrics = {
                 "Data Points": pts,
                 "Time Range": dur,
@@ -1045,27 +1094,20 @@ class DataAnalysisTab(QWidget):
                 f"▶ Avg {D_label}": vel.mean() if len(vel) > 0 else 0.0,
             }
 
-            # Format for display
             lines = []
-            
-            # Primary metrics with specific formatting
             primary_metrics = [
                 ("Data Points", "{:.0f}"),
                 ("Time Range", "{:.1f} s"),
                 (f"▶ Avg {P_label}", "{:.4f}"),
                 (f"▶ Avg {D_label}", "{:.4f}")
             ]
-            
             for key, fmt_str in primary_metrics:
                 if key in self.metrics:
                     value = self.metrics[key]
                     lines.append(f"{key + ':':<18} {fmt_str.format(value)}")
-            
-            # Update display
             txt = "\n".join(lines)
             self.metrics_txt.setText(txt)
             
-            # Enable record buttons when metrics are computed and we have valid data
             has_valid_data = len(vals) > 0 and not np.isnan(vals.mean())
             self.record_distance_btn.setEnabled(has_valid_data)
             self.record_velocity_btn.setEnabled(has_valid_data and len(vel) > 0)
@@ -1073,7 +1115,6 @@ class DataAnalysisTab(QWidget):
         except Exception as e:
             print(f"[ERROR] Metrics computation failed: {e}")
             self.metrics_txt.setText(f"Error computing metrics: {e}")
-            # Disable buttons on error
             self.record_distance_btn.setEnabled(False)
             self.record_velocity_btn.setEnabled(False)
 

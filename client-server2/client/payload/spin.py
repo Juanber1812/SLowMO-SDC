@@ -164,7 +164,8 @@ class AngularPositionPlotter(QFrame):
         elapsed = float(timestamp - self.start_time)
         # Compute angle in degrees from rvec (using second component)
         angle_deg = float(np.degrees(rvec[1]))
-        
+        angle_deg = round(angle_deg, 0)
+
         self.current_angle = angle_deg
         self.time_data.append(elapsed)
         self.data.append(angle_deg)
