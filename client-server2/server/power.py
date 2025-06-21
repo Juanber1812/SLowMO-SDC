@@ -24,6 +24,22 @@ def get_power_values(ina228):
         print(f"Power: {ina228.power:.2f} mW")
         print(f"Energy: {ina228.energy:.2f} J")
         print(f"Temperature: {ina228.temperature:.2f} C")
+
+        # Additional INA228 data
+        print(f"Alert: {ina228.alert}")
+        print(f"Conversion Ready: {ina228.conversion_ready}")
+        print(f"ADC Conversion Time: {ina228.adc_conversion_time} us")
+        print(f"ADC Averaging: {ina228.adc_averaging}")
+        print(f"Shunt Calibration: {ina228.shunt_calibration}")
+        print(f"Manufacturer ID: {ina228.manufacturer_id:#06x}")
+        print(f"Device ID: {ina228.device_id:#06x}")
+
+        return {
+            "current": ina228.current,
+            "voltage": ina228.voltage,
+            "power": ina228.power,
+            "energy": ina228.energy,
+            "temperature": ina228.temperature,
+        }
     except Exception as e:
         print(f"Error reading sensor data: {e}")
-        time.sleep(interval)
