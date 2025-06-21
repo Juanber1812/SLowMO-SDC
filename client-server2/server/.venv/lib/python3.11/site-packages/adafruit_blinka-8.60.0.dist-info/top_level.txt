@@ -1,0 +1,13 @@
+analogio
+bitbangio
+board
+busio
+digitalio
+keypad
+micropython
+neopixel_write
+onewireio
+pulseio
+pwmio
+rainbowio
+usb_hid
