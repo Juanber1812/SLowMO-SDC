@@ -1,19 +1,23 @@
-import sys
-import board
-import adafruit_ina228
+try:
+    import board
+    import adafruit_ina228
+except ImportError as e:
+    print(f"Error importing libraries: {e}")
+    print("Make sure you have the required libraries installed.")
+    raise
 
 def init_sensor():
     try:
         i2c = board.I2C()
     except Exception as e:
         print(f"Error initializing I2C: {e}")
-        sys.exit(1)
+        raise
 
     try:
         ina228 = adafruit_ina228.INA228(i2c)
     except Exception as e:
         print(f"Error initializing INA228 sensor: {e}")
-        sys.exit(1)
+        raise
     return ina228
 
 def get_power_values(ina228):
@@ -43,3 +47,8 @@ def get_power_values(ina228):
         }
     except Exception as e:
         print(f"Error reading sensor data: {e}")
+        return None
+    
+if __name__ == "__main__":
+    sensor = init_sensor()
+    get_power_values(sensor)
