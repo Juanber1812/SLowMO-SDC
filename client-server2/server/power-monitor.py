@@ -1,7 +1,7 @@
 import time
 import sys
-import board
-import adafruit_ina228
+import board # type: ignore
+import adafruit_ina228 # type: ignore
 
 try:
     i2c = board.I2C()

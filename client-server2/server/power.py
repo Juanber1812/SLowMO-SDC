@@ -1,6 +1,6 @@
 try:
-    import board
-    import adafruit_ina228
+    import board # type: ignore
+    import adafruit_ina228 # type: ignore
 except ImportError as e:
     print(f"Error importing libraries: {e}")
     print("Make sure you have the required libraries installed.")
