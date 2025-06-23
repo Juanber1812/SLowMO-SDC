@@ -28,7 +28,7 @@ from theme import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPainter, QPen, QColor
 
-from scipy.signal import savgol_filter, butter, filtfilt
+from scipy.signal import savgol_filter, butter, filtfilt, find_peaks, peak_prominences
 
 # Matplotlib imports for plotting
 try:
@@ -344,7 +344,7 @@ class DataAnalysisTab(QWidget):
                 padding: 4px;
             }}
         """)
-        self.metrics_txt.setMaximumHeight(120)  # Reduced height
+        self.metrics_txt.setFixedHeight(180)  # Reduced height
         self.metrics_txt.setText("Load a CSV file to see analysis...")
         metrics_layout.addWidget(self.metrics_txt)
 
@@ -399,16 +399,18 @@ class DataAnalysisTab(QWidget):
         sensor_layout.addWidget(self.sensor_type_combo)
         record_layout.addLayout(sensor_layout)
         
-        self.record_distance_btn = QPushButton("📏 Record Avg Distance")
+        self.record_distance_btn = QPushButton("Record Distance")
+        self.record_distance_btn.setFixedHeight(24)
+        self.record_distance_btn.setFixedWidth(120)
         style_button(self.record_distance_btn, SUCCESS_COLOR)
-        self.record_distance_btn.setFixedHeight(32)
         self.record_distance_btn.clicked.connect(self._record_distance)
         self.record_distance_btn.setEnabled(False)
         record_layout.addWidget(self.record_distance_btn)
         
-        self.record_velocity_btn = QPushButton("🚀 Record Avg Velocity")
+        self.record_velocity_btn = QPushButton("Record Gradient")
+        self.record_velocity_btn.setFixedHeight(24)
+        self.record_velocity_btn.setFixedWidth(120)
         style_button(self.record_velocity_btn, WARNING_COLOR)
-        self.record_velocity_btn.setFixedHeight(32)
         self.record_velocity_btn.clicked.connect(self._record_velocity)
         self.record_velocity_btn.setEnabled(False)
         record_layout.addWidget(self.record_velocity_btn)
@@ -444,6 +446,15 @@ class DataAnalysisTab(QWidget):
         self.manual_submit_btn.clicked.connect(self.manual_submit_manual_value)
         manual_input_layout.addWidget(self.manual_submit_btn)
         record_layout.addLayout(manual_input_layout)
+        
+        # Rotation speed record button
+        self.record_rotation_btn = QPushButton("Record Rotation")
+        self.record_rotation_btn.setFixedHeight(24)
+        self.record_rotation_btn.setFixedWidth(120)
+        style_button(self.record_rotation_btn, ERROR_COLOR)
+        self.record_rotation_btn.clicked.connect(self._record_rotation)
+        self.record_rotation_btn.setEnabled(False)
+        record_layout.addWidget(self.record_rotation_btn)
         
         metrics_layout.addWidget(record_buttons_widget)
 
@@ -756,6 +767,35 @@ class DataAnalysisTab(QWidget):
             
             filter_layout.addWidget(y_range_container)
 
+        # Line of Best Fit Checkbox
+        if filter_type == "distance":
+            bestfit_cb = QCheckBox("Line of Best Fit")
+            bestfit_cb.setStyleSheet(f"""
+                QCheckBox {{
+                    color: {TEXT_COLOR};
+                    font-family: {FONT_FAMILY};
+                    font-size: {FONT_SIZE_NORMAL}pt;
+                    spacing: 8px;
+                }}
+                QCheckBox::indicator {{
+                    width: 16px;
+                    height: 16px;
+                    border: 2px solid {BORDER_COLOR};
+                    border-radius: 3px;
+                    background-color: {BOX_BACKGROUND};
+                }}
+                QCheckBox::indicator:checked {{
+                    background-color: {BUTTON_COLOR};
+                    border-color: {BUTTON_COLOR};
+                }}
+                QCheckBox::indicator:hover {{
+                    border-color: {BUTTON_HOVER};
+                }}
+            """)
+            bestfit_cb.toggled.connect(self.update_plots)
+            filters_grid.addWidget(bestfit_cb, row, 0)
+            setattr(self, f"{filter_type}_bestfit_cb", bestfit_cb)
+
         # Set column stretches to make better use of space
         filters_grid.setColumnStretch(0, 0)  # Checkbox column: fixed width
         filters_grid.setColumnStretch(1, 1)  # Parameters column: stretch
@@ -891,34 +931,6 @@ class DataAnalysisTab(QWidget):
             print(f"[ERROR] Butterworth filter failed: {e}")
             return data.copy()
 
-    def apply_kalman(self, data, process_noise=1e-5, measurement_noise=1e-2):
-        """Apply Kalman filter with configurable noise parameters"""
-        try:
-            if len(data) == 0:
-                return data.copy()
-            
-            filtered = np.zeros_like(data)
-            Q = process_noise      # Process noise
-            R = measurement_noise  # Measurement noise
-            P = 1.0               # Initial error covariance
-            x = data[0]           # Initial state
-            
-            for i, z in enumerate(data):
-                # Predict
-                P = P + Q
-                
-                # Update
-                K = P / (P + R)
-                x = x + K * (z - x)
-                P = (1 - K) * P
-                
-                filtered[i] = x
-            
-            return filtered
-        except Exception as e:
-            print(f"[ERROR] Kalman filter failed: {e}")
-            return data.copy()
-
     def _apply_filters(self, data, filter_type, fs=None):
         """Apply all enabled filters for a given type"""
         result = data.copy()
@@ -1021,6 +1033,40 @@ class DataAnalysisTab(QWidget):
             ax1.plot(full_ts, full_v, color=PLOT_LINE_ALT, alpha=0.4, label="Full Data", linewidth=1)
             ax1.plot(ts, raw, color=PLOT_LINE_SECONDARY, alpha=0.6, label="Raw", linewidth=1)
             ax1.plot(ts, vals, color=PLOT_LINE_PRIMARY, linewidth=2, label="Filtered")
+
+            # If Butterworth filter is enabled, mark peaks used for rotation calculation
+            if self.distance_filters.get('butter_enabled', False):
+                _, _, _, extrema_indices = self.calculate_rotation_speed(vals, ts)
+                if extrema_indices is not None and len(extrema_indices) > 0:
+                    extrema_x = [ts[i] for i in extrema_indices]
+                    extrema_y = [vals[i] for i in extrema_indices]
+                    
+                    # Plot all extrema (both peaks and troughs)
+                    ax1.scatter(extrema_x, extrema_y, color='red', marker='o', s=50, 
+                               label="Detected Points", zorder=5)
+                    
+                    # Optionally, you can visualize peaks and troughs differently
+                    peaks_mask = np.isin(extrema_indices, find_peaks(vals, distance=3, prominence=0.005)[0])
+                    troughs_mask = ~peaks_mask
+                    
+                    peaks_x = [extrema_x[i] for i, is_peak in enumerate(peaks_mask) if is_peak]
+                    peaks_y = [extrema_y[i] for i, is_peak in enumerate(peaks_mask) if is_peak]
+                    
+                    troughs_x = [extrema_x[i] for i, is_peak in enumerate(peaks_mask) if not is_peak]
+                    troughs_y = [extrema_y[i] for i, is_peak in enumerate(peaks_mask) if not is_peak]
+                    
+                    ax1.scatter(peaks_x, peaks_y, color='red', marker='^', s=50, label="Peaks", zorder=6)
+                    ax1.scatter(troughs_x, troughs_y, color='blue', marker='v', s=50, label="Troughs", zorder=6)
+
+            # Line of Best Fit
+            show_bestfit = hasattr(self, "distance_bestfit_cb") and self.distance_bestfit_cb.isChecked()
+            bestfit_gradient = None
+            if show_bestfit and len(ts) > 1:
+                # Fit line: y = m*x + b
+                m, b = np.polyfit(ts, vals, 1)
+                bestfit_line = m * ts + b
+                ax1.plot(ts, bestfit_line, color=WARNING_COLOR, linestyle="--", linewidth=2, label="Best Fit")
+                bestfit_gradient = m
             ax1.axvline(s, color=SUCCESS_COLOR, linestyle='--', alpha=0.7, label=f"Start: {s:.1f}s")
             ax1.axvline(e, color=ERROR_COLOR, linestyle='--', alpha=0.7, label=f"End: {e:.1f}s")
             ax1.set_xlabel("Time (s)", color=TEXT_COLOR, fontfamily=FONT_FAMILY, fontsize=FONT_SIZE_LABEL-2)
@@ -1059,22 +1105,74 @@ class DataAnalysisTab(QWidget):
 
             # Compute metrics from filtered data:
             # For distance: use 'vals'
-            # For velocity: if mask exists use filtered raw_vel, otherwise vel
+            # For velocity: use filtered velocity (vel), possibly masked by min/max
             if hasattr(self, "velocity_min_spin") and hasattr(self, "velocity_max_spin") and len(raw_vel) > 0:
                 min_val = self.velocity_min_spin.value()
                 max_val = self.velocity_max_spin.value()
-                mask = (raw_vel >= min_val) & (raw_vel <= max_val)
-                filtered_vel_for_metrics = raw_vel[mask]
+                # Only mask if lengths match
+                if len(vel) == len(raw_vel):
+                    mask = (vel >= min_val) & (vel <= max_val)
+                    filtered_vel_for_metrics = vel[mask]
+                else:
+                    # If lengths don't match, use all of vel (and optionally warn)
+                    filtered_vel_for_metrics = vel
             else:
                 filtered_vel_for_metrics = vel
 
-            self._compute_metrics(vals, filtered_vel_for_metrics, dts, current_mode_text)
+            self._compute_metrics(vals, filtered_vel_for_metrics, dts, current_mode_text, bestfit_gradient)
             
         except Exception as e:
             print(f"Plot error in DataAnalysisTab.update_plots: {e}\n{traceback.format_exc()}")
             self.metrics_txt.setText(f"Error plotting data: {e}")
 
-    def _compute_metrics(self, vals, vel, dts, mode_text):
+    def calculate_rotation_speed(self, filtered_data, timestamps):
+        """Calculate rotation speed from filtered data by finding period between peaks AND troughs"""
+        if len(filtered_data) < 5:  # Need enough data points
+            return None, None, None, None  # Return 4 values
+    
+        try:
+            # 1. Find peaks (local maxima)
+            peaks, _ = find_peaks(filtered_data, distance=3, prominence=0.005)
+            
+            # 2. Find troughs (local minima) by inverting the signal
+            troughs, _ = find_peaks(-filtered_data, distance=3, prominence=0.005)
+            
+            # 3. Combine peaks and troughs as "extrema"
+            if len(peaks) == 0 and len(troughs) == 0:
+                return None, None, None, None  # No peaks or troughs found
+                
+            extrema_indices = np.concatenate([peaks, troughs] if len(peaks) > 0 and len(troughs) > 0 
+                                             else [peaks] if len(peaks) > 0 
+                                             else [troughs])
+            
+            # Only proceed if we have enough extrema points
+            if len(extrema_indices) < 2:
+                return None, None, None, None
+                
+            # 4. Sort by time
+            extrema_indices = np.sort(extrema_indices)
+            
+            # 5. Get timestamps for each extrema
+            extrema_times = timestamps[extrema_indices]
+            
+            # 6. Calculate time between consecutive extrema
+            periods = np.diff(extrema_times)
+            
+            # 7. Calculate rotation metrics
+            # If using both peaks and troughs, each full rotation has TWO extrema
+            # So we multiply each period by 2 to get the full rotation period
+            full_rotation_periods = periods * 2
+            avg_period = np.mean(full_rotation_periods)
+            avg_period = avg_period*4
+            frequency = 1.0 / avg_period if avg_period > 0 else 0
+            rpm = frequency * 360  # Convert Hz to RPM
+            
+            return avg_period, frequency, rpm, extrema_indices
+        except Exception as e:
+            print(f"[ERROR] Rotation speed calculation failed: {e}")
+            return None, None, None, None  # Always return 4 values
+    
+    def _compute_metrics(self, vals, vel, dts, mode_text, bestfit_gradient=None):
         """Compute and display analysis metrics"""
         try:
             pts = len(vals)
@@ -1090,21 +1188,49 @@ class DataAnalysisTab(QWidget):
             self.metrics = {
                 "Data Points": pts,
                 "Time Range": dur,
-                f"▶ Avg {P_label}": vals.mean() if len(vals) > 0 else 0.0,
-                f"▶ Avg {D_label}": vel.mean() if len(vel) > 0 else 0.0,
+                f"Avg {P_label}": vals.mean() if len(vals) > 0 else 0.0,
+                f"Avg {D_label}": vel.mean() if len(vel) > 0 else 0.0,
             }
+            
+            if bestfit_gradient is not None:
+                self.metrics["Best Fit Gradient"] = bestfit_gradient
+                
+            # Calculate rotation speed if there's enough data and we've applied filters
+            if len(vals) > 10 and self.distance_filters.get('butter_enabled', False):
+                # Get timestamps from the current window
+                window_ts = np.linspace(
+                    self.start_spin.value(), 
+                    self.end_spin.value(), 
+                    len(vals)
+                )
+                period, freq, rpm, _ = self.calculate_rotation_speed(vals, window_ts)
+                
+                if period is not None:
+                    self.metrics["Rotation Period"] = period
+                    self.metrics["Rotation Freq"] = freq
+                    self.metrics["Rotation Speed"] = rpm
 
             lines = []
             primary_metrics = [
                 ("Data Points", "{:.0f}"),
                 ("Time Range", "{:.1f} s"),
-                (f"▶ Avg {P_label}", "{:.4f}"),
-                (f"▶ Avg {D_label}", "{:.4f}")
+                (f"Avg {P_label}", "{:.4f}"),
+                (f"Avg {D_label}", "{:.4f}")
             ]
             for key, fmt_str in primary_metrics:
                 if key in self.metrics:
                     value = self.metrics[key]
                     lines.append(f"{key + ':':<18} {fmt_str.format(value)}")
+                
+            # Show gradient if present
+            if "Best Fit Gradient" in self.metrics:
+                lines.append(f"{'Best Fit Gradient:':<18} {self.metrics['Best Fit Gradient']:.4f}")
+            
+            # Show rotation metrics if present
+            if "Rotation Period" in self.metrics:
+                lines.append(f"{'Rotation Period:':<18} {self.metrics['Rotation Period']:.4f} s")
+                lines.append(f"{'Rotation Speed:':<18} {self.metrics['Rotation Speed']:.4f} °/s")
+            
             txt = "\n".join(lines)
             self.metrics_txt.setText(txt)
             
@@ -1223,52 +1349,56 @@ class DataAnalysisTab(QWidget):
         print(f"[INFO] Recorded distance: {avg_value:.4f}")
 
     def _record_velocity(self):
-        """Record the current average velocity to the collection CSV"""
+        """Record the current best fit gradient (or avg velocity if not available) to the collection CSV"""
         if not hasattr(self, 'metrics') or not self.metrics:
             QMessageBox.warning(self, "No Data", "No analysis data available to record.")
             return
-        
-        # Find the average velocity metric
-        avg_velocity_key = None
-        for key in self.metrics.keys():
-            if "▶ Avg" in key and ("Velocity" in key or "Rate of Change" in key or "Spin Rate" in key):
-                avg_velocity_key = key
-                break
-        
-        if avg_velocity_key is None:
-            QMessageBox.warning(self, "No Data", "No average velocity data found.")
-            return
-        
-        avg_value = self.metrics[avg_velocity_key]
-        mode_text = self.mode_combo.currentText()
-        
-        # Determine units
-        if mode_text == "DISTANCE MEASURING MODE":
-            data_type = "Velocity"
-            units = "m/s"
-        elif mode_text == "SCANNING MODE":
-            data_type = "Rate of Change"
-            units = "°/s"
-        else:  # SPIN MODE
-            data_type = "Spin Rate"
-            units = "°/s"
-        
-        # Add to collection
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Get sensor type from dropdown
+
+        # Prefer to record the best fit gradient if available
+        if "Best Fit Gradient" in self.metrics:
+            value = self.metrics["Best Fit Gradient"]
+            label = "Gradient"
+        else:
+            # Fallback to avg velocity
+            avg_velocity_key = None
+            for key in self.metrics.keys():
+                if "▶ Avg" in key and ("Velocity" in key or "Rate of Change" in key or "Spin Rate" in key):
+                    avg_velocity_key = key
+                    break
+            if avg_velocity_key is None:
+                QMessageBox.warning(self, "No Data", "No gradient or average velocity data found.")
+                return
+            value = self.metrics[avg_velocity_key]
+            label = "Avg Velocity"
+
         sensor_type = self.sensor_type_combo.currentText()
-        
         entry = {
-            "sensor_type": sensor_type,  # Record sensor type
-            "avg_value": avg_value,
+            "sensor_type": sensor_type,
+            "value_type": label,
+            "value": value,
         }
-        
         self.collection_data.append(entry)
         self._update_csv_display()
         self._auto_save_csv()
+        print(f"[INFO] Recorded {label}: {value:.4f}")
+
+    def _record_rotation(self):
+        """Record the rotation speed to the collection CSV"""
+        if not hasattr(self, 'metrics') or not self.metrics or "Rotation Speed" not in self.metrics:
+            QMessageBox.warning(self, "No Data", "No rotation speed data available to record.")
+            return
         
-        print(f"[INFO] Recorded velocity: {avg_value:.4f} {units}")
+        value = self.metrics["Rotation Speed"]
+        sensor_type = self.sensor_type_combo.currentText()
+        entry = {
+            "sensor_type": sensor_type,
+            "value_type": "Rotation Speed",
+            "value": value,
+        }
+        self.collection_data.append(entry)
+        self._update_csv_display()
+        self._auto_save_csv()
+        print(f"[INFO] Recorded rotation speed: {value:.2f} RPM")
 
     def manual_submit_manual_value(self):
         """Submit the manual input from the QLineEdit as a manual record."""
@@ -1281,11 +1411,10 @@ class DataAnalysisTab(QWidget):
         except ValueError:
             QMessageBox.warning(self, "Input Error", "Invalid number format.")
             return
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        mode_text = self.mode_combo.currentText() if hasattr(self, 'mode_combo') else ""
         entry = {
             "sensor_type": "manual",
-            "avg_value": value,
+            "value_type": "Manual",
+            "value": value,
         }
         self.collection_data.append(entry)
         self._update_csv_display()
@@ -1317,21 +1446,23 @@ class DataAnalysisTab(QWidget):
             self.csv_data_display.setText("No data collected yet...")
             self.save_csv_btn.setEnabled(False)
             return
-        
+
         lines = [f"Entries: {len(self.collection_data)}"]
         lines.append("─" * 25)
-        
+
         # Show last 5 entries
         recent_data = self.collection_data[-5:] if len(self.collection_data) > 5 else self.collection_data
-        
+
         for i, entry in enumerate(recent_data):
             entry_num = len(self.collection_data) - len(recent_data) + i + 1
-            # Include sensor type in the display
-            lines.append(f" ({entry['sensor_type']}): {entry['avg_value']:.4f}")
-        
+            sensor = entry.get("sensor_type", "")
+            vtype = entry.get("value_type", "")
+            value = entry.get("value", entry.get("avg_value", 0.0))
+            lines.append(f"{entry_num}. ({sensor}) {vtype}: {value:.4f}")
+
         if len(self.collection_data) > 5:
             lines.insert(2, f"... (showing last 5 of {len(self.collection_data)})")
-        
+
         self.csv_data_display.setText("\n".join(lines))
         self.save_csv_btn.setEnabled(True)
 
@@ -1386,32 +1517,31 @@ class DataAnalysisTab(QWidget):
         if not self.collection_data:
             QMessageBox.warning(self, "No Data", "No data to save.")
             return
-        
+
         try:
             with open(file_path, 'w', newline='', encoding='utf-8') as csvfile:
                 csv_writer = csv.writer(csvfile)
-                
                 # Write the header row
-                header = self.collection_data[0].keys() if self.collection_data else [
-                    "sensor_type", 
-                    "avg_value"
-                ]
+                header = ["sensor_type", "value_type", "value"]
                 csv_writer.writerow(header)
-                
                 # Write the data rows
                 for entry in self.collection_data:
-                    csv_writer.writerow(entry.values())
-            
+                    csv_writer.writerow([
+                        entry.get("sensor_type", ""),
+                        entry.get("value_type", ""),
+                        entry.get("value", entry.get("avg_value", 0.0))
+                    ])
+
             self.current_csv_path = file_path
             QMessageBox.information(
-                self, "Save Successful", 
+                self, "Save Successful",
                 f"Data saved to:\n{file_path}"
             )
             print(f"[INFO] Data saved to: {file_path}")
-        
+
         except Exception as e:
             QMessageBox.critical(
-                self, "Save Error", 
+                self, "Save Error",
                 f"Failed to save data to CSV:\n{e}"
             )
             print(f"[ERROR] Failed to save data to CSV: {e}")
