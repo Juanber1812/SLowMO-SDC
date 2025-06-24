@@ -3722,3 +3722,12 @@ socketio.exceptions.ConnectionError: HTTPConnectionPool(host='192.168.1.146', po
 2025-06-23 13:33:41,282 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
 2025-06-23 13:38:25,225 - INFO - Disconnected from server: transport error
 2025-06-23 13:52:03,535 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-23 14:17:14,978 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-23 14:17:19,994 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.39.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1750684634.9812298 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000022CE633E7B0>, 'Connection to 192.168.39.89 timed out. (connect timeout=5)'))
+2025-06-23 14:17:35,215 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-23 14:17:40,550 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-23 14:17:41,717 - INFO - [ADCSSection] Displaying details for: Automatic Orientation
+2025-06-23 14:17:45,149 - INFO - [ADCSSection] Invalid input: 'jhvjhyujf' is not an integer.
+2025-06-23 14:17:48,191 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-23 14:17:49,328 - INFO - [ADCSSection] Displaying details for: Detumbling
+2025-06-23 15:34:53,212 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
