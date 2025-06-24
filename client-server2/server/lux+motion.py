@@ -14,7 +14,7 @@ SLEEP_PIN = 26   # SLEEP (enable)
 # ── SET UP MOTOR DRIVER PINS ───────────────────────────────────────────
 GPIO.setmode(GPIO.BCM)
 GPIO.setup([PWM_PIN, DIR_PIN, SLEEP_PIN], GPIO.OUT, initial=GPIO.LOW)
-pwm = GPIO.PWM(PWM_PIN, 20000)        # 1 kHz PWM
+pwm = GPIO.PWM(PWM_PIN, 1000)        # 1 kHz PWM
 pwm.start(0)                         # speed = 0 %
 
 GPIO.output(SLEEP_PIN, GPIO.HIGH)    # wake up driver
