@@ -160,41 +160,42 @@ def orientation_loop():
 
 # Creating environmental calibration mode function
 def environmental_calibration_mode():
-	motor_forward(50)
-	print("Signal: Environmental Calibration mode")
-	# Setting reference light readings (single sensor)
-	light_intensity = []
-     pd_controller = PDController(Kp=1600, Kd=80)
-     calibration = False
-     dt = 0.1
+    motor_forward(50)
+    print("Signal: Environmental Calibration mode")
+    # Setting reference light readings (single sensor)
+    light_intensity = []
+    pd_controller    = PDController(Kp=1600, Kd=80)
+    calibration      = False
+    dt               = 0.1
+
+    # collect three samples and detect local max
     while not calibration:
-        # read single lux sensor
-        light = lux_sensor.light
-        light_intensity.append(light)
-        # once we have 3 samples detect a local-max
+        light_intensity.append(lux_sensor.light)
         if len(light_intensity) > 2:
             if np.sign(light_intensity[-2] - light_intensity[-3]) \
                == -np.sign(light_intensity[-1] - light_intensity[-2]):
-                # lock current orientation as reference
                 desired_orientation = orientation
-                actual_orientation = orientation
-                calibration = True
+                actual_orientation  = orientation
+                calibration         = True
+
+    # now drive until we’re within tolerance of that orientation
     while calibration and abs(desired_orientation - orientation) > 0.01:
-         control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-         motor_speed = max(min(abs(control_signal), 100), 0)
-         if control_signal > 0:
-             motor_forward(motor_speed)
-             orientation += velocity * dt
-             actual_orientation = orientation
-         else:
-             motor_backward(motor_speed)
-             orientation += velocity * dt
-             actual_orientation = orientation
+        control_signal = pd_controller.compute(
+            desired_orientation, actual_orientation, dt
+        )
+        motor_speed = max(min(abs(control_signal), 100), 0)
+        if control_signal > 0:
+            motor_forward(motor_speed)
+        else:
+            motor_backward(motor_speed)
+        orientation          += velocity * dt
+        actual_orientation    = orientation
     else:
         orientation += velocity * dt
         stop_motor()
         return
-     time.sleep(0.1)
+
+    time.sleep(0.1)
 
 # Creating manual orientation mode function
 def manual_orientation_mode():
