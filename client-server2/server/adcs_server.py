@@ -309,9 +309,9 @@ def read_accelerometer():
     )
 
 if __name__ == "__main__":
-     from time import sleep
+    from time import sleep
 
-     try:
+    try:
         print("Testing ADCS Motor & Sensors...")
 
         motor_forward(50); sleep(1)
