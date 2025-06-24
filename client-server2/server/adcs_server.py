@@ -1,5 +1,5 @@
 # Required libraries
-import time, RPi.GPIO as GPIO, board, busio, adafruit_tca9548a, adafruit_veml7700, smbus
+import time, RPi.GPIO as GPIO, board, busio, adafruit_veml7700, smbus
 import numpy as np
 
 # Pin definitions (match lux+motion.py)
@@ -59,12 +59,7 @@ GPIO.setup(17, GPIO.IN)  #Change for pin number used
 
 #Initialising I2C bus and multiplexer for light sensor
 i2c = busio.I2C(board.SCL, board.SDA)
-tca = adafruit_tca9548a.TCA9548A(i2c)
-
-# Assigning light sensors to different channels
-veml7700_1 = adafruit_veml7700.VEML7700(tca[0])  
-veml7700_2 = adafruit_veml7700.VEML7700(tca[1])  
-veml7700_3 = adafruit_veml7700.VEML7700(tca[2])
+lux_sensor = adafruit_veml7700.VEML7700(i2c)
 
 # Setting I2C protocol and device address used in motion sensor functions
 bus = smbus.SMBus(1) 	
@@ -167,60 +162,39 @@ def orientation_loop():
 def environmental_calibration_mode():
 	motor_forward(50)
 	print("Signal: Environmental Calibration mode")
-	#Setting reference light readings
-	light_intensity_1 = []
-	light_intensity_2 = []
-	light_intensity_3 = []
-	pd_controller = PDController(Kp=1600, Kd=80)
-	calibration = False
-	dt = 0.1
-	while calibration == False:
-		# Checking for light maximum
-		light1 = veml7700_1.light
-		light2 = veml7700_2.light
-		light3 = veml7700_3.light
-		light_intensity_1.append(light1)
-		light_intensity_2.append(light2)
-		light_intensity_3.append(light3)
-		timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-		if len(light_intensity_1) > 2 or len(light_intensity_2) > 2 or len(light_intensity_3) > 2:
-			accel_state = False
-			if np.sign(light_intensity_1[-2]-light_intensity_1[-3]) == -np.sign(light_intensity_1[-1]-light_intensity_1[-2]):
-				orientation = 0
-				orientation += velocity * dt
-				desired_orientation = 0
-				actual_orientation = orientation
-				calibration = True
-			elif np.sign(light_intensity_2[-2]-light_intensity_2[-3]) == -np.sign(light_intensity_2[-1]-light_intensity_2[-2]):
-				orientation = -60
-				orientation += velocity * dt
-				desired_orientation = -60
-				actual_orientation = orientation
-				calibration = True
-			elif np.sign(light_intensity_3[-2]-light_intensity_3[-3]) == -np.sign(light_intensity_3[-1]-light_intensity_3[-2]):
-				orientation = -120
-				orientation += velocity * dt
-				desired_orientation = -120
-				actual_orientation = orientation
-				calibration = True
-	while calibration == True and abs(desired_orientation - orientation) > 0.01:
-		control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-		# Mapping PD output to motor speed (ensure values are within valid range)
-		motor_speed = max(min(abs(control_signal), 100), 0)  # Limiting to realistic values
-		#Adjust motor direction based on control signal sign
-		if control_signal > 0:
-			motor_forward(motor_speed)
-			orientation += velocity * dt
-			actual_orientation = orientation  # Update actual orientation in real-time
-		else:
-			motor_backward(motor_speed)
-			orientation += velocity * dt
-			actual_orientation = orientation  # Update actual orientation in real-time
-	else:
-		orientation += velocity * dt
-		stop_motor()
-		return        
-	time.sleep(0.1)
+	# Setting reference light readings (single sensor)
+	light_intensity = []
+     pd_controller = PDController(Kp=1600, Kd=80)
+     calibration = False
+     dt = 0.1
+    while not calibration:
+        # read single lux sensor
+        light = lux_sensor.light
+        light_intensity.append(light)
+        # once we have 3 samples detect a local-max
+        if len(light_intensity) > 2:
+            if np.sign(light_intensity[-2] - light_intensity[-3]) \
+               == -np.sign(light_intensity[-1] - light_intensity[-2]):
+                # lock current orientation as reference
+                desired_orientation = orientation
+                actual_orientation = orientation
+                calibration = True
+    while calibration and abs(desired_orientation - orientation) > 0.01:
+         control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
+         motor_speed = max(min(abs(control_signal), 100), 0)
+         if control_signal > 0:
+             motor_forward(motor_speed)
+             orientation += velocity * dt
+             actual_orientation = orientation
+         else:
+             motor_backward(motor_speed)
+             orientation += velocity * dt
+             actual_orientation = orientation
+    else:
+        orientation += velocity * dt
+        stop_motor()
+        return
+     time.sleep(0.1)
 
 # Creating manual orientation mode function
 def manual_orientation_mode():
