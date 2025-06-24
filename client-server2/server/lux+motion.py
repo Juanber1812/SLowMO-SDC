@@ -1,43 +1,47 @@
 #!/usr/bin/env python3
-# combo_test.py  –  Motor + VEML7700 + MPU6050 interactive demo
+# combo_test.py – Motor + VEML7700 + MPU6050 interactive demo with dual-PWM
+
 import time
 import board, busio
 import adafruit_veml7700
 import RPi.GPIO as GPIO
 import smbus
 
-# ── GPIO PIN DEFINITIONS ───────────────────────────────────────────────
-PWM_PIN   = 13   # IN1  (hardware-PWM)
-DIR_PIN   = 19   # IN2
-SLEEP_PIN = 26   # SLEEP (enable)
+# ── GPIO PIN DEFINITIONS ─────────────────────────────
+IN1 = 13  # Motor input 1 (PWM)
+IN2 = 19  # Motor input 2 (PWM)
+SLEEP = 26
 
-# ── SET UP MOTOR DRIVER PINS ───────────────────────────────────────────
+# ── SET UP GPIO PINS ─────────────────────────────────
 GPIO.setmode(GPIO.BCM)
-GPIO.setup([PWM_PIN, DIR_PIN, SLEEP_PIN], GPIO.OUT, initial=GPIO.LOW)
-pwm = GPIO.PWM(PWM_PIN, 1000)        # 1 kHz PWM
-pwm.start(0)                         # speed = 0 %
+GPIO.setup([IN1, IN2, SLEEP], GPIO.OUT)
+GPIO.output(SLEEP, GPIO.HIGH)  # Wake up driver
 
-GPIO.output(SLEEP_PIN, GPIO.HIGH)    # wake up driver
+pwm1 = GPIO.PWM(IN1, 1000)  # 1 kHz PWM on IN1
+pwm2 = GPIO.PWM(IN2, 1000)  # 1 kHz PWM on IN2
+pwm1.start(0)
+pwm2.start(0)
 
 def motor_forward(speed):
-    GPIO.output(DIR_PIN, GPIO.LOW)
-    pwm.ChangeDutyCycle(speed)
+    pwm2.ChangeDutyCycle(0)  # IN2 low
+    pwm1.ChangeDutyCycle(speed)  # PWM on IN1
 
 def motor_reverse(speed):
-    GPIO.output(DIR_PIN, GPIO.HIGH)
-    pwm.ChangeDutyCycle(speed)
+    pwm1.ChangeDutyCycle(0)  # IN1 low
+    pwm2.ChangeDutyCycle(speed)  # PWM on IN2
 
 def motor_stop():
-    pwm.ChangeDutyCycle(0)
+    pwm1.ChangeDutyCycle(0)
+    pwm2.ChangeDutyCycle(0)
 
-# ── VEML7700 (lux sensor) ─────────────────────────────────────────────
+# ── VEML7700 (lux sensor) ────────────────────────────
 i2c = busio.I2C(board.SCL, board.SDA)
 veml = adafruit_veml7700.VEML7700(i2c)
 
-# ── MPU-6050 (motion sensor) ───────────────────────────────────────────
+# ── MPU-6050 (motion sensor) ─────────────────────────
 MPU_ADDR = 0x68
 bus = smbus.SMBus(1)
-bus.write_byte_data(MPU_ADDR, 0x6B, 0)          # exit sleep
+bus.write_byte_data(MPU_ADDR, 0x6B, 0)  # Wake MPU6050
 
 def mpu_raw(addr):
     hi = bus.read_byte_data(MPU_ADDR, addr)
@@ -54,7 +58,7 @@ def read_mpu():
     gz = mpu_raw(0x47) / 131.0
     return ax, ay, az, gx, gy, gz
 
-# ── INTERACTIVE CLI ────────────────────────────────────────────────────
+# ── INTERACTIVE CLI ──────────────────────────────────
 menu = """
 Commands:
   f [0-100]   – forward  (e.g. f 60)
@@ -77,11 +81,13 @@ try:
             motor_stop()
             print("Motor stopped.")
         elif cmd[0] == "f" and len(cmd) == 2:
-            motor_forward(min(max(int(cmd[1]), 0), 100))
-            print(f"Forward at {cmd[1]} %")
+            speed = min(max(int(cmd[1]), 0), 100)
+            motor_forward(speed)
+            print(f"Forward at {speed}%")
         elif cmd[0] == "r" and len(cmd) == 2:
-            motor_reverse(min(max(int(cmd[1]), 0), 100))
-            print(f"Reverse at {cmd[1]} %")
+            speed = min(max(int(cmd[1]), 0), 100)
+            motor_reverse(speed)
+            print(f"Reverse at {speed}%")
         elif cmd[0] == "lux":
             print(f"Lux: {veml.light:.2f} lx")
         elif cmd[0] == "mpu":
@@ -95,6 +101,7 @@ except KeyboardInterrupt:
     pass
 finally:
     motor_stop()
-    pwm.stop()
+    pwm1.stop()
+    pwm2.stop()
     GPIO.cleanup()
     print("\nGood-bye!")
