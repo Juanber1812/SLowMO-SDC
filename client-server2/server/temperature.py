@@ -31,7 +31,7 @@ def get_all_temperatures():
                 temperatures['main'] = temp
             else:
                 temperatures[sensor.id] = temp
-
+    temperatures["number_of_sensors"] = len(temperatures)
     return temperatures
 
 if __name__ == "__main__":
