@@ -15,18 +15,24 @@ def get_temperature(sensor_id):
     except Exception as e:
         print(f"Error reading temperature from sensor {sensor_id}: {e}")
         return None
-    
-    
-if __name__ == "__main__":
-    print('Running temperature sensor script...')
+
+def get_all_temperatures():
     sensors = W1ThermSensor.get_available_sensors()
-    print(f"Found {len(sensors)} temperature sensors:")
-    for sensor in sensors:
-        print("Sensor %s has temperature %.2f" % (sensor.id, sensor.get_temperature()))
+    temperatures = {}
     for sensor in sensors:
         temp = get_temperature(sensor.id)
         if temp is not None:
-            print(f"Sensor {sensor.id} has temperature {temp:.2f} °C")
-        else:
-            print(f"Failed to read temperature from sensor {sensor.id}")
-            print(f"Failed to read temperature from sensor {sensor.id}")
+            temperatures[sensor.id] = temp
+    return temperatures
+
+if __name__ == "__main__":
+    print('Running temperature sensor script...')
+    temperatures = get_all_temperatures()
+    print('Temperature sensors found:', len(temperatures))
+    print(f"Combined temperature readings from all sensors: {temperatures}")
+    if temperatures:
+        for sensor_id, temp in temperatures.items():
+            print(f"Sensor {sensor_id} has temperature {temp:.2f} °C")
+    else:
+        print("No temperature sensors found.")
+    print('Temperature sensor script finished.')
