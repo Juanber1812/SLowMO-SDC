@@ -42,7 +42,9 @@ if __name__ == "__main__":
     print(f"Combined temperature readings from all sensors: {temperatures}")
     if temperatures:
         for sensor_id, temp in temperatures.items():
-            print(f"Sensor {sensor_id} has temperature {temp:.2f} °C")
+            if sensor_id == 'number_of_sensors':
+                continue
+            print(f"Sensor {sensor_id} has temperature {temp:.3f} °C")
     else:
         print("No temperature sensors found.")
     print('Temperature sensor script finished.')
