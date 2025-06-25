@@ -6,6 +6,7 @@ from w1thermsensor import W1ThermSensor
 # Sensor 28-000007602ffa has temperature 22.50
 # Sensor 28-000007602ffb has temperature 23.00
 # Sensor 28-000007602ffb has temperature 23.00
+# Last edited 20250625T21:06
 
 BATTERY_SENSOR_ID = '0b24404e94cd'
 MAIN_SENSOR_ID = 'UNKNOWN'
