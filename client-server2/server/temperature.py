@@ -38,7 +38,7 @@ def get_all_temperatures():
 if __name__ == "__main__":
     print('Running temperature sensor script...')
     temperatures = get_all_temperatures()
-    print('Temperature sensors found:', len(temperatures))
+    print('Temperature sensors found:', temperatures.get("number_of_sensors", 0))
     print(f"Combined temperature readings from all sensors: {temperatures}")
     if temperatures:
         for sensor_id, temp in temperatures.items():
