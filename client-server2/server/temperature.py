@@ -19,6 +19,7 @@ def get_temperature(sensor_id):
         return None
     
 if __name__ == "__main__":
+    print('Running temperature sensor script...')
     sensors = W1ThermSensor.get_available_sensors()
     for sensor in sensors:
         temp = get_temperature(sensor.id)
