@@ -7,6 +7,9 @@ from w1thermsensor import W1ThermSensor
 # Sensor 28-000007602ffb has temperature 23.00
 # Sensor 28-000007602ffb has temperature 23.00
 
+BATTERY_SENSOR_ID = '0b24404e94cd'
+MAIN_SENSOR_ID = 'UNKNOWN'
+
 def get_temperature(sensor_id):
     try:
         sensor = W1ThermSensor(sensor_id=sensor_id)
@@ -22,7 +25,13 @@ def get_all_temperatures():
     for sensor in sensors:
         temp = get_temperature(sensor.id)
         if temp is not None:
-            temperatures[sensor.id] = temp
+            if sensor.id == BATTERY_SENSOR_ID:
+                temperatures['battery'] = temp
+            elif sensor.id == MAIN_SENSOR_ID:
+                temperatures['main'] = temp
+            else:
+                temperatures[sensor.id] = temp
+
     return temperatures
 
 if __name__ == "__main__":
