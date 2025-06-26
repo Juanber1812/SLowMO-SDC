@@ -53,10 +53,6 @@ def get_power_values(ina228):
             print(f"Error reading temperature: {e}")
 
         # Additional INA228 data
-        try:
-            print(f"Alert: {ina228.alert}")
-        except Exception as e:
-            print(f"Error reading alert: {e}")
 
         try:
             print(f"Device ID: {ina228.device_id:#06x}")
@@ -73,7 +69,23 @@ def get_power_values(ina228):
     except Exception as e:
         print(f"Error reading sensor data: {e}")
         return None
-    
+
+# Print until the script is stopped
+def print_sensor_data_loop():
+    ina228 = init_sensor()
+    while True:
+        try:
+            power_data = get_power_values(ina228)
+            if power_data:
+                print(f"Power Data: {power_data}")
+            else:
+                print("No power data available.")
+        except KeyboardInterrupt:
+            print("Stopping sensor data printing.")
+            break
+        except Exception as e:
+            print(f"Error in main loop: {e}")
+
 if __name__ == "__main__":
     sensor = init_sensor()
     power_readings = get_power_values(sensor)
