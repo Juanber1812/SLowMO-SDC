@@ -105,19 +105,22 @@ def emergency_stop_handler(channel):
 # ensure pin is input with pull-up
 GPIO.setup(EMERGENCY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# remove any previous detector, ignore if none
+# remove any old detector (ignore if none)
 try:
     GPIO.remove_event_detect(EMERGENCY_PIN)
 except RuntimeError:
     pass
 
-# now add the falling-edge detector
-GPIO.add_event_detect(
-    EMERGENCY_PIN,
-    GPIO.FALLING,
-    callback=emergency_stop_handler,
-    bouncetime=200
-)
+# add the falling-edge detector, but don’t crash if it’s already there
+try:
+    GPIO.add_event_detect(
+        EMERGENCY_PIN,
+        GPIO.FALLING,
+        callback=emergency_stop_handler,
+        bouncetime=200
+    )
+except RuntimeError:
+    print("Warning: emergency_stop edge detect already configured")
 
 # ── COMPLEMENTARY FILTER ────────────────────────────────────────
 class ComplementaryFilter:
