@@ -1,0 +1,19 @@
+2025-06-26 13:40:33,006 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-26 13:40:33,203 - INFO - Connected to server
+2025-06-26 13:40:33,204 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-26 13:40:33,205 - INFO - [INFO] Successfully connected to server
+2025-06-26 13:40:49,563 - INFO - Image captured: /home/slowmo/captures/image_20250626_134048.jpg (1.35 MB)
+2025-06-26 13:40:50,389 - INFO - Image saved: c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\captured_images\image_20250626_134048.jpg (1382.6 KB)
+2025-06-26 13:41:22,973 - INFO - Requesting LIDAR streaming start
+2025-06-26 13:41:25,079 - INFO - Requesting LIDAR streaming stop
+2025-06-26 13:41:25,089 - INFO - Back button clicked in LidarWidget
+2025-06-26 13:41:26,663 - INFO - Requesting LIDAR streaming start
+2025-06-26 13:41:28,032 - INFO - Requesting LIDAR streaming stop
+2025-06-26 13:41:28,037 - INFO - Back button clicked in LidarWidget
+2025-06-26 13:41:28,747 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-26 13:41:40,718 - INFO - Disconnected from server: client disconnect
+2025-06-26 13:41:47,418 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-26 13:41:47,770 - INFO - Connected to server
+2025-06-26 13:41:47,771 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-26 13:41:47,775 - INFO - [INFO] Successfully connected to server
+2025-06-26 13:41:53,266 - INFO - Disconnected from server: client disconnect
