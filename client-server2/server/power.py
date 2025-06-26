@@ -86,7 +86,7 @@ def print_sensor_data_loop():
             break
         except Exception as e:
             print(f"Error in main loop: {e}")
-    time.sleep(1)  # Sleep to avoid flooding the output
+        time.sleep(1)  # Sleep to avoid flooding the output
 
 if __name__ == "__main__":
     sensor = init_sensor()
