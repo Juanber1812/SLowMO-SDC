@@ -28,7 +28,7 @@ def get_power_values(ina228):
             print(f"Error reading current: {e}")
 
         try:
-            print(f"Bus Voltage: {ina228.voltage:.2f} V")
+            print(f"Bus Voltage: {ina228.bus_voltage:.2f} V")
         except Exception as e:
             print(f"Error reading bus voltage: {e}")
 
@@ -48,7 +48,7 @@ def get_power_values(ina228):
             print(f"Error reading energy: {e}")
 
         try:
-            print(f"Temperature: {ina228.temperature:.2f} C")
+            print(f"Temperature: {ina228.die_temperature:.2f} C")
         except Exception as e:
             print(f"Error reading temperature: {e}")
 
@@ -90,10 +90,10 @@ def get_power_values(ina228):
 
         return {
             "current": ina228.current,
-            "voltage": ina228.voltage,
+            "voltage": ina228.bus_voltage,
             "power": ina228.power,
             "energy": ina228.energy,
-            "temperature": ina228.temperature,
+            "temperature": ina228.die_temperature,
         }
     except Exception as e:
         print(f"Error reading sensor data: {e}")
