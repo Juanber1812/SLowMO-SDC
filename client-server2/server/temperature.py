@@ -9,7 +9,7 @@ from w1thermsensor import W1ThermSensor
 # Last edited 20250625T21:06
 
 BATTERY_SENSOR_ID = '0b24404e94cd'
-MAIN_SENSOR_ID = 'UNKNOWN'
+MAIN_SENSOR_ID = '0b2440864105'
 
 def get_temperature(sensor_id):
     try:
