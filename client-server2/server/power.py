@@ -1,6 +1,7 @@
 try:
     import board # type: ignore
     import adafruit_ina228 # type: ignore
+    import time
 except ImportError as e:
     print(f"Error importing libraries: {e}")
     print("Make sure you have the required libraries installed.")
@@ -85,6 +86,7 @@ def print_sensor_data_loop():
             break
         except Exception as e:
             print(f"Error in main loop: {e}")
+    time.sleep(1)  # Sleep to avoid flooding the output
 
 if __name__ == "__main__":
     sensor = init_sensor()
