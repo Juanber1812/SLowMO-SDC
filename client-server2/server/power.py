@@ -59,31 +59,6 @@ def get_power_values(ina228):
             print(f"Error reading alert: {e}")
 
         try:
-            print(f"Conversion Ready: {ina228.conversion_ready}")
-        except Exception as e:
-            print(f"Error reading conversion ready: {e}")
-
-        try:
-            print(f"ADC Conversion Time: {ina228.adc_conversion_time} us")
-        except Exception as e:
-            print(f"Error reading ADC conversion time: {e}")
-
-        try:
-            print(f"ADC Averaging: {ina228.adc_averaging}")
-        except Exception as e:
-            print(f"Error reading ADC averaging: {e}")
-
-        try:
-            print(f"Shunt Calibration: {ina228.shunt_calibration}")
-        except Exception as e:
-            print(f"Error reading shunt calibration: {e}")
-
-        try:
-            print(f"Manufacturer ID: {ina228.manufacturer_id:#06x}")
-        except Exception as e:
-            print(f"Error reading manufacturer ID: {e}")
-
-        try:
             print(f"Device ID: {ina228.device_id:#06x}")
         except Exception as e:
             print(f"Error reading device ID: {e}")
@@ -101,4 +76,5 @@ def get_power_values(ina228):
     
 if __name__ == "__main__":
     sensor = init_sensor()
-    get_power_values(sensor)
+    power_readings = get_power_values(sensor)
+    print("Power readings:", power_readings)
