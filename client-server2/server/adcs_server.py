@@ -224,6 +224,27 @@ def live_sensor_mode():
     except KeyboardInterrupt:
         print("\nLive mode stopped.")
 
+def scan_tca_channels():
+    """
+    Turn on each channel of the TCA9548A (0x70) and list
+    all I²C addresses that ACK on that channel.
+    """
+    MUX_ADDR = 0x70
+    print("Scanning TCA9548A channels…")
+    for ch in range(8):
+        mask = 1 << ch
+        # select only this channel
+        bus.write_byte_data(MUX_ADDR, 0x00, mask)
+        # scan via busio.I2C
+        while not i2c.try_lock():
+            pass
+        devs = i2c.scan()
+        i2c.unlock()
+        listing = ", ".join(hex(d) for d in devs) if devs else "–"
+        print(f"  Channel {ch}: {listing}")
+    # turn off all channels
+    bus.write_byte_data(MUX_ADDR, 0x00, 0x00)
+
 # ── CLI DISPATCH ────────────────────────────────────────────────
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Test ADCS")
@@ -231,7 +252,7 @@ if __name__ == "__main__":
                         choices=["motor_forward","motor_backward","stop",
                                  "read_gyro","read_accel",
                                  "orientation","env_cal","manual",
-                                 "auto","detumble","live"])
+                                 "auto","detumble","live", "scan_mux"])
     parser.add_argument("-s","--speed", type=int, default=50)
     parser.add_argument("-a","--angle", type=float, default=0.0)
     args = parser.parse_args()
@@ -248,6 +269,10 @@ if __name__ == "__main__":
         elif args.cmd=="auto": automatic_orientation_mode(math.radians(args.angle))
         elif args.cmd=="detumble": detumbling_mode()
         elif args.cmd=="live": live_sensor_mode()
+        elif args.cmd == "scan_mux":
+            scan_tca_channels()
     finally:
         stop_motor()
+        pwm.stop()
+        GPIO.cleanup()
 
