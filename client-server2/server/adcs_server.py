@@ -1,303 +1,246 @@
 # Required libraries
-import time, RPi.GPIO as GPIO, board, busio, adafruit_veml7700, smbus
+import time
+import sys
+import math
+import threading
+import argparse
+
+import RPi.GPIO as GPIO
+import board, busio, smbus
+import adafruit_tca9548a, adafruit_veml7700
 import numpy as np
 
-# Pin definitions (match lux+motion.py)
-PWM_PIN   = 13  # GPIO 13 (hardware PWM)
-DIR_PIN   = 19  # GPIO 19 (direction)
-SLEEP_PIN = 26  # GPIO 26 (enable)
-RPM_PIN   = 17  # GPIO 17 (hall / lock sensor)
+# ── PIN & I²C SETUP ─────────────────────────────────────────────
+PWM_PIN, DIR_PIN, SLEEP_PIN = 13, 19, 26
+RPM_PIN = 17
 
-# ── MOTOR SETUP ─────────────────────────────────
 GPIO.setmode(GPIO.BCM)
 GPIO.setup([PWM_PIN, DIR_PIN, SLEEP_PIN], GPIO.OUT, initial=GPIO.LOW)
-GPIO.output(SLEEP_PIN, GPIO.HIGH)   # wake the driver
-pwm = GPIO.PWM(PWM_PIN,    1000)    # 1 kHz PWM
-pwm.start(0)                       # speed = 0%
+GPIO.setup(RPM_PIN, GPIO.IN)
+GPIO.output(SLEEP_PIN, GPIO.HIGH)
 
+pwm = GPIO.PWM(PWM_PIN, 1000)
+pwm.start(0)
+
+i2c = busio.I2C(board.SCL, board.SDA)
+tca = adafruit_tca9548a.TCA9548A(i2c)
+lux_sensors = [adafruit_veml7700.VEML7700(tca[i]) for i in range(3)]
+
+bus = smbus.SMBus(1)
+Device_Address = 0x68
+PWR_MGMT_1, SMPLRT_DIV, CONFIG, GYRO_CONFIG, INT_ENABLE = 0x6B, 0x19, 0x1A, 0x1B, 0x38
+ACCEL_XOUT_H, ACCEL_YOUT_H, ACCEL_ZOUT_H = 0x3B, 0x3D, 0x3F
+GYRO_XOUT_H, GYRO_YOUT_H, GYRO_ZOUT_H = 0x43, 0x45, 0x47
+
+# ── MOTOR HELPERS ────────────────────────────────────────────────
 def motor_forward(speed: int):
-    GPIO.output(DIR_PIN, GPIO.LOW)    # forward = LOW
-    pwm.ChangeDutyCycle(max(0, min(speed, 100)))
+    GPIO.output(DIR_PIN, GPIO.LOW)
+    pwm.ChangeDutyCycle(max(0, min(100, speed)))
 
 def motor_backward(speed: int):
-    GPIO.output(DIR_PIN, GPIO.HIGH)   # reverse = HIGH
-    pwm.ChangeDutyCycle(max(0, min(speed, 100)))
+    GPIO.output(DIR_PIN, GPIO.HIGH)
+    pwm.ChangeDutyCycle(max(0, min(100, speed)))
 
 def stop_motor():
     pwm.ChangeDutyCycle(0)
 
-# Hall/lock sensor setup
-GPIO.setup(RPM_PIN, GPIO.IN)
-
-############## Acceleration functions that I made, but realised I don't need. Kept though in case we change our minds.
-#def accelerate_motor(step=5, delay=0.1):
-#	accel_state = True
-#	speed = pwm  # Initialize speed or pass as argument if needed
-#	while accel_state == True:
-#		if speed >= 99:
-#			break
-#		speed += step
-#		print(f"Accelerating: speed = {speed}")
-#		pwm.ChangeDutyCycle(speed)
-#		time.sleep(delay)
-
-#def deccelerate_motor(step=5, delay=0.1):
-#	accel_state = True
-#	speed = 50  # Initialize speed or pass as argument if needed
-#	while accel_state == True:
-#		if speed == 0:
-#			break
-#		speed -= step
-#		print(f"Decelerating: speed = {speed}")
-#		pwm.ChangeDutyCycle(speed)
-#		time.sleep(delay)
-
-# Setting up rpm sensor
-GPIO.setmode(GPIO.BCM)  #Use Broadcom pin numbering
-GPIO.setup(17, GPIO.IN)  #Change for pin number used
-###set variable showing whether sensor is high or low###
-
-#Initialising I2C bus and multiplexer for light sensor
-i2c = busio.I2C(board.SCL, board.SDA)
-lux_sensor = adafruit_veml7700.VEML7700(i2c)
-
-# Setting I2C protocol and device address used in motion sensor functions
-bus = smbus.SMBus(1) 	
-Device_Address = 0x68
-
-# Setting motion sensor registers and addresses
-PWR_MGMT_1   = 0x6B
-SMPLRT_DIV   = 0x19
-CONFIG       = 0x1A
-GYRO_CONFIG  = 0x1B
-INT_ENABLE   = 0x38
-ACCEL_XOUT_H = 0x3B
-ACCEL_YOUT_H = 0x3D
-ACCEL_ZOUT_H = 0x3F
-GYRO_XOUT_H  = 0x43
-GYRO_YOUT_H  = 0x45
-GYRO_ZOUT_H  = 0x47
-
-# Creating function to initialise motion sensor
+# ── MPU INITIALIZATION & READ ────────────────────────────────────
 def MPU_Init():
-	bus.write_byte_data(Device_Address, SMPLRT_DIV, 7)
-	bus.write_byte_data(Device_Address, PWR_MGMT_1, 1)
-	bus.write_byte_data(Device_Address, CONFIG, 0)
-	bus.write_byte_data(Device_Address, GYRO_CONFIG, 24)
-	bus.write_byte_data(Device_Address, INT_ENABLE, 1)
+    bus.write_byte_data(Device_Address, SMPLRT_DIV, 7)
+    bus.write_byte_data(Device_Address, PWR_MGMT_1, 1)
+    bus.write_byte_data(Device_Address, CONFIG, 0)
+    bus.write_byte_data(Device_Address, GYRO_CONFIG, 24)
+    bus.write_byte_data(Device_Address, INT_ENABLE, 1)
 
-# Creating function to read motion sensor's raw data
 def read_raw_data(addr):
-	high = bus.read_byte_data(Device_Address, addr)
-	low = bus.read_byte_data(Device_Address, addr+1)
-	value = ((high << 8) | low)
-	if(value > 32768):
-		value = value - 65536
-	return value
+    high = bus.read_byte_data(Device_Address, addr)
+    low = bus.read_byte_data(Device_Address, addr+1)
+    val = (high << 8) | low
+    return val - 65536 if val > 32767 else val
 
-# Setting PD controller
-class PDController:
-	def __init__(self, Kp, Kd):
-		self.Kp = Kp
-		self.Kd = Kd
-		self.previous_error = 0
-
-	def compute(self, desired_orientation, actual_orientation, dt):
-		error = desired_orientation - actual_orientation
-		derivative = (error - self.previous_error) / dt if dt > 0 else 0
-		control_output = self.Kp * error + self.Kd * derivative
-		self.previous_error = error
-		return control_output
-
-# Beginning initialisation of motion sensor
-MPU_Init()
-
-
-# Initial orientation
-orientation = 0
-
-# Orientation tracking
-def orientation_loop():
-    # Orientation tracking
-    start_time = time.perf_counter()
-    initial_time = None
-    prev_ref = False
-    while True:
-        elapsed = time.perf_counter() - start_time
-        acc_x = read_raw_data(ACCEL_XOUT_H)
-        acc_y = read_raw_data(ACCEL_YOUT_H)
-        acc_z = read_raw_data(ACCEL_ZOUT_H)
-        gyro_x = read_raw_data(GYRO_XOUT_H)
-        gyro_y = read_raw_data(GYRO_YOUT_H)
-        gyro_z = read_raw_data(GYRO_ZOUT_H)
-        Ax = acc_x/16384.0
-        Ay = acc_y/16384.0
-        Az = acc_z/16384.0
-        Gx = gyro_x/131.0
-        Gy = gyro_y/131.0
-        Gz = gyro_z/131.0
-        velocity = Gz
-        dt = 0.1############Update for sensor update rate
-        orientation += velocity * dt
-        #RPM sensing
-        if GPIO.input(Motor1E) != GPIO.LOW:
-            if GPIO.input(17) == GPIO.HIGH and prev_ref == False: 
-                if initial_time is None:  
-                    initial_time = time.perf_counter()
-                    prev_ref = True
-                else:
-                    current_time = time.perf_counter()
-                    period = current_time - initial_time
-                    rpm = 60/period 
-                    initial_time = current_time
-                    prev_ref = True
-            else:
-                rpm = 0
-                prev_ref = False
-        else:
-            rpm = 0
-    # end orientation_loop
-
-# Creating environmental calibration mode function
-def environmental_calibration_mode():
-    motor_forward(50)
-    print("Signal: Environmental Calibration mode")
-    # Setting reference light readings (single sensor)
-    light_intensity = []
-    pd_controller    = PDController(Kp=1600, Kd=80)
-    calibration      = False
-    dt               = 0.1
-
-    # collect three samples and detect local max
-    while not calibration:
-        light_intensity.append(lux_sensor.light)
-        if len(light_intensity) > 2:
-            if np.sign(light_intensity[-2] - light_intensity[-3]) \
-               == -np.sign(light_intensity[-1] - light_intensity[-2]):
-                desired_orientation = orientation
-                actual_orientation  = orientation
-                calibration         = True
-
-    # now drive until we’re within tolerance of that orientation
-    while calibration and abs(desired_orientation - orientation) > 0.01:
-        control_signal = pd_controller.compute(
-            desired_orientation, actual_orientation, dt
-        )
-        motor_speed = max(min(abs(control_signal), 100), 0)
-        if control_signal > 0:
-            motor_forward(motor_speed)
-        else:
-            motor_backward(motor_speed)
-        orientation          += velocity * dt
-        actual_orientation    = orientation
-    else:
-        orientation += velocity * dt
-        stop_motor()
-        return
-
-    time.sleep(0.1)
-
-# Creating manual orientation mode function
-def manual_orientation_mode():
-	print("Signal: Manual Orientation mode")
-	#Creating commands for motor
-	def startstop_cw():
-		print("Signal: Manual Orientation mode - Clockwise command received")
-		if speed == 0:
-			motor_forward(50)
-		elif speed != 0:
-			stop_motor()
-	def startstop_ccw():
-		print("Signal: Manual Orientation mode - Counter-clockwise command received")
-		if speed == 0:
-			motor_backward(50)
-		elif speed != 50:
-			stop_motor()
-
-# Creating automatic orientation mode function
-def automatic_orientation_mode():
-	print("Signal: Automatic Orientation mode")
-	def rotation():
-		print("Signal: Automatic Orientation mode - Rotation command received")
-		# Parameter setting
-		desired_orientation = float(entry.get())
-		actual_orientation = orientation
-		pd_controller = PDController(Kp=1600, Kd=80)
-		# Running controller
-		while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
-			control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-			# Mapping PD output to motor speed (ensure values are within valid range)
-			motor_speed = max(min(abs(control_signal), 100), 0)  # Limiting to realistic values
-			#Adjust motor direction based on control signal sign
-			if control_signal > 0:
-				motor_forward(motor_speed)
-				orientation += velocity * dt
-				actual_orientation = orientation  # Update actual orientation in real-time
-			else:
-				motor_backward(motor_speed)
-				orientation += velocity * dt
-				actual_orientation = orientation  # Update actual orientation in real-time
-		else:
-			orientation += velocity * dt
-			stop_motor()
-			return
-	def start_rotation():
-		rotation(float(entry.get()))
-
-# Creating detumbling mode function
-def detumbling_mode():
-	desired_orientation = 0  
-	actual_orientation = orientation
-	dt = 0.1
-	pd_controller = PDController(Kp=1600, Kd=80)
-	while abs(actual_orientation - desired_orientation) > 0.1:  # Stop condition
-		control_signal = pd_controller.compute(desired_orientation, actual_orientation, dt)
-		# Mapping PD output to motor speed (ensure values are within valid range)
-		motor_speed = max(min(abs(control_signal), 100), 0)  # Limiting to realistic values
-		#Adjust motor direction based on control signal sign
-		if control_signal > 0:
-			motor_forward(motor_speed)
-			orientation += velocity * dt
-			actual_orientation = orientation  # Update actual orientation in real-time
-		else:
-			motor_backward(motor_speed)
-			orientation += velocity * dt
-			actual_orientation = orientation  # Update actual orientation in real-time
-	else:
-		orientation += velocity * dt
-		stop_motor()
-		return
-    
-# ── Test helpers ─────────────────────────────────
 def read_gyroscope():
     return (
-        read_raw_data(GYRO_XOUT_H) / 131.0,
-        read_raw_data(GYRO_YOUT_H) / 131.0,
-        read_raw_data(GYRO_ZOUT_H) / 131.0,
+        read_raw_data(GYRO_XOUT_H)/131.0,
+        read_raw_data(GYRO_YOUT_H)/131.0,
+        read_raw_data(GYRO_ZOUT_H)/131.0,
     )
 
 def read_accelerometer():
     return (
-        read_raw_data(ACCEL_XOUT_H) / 16384.0,
-        read_raw_data(ACCEL_YOUT_H) / 16384.0,
-        read_raw_data(ACCEL_ZOUT_H) / 16384.0,
+        read_raw_data(ACCEL_XOUT_H)/16384.0,
+        read_raw_data(ACCEL_YOUT_H)/16384.0,
+        read_raw_data(ACCEL_ZOUT_H)/16384.0,
     )
 
+def read_lux_sensors():
+    return [s.light for s in lux_sensors]
+
+MPU_Init()
+
+# ── EMERGENCY STOP ───────────────────────────────────────────────
+EMERGENCY_PIN = 16
+emergency_stop_flag = False
+
+def emergency_stop_handler(channel):
+    global emergency_stop_flag
+    emergency_stop_flag = True
+    stop_motor()
+    print("\n*** EMERGENCY STOP ***")
+    GPIO.cleanup()
+    sys.exit(1)
+
+GPIO.setup(EMERGENCY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.add_event_detect(EMERGENCY_PIN, GPIO.FALLING,
+                      callback=emergency_stop_handler, bouncetime=200)
+
+# ── COMPLEMENTARY FILTER ────────────────────────────────────────
+class ComplementaryFilter:
+    def __init__(self, alpha=0.98):
+        self.alpha = alpha
+        self.angle = 0.0
+
+    def update(self, gyro_rate, accel_angle, dt):
+        self.angle = (self.alpha * (self.angle + gyro_rate*dt)
+                      + (1-self.alpha)*accel_angle)
+        return self.angle
+
+comp_filter = ComplementaryFilter(alpha=0.98)
+orientation = 0.0
+
+# ── PD CONTROLLER ───────────────────────────────────────────────
+class PDController:
+    def __init__(self, Kp, Kd):
+        self.Kp, self.Kd = Kp, Kd
+        self.prev_error = 0.0
+
+    def compute(self, target, actual, dt):
+        error = target - actual
+        deriv = (error - self.prev_error)/dt if dt>0 else 0.0
+        self.prev_error = error
+        return self.Kp*error + self.Kd*deriv
+
+# ── MODES ────────────────────────────────────────────────────────
+def orientation_loop():
+    global orientation
+    print("Starting fused orientation loop (E-stop abort).")
+    start = time.perf_counter()
+    while not emergency_stop_flag:
+        now = time.perf_counter(); dt = now - start; start = now
+        gx,gy,gz = read_gyroscope()
+        ax,ay,az = read_accelerometer()
+        accel_ang = math.atan2(ay, az)
+        orientation = comp_filter.update(math.radians(gz), accel_ang, dt)
+        print(f"Orient: {math.degrees(orientation):.2f}°", end='\r', flush=True)
+        time.sleep(0.01)
+    stop_motor()
+    GPIO.cleanup()
+
+def environmental_calibration_mode():
+    global orientation
+    ax,ay,az = read_accelerometer()
+    init_ang = math.atan2(ay, az)
+    comp_filter.angle = init_ang
+    orientation = 0.0
+    print(f"Init zero = {math.degrees(init_ang):.2f}° gravity")
+    motor_forward(50)
+    print("Sweeping @50%… waiting for peak lux.")
+    history = []
+    start = time.perf_counter()
+    peak = False
+    while not peak and not emergency_stop_flag:
+        now = time.perf_counter(); dt = now - start; start = now
+        gx,gy,gz = read_gyroscope()
+        ax,ay,az = read_accelerometer()
+        orientation = comp_filter.update(math.radians(gz), math.atan2(ay,az), dt)
+        lux = read_lux_sensors()
+        history.append(lux)
+        if len(history)>=3:
+            p,c,n = history[-3], history[-2], history[-1]
+            for i in range(3):
+                if c[i]>p[i] and c[i]>n[i]:
+                    print(f"→ Sensor {i} peak {c[i]:.1f} lux")
+                    peak = True; break
+        time.sleep(0.01)
+    zero_off = comp_filter.angle
+    print(f"Captured zero offset {math.degrees(zero_off):.2f}°")
+    comp_filter.angle = 0.0; orientation = 0.0
+    stop_motor()
+    print("Env calibration done.")
+
+def manual_orientation_mode():
+    print("Manual mode: 'f'=forward, 'b'=backward, 's'=stop, 'q'=quit")
+    while True:
+        cmd = input("cmd> ").strip().lower()
+        if cmd=='f': motor_forward(50)
+        elif cmd=='b': motor_backward(50)
+        elif cmd=='s': stop_motor()
+        elif cmd=='q': break
+        else: print("unknown")
+
+def automatic_orientation_mode(target):
+    global orientation
+    pd = PDController(Kp=1600, Kd=80)
+    print(f"Auto mode → {math.degrees(target):.2f}°")
+    start = time.perf_counter()
+    while not emergency_stop_flag:
+        now = time.perf_counter(); dt = now - start; start = now
+        gx,gy,gz = read_gyroscope()
+        ax,ay,az = read_accelerometer()
+        orientation = comp_filter.update(math.radians(gz),
+                                        math.atan2(ay,az), dt)
+        err = target - orientation
+        if abs(err) < math.radians(0.1): break
+        ctrl = pd.compute(target, orientation, dt)
+        spd = max(0, min(100, abs(ctrl)))
+        motor_forward(spd) if ctrl>0 else motor_backward(spd)
+        time.sleep(0.01)
+    stop_motor()
+    print("Auto target reached.")
+
+def detumbling_mode():
+    automatic_orientation_mode(0.0)
+
+def live_sensor_mode():
+    print("\n=== LIVE SENSOR MODE ===")
+    print("  motor cmds: use separate shell with 'motor_forward|motor_backward|stop'")
+    print(" Ctrl-C to exit live\n")
+    try:
+        while True:
+            gx,gy,gz = read_gyroscope()
+            ax,ay,az = read_accelerometer()
+            lux = read_lux_sensors()
+            line = (f"Gyro({gx:.1f},{gy:.1f},{gz:.1f})  "
+                    f"Accel({ax:.2f},{ay:.2f},{az:.2f})  "
+                    f"Lux[{lux[0]:.1f},{lux[1]:.1f},{lux[2]:.1f}]")
+            print(line, end='\r', flush=True)
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        print("\nLive mode stopped.")
+
+# ── CLI DISPATCH ────────────────────────────────────────────────
 if __name__ == "__main__":
-    from time import sleep
+    parser = argparse.ArgumentParser("Test ADCS")
+    parser.add_argument("cmd", nargs="?", default="live",
+                        choices=["motor_forward","motor_backward","stop",
+                                 "read_gyro","read_accel",
+                                 "orientation","env_cal","manual",
+                                 "auto","detumble","live"])
+    parser.add_argument("-s","--speed", type=int, default=50)
+    parser.add_argument("-a","--angle", type=float, default=0.0)
+    args = parser.parse_args()
 
     try:
-        print("Testing ADCS Motor & Sensors...")
-
-        motor_forward(50); sleep(1)
-        stop_motor();       sleep(1)
-        motor_backward(50); sleep(1)
-        stop_motor()
-
-        print("Gyroscope:",    read_gyroscope())
-        print("Accelerometer:", read_accelerometer())
+        if args.cmd=="motor_forward": motor_forward(args.speed)
+        elif args.cmd=="motor_backward": motor_backward(args.speed)
+        elif args.cmd=="stop": stop_motor()
+        elif args.cmd=="read_gyro": print("Gyro:", read_gyroscope())
+        elif args.cmd=="read_accel": print("Accel:", read_accelerometer())
+        elif args.cmd=="orientation": orientation_loop()
+        elif args.cmd=="env_cal": environmental_calibration_mode()
+        elif args.cmd=="manual": manual_orientation_mode()
+        elif args.cmd=="auto": automatic_orientation_mode(math.radians(args.angle))
+        elif args.cmd=="detumble": detumbling_mode()
+        elif args.cmd=="live": live_sensor_mode()
     finally:
         stop_motor()
-        pwm.stop()
-        GPIO.cleanup()
 
