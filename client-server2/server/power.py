@@ -2,6 +2,9 @@ try:
     import board # type: ignore
     import adafruit_ina228 # type: ignore
     import time
+    import csv
+    import os
+    from datetime import datetime
 except ImportError as e:
     print(f"Error importing libraries: {e}")
     print("Make sure you have the required libraries installed.")
@@ -74,19 +77,35 @@ def get_power_values(ina228):
 # Print until the script is stopped
 def print_sensor_data_loop():
     ina228 = init_sensor()
-    while True:
-        try:
-            power_data = get_power_values(ina228)
-            if power_data:
-                print(f"Power Data: {power_data}")
-            else:
-                print("No power data available.")
-        except KeyboardInterrupt:
-            print("Stopping sensor data printing.")
-            break
-        except Exception as e:
-            print(f"Error in main loop: {e}")
-        time.sleep(1)  # Sleep to avoid flooding the output
+    data_rows = []
+    headers = ['current', 'voltage', 'power', 'energy', 'temperature']
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'power_log_{timestamp}.csv'
+    try:
+        while True:
+            try:
+                power_data = get_power_values(ina228)
+                if power_data:
+                    print(f"Power Data: {power_data}")
+                    row = [power_data.get(h) for h in headers]
+                    data_rows.append(row)
+                else:
+                    print("No power data available.")
+            except KeyboardInterrupt:
+                print("Stopping sensor data printing. Saving CSV file...")
+                break
+            except Exception as e:
+                print(f"Error in main loop: {e}")
+            time.sleep(1)
+    finally:
+        if data_rows:
+            with open(filename, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(headers)
+                writer.writerows(data_rows)
+            print(f"Data saved to {filename}")
+        else:
+            print("No data to save.")
 
 if __name__ == "__main__":
     sensor = init_sensor()
