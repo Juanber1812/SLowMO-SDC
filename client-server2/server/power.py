@@ -96,7 +96,7 @@ def print_sensor_data_loop():
                 break
             except Exception as e:
                 print(f"Error in main loop: {e}")
-            time.sleep(1)
+            time.sleep(3)
     finally:
         if data_rows:
             with open(filename, 'w', newline='') as csvfile:
