@@ -271,31 +271,91 @@ def scan_tca_channels():
     # turn off all channels
     bus.write_byte_data(MUX_ADDR, 0x00, 0x00)
 
+def interactive_mode():
+    """REPL to call all ADCS commands on the fly."""
+    print("\n=== INTERACTIVE MODE ===")
+    print(" f <speed>    - forward")
+    print(" r <speed>    - reverse")
+    print(" s            - stop motor")
+    print(" env_cal      - environmental calibration")
+    print(" auto <angle> - automatic orientation (deg)")
+    print(" detumble     - detumbling_mode()")
+    print(" scan_mux     - scan I2C multiplexer")
+    print(" orient       - orientation_loop()")
+    print(" live         - live_sensor_mode()")
+    print(" quit/q       - exit\n")
+    while True:
+        parts = input("CMD> ").strip().split()
+        if not parts:
+            continue
+        cmd = parts[0].lower()
+        arg = parts[1] if len(parts)>1 else None
+
+        if cmd=='f' and arg:
+            motor_forward(int(arg))
+        elif cmd=='r' and arg:
+            motor_backward(int(arg))
+        elif cmd=='s':
+            stop_motor()
+        elif cmd=='env_cal':
+            environmental_calibration_mode()
+        elif cmd=='auto' and arg:
+            automatic_orientation_mode(math.radians(float(arg)))
+        elif cmd=='detumble':
+            detumbling_mode()
+        elif cmd=='scan_mux':
+            scan_tca_channels()
+        elif cmd=='orient':
+            orientation_loop()
+        elif cmd=='live':
+            live_sensor_mode()
+        elif cmd in ('q','quit','exit'):
+            break
+        else:
+            print("Unknown command, try again.")
+
+    print("Exiting interactive mode.\n")
+
+
 # ── CLI DISPATCH ────────────────────────────────────────────────
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Test ADCS")
-    parser.add_argument("cmd", nargs="?", default="live",
-                        choices=["motor_forward","motor_backward","stop",
-                                 "read_gyro","read_accel",
-                                 "orientation","env_cal","manual",
-                                 "auto","detumble","live", "scan_mux"])
+    parser.add_argument("cmd", nargs="?", default="interactive",
+                        choices=[
+                          "interactive","motor_forward","motor_backward","stop",
+                          "read_gyro","read_accel","orientation","env_cal",
+                          "manual","auto","detumble","live","scan_mux"
+                        ])
     parser.add_argument("-s","--speed", type=int, default=50)
     parser.add_argument("-a","--angle", type=float, default=0.0)
     args = parser.parse_args()
 
     try:
-        if args.cmd=="motor_forward": motor_forward(args.speed)
-        elif args.cmd=="motor_backward": motor_backward(args.speed)
-        elif args.cmd=="stop": stop_motor()
-        elif args.cmd=="read_gyro": print("Gyro:", read_gyroscope())
-        elif args.cmd=="read_accel": print("Accel:", read_accelerometer())
-        elif args.cmd=="orientation": orientation_loop()
-        elif args.cmd=="env_cal": environmental_calibration_mode()
-        elif args.cmd=="manual": manual_orientation_mode()
-        elif args.cmd=="auto": automatic_orientation_mode(math.radians(args.angle))
-        elif args.cmd=="detumble": detumbling_mode()
-        elif args.cmd=="live": live_sensor_mode()
-        elif args.cmd == "scan_mux":
+        if args.cmd=="interactive":
+            interactive_mode()
+        elif args.cmd=="motor_forward":
+            motor_forward(args.speed)
+        elif args.cmd=="motor_backward":
+            motor_backward(args.speed)
+        elif args.cmd=="stop":
+            stop_motor()
+        elif args.cmd=="read_gyro":
+            print("Gyro:", read_gyroscope())
+        elif args.cmd=="read_accel":
+            print("Accel:", read_accelerometer())
+        elif args.cmd=="orientation":
+            orientation_loop()
+        elif args.cmd=="env_cal":
+            environmental_calibration_mode()
+        elif args.cmd=="manual":
+            manual_orientation_mode()
+        elif args.cmd=="auto":
+            automatic_orientation_mode(math.radians(args.angle))
+        elif args.cmd=="detumble":
+            detumbling_mode()
+        elif args.cmd=="live":
+            live_sensor_mode()
+        elif args.cmd=="scan_mux":
             scan_tca_channels()
     finally:
         stop_motor()
