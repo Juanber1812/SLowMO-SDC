@@ -13,10 +13,12 @@ import adafruit_veml7700
 import numpy as np
 
 # ── PIN & I²C SETUP ─────────────────────────────────────────────
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)          # disable “already in use” warnings
+
 PWM_PIN, DIR_PIN, SLEEP_PIN = 13, 19, 26
 RPM_PIN = 17
 
-GPIO.setmode(GPIO.BCM)
 GPIO.setup([PWM_PIN, DIR_PIN, SLEEP_PIN], GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(RPM_PIN, GPIO.IN)
 GPIO.output(SLEEP_PIN, GPIO.HIGH)
@@ -100,9 +102,25 @@ def emergency_stop_handler(channel):
     GPIO.cleanup()
     sys.exit(1)
 
+# ensure pin is input with pull-up
 GPIO.setup(EMERGENCY_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.add_event_detect(EMERGENCY_PIN, GPIO.FALLING,
-                      callback=emergency_stop_handler, bouncetime=200)
+
+# remove any old detector (ignore if none)
+try:
+    GPIO.remove_event_detect(EMERGENCY_PIN)
+except RuntimeError:
+    pass
+
+# add the falling-edge detector, but don’t crash if it’s already there
+try:
+    GPIO.add_event_detect(
+        EMERGENCY_PIN,
+        GPIO.FALLING,
+        callback=emergency_stop_handler,
+        bouncetime=200
+    )
+except RuntimeError:
+    print("Warning: emergency_stop edge detect already configured")
 
 # ── COMPLEMENTARY FILTER ────────────────────────────────────────
 class ComplementaryFilter:
