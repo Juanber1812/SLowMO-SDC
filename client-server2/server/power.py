@@ -84,6 +84,7 @@ def print_sensor_data_loop():
     try:
         while True:
             try:
+                input("Press Enter to read sensor data (Ctrl+C to exit)...")
                 power_data = get_power_values(ina228)
                 if power_data:
                     print(f"Power Data: {power_data}")
@@ -96,7 +97,6 @@ def print_sensor_data_loop():
                 break
             except Exception as e:
                 print(f"Error in main loop: {e}")
-            time.sleep(1)
     finally:
         if data_rows:
             with open(filename, 'w', newline='') as csvfile:
