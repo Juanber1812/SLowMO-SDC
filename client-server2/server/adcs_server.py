@@ -27,11 +27,15 @@ pwm.start(0)
 i2c = busio.I2C(board.SCL, board.SDA)
 tca = TCA9548A(i2c)
 
-lux_sensors = [
-  adafruit_veml7700.VEML7700(tca[0]),
-  adafruit_veml7700.VEML7700(tca[1]),
-  adafruit_veml7700.VEML7700(tca[2]),
-]
+try:
+    lux_sensors = [
+        adafruit_veml7700.VEML7700(tca[0]),
+        adafruit_veml7700.VEML7700(tca[1]),
+        adafruit_veml7700.VEML7700(tca[2]),
+    ]
+except Exception as e:
+    print("Warning: could not init lux sensors:", e)
+    lux_sensors = []
 
 bus = smbus.SMBus(1)
 Device_Address = 0x68
