@@ -7,7 +7,9 @@ import argparse
 
 import RPi.GPIO as GPIO
 import board, busio, smbus
-import adafruit_tca9548a, adafruit_veml7700
+import adafruit_tca9548a
+from adafruit_tca9548a import TCA9548A
+import adafruit_veml7700
 import numpy as np
 
 # ── PIN & I²C SETUP ─────────────────────────────────────────────
@@ -23,8 +25,13 @@ pwm = GPIO.PWM(PWM_PIN, 1000)
 pwm.start(0)
 
 i2c = busio.I2C(board.SCL, board.SDA)
-tca = adafruit_tca9548a.TCA9548A(i2c)
-lux_sensors = [adafruit_veml7700.VEML7700(tca[i]) for i in range(3)]
+tca = TCA9548A(i2c)
+
+lux_sensors = [
+  adafruit_veml7700.VEML7700(tca[0]),
+  adafruit_veml7700.VEML7700(tca[1]),
+  adafruit_veml7700.VEML7700(tca[2]),
+]
 
 bus = smbus.SMBus(1)
 Device_Address = 0x68
