@@ -18,11 +18,10 @@ def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
 
 
-# server2.py
 def start_background_tasks():
-    socketio.start_background_task(camera.start_stream)
-    socketio.start_background_task(sensors.start_sensors)
-    socketio.start_background_task(lidar.start_lidar)
+    threading.Thread(target=camera.start_stream, daemon=True).start()
+    threading.Thread(target=sensors.start_sensors, daemon=True).start()
+    threading.Thread(target=lidar.start_lidar, daemon=True).start()
 
 @socketio.on('connect')
 def handle_connect():
