@@ -19,9 +19,9 @@ def print_server_status(status):
 
 
 def start_background_tasks():
-    threading.Thread(target=camera.start_stream, daemon=True).start()
-    threading.Thread(target=sensors.start_sensors, daemon=True).start()
-    threading.Thread(target=lidar.start_lidar, daemon=True).start()
+    threading.Thread(target=camera.start_stream)
+    threading.Thread(target=sensors.start_sensors)
+    threading.Thread(target=lidar.start_lidar)
 
 @socketio.on('connect')
 def handle_connect():
