@@ -29,15 +29,19 @@ pwm.start(0)
 i2c = busio.I2C(board.SCL, board.SDA)
 tca = TCA9548A(i2c)
 
-try:
-    lux_sensors = [
-        adafruit_veml7700.VEML7700(tca[0]),
-        adafruit_veml7700.VEML7700(tca[1]),
-        adafruit_veml7700.VEML7700(tca[2]),
-    ]
-except Exception as e:
-    print("Warning: could not init lux sensors:", e)
-    lux_sensors = []
+# ── DYNAMIC LUX SENSOR INIT ─────────────────────────────────────
+lux_sensors = []
+for ch in (0, 1, 2):
+    try:
+        sensor = adafruit_veml7700.VEML7700(tca[ch])
+        lux_sensors.append(sensor)
+        print(f"Detected lux sensor on TCA channel {ch}")
+    except Exception as e:
+        print(f"No lux sensor at channel {ch}: {e}")
+
+def read_lux_sensors():
+    # return a list of whatever sensors we have
+    return [s.light for s in lux_sensors]
 
 bus = smbus.SMBus(1)
 Device_Address = 0x68
@@ -84,9 +88,6 @@ def read_accelerometer():
         read_raw_data(ACCEL_YOUT_H)/16384.0,
         read_raw_data(ACCEL_ZOUT_H)/16384.0,
     )
-
-def read_lux_sensors():
-    return [s.light for s in lux_sensors]
 
 MPU_Init()
 
@@ -183,12 +184,14 @@ def environmental_calibration_mode():
         orientation = comp_filter.update(math.radians(gz), math.atan2(ay,az), dt)
         lux = read_lux_sensors()
         history.append(lux)
-        if len(history)>=3:
-            p,c,n = history[-3], history[-2], history[-1]
-            for i in range(3):
-                if c[i]>p[i] and c[i]>n[i]:
-                    print(f"→ Sensor {i} peak {c[i]:.1f} lux")
-                    peak = True; break
+        # detect local max on any channel
+        if len(history) >= 3:
+            p, c, n = history[-3], history[-2], history[-1]
+            for i in range(len(lux_sensors)):
+                if c[i] > p[i] and c[i] > n[i]:
+                    print(f"→ Sensor #{i} (ch {i}) peak {c[i]:.1f} lux")
+                    peak = True
+                    break
         time.sleep(0.01)
     zero_off = comp_filter.angle
     print(f"Captured zero offset {math.degrees(zero_off):.2f}°")
@@ -238,9 +241,10 @@ def live_sensor_mode():
             gx,gy,gz = read_gyroscope()
             ax,ay,az = read_accelerometer()
             lux = read_lux_sensors()
+            lux_str = ", ".join(f"{v:.1f}" for v in lux)
             line = (f"Gyro({gx:.1f},{gy:.1f},{gz:.1f})  "
                     f"Accel({ax:.2f},{ay:.2f},{az:.2f})  "
-                    f"Lux[{lux[0]:.1f},{lux[1]:.1f},{lux[2]:.1f}]")
+                    f"Lux[{lux_str}]")
             print(line, end='\r', flush=True)
             time.sleep(0.5)
     except KeyboardInterrupt:
