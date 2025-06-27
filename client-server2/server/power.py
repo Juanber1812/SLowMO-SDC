@@ -71,8 +71,10 @@ def get_power_values(ina228):
 
         try:
             battery_percentage = get_battery_percentage(ina228.bus_voltage)
-            if battery_percentage is not None:
+            if battery_percentage is not None and battery_percentage >= 0 and battery_percentage <= 100:
                 print(f"Battery Percentage: {battery_percentage}%")
+            else:
+                print(f"Battery percentage is out of range (0-100%) - received: {battery_percentage}")
         except Exception as e:
             print(f"Error calculating battery percentage: {e}")
 
