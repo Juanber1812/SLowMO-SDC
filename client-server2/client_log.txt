@@ -108,3 +108,35 @@
 2025-06-26 14:10:04,628 - INFO - [INFO] Successfully connected to server
 2025-06-26 14:10:14,351 - INFO - Requesting LIDAR streaming start
 2025-06-26 14:10:23,462 - INFO - Disconnected from server: client disconnect
+2025-06-27 15:01:27,784 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-27 15:01:30,528 - INFO - Attempting to reconnect to http://192.168.39.89:5000...
+2025-06-27 15:01:32,822 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.39.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751032887.7963045 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000186F22DE7B0>, 'Connection to 192.168.39.89 timed out. (connect timeout=5)'))
+2025-06-27 15:01:35,538 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.39.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751032890.5302978 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000186F2335090>, 'Connection to 192.168.39.89 timed out. (connect timeout=5)'))
+2025-06-27 15:01:48,988 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-27 15:01:54,576 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-27 15:01:59,590 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.39.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751032914.5780578 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001F1F0CCA7B0>, 'Connection to 192.168.39.89 timed out. (connect timeout=5)'))
+2025-06-27 15:02:00,700 - INFO - Attempting to reconnect to http://192.168.39.89:5000...
+2025-06-27 15:02:05,714 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.39.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751032920.7040992 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001F1F0D25A90>, 'Connection to 192.168.39.89 timed out. (connect timeout=5)'))
+2025-06-27 15:29:29,163 - INFO - Attempting to reconnect to http://192.168.39.89:5000...
+2025-06-27 15:29:29,457 - INFO - Connected to server
+2025-06-27 15:29:29,459 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:29:38,233 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:29:38,235 - INFO - Stream paused for config application.
+2025-06-27 15:29:38,739 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-27 15:29:38,744 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-27 15:29:38,947 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-27 15:29:44,901 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-27 15:29:45,943 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:29:46,061 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:29:46,335 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:29:46,425 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:29:46,529 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:29:46,629 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:29:46,724 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:29:46,807 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:30:44,208 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:30:44,211 - INFO - Stream paused for config application.
+2025-06-27 15:30:44,714 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-27 15:30:44,719 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-27 15:30:44,923 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-27 15:30:51,498 - INFO - Disconnected from server: transport error

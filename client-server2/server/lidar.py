@@ -29,7 +29,6 @@ def read_distance(bus):
         low = bus.read_byte_data(LIDAR_ADDR, DISTANCE_LOW)
         return (high << 8) + low
     except Exception as e:
-        print(f"[ERROR] LIDAR read: {e}")
         return None
 
 def start_lidar():

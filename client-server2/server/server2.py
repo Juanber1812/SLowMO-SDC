@@ -83,23 +83,23 @@ def handle_adcs_command(data):
         
         elif command == "manual_clockwise_start":
             # Start clockwise motor action (e.g., acceleration).
-            from adcs_functions import accelerate_motor
-            accelerate_motor()  # Adjust with parameters if needed.
+            from motor_test import rotate_clockwise_dc
+            rotate_clockwise_dc()  # Adjust with parameters if needed.
         
         elif command == "manual_clockwise_stop":
             # Stop the clockwise action. Replace with an appropriate stop function.
-            from adcs_functions import stop_motor
-            stop_motor()
+            from motor_test import stop_motor_dc
+            stop_motor_dc()
         
         elif command == "manual_anticlockwise_start":
             # Start anticlockwise action (e.g., deceleration or reverse logic).
-            from adcs_functions import deccelerate_motor
-            deccelerate_motor()  # Adjust with parameters if needed.
+            from motor_test import rotate_counterclockwise_dc
+            rotate_counterclockwise_dc()  # Adjust with parameters if needed.
         
         elif command == "manual_anticlockwise_stop":
             # Stop anticlockwise action, using a stop routine.
-            from adcs_functions import stop_motor
-            stop_motor()
+            from motor_test import stop_motor_dc
+            stop_motor_dc()
         
         elif command == "set_target_orientation":
             target = data.get("value")
