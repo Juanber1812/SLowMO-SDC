@@ -668,6 +668,7 @@ class MainWindow(QWidget):
         # Adjust sizing as needed. For example, to make it expand:
         self.adcs_control_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
+        self.adcs_control_widget.adcs_command_sent.connect(self.handle_adcs_command)
         row3.addWidget(self.adcs_control_widget)
         parent_layout.addLayout(row3)
 
@@ -1049,6 +1050,15 @@ class MainWindow(QWidget):
                         )
             except Exception as e:
                 logging.error(f"Failed to process LIDAR status: {e}")
+
+    def handle_adcs_command(self, mode_name, command_name, value):
+        data = {
+            "mode":    mode_name,
+            "command": command_name,
+            "value":   value
+        }
+        sio.emit("adcs_command", data)
+        print(f"[CLIENT] ADCS command sent: {data}")
 
     def start_lidar_streaming(self):
         """Start LIDAR data streaming from server"""
