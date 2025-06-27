@@ -24,6 +24,12 @@ def init_sensor():
         raise
     return ina228
 
+# Hi Juan, this is a placeholder until next week when I will add the battery percentage retrieval logic.
+def get_battery_percentage(voltage=7.4):
+    # Placeholder function for battery percentage
+    # This should be replaced with actual battery percentage retrieval logic
+    return 0
+
 def get_power_values(ina228):
     try:
         try:
@@ -63,18 +69,26 @@ def get_power_values(ina228):
         except Exception as e:
             print(f"Error reading device ID: {e}")
 
+        try:
+            battery_percentage = get_battery_percentage(ina228.bus_voltage)
+            if battery_percentage is not None:
+                print(f"Battery Percentage: {battery_percentage}%")
+        except Exception as e:
+            print(f"Error calculating battery percentage: {e}")
+
         return {
             "current": ina228.current,
             "voltage": ina228.bus_voltage,
             "power": ina228.power,
             "energy": ina228.energy,
             "temperature": ina228.die_temperature,
+            "battery_percentage": battery_percentage,  # Placeholder for battery percentage
         }
     except Exception as e:
         print(f"Error reading sensor data: {e}")
         return None
 
-# Print until the script is stopped
+# Print until the script is stopped - FOR TESTING ONLY
 def print_sensor_data_loop():
     ina228 = init_sensor()
     data_rows = []
