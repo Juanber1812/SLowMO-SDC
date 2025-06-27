@@ -108,3 +108,198 @@
 2025-06-26 14:10:04,628 - INFO - [INFO] Successfully connected to server
 2025-06-26 14:10:14,351 - INFO - Requesting LIDAR streaming start
 2025-06-26 14:10:23,462 - INFO - Disconnected from server: client disconnect
+2025-06-27 15:01:27,784 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-27 15:01:30,528 - INFO - Attempting to reconnect to http://192.168.39.89:5000...
+2025-06-27 15:01:32,822 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.39.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751032887.7963045 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000186F22DE7B0>, 'Connection to 192.168.39.89 timed out. (connect timeout=5)'))
+2025-06-27 15:01:35,538 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.39.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751032890.5302978 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000186F2335090>, 'Connection to 192.168.39.89 timed out. (connect timeout=5)'))
+2025-06-27 15:01:48,988 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-27 15:01:54,576 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-27 15:01:59,590 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.39.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751032914.5780578 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001F1F0CCA7B0>, 'Connection to 192.168.39.89 timed out. (connect timeout=5)'))
+2025-06-27 15:02:00,700 - INFO - Attempting to reconnect to http://192.168.39.89:5000...
+2025-06-27 15:02:05,714 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.39.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751032920.7040992 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001F1F0D25A90>, 'Connection to 192.168.39.89 timed out. (connect timeout=5)'))
+2025-06-27 15:29:29,163 - INFO - Attempting to reconnect to http://192.168.39.89:5000...
+2025-06-27 15:29:29,457 - INFO - Connected to server
+2025-06-27 15:29:29,459 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:29:38,233 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:29:38,235 - INFO - Stream paused for config application.
+2025-06-27 15:29:38,739 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-27 15:29:38,744 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-27 15:29:38,947 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-27 15:29:44,901 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-27 15:29:45,943 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:29:46,061 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:29:46,335 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:29:46,425 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:29:46,529 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:29:46,629 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:29:46,724 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:29:46,807 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:30:44,208 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:30:44,211 - INFO - Stream paused for config application.
+2025-06-27 15:30:44,714 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-27 15:30:44,719 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-27 15:30:44,923 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-27 15:30:51,498 - INFO - Disconnected from server: transport error
+2025-06-27 15:31:24,444 - ERROR - Error during disconnect phase of reconnect: / is not a connected namespace.
+2025-06-27 15:31:24,446 - INFO - Attempting to reconnect to http://192.168.39.89:5000...
+2025-06-27 15:31:24,448 - ERROR - Reconnect failed with an unexpected error: Client is not in a disconnected state
+Traceback (most recent call last):
+  File "c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\client3.py", line 1632, in reconnect_socket
+    sio.connect(SERVER_URL, wait_timeout=5)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\socketio\client.py", line 147, in connect
+    self.eio.connect(real_url, headers=real_headers,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     transports=transports,
+                     ^^^^^^^^^^^^^^^^^^^^^^
+                     engineio_path=socketio_path)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\juanb\AppData\Local\Programs\Python\Python313\Lib\site-packages\engineio\client.py", line 84, in connect
+    raise ValueError('Client is not in a disconnected state')
+ValueError: Client is not in a disconnected state
+2025-06-27 15:31:24,557 - INFO - Connected to server
+2025-06-27 15:31:24,559 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:31:26,889 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:31:27,393 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-27 15:31:27,399 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-27 15:31:31,616 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:31:31,618 - INFO - Stream paused for config application.
+2025-06-27 15:31:32,120 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-27 15:31:32,125 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-27 15:31:32,352 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-27 15:31:49,716 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:31:50,235 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:32:07,902 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:32:08,095 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:32:08,326 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:32:08,471 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:32:08,613 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:32:08,750 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:32:09,978 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 15:32:11,137 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 15:32:11,547 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 15:32:12,171 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 15:32:12,365 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 15:32:12,704 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 15:55:38,129 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-27 15:55:38,300 - INFO - Connected to server
+2025-06-27 15:55:38,302 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 15:55:38,303 - INFO - [INFO] Successfully connected to server
+2025-06-27 15:55:42,388 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-27 15:55:43,617 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:55:43,728 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:55:44,639 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:55:45,236 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:55:47,902 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:55:48,375 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:55:49,838 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 15:55:50,598 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 15:55:50,905 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 15:55:51,311 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 15:55:52,939 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-27 15:55:53,884 - INFO - [ADCSSection] Displaying details for: Detumbling
+2025-06-27 15:55:56,749 - INFO - [ADCSSection] Action for mode 'Detumbling': Command 'detumbling', Value: None
+2025-06-27 15:55:57,290 - INFO - [ADCSSection] Action for mode 'Detumbling': Command 'detumbling', Value: None
+2025-06-27 15:56:00,515 - INFO - [ADCSSection] Action for mode 'Detumbling': Command 'detumbling', Value: None
+2025-06-27 15:56:03,723 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-27 15:56:04,664 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-27 15:56:05,297 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:56:05,410 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:56:05,473 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:56:05,575 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:56:05,626 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:56:05,726 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:59:09,574 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:59:09,774 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 15:59:10,081 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 15:59:10,233 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:00:35,809 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:00:36,027 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:00:41,946 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:00:42,151 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:00:46,458 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:00:53,044 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:01:00,568 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:01:06,387 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:01:10,594 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:01:13,223 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:01:17,897 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:01:22,572 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:01:31,015 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:01:33,077 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:01:34,899 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:01:39,857 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:01:40,650 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:01:44,794 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:01:45,118 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:01:49,002 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:01:52,047 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:02:03,150 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:04:17,328 - INFO - Disconnected from server: client disconnect
+2025-06-27 16:08:24,894 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-27 16:08:25,115 - INFO - Connected to server
+2025-06-27 16:08:25,117 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 16:08:25,119 - INFO - [INFO] Successfully connected to server
+2025-06-27 16:08:26,804 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-27 16:08:28,263 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:08:28,346 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:08:28,420 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:08:28,521 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:08:28,607 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:08:28,699 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:08:57,860 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:08:58,078 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:09:01,760 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:09:06,925 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:09:09,365 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:09:11,914 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:09:14,483 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:09:14,867 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:09:24,383 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:09:30,056 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:09:30,746 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:09:40,942 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:09:43,737 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:09:46,858 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:09:49,084 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:09:52,860 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:09:59,224 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:10:02,591 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:10:03,887 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:10:09,833 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:11:04,142 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:11:07,742 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:11:09,587 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:11:13,293 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:11:13,751 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:11:17,502 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:11:18,808 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:11:20,381 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:11:21,615 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:11:26,367 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:11:27,827 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:11:29,184 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:11:52,571 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:11:52,844 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:11:53,663 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:11:59,950 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:12:04,045 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:12:09,848 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:12:32,848 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:12:36,249 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:12:51,632 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-27 16:12:53,495 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-27 16:12:56,958 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:13:01,708 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:13:02,791 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-27 16:13:04,953 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-27 16:13:21,996 - INFO - Disconnected from server: client disconnect
+2025-06-27 16:26:20,131 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-27 16:26:20,416 - INFO - Connected to server
+2025-06-27 16:26:20,417 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 16:26:20,419 - INFO - [INFO] Successfully connected to server
+2025-06-27 16:27:00,358 - INFO - Disconnected from server: client disconnect
+2025-06-27 16:29:16,506 - INFO - [INFO] Attempting to connect to http://192.168.39.89:5000
+2025-06-27 16:29:16,713 - INFO - Connected to server
+2025-06-27 16:29:16,715 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-27 16:29:16,716 - INFO - [INFO] Successfully connected to server

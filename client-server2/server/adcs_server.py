@@ -29,15 +29,19 @@ pwm.start(0)
 i2c = busio.I2C(board.SCL, board.SDA)
 tca = TCA9548A(i2c)
 
-try:
-    lux_sensors = [
-        adafruit_veml7700.VEML7700(tca[0]),
-        adafruit_veml7700.VEML7700(tca[1]),
-        adafruit_veml7700.VEML7700(tca[2]),
-    ]
-except Exception as e:
-    print("Warning: could not init lux sensors:", e)
-    lux_sensors = []
+# ── DYNAMIC LUX SENSOR INIT ─────────────────────────────────────
+lux_sensors = []
+for ch in (0, 1, 2):
+    try:
+        sensor = adafruit_veml7700.VEML7700(tca[ch])
+        lux_sensors.append(sensor)
+        print(f"Detected lux sensor on TCA channel {ch}")
+    except Exception as e:
+        print(f"No lux sensor at channel {ch}: {e}")
+
+def read_lux_sensors():
+    # return a list of whatever sensors we have
+    return [s.light for s in lux_sensors]
 
 bus = smbus.SMBus(1)
 Device_Address = 0x68
@@ -84,9 +88,6 @@ def read_accelerometer():
         read_raw_data(ACCEL_YOUT_H)/16384.0,
         read_raw_data(ACCEL_ZOUT_H)/16384.0,
     )
-
-def read_lux_sensors():
-    return [s.light for s in lux_sensors]
 
 MPU_Init()
 
@@ -183,12 +184,14 @@ def environmental_calibration_mode():
         orientation = comp_filter.update(math.radians(gz), math.atan2(ay,az), dt)
         lux = read_lux_sensors()
         history.append(lux)
-        if len(history)>=3:
-            p,c,n = history[-3], history[-2], history[-1]
-            for i in range(3):
-                if c[i]>p[i] and c[i]>n[i]:
-                    print(f"→ Sensor {i} peak {c[i]:.1f} lux")
-                    peak = True; break
+        # detect local max on any channel
+        if len(history) >= 3:
+            p, c, n = history[-3], history[-2], history[-1]
+            for i in range(len(lux_sensors)):
+                if c[i] > p[i] and c[i] > n[i]:
+                    print(f"→ Sensor #{i} (ch {i}) peak {c[i]:.1f} lux")
+                    peak = True
+                    break
         time.sleep(0.01)
     zero_off = comp_filter.angle
     print(f"Captured zero offset {math.degrees(zero_off):.2f}°")
@@ -238,9 +241,10 @@ def live_sensor_mode():
             gx,gy,gz = read_gyroscope()
             ax,ay,az = read_accelerometer()
             lux = read_lux_sensors()
+            lux_str = ", ".join(f"{v:.1f}" for v in lux)
             line = (f"Gyro({gx:.1f},{gy:.1f},{gz:.1f})  "
                     f"Accel({ax:.2f},{ay:.2f},{az:.2f})  "
-                    f"Lux[{lux[0]:.1f},{lux[1]:.1f},{lux[2]:.1f}]")
+                    f"Lux[{lux_str}]")
             print(line, end='\r', flush=True)
             time.sleep(0.5)
     except KeyboardInterrupt:
@@ -267,31 +271,91 @@ def scan_tca_channels():
     # turn off all channels
     bus.write_byte_data(MUX_ADDR, 0x00, 0x00)
 
+def interactive_mode():
+    """REPL to call all ADCS commands on the fly."""
+    print("\n=== INTERACTIVE MODE ===")
+    print(" f <speed>    - forward")
+    print(" r <speed>    - reverse")
+    print(" s            - stop motor")
+    print(" env_cal      - environmental calibration")
+    print(" auto <angle> - automatic orientation (deg)")
+    print(" detumble     - detumbling_mode()")
+    print(" scan_mux     - scan I2C multiplexer")
+    print(" orient       - orientation_loop()")
+    print(" live         - live_sensor_mode()")
+    print(" quit/q       - exit\n")
+    while True:
+        parts = input("CMD> ").strip().split()
+        if not parts:
+            continue
+        cmd = parts[0].lower()
+        arg = parts[1] if len(parts)>1 else None
+
+        if cmd=='f' and arg:
+            motor_forward(int(arg))
+        elif cmd=='r' and arg:
+            motor_backward(int(arg))
+        elif cmd=='s':
+            stop_motor()
+        elif cmd=='env_cal':
+            environmental_calibration_mode()
+        elif cmd=='auto' and arg:
+            automatic_orientation_mode(math.radians(float(arg)))
+        elif cmd=='detumble':
+            detumbling_mode()
+        elif cmd=='scan_mux':
+            scan_tca_channels()
+        elif cmd=='orient':
+            orientation_loop()
+        elif cmd=='live':
+            live_sensor_mode()
+        elif cmd in ('q','quit','exit'):
+            break
+        else:
+            print("Unknown command, try again.")
+
+    print("Exiting interactive mode.\n")
+
+
 # ── CLI DISPATCH ────────────────────────────────────────────────
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Test ADCS")
-    parser.add_argument("cmd", nargs="?", default="live",
-                        choices=["motor_forward","motor_backward","stop",
-                                 "read_gyro","read_accel",
-                                 "orientation","env_cal","manual",
-                                 "auto","detumble","live", "scan_mux"])
+    parser.add_argument("cmd", nargs="?", default="interactive",
+                        choices=[
+                          "interactive","motor_forward","motor_backward","stop",
+                          "read_gyro","read_accel","orientation","env_cal",
+                          "manual","auto","detumble","live","scan_mux"
+                        ])
     parser.add_argument("-s","--speed", type=int, default=50)
     parser.add_argument("-a","--angle", type=float, default=0.0)
     args = parser.parse_args()
 
     try:
-        if args.cmd=="motor_forward": motor_forward(args.speed)
-        elif args.cmd=="motor_backward": motor_backward(args.speed)
-        elif args.cmd=="stop": stop_motor()
-        elif args.cmd=="read_gyro": print("Gyro:", read_gyroscope())
-        elif args.cmd=="read_accel": print("Accel:", read_accelerometer())
-        elif args.cmd=="orientation": orientation_loop()
-        elif args.cmd=="env_cal": environmental_calibration_mode()
-        elif args.cmd=="manual": manual_orientation_mode()
-        elif args.cmd=="auto": automatic_orientation_mode(math.radians(args.angle))
-        elif args.cmd=="detumble": detumbling_mode()
-        elif args.cmd=="live": live_sensor_mode()
-        elif args.cmd == "scan_mux":
+        if args.cmd=="interactive":
+            interactive_mode()
+        elif args.cmd=="motor_forward":
+            motor_forward(args.speed)
+        elif args.cmd=="motor_backward":
+            motor_backward(args.speed)
+        elif args.cmd=="stop":
+            stop_motor()
+        elif args.cmd=="read_gyro":
+            print("Gyro:", read_gyroscope())
+        elif args.cmd=="read_accel":
+            print("Accel:", read_accelerometer())
+        elif args.cmd=="orientation":
+            orientation_loop()
+        elif args.cmd=="env_cal":
+            environmental_calibration_mode()
+        elif args.cmd=="manual":
+            manual_orientation_mode()
+        elif args.cmd=="auto":
+            automatic_orientation_mode(math.radians(args.angle))
+        elif args.cmd=="detumble":
+            detumbling_mode()
+        elif args.cmd=="live":
+            live_sensor_mode()
+        elif args.cmd=="scan_mux":
             scan_tca_channels()
     finally:
         stop_motor()

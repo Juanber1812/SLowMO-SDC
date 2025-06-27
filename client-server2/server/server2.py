@@ -23,6 +23,21 @@ def start_background_tasks():
     threading.Thread(target=sensors.start_sensors, daemon=True).start()
     threading.Thread(target=lidar.start_lidar, daemon=True).start()
 
+    # Tachometer task
+    from tachometer import run_tachometer
+
+    # helper that prints & pushes via SocketIO
+    def report_rpm(rpm):
+        print(f"[TACHO] RPM: {rpm:.1f}")                             # <-- print
+        socketio.emit("tachometer_data", {"rpm": rpm}, broadcast=True)  # <-- emit
+
+    # launch the tachometer loop in its own thread
+    threading.Thread(
+        target=lambda: run_tachometer(report_rpm),
+        daemon=True
+    ).start()
+
+
 @socketio.on('connect')
 def handle_connect():
     print(f"[INFO] Client connected: {request.sid}")
@@ -83,23 +98,23 @@ def handle_adcs_command(data):
         
         elif command == "manual_clockwise_start":
             # Start clockwise motor action (e.g., acceleration).
-            from adcs_functions import accelerate_motor
-            accelerate_motor()  # Adjust with parameters if needed.
+            from motor_test import rotate_clockwise_dc
+            rotate_clockwise_dc()  # Adjust with parameters if needed.
         
         elif command == "manual_clockwise_stop":
             # Stop the clockwise action. Replace with an appropriate stop function.
-            from adcs_functions import stop_motor
-            stop_motor()
+            from motor_test import stop_motor_dc
+            stop_motor_dc()
         
         elif command == "manual_anticlockwise_start":
             # Start anticlockwise action (e.g., deceleration or reverse logic).
-            from adcs_functions import deccelerate_motor
-            deccelerate_motor()  # Adjust with parameters if needed.
+            from motor_test import rotate_counterclockwise_dc
+            rotate_counterclockwise_dc()  # Adjust with parameters if needed.
         
         elif command == "manual_anticlockwise_stop":
             # Stop anticlockwise action, using a stop routine.
-            from adcs_functions import stop_motor
-            stop_motor()
+            from motor_test import stop_motor_dc
+            stop_motor_dc()
         
         elif command == "set_target_orientation":
             target = data.get("value")
@@ -242,7 +257,6 @@ def handle_download_image(data):
             "success": False,
             "error": str(e)
         })
-
 
 def set_camera_state(new_state):
     global camera_state

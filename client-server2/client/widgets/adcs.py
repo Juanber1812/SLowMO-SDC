@@ -184,69 +184,82 @@ class ADCSSection(QGroupBox):
         
         # Create independent buttons/signals based on the current mode
         if mode_name == "Environmental Calibration":
-            btn = QPushButton("Environmental Calibration")
-            btn.setStyleSheet(ADCS_BUTTON_STYLE)
-            btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-            btn.clicked.connect(lambda: self._handle_detail_action_clicked(mode_name, "environmental", None))
-            self.detail_button_row_layout.addWidget(btn)
-        
+            self.env_cal_btn = QPushButton("Env Cal")
+            self.env_cal_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+            self.env_cal_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
+            self.env_cal_btn.clicked.connect(
+                lambda: self._handle_detail_action_clicked(
+                    mode_name, "environmental", None
+                )
+            )
+            self.detail_button_row_layout.addWidget(self.env_cal_btn)
+
         elif mode_name == "Manual Orientation":
-            # Create 'Clockwise' and 'Anticlockwise' buttons with press/release events
-            for name in ["Clockwise", "Anticlockwise"]:
-                btn = QPushButton(name)
-                btn.setStyleSheet(ADCS_BUTTON_STYLE)
-                btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-                if name == "Clockwise":
-                    btn.pressed.connect(lambda m=mode_name, cmd_start="manual_clockwise_start": self._handle_detail_action_clicked(m, cmd_start, None))
-                    btn.released.connect(lambda m=mode_name, cmd_stop="manual_clockwise_stop": self._handle_detail_action_clicked(m, cmd_stop, None))
-                else:
-                    btn.pressed.connect(lambda m=mode_name, cmd_start="manual_anticlockwise_start": self._handle_detail_action_clicked(m, cmd_start, None))
-                    btn.released.connect(lambda m=mode_name, cmd_stop="manual_anticlockwise_stop": self._handle_detail_action_clicked(m, cmd_stop, None))
-                self.detail_button_row_layout.addWidget(btn)
-                self.adcs_detail_action_buttons.append(btn)
-        
+            # Clockwise button
+            self.cw_start_btn = QPushButton("Clockwise")
+            self.cw_start_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+            self.cw_start_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
+            self.cw_start_btn.pressed.connect(
+                lambda: self._handle_detail_action_clicked(
+                    mode_name, "manual_clockwise_start", None
+                )
+            )
+            self.cw_start_btn.released.connect(
+                lambda: self._handle_detail_action_clicked(
+                    mode_name, "manual_clockwise_stop", None
+                )
+            )
+            self.detail_button_row_layout.addWidget(self.cw_start_btn)
+
+            # Anticlockwise button
+            self.ccw_start_btn = QPushButton("Anticlockwise")
+            self.ccw_start_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+            self.ccw_start_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
+            self.ccw_start_btn.pressed.connect(
+                lambda: self._handle_detail_action_clicked(
+                    mode_name, "manual_anticlockwise_start", None
+                )
+            )
+            self.ccw_start_btn.released.connect(
+                lambda: self._handle_detail_action_clicked(
+                    mode_name, "manual_anticlockwise_stop", None
+                )
+            )
+            self.detail_button_row_layout.addWidget(self.ccw_start_btn)
+
         elif mode_name == "Automatic Orientation":
-            # Create container for setting a value
-            input_container = QWidget()
-            input_layout = QHBoxLayout(input_container)
-            input_layout.setContentsMargins(0, 0, 0, 0)
-            input_layout.setSpacing(5)
-            
-            value_label = QLabel("Desired Value:")
-            value_label.setStyleSheet(ADCS_LABEL_STYLE)
-            input_layout.addWidget(value_label)
-            
             self.orientation_input_field = QLineEdit()
-            self.orientation_input_field.setPlaceholderText("Enter integer")
-            self.orientation_input_field.setStyleSheet(f"""
-                QLineEdit {{
-                    color: {TEXT_COLOR};
-                    background-color: #2D2D2D;
-                    border: 1px solid {BORDER_COLOR};
-                    border-radius: {BORDER_RADIUS}px;
-                    padding: 5px;
-                    font-family: {FONT_FAMILY};
-                    font-size: {FONT_SIZE_NORMAL}pt;
-                }}
-            """)
             self.orientation_input_field.setFixedHeight(ADCS_BUTTON_HEIGHT)
-            self.orientation_input_field.returnPressed.connect(self._handle_send_automatic_orientation_value)
-            input_layout.addWidget(self.orientation_input_field)
-            
-            self.orientation_send_button = QPushButton("Send")
-            self.orientation_send_button.setStyleSheet(ADCS_BUTTON_STYLE)
-            self.orientation_send_button.setFixedHeight(ADCS_BUTTON_HEIGHT)
-            self.orientation_send_button.clicked.connect(self._handle_send_automatic_orientation_value)
-            input_layout.addWidget(self.orientation_send_button)
-            
-            self.detail_button_row_layout.addWidget(input_container)
-        
+            self.orientation_input_field.setPlaceholderText("Angle (deg)")
+            self.orientation_input_field.returnPressed.connect(
+                lambda: self._handle_detail_action_clicked(
+                    mode_name, "set_target_orientation",
+                    int(self.orientation_input_field.text() or 0)
+                )
+            )
+            self.detail_button_row_layout.addWidget(self.orientation_input_field)
+
+            self.orientation_send_btn = QPushButton("Send")
+            self.orientation_send_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+            self.orientation_send_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
+            self.orientation_send_btn.clicked.connect(
+                lambda: self._handle_detail_action_clicked(
+                    mode_name, "set_target_orientation",
+                    int(self.orientation_input_field.text() or 0)
+                )
+            )
+            self.detail_button_row_layout.addWidget(self.orientation_send_btn)
+
         elif mode_name == "Detumbling":
-            btn = QPushButton("Detumbling")
-            btn.setStyleSheet(ADCS_BUTTON_STYLE)
-            btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-            btn.clicked.connect(lambda: self._handle_detail_action_clicked(mode_name, "detumbling", None))
-            self.detail_button_row_layout.addWidget(btn)
+            self.detumble_btn = QPushButton("Detumble")
+            self.detumble_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+            self.detumble_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
+            self.detumble_btn.clicked.connect(
+                lambda: self._handle_detail_action_clicked(
+                    mode_name, "detumbling", None
+                )
+            )
+            self.detail_button_row_layout.addWidget(self.detumble_btn)
         
         # Re-add the persistent back button
         if self.back_button:
