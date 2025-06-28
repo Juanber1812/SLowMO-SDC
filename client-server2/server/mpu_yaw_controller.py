@@ -106,6 +106,7 @@ class MPU6050:
         self.angle_yaw_pure = 0.0  # Pure gyro integration for control
         
         # Initialize the sensor
+        self.sensor_ready = False
         self.initialize_sensor()
     
     def initialize_sensor(self):
@@ -131,39 +132,50 @@ class MPU6050:
             
             # Perform calibration
             self.calibrate_gyro()
+            self.sensor_ready = True
             
         except Exception as e:
-            print(f"Error initializing MPU6050: {e}")
-            sys.exit(1)
+            print(f"Warning: Could not initialize MPU6050: {e}")
+            print("The controller will continue but sensor data will not be available.")
+            print("Please check connections and try restarting the program.")
+            self.sensor_ready = False
     
     def calibrate_gyro(self, samples=2000):
         """Calibrate gyroscope by averaging readings when stationary"""
-        print("Calibrating gyroscope... Keep sensor stationary!")
-        
-        gyro_x_sum = 0
-        gyro_y_sum = 0
-        gyro_z_sum = 0
-        
-        for i in range(samples):
-            gyro_x, gyro_y, gyro_z = self.read_gyroscope_raw()
-            gyro_x_sum += gyro_x
-            gyro_y_sum += gyro_y
-            gyro_z_sum += gyro_z
+        try:
+            print("Calibrating gyroscope... Keep sensor stationary!")
             
-            if i % 200 == 0:
-                print(f"Calibration progress: {(i/samples)*100:.1f}%")
+            gyro_x_sum = 0
+            gyro_y_sum = 0
+            gyro_z_sum = 0
             
-            time.sleep(0.004)  # 250Hz sampling
-        
-        self.gyro_x_cal = gyro_x_sum / samples
-        self.gyro_y_cal = gyro_y_sum / samples
-        self.gyro_z_cal = gyro_z_sum / samples
-        
-        print(f"Gyro calibration complete!")
-        print(f"Offsets - X: {self.gyro_x_cal:.3f}, Y: {self.gyro_y_cal:.3f}, Z: {self.gyro_z_cal:.3f}")
+            for i in range(samples):
+                gyro_x, gyro_y, gyro_z = self.read_gyroscope_raw()
+                gyro_x_sum += gyro_x
+                gyro_y_sum += gyro_y
+                gyro_z_sum += gyro_z
+                
+                if i % 200 == 0:
+                    print(f"Calibration progress: {(i/samples)*100:.1f}%")
+                
+                time.sleep(0.004)  # 250Hz sampling
+            
+            self.gyro_x_cal = gyro_x_sum / samples
+            self.gyro_y_cal = gyro_y_sum / samples
+            self.gyro_z_cal = gyro_z_sum / samples
+            
+            print(f"Gyro calibration complete!")
+            print(f"Offsets - X: {self.gyro_x_cal:.3f}, Y: {self.gyro_y_cal:.3f}, Z: {self.gyro_z_cal:.3f}")
+            
+        except Exception as e:
+            print(f"Error during calibration: {e}")
+            print("Using default calibration values (0, 0, 0)")
+            self.gyro_x_cal = 0.0
+            self.gyro_y_cal = 0.0
+            self.gyro_z_cal = 0.0
     
     def read_raw_data(self, addr):
-        """Read raw 16-bit data from sensor with error handling"""
+        """Read raw 16-bit data from sensor with robust error handling"""
         try:
             high = self.bus.read_byte_data(self.device_address, addr)
             low = self.bus.read_byte_data(self.device_address, addr + 1)
@@ -177,7 +189,9 @@ class MPU6050:
                 
             return value
         except OSError as e:
-            if e.errno == 121:  # Remote I/O error
+            # Handle all I2C-related OSError exceptions (errno 5, 121, etc.)
+            self.sensor_ready = False  # Mark sensor as not ready
+            if e.errno in [5, 121]:  # Input/output error or Remote I/O error
                 print(f"\nI2C communication error: {e}")
                 print("Trying to reconnect to MPU6050...")
                 time.sleep(0.1)
@@ -187,12 +201,15 @@ class MPU6050:
                     self.bus = smbus2.SMBus(1)
                     # Wake up the MPU6050 again
                     self.bus.write_byte_data(self.device_address, self.PWR_MGMT_1, 0)
+                    self.sensor_ready = True  # Mark as ready if successful
+                    print("Reconnection successful!")
                     return 0  # Return safe value
-                except:
-                    print("Failed to reconnect. Returning safe value.")
-                    return 0
+                except Exception as reconnect_error:
+                    print(f"Failed to reconnect: {reconnect_error}")
+                    return 0  # Return safe value and continue
             else:
-                raise e
+                print(f"\nUnexpected I2C error: {e}")
+                return 0  # Return safe value for any other I2C error
     
     def read_accelerometer(self):
         """Read accelerometer data (x, y, z) in g"""
@@ -324,6 +341,27 @@ class MPU6050:
         self.angle_yaw_pure = 0.0   # Reset pure gyro integration
         print("Position calibrated - current orientation set as zero reference")
 
+    def attempt_reconnection(self):
+        """Try to reconnect to the MPU6050 sensor"""
+        try:
+            print("\nAttempting to reconnect to MPU6050...")
+            # Close and reopen the I2C bus
+            self.bus.close()
+            self.bus = smbus2.SMBus(1)
+            time.sleep(0.1)
+            
+            # Re-initialize the sensor
+            self.initialize_sensor()
+            
+            if self.sensor_ready:
+                print("MPU6050 reconnected successfully!")
+            return self.sensor_ready
+            
+        except Exception as e:
+            print(f"Reconnection failed: {e}")
+            return False
+    
+    # ...existing code...
 # ── PD BANG-BANG CONTROLLER ────────────────────────────────────────────
 class PDBangBangController:
     def __init__(self, kp=1.0, kd=0.1, deadband=2.0, min_pulse_time=0.1):
@@ -494,6 +532,7 @@ def main():
     print("  g          - Start controller (GO)")
     print("  s          - Stop controller")
     print("  z          - Zero current position")
+    print("  r          - Reconnect sensor")
     print("  1          - Target  10°")
     print("  2          - Target  20°") 
     print("  3          - Target  30°")
@@ -526,12 +565,21 @@ def main():
             command = check_single_key_input()
             if command:
                 if command == 'g':
-                    controller.start_controller()
+                    if mpu.sensor_ready:
+                        controller.start_controller()
+                    else:
+                        print("\nError: Sensor not ready! Cannot start controller.")
                 elif command == 's':
                     controller.stop_controller()
+                elif command == 'r':
+                    print("\nAttempting sensor reconnection...")
+                    mpu.attempt_reconnection()
                 elif command == 'z':
-                    mpu.calibrate_at_current_position()
-                    controller.set_target(0.0)
+                    if mpu.sensor_ready:
+                        mpu.calibrate_at_current_position()
+                        controller.set_target(0.0)
+                    else:
+                        print("\nError: Sensor not ready! Cannot zero position.")
                 elif command == '1':
                     controller.set_target(10.0)
                 elif command == '2':
@@ -566,6 +614,11 @@ def main():
             gyro_x, gyro_y, gyro_z = mpu.read_gyroscope()
             gyro_rate = gyro_z  # Yaw rate
             
+            # Auto-stop controller if sensor becomes unavailable
+            if not mpu.sensor_ready and controller.controller_enabled:
+                print("\nSensor lost! Stopping controller for safety.")
+                controller.stop_controller()
+            
             # Calculate time step
             current_time = time.time()
             dt = current_time - last_time
@@ -588,6 +641,7 @@ def main():
             # Display status every 10 loops (~10Hz)
             if loop_count % 10 == 0:
                 log_status = " [LOG]" if controller.enable_logging else ""
+                sensor_status = " [SENSOR OK]" if mpu.sensor_ready else " [SENSOR ERR]"
                 if controller.input_mode:
                     ctrl_status = " [PAUSE]"
                 elif controller.controller_enabled:
@@ -600,7 +654,7 @@ def main():
                     f"Error: {error:+6.1f}° | "
                     f"Rate: {gyro_rate:+5.1f}°/s | "
                     f"PD: {pd_output:+6.2f} | "
-                    f"Motor: {motor_cmd:>4s}{ctrl_status}{log_status}"
+                    f"Motor: {motor_cmd:>4s}{ctrl_status}{sensor_status}{log_status}"
                 )
                 print(status, end='', flush=True)
             
