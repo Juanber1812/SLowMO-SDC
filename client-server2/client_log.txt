@@ -648,3 +648,29 @@ ValueError: Client is not in a disconnected state
 2025-06-28 09:53:01,472 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
 2025-06-28 09:53:01,548 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
 2025-06-28 09:53:21,423 - INFO - Disconnected from server: transport error
+2025-06-28 10:00:41,631 - INFO - Connected to server
+2025-06-28 10:00:41,636 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 10:01:00,895 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 10:01:00,898 - INFO - Stream paused for config application.
+2025-06-28 10:01:01,402 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-28 10:01:01,407 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-28 10:01:01,612 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-28 10:01:04,234 - INFO - Requesting LIDAR streaming start
+2025-06-28 10:01:05,132 - INFO - Requesting LIDAR streaming stop
+2025-06-28 10:01:05,136 - INFO - Back button clicked in LidarWidget
+2025-06-28 10:01:05,919 - INFO - Requesting LIDAR streaming start
+2025-06-28 10:01:06,397 - INFO - Requesting LIDAR streaming stop
+2025-06-28 10:01:06,400 - INFO - Back button clicked in LidarWidget
+2025-06-28 10:01:12,097 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-28 10:01:12,356 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-28 10:01:13,465 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-28 10:01:14,080 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-28 10:01:15,976 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-28 10:01:16,572 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-28 10:01:23,825 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-28 10:01:24,026 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-28 10:01:24,770 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-28 10:01:25,320 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-28 10:01:35,586 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-28 10:01:36,040 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-28 10:01:49,576 - INFO - Disconnected from server: transport error

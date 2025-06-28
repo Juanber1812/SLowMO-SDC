@@ -24,19 +24,19 @@ def start_background_tasks():
     threading.Thread(target=lidar.start_lidar, daemon=True).start()
 
     # Tachometer task
-    from tachometer import run_tachometer
-
-    # helper that prints & pushes via SocketIO
-    def report_rpm(rpm):
-        print(f"[TACHO] RPM: {rpm:.1f}")                             # <-- print
-        # remove the old `broadcast` arg
-        socketio.emit("tachometer_data", {"rpm": rpm})
+#    from tachometer import run_tachometer
+#
+ #   # helper that prints & pushes via SocketIO
+  #  def report_rpm(rpm):
+   #     print(f"[TACHO] RPM: {rpm:.1f}")                             # <-- print
+    #    # remove the old `broadcast` arg
+     #   socketio.emit("tachometer_data", {"rpm": rpm})
 
     # launch the tachometer loop in its own thread
-    threading.Thread(
-        target=lambda: run_tachometer(report_rpm),
-        daemon=True
-    ).start()
+ #   threading.Thread(
+  #      target=lambda: run_tachometer(report_rpm),
+   #     daemon=True
+    #).start()
 
 
 @socketio.on('connect')
