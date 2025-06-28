@@ -535,6 +535,9 @@ def main(auto_log=False, log_filename=None):
         # Initialize sensor
         mpu = MPU6050()
         
+        # Set to GYRO-ONLY mode to disable accelerometer bias
+        mpu.set_control_mode(use_gyro_only=True, verbose=True)
+        
         # Auto-start logging if requested
         if auto_log:
             mpu.start_csv_logging(log_filename)
@@ -556,10 +559,10 @@ def main(auto_log=False, log_filename=None):
             angles = data['angles']
             temp = data['temperature']
             
-            # Live display with both angles and raw data (overwrite same line) - remapped order
+            # Live display with PURE GYRO data (no accelerometer bias)
             log_status = " [LOGGING]" if mpu.enable_logging else ""
             live_display = (
-                f"\rYaw: {angles['yaw']:+6.1f}° | "        # Primary control (was pitch)
+                f"\rYaw_PURE: {angles['yaw_pure']:+6.1f}° | "  # PURE gyro (no accelerometer bias)
                 f"Roll: {angles['roll']:+6.1f}° | "
                 f"Pitch: {angles['pitch']:+6.1f}° | "     # Secondary (was yaw)
                 f"Accel: X={accel['x']:+5.2f}g Y={accel['y']:+5.2f}g Z={accel['z']:+5.2f}g | "
