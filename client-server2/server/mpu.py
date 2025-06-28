@@ -511,17 +511,18 @@ class MPU6050:
         self.angle_yaw_pure = 0.0   # Reset pure gyro integration
         print("Position calibrated - current orientation set as zero reference")
     
-    def set_control_mode(self, use_gyro_only=False, disable_accel_correction=False):
+    def set_control_mode(self, use_gyro_only=False, disable_accel_correction=False, verbose=True):
         """Configure filter for control applications"""
         self.use_gyro_only = use_gyro_only
         self.disable_accel_correction = disable_accel_correction
         
-        if use_gyro_only:
-            print("Control mode: GYRO ONLY (no accelerometer bias)")
-        elif disable_accel_correction:
-            print("Control mode: REDUCED ACCELEROMETER CORRECTION")
-        else:
-            print("Control mode: NORMAL (with accelerometer correction)")
+        if verbose:
+            if use_gyro_only:
+                print("Control mode: GYRO ONLY (no accelerometer bias)")
+            elif disable_accel_correction:
+                print("Control mode: REDUCED ACCELEROMETER CORRECTION")
+            else:
+                print("Control mode: NORMAL (with accelerometer correction)")
     
     def get_yaw_for_control_pure(self):
         """Get pure gyro-integrated yaw for control (no accelerometer bias)"""

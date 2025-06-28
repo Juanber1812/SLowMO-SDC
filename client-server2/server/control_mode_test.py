@@ -76,26 +76,23 @@ def run_comparison_mode(mpu):
     print("-" * 80)
     
     try:
+        # Set to normal mode initially
+        mpu.set_control_mode(use_gyro_only=False, disable_accel_correction=False)
+        
         while True:
-            # Get normal mode
-            mpu.set_control_mode(use_gyro_only=False, disable_accel_correction=False)
-            data1 = mpu.read_all_data()
-            normal_yaw = data1['angles']['yaw']
+            # Just read data once - don't switch modes rapidly
+            data = mpu.read_all_data()
+            angles = data['angles']
             
-            # Get reduced mode 
-            mpu.set_control_mode(use_gyro_only=False, disable_accel_correction=True)
-            data2 = mpu.read_all_data()
-            reduced_yaw = data2['angles']['yaw']
+            # Get the different angle readings from the single data read
+            normal_yaw = angles['yaw']           # Filtered with accelerometer
+            pure_yaw = angles.get('yaw_pure', 0) # Pure gyro integration
+            raw_yaw = angles.get('yaw_raw', 0)   # Raw complementary filter
             
-            # Get pure gyro mode
-            mpu.set_control_mode(use_gyro_only=True, disable_accel_correction=False)
-            data3 = mpu.read_all_data()
-            pure_yaw = data3['angles']['yaw_pure']
-            
-            print(f"\\rNormal: {normal_yaw:+7.2f}° | " +
-                  f"Reduced: {reduced_yaw:+7.2f}° | " +
-                  f"Pure: {pure_yaw:+7.2f}° | " +
-                  f"Drift difference: {abs(pure_yaw - normal_yaw):5.2f}°", 
+            print(f"\\rFiltered: {normal_yaw:+7.2f}° | " +
+                  f"Raw: {raw_yaw:+7.2f}° | " +
+                  f"Pure Gyro: {pure_yaw:+7.2f}° | " +
+                  f"Bias: {abs(pure_yaw - normal_yaw):5.2f}°", 
                   end='', flush=True)
             
             time.sleep(0.1)
