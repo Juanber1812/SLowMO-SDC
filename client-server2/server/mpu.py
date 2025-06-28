@@ -355,16 +355,19 @@ class MPU6050:
         # Get angle estimates
         angles = self.get_angles()
         
-        # Log data to CSV file
+        # Log data to CSV file (NEW 2-column format)
         if self.enable_logging and self.csv_writer is not None:
             try:
+                # Calculate relative time from start (in seconds with high precision)
+                current_time = time.time()
+                if self.log_start_time is None:
+                    self.log_start_time = current_time
+                relative_time = current_time - self.log_start_time
+                
+                # Log only time and yaw with good decimal precision
                 self.csv_writer.writerow([
-                    datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3],
-                    acc_x, acc_y, acc_z,
-                    gyro_x, gyro_y, gyro_z,
-                    temperature,
-                    angles['yaw_pure'], angles['roll'], angles['pitch'],    # Use pure gyro yaw
-                    self.dt, self.yaw_drift_rate
+                    f"{relative_time:.6f}",               # 6 decimal places for time
+                    f"{angles['yaw_pure']:.6f}"           # 6 decimal places for yaw angle
                 ])
                 self.log_file.flush()  # Ensure data is written to file
             except Exception as e:
@@ -394,15 +397,11 @@ class MPU6050:
             self.log_file = open(file_path, mode='a', newline='')
             self.csv_writer = csv.writer(self.log_file)
             
-            # Write header row if file is new
+            # Write header row if file is new (NEW 2-column format)
             if os.stat(file_path).st_size == 0:
-                self.csv_writer.writerow([
-                    'Timestamp', 'Accel_X', 'Accel_Y', 'Accel_Z',
-                    'Gyro_X', 'Gyro_Y', 'Gyro_Z',
-                    'Temperature',
-                    'Yaw_Pure', 'Roll', 'Pitch',    # Pure gyro yaw header
-                    'Delta_Time', 'Yaw_Drift_Rate'
-                ])
+                self.csv_writer.writerow(['time', 'yaw'])
+                # Initialize log start time
+                self.log_start_time = time.time()
             
             self.enable_logging = True
             print(f"Logging started: {file_path}")

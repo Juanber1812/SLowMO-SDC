@@ -5,7 +5,7 @@ from adafruit_veml7700 import VEML7700
 
 # Constants
 MUX_ADDRESS = 0x70  # I2C address of the multiplexer
-CHANNELS = [0, 1, 2]  # Channels where VEML7700s are connected
+CHANNELS = [1, 2, 3]  # Channels where VEML7700s are connected
 
 # Setup I2C
 i2c = busio.I2C(board.SCL, board.SDA)
