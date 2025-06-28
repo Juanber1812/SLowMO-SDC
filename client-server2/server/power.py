@@ -12,6 +12,8 @@ except ImportError as e:
     print("If it's not working let me know, I had some issues and had to use python 3.9 rather than 3.11")
     raise
 
+# Last edited 20250628T15:12
+
 def init_sensor():
     try:
         i2c = board.I2C()
