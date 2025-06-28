@@ -50,16 +50,18 @@ class SimplePitchController:
                     print(f"\\nSAFETY STOP: Error too large ({error:.1f}°)")
                     break
                 
-                # Bang-bang control logic
+                # Bang-bang control logic (REACTION WHEEL CORRECTED)
                 if abs(error) < self.pd.deadband:
                     stop_motor_dc()
                     status = "STOP"
                 elif control_output > 0:
-                    rotate_clockwise_dc()
-                    status = "CW"
-                elif control_output < 0:
+                    # Positive error: need to rotate cube CW → Motor CCW (reaction wheel)
                     rotate_counterclockwise_dc()
                     status = "CCW"
+                elif control_output < 0:
+                    # Negative error: need to rotate cube CCW → Motor CW (reaction wheel)
+                    rotate_clockwise_dc()
+                    status = "CW"
                 else:
                     stop_motor_dc()
                     status = "STOP"
