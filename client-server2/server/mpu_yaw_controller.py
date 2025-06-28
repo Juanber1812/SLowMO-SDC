@@ -31,19 +31,22 @@ GPIO.setup([IN1_PIN, IN2_PIN, SLEEP_PIN], GPIO.OUT, initial=GPIO.LOW)
 GPIO.output(SLEEP_PIN, GPIO.HIGH)  # Enable motor driver
 
 def rotate_clockwise():
-    """Rotate motor clockwise (full power)"""
+    """Rotate motor clockwise (full power) with I2C protection"""
     GPIO.output(IN1_PIN, GPIO.HIGH)
     GPIO.output(IN2_PIN, GPIO.LOW)
+    time.sleep(0.001)  # Brief delay to avoid I2C interference
 
 def rotate_counterclockwise():
-    """Rotate motor counterclockwise (full power)"""
+    """Rotate motor counterclockwise (full power) with I2C protection"""
     GPIO.output(IN1_PIN, GPIO.LOW)
     GPIO.output(IN2_PIN, GPIO.HIGH)
+    time.sleep(0.001)  # Brief delay to avoid I2C interference
 
 def stop_motor():
-    """Stop motor (no power)"""
+    """Stop motor (no power) with I2C protection"""
     GPIO.output(IN1_PIN, GPIO.LOW)
     GPIO.output(IN2_PIN, GPIO.LOW)
+    time.sleep(0.001)  # Brief delay to avoid I2C interference
 
 # ── MPU-6050 SETUP FROM MPU.PY ─────────────────────────────────────────
 class MPU6050:
@@ -115,8 +118,8 @@ class MPU6050:
             # Wake up the MPU6050 (it starts in sleep mode)
             self.bus.write_byte_data(self.device_address, self.PWR_MGMT_1, 0)
             
-            # Set sample rate to 250Hz (1000Hz / (1 + 3))
-            self.bus.write_byte_data(self.device_address, self.SMPLRT_DIV, 3)
+            # Set sample rate to 50Hz (1000Hz / (1 + 19)) for stability
+            self.bus.write_byte_data(self.device_address, self.SMPLRT_DIV, 19)
             
             # Set accelerometer configuration (+/- 2g)
             self.bus.write_byte_data(self.device_address, self.ACCEL_CONFIG, 0)
@@ -124,11 +127,11 @@ class MPU6050:
             # Set gyroscope configuration (+/- 250 deg/s)
             self.bus.write_byte_data(self.device_address, self.GYRO_CONFIG, 0)
             
-            # Set filter bandwidth to 21Hz
-            self.bus.write_byte_data(self.device_address, self.CONFIG, 0)
+            # Set filter bandwidth to 5Hz for maximum noise rejection
+            self.bus.write_byte_data(self.device_address, self.CONFIG, 6)
             
             print("MPU6050 initialized successfully!")
-            time.sleep(0.1)  # Give sensor time to stabilize
+            time.sleep(0.5)  # Longer stabilization time
             
             # Perform calibration
             self.calibrate_gyro()
@@ -175,41 +178,22 @@ class MPU6050:
             self.gyro_z_cal = 0.0
     
     def read_raw_data(self, addr):
-        """Read raw 16-bit data from sensor with robust error handling"""
-        try:
-            high = self.bus.read_byte_data(self.device_address, addr)
-            low = self.bus.read_byte_data(self.device_address, addr + 1)
+        """Read raw 16-bit data from sensor - stable, slow version"""
+        # Small delay before I2C operations for stability
+        time.sleep(0.001)  # 1ms delay prevents bus collisions
+        
+        high = self.bus.read_byte_data(self.device_address, addr)
+        time.sleep(0.0005)  # 0.5ms between byte reads
+        low = self.bus.read_byte_data(self.device_address, addr + 1)
+        
+        # Combine high and low bytes
+        value = (high << 8) + low
+        
+        # Convert to signed 16-bit
+        if value >= 32768:
+            value = value - 65536
             
-            # Combine high and low bytes
-            value = (high << 8) + low
-            
-            # Convert to signed 16-bit
-            if value >= 32768:
-                value = value - 65536
-                
-            return value
-        except OSError as e:
-            # Handle all I2C-related OSError exceptions (errno 5, 121, etc.)
-            self.sensor_ready = False  # Mark sensor as not ready
-            if e.errno in [5, 121]:  # Input/output error or Remote I/O error
-                print(f"\nI2C communication error: {e}")
-                print("Trying to reconnect to MPU6050...")
-                time.sleep(0.1)
-                try:
-                    # Try to reinitialize the bus connection
-                    self.bus.close()
-                    self.bus = smbus2.SMBus(1)
-                    # Wake up the MPU6050 again
-                    self.bus.write_byte_data(self.device_address, self.PWR_MGMT_1, 0)
-                    self.sensor_ready = True  # Mark as ready if successful
-                    print("Reconnection successful!")
-                    return 0  # Return safe value
-                except Exception as reconnect_error:
-                    print(f"Failed to reconnect: {reconnect_error}")
-                    return 0  # Return safe value and continue
-            else:
-                print(f"\nUnexpected I2C error: {e}")
-                return 0  # Return safe value for any other I2C error
+        return value
     
     def read_accelerometer(self):
         """Read accelerometer data (x, y, z) in g"""
@@ -428,12 +412,12 @@ class PDBangBangController:
         Returns:
             motor_command: "CW", "CCW", or "STOP"
         """
-        # If controller is disabled or in input mode, always return STOP
-        if not self.controller_enabled or self.input_mode:
-            return "STOP", 0.0, 0.0
-        
         # Calculate error
         error = self.target_yaw - current_yaw
+        
+        # If controller is disabled or in input mode, don't execute control but still calculate error for display
+        if not self.controller_enabled or self.input_mode:
+            return "STOP", error, 0.0
         
         # Calculate derivative (rate of error change)
         if dt > 0:
@@ -787,7 +771,7 @@ def main():
                 print(status, end='', flush=True)
             
             loop_count += 1
-            time.sleep(0.01)  # 100Hz control loop
+            time.sleep(0.02)  # 50Hz control loop - more stable than 100Hz
             
     except KeyboardInterrupt:
         print("\n\nShutting down...")

@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 
-TACHO_PIN = 17
+TACHO_PIN = 0  # Changed to GPIO 0 as requested
 
 def run_tachometer(report_func):
     """Continuously sample TACHO_PIN and call report_func(rpm)."""
@@ -45,9 +45,16 @@ def run_tachometer(report_func):
 
 # ── MANUAL TEST REPL ─────────────────────────────────────────
 if __name__ == "__main__":
-    print("Tachometer test: reading RPM on GPIO17 (Ctrl-C to exit)")
+    print(f"Tachometer test: reading RPM on GPIO {TACHO_PIN} (Ctrl-C to exit)")
+    print("Connect your tachometer data line to GPIO 0")
+    print("Raw signal and RPM will be displayed...")
     try:
-        run_tachometer(lambda r: print(f"RPM: {r:.1f}"))
+        def display_rpm(rpm):
+            # Show both raw signal level and calculated RPM
+            level = GPIO.input(TACHO_PIN)
+            print(f"GPIO {TACHO_PIN} Level: {level} | RPM: {rpm:.1f}")
+        
+        run_tachometer(display_rpm)
     except KeyboardInterrupt:
         print("\nExiting tachometer test.")
     finally:
