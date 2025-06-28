@@ -86,7 +86,7 @@ def get_power_values(ina228):
             "power": ina228.power,
             "energy": ina228.energy,
             "temperature": ina228.die_temperature,
-            "battery_percentage": battery_percentage,  # Placeholder for battery percentage
+            "battery_percentage": battery_percentage,  # Placeholder for battery percentage, should return 0 until logic is added
         }
     except Exception as e:
         print(f"Error reading sensor data: {e}")
@@ -96,7 +96,7 @@ def get_power_values(ina228):
 def print_sensor_data_loop():
     ina228 = init_sensor()
     data_rows = []
-    headers = ['current', 'voltage', 'power', 'energy', 'temperature']
+    headers = ['current', 'voltage', 'power', 'energy', 'temperature', 'battery_percentage']
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     filename = f'power_log_{timestamp}.csv'
     try:
