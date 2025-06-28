@@ -330,6 +330,9 @@ class PDBangBangController:
         self.motor_state = "STOP"  # "CW", "CCW", "STOP"
         self.pulse_start_time = 0.0
         
+        # Controller enable/disable
+        self.controller_enabled = False  # Controller starts disabled
+        
         # Logging
         self.log_data = []
         self.enable_logging = False
@@ -338,6 +341,18 @@ class PDBangBangController:
         """Set target yaw angle in degrees"""
         self.target_yaw = target_angle
         print(f"Target yaw set to: {target_angle:.1f}°")
+    
+    def start_controller(self):
+        """Start the PD controller"""
+        self.controller_enabled = True
+        print("Controller STARTED - Motor control active")
+    
+    def stop_controller(self):
+        """Stop the PD controller and motor"""
+        self.controller_enabled = False
+        self.motor_state = "STOP"
+        stop_motor()  # Immediately stop motor
+        print("Controller STOPPED - Motor disabled")
     
     def update(self, current_yaw, gyro_rate, dt):
         """
@@ -351,6 +366,10 @@ class PDBangBangController:
         Returns:
             motor_command: "CW", "CCW", or "STOP"
         """
+        # If controller is disabled, always return STOP
+        if not self.controller_enabled:
+            return "STOP", 0.0, 0.0
+        
         # Calculate error
         error = self.target_yaw - current_yaw
         
@@ -453,6 +472,8 @@ def main():
     
     print("\nSystem ready!")
     print("Commands:")
+    print("  start      - Start controller (enable motor control)")
+    print("  stop       - Stop controller (disable motor)")
     print("  t <angle>  - Set target angle (e.g., 't 45')")
     print("  z          - Zero current position")
     print("  l          - Start logging")
@@ -477,7 +498,11 @@ def main():
             # Check for keyboard commands
             command = check_keyboard_input()
             if command:
-                if command.startswith('t '):
+                if command == 'start':
+                    controller.start_controller()
+                elif command == 'stop':
+                    controller.stop_controller()
+                elif command.startswith('t '):
                     try:
                         target = float(command.split()[1])
                         controller.set_target(target)
@@ -517,24 +542,28 @@ def main():
             # Update PD controller
             motor_cmd, error, pd_output = controller.update(current_yaw, gyro_rate, dt)
             
-            # Execute motor command
-            if motor_cmd == "CW":
-                rotate_clockwise()
-            elif motor_cmd == "CCW":
-                rotate_counterclockwise()
+            # Execute motor command only if controller is enabled
+            if controller.controller_enabled:
+                if motor_cmd == "CW":
+                    rotate_clockwise()
+                elif motor_cmd == "CCW":
+                    rotate_counterclockwise()
+                else:
+                    stop_motor()
             else:
-                stop_motor()
+                stop_motor()  # Ensure motor is stopped when controller is disabled
             
             # Display status every 10 loops (~10Hz)
             if loop_count % 10 == 0:
                 log_status = " [LOG]" if controller.enable_logging else ""
+                ctrl_status = " [ON]" if controller.controller_enabled else " [OFF]"
                 status = (
                     f"\rYaw: {current_yaw:+6.1f}° | "
                     f"Target: {controller.target_yaw:+6.1f}° | "
                     f"Error: {error:+6.1f}° | "
                     f"Rate: {gyro_rate:+5.1f}°/s | "
                     f"PD: {pd_output:+6.2f} | "
-                    f"Motor: {motor_cmd:>4s}{log_status}"
+                    f"Motor: {motor_cmd:>4s}{ctrl_status}{log_status}"
                 )
                 print(status, end='', flush=True)
             
