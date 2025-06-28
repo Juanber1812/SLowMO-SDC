@@ -17,8 +17,8 @@ class SimplePitchController:
         # Initialize MPU6050
         self.mpu = MPU6050()
         
-        # Initialize PD Controller with conservative settings for testing
-        self.pd = PDController(kp=0.5, kd=0.05, deadband=1.0)
+        # Initialize PD Controller with much more conservative settings
+        self.pd = PDController(kp=0.1, kd=0.01, deadband=2.0)
         
         # Control state
         self.running = False
@@ -40,6 +40,15 @@ class SimplePitchController:
                 # Update PD controller
                 self.pd.update_current_angle(current_pitch)
                 control_output, error, derivative = self.pd.calculate_control()
+                
+                # SAFETY: Limit control output to prevent runaway
+                control_output = max(-10.0, min(10.0, control_output))
+                
+                # SAFETY: Stop if error is too large (system may be broken)
+                if abs(error) > 90:
+                    stop_motor_dc()
+                    print(f"\\nSAFETY STOP: Error too large ({error:.1f}°)")
+                    break
                 
                 # Bang-bang control logic
                 if abs(error) < self.pd.deadband:
@@ -112,11 +121,18 @@ def main():
     print("  start <angle>    - Start control to target angle")
     print("  stop             - Stop control")
     print("  target <angle>   - Change target angle")
-    print("  tune <kp> <kd>   - Tune PD gains")
+    print("  tune <kp> <kd>   - Tune PD gains (try: 0.1 0.01)")
+    print("  deadband <deg>   - Set deadband (try: 3.0)")
     print("  zero             - Calibrate current position as 0°")
     print("  status           - Show current readings")
     print("  manual <cmd>     - Manual control (cw/ccw/stop)")
     print("  quit             - Exit")
+    print("  ")
+    print("🔧 TUNING TIPS:")
+    print("  - Start with: tune 0.05 0.005")
+    print("  - If oscillating: REDUCE Kp")
+    print("  - If overshoot: INCREASE Kd")
+    print("  - If slow: slightly increase Kp")
     print("="*60)
     
     controller = SimplePitchController()
@@ -158,6 +174,14 @@ def main():
                     controller.tune_gains(kp, kd)
                 except ValueError:
                     print("Invalid gains")
+            
+            elif cmd[0] == "deadband" and len(cmd) == 2:
+                try:
+                    deadband = float(cmd[1])
+                    controller.pd.set_deadband(deadband)
+                    print(f"\\nDeadband set to {deadband}°")
+                except ValueError:
+                    print("Invalid deadband")
             
             elif cmd[0] == "zero":
                 controller.calibrate_zero()

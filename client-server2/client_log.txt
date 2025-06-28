@@ -1216,3 +1216,4 @@ ValueError: Client is not in a disconnected state
 2025-06-28 16:51:35,736 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
 2025-06-28 16:51:36,151 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
 2025-06-28 16:51:36,353 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-28 16:53:29,976 - INFO - Disconnected from server: transport error
