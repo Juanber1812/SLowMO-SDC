@@ -1245,3 +1245,15 @@ ValueError: Client is not in a disconnected state
 2025-06-28 18:55:20,692 - INFO - Stream restart scheduled (if it was on before apply_config).
 2025-06-28 18:56:16,383 - INFO - Disconnected from server: transport error
 2025-06-28 18:56:17,223 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-28 21:05:39,768 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-28 21:05:40,062 - INFO - Connected to server
+2025-06-28 21:05:40,063 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 21:05:40,066 - INFO - [INFO] Successfully connected to server
+2025-06-28 21:06:50,662 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-28 21:06:51,871 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-28 21:06:52,117 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-28 21:07:02,664 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-28 21:07:05,785 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-28 21:07:06,600 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-28 21:07:09,088 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-28 21:07:44,882 - INFO - Disconnected from server: client disconnect
