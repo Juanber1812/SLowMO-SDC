@@ -396,7 +396,7 @@ class MPU6050:
                     'Timestamp', 'Accel_X', 'Accel_Y', 'Accel_Z',
                     'Gyro_X', 'Gyro_Y', 'Gyro_Z',
                     'Temperature',
-                    'Yaw', 'Roll', 'Pitch',    # Remapped header order
+                    'Yaw_Pure', 'Roll', 'Pitch',    # Pure gyro yaw header
                     'Delta_Time', 'Yaw_Drift_Rate'
                 ])
             
@@ -428,8 +428,8 @@ class MPU6050:
             self.log_file = open(filename, 'w', newline='')
             self.csv_writer = csv.writer(self.log_file)
             
-            # Write header (remapped: yaw first as primary control)
-            self.csv_writer.writerow(['timestamp', 'yaw', 'roll', 'pitch'])
+            # Write header (pure gyro yaw for control)
+            self.csv_writer.writerow(['timestamp', 'yaw_pure', 'roll', 'pitch'])
             self.log_file.flush()
             
             self.enable_logging = True
@@ -468,7 +468,7 @@ class MPU6050:
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]  # millisecond precision
                 self.csv_writer.writerow([
                     timestamp,
-                    round(self.angle_yaw_output, 3),      # Primary control (was pitch)
+                    round(self.angle_yaw_pure, 3),        # PURE gyro yaw (no accelerometer bias)
                     round(self.angle_roll_output, 3),
                     round(self.angle_pitch_output, 3)     # Secondary (was yaw)
                 ])
@@ -523,11 +523,6 @@ class MPU6050:
                 print("Control mode: REDUCED ACCELEROMETER CORRECTION")
             else:
                 print("Control mode: NORMAL (with accelerometer correction)")
-    
-    def get_yaw_for_control_pure(self):
-        """Get pure gyro-integrated yaw for control (no accelerometer bias)"""
-        self.update_angles()
-        return self.angle_yaw_pure if hasattr(self, 'angle_yaw_pure') else self.angle_yaw
     
 def main(auto_log=False, log_filename=None):
     """Main loop to read and display MPU6050 data with attitude estimation"""
