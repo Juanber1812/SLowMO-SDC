@@ -3,13 +3,12 @@
 MPU6050 Yaw PD Bang-Bang Controller
 Uses yaw angle from MPU6050 to control motor with bang-bang (ON/OFF) logic
 Combines PD control algorithm with simple binary motor commands
+Uses the exact same MPU6050 class and yaw calculation from mpu.py
 """
 
 import time
-import board, busio
-import adafruit_veml7700
 import RPi.GPIO as GPIO
-import smbus
+import smbus2
 import math
 from datetime import datetime
 import csv
@@ -46,97 +45,266 @@ def stop_motor():
     GPIO.output(IN1_PIN, GPIO.LOW)
     GPIO.output(IN2_PIN, GPIO.LOW)
 
-# ── MPU-6050 SETUP ─────────────────────────────────────────────────────
-MPU_ADDR = 0x68
-bus = smbus.SMBus(1)
-bus.write_byte_data(MPU_ADDR, 0x6B, 0)  # Exit sleep mode
-
-def mpu_raw(addr):
-    """Read raw 16-bit data from MPU6050"""
-    hi = bus.read_byte_data(MPU_ADDR, addr)
-    lo = bus.read_byte_data(MPU_ADDR, addr+1)
-    val = (hi << 8) | lo
-    return val - 65536 if val > 32767 else val
-
-def read_mpu():
-    """Read MPU6050 accelerometer and gyroscope data"""
-    ax = mpu_raw(0x3B) / 16384.0  # Accelerometer X (g)
-    ay = mpu_raw(0x3D) / 16384.0  # Accelerometer Y (g)
-    az = mpu_raw(0x3F) / 16384.0  # Accelerometer Z (g)
-    gx = mpu_raw(0x43) / 131.0    # Gyroscope X (°/s)
-    gy = mpu_raw(0x45) / 131.0    # Gyroscope Y (°/s)
-    gz = mpu_raw(0x47) / 131.0    # Gyroscope Z (°/s)
-    return ax, ay, az, gx, gy, gz
-
-# ── YAW ANGLE CALCULATION ──────────────────────────────────────────────
-class YawEstimator:
-    def __init__(self):
-        self.yaw_angle = 0.0
-        self.yaw_gyro = 0.0
-        self.yaw_accel = 0.0
+# ── MPU-6050 SETUP FROM MPU.PY ─────────────────────────────────────────
+class MPU6050:
+    def __init__(self, bus_number=1, device_address=0x68):
+        """Initialize MPU6050 sensor with complementary filter"""
+        self.bus = smbus2.SMBus(bus_number)
+        self.device_address = device_address
+        
+        # MPU6050 Register addresses
+        self.PWR_MGMT_1 = 0x6B
+        self.SMPLRT_DIV = 0x19
+        self.CONFIG = 0x1A
+        self.GYRO_CONFIG = 0x1B
+        self.ACCEL_CONFIG = 0x1C
+        self.INT_ENABLE = 0x38
+        
+        # Data registers
+        self.ACCEL_XOUT_H = 0x3B
+        self.GYRO_XOUT_H = 0x43
+        self.TEMP_OUT_H = 0x41
+        
+        # Calibration values (renamed: pitch->yaw for spacecraft convention)
+        self.gyro_x_cal = 0.0
+        self.gyro_y_cal = 0.0
+        self.gyro_z_cal = 0.0
+        self.accel_yaw_cal = 0.0     # Primary control calibration (was pitch_cal)
+        self.accel_roll_cal = 0.0
+        
+        # Angle variables (renamed: pitch->yaw, yaw->pitch for spacecraft convention)
+        self.angle_yaw = 0.0      # Primary control angle (was pitch)
+        self.angle_roll = 0.0
+        self.angle_pitch = 0.0    # Secondary angle (was yaw)
+        self.angle_yaw_acc = 0.0  # Accelerometer yaw (was pitch_acc)
+        self.angle_roll_acc = 0.0
+        
+        # Output angles (filtered)
+        self.angle_yaw_output = 0.0    # Primary control output (was pitch_output)
+        self.angle_roll_output = 0.0
+        self.angle_pitch_output = 0.0  # Secondary output (was yaw_output)
+        
+        # Filter and timing variables
+        self.set_gyro_angles = False
         self.last_time = time.time()
-        self.initialized = False
+        self.dt = 0.0
         
-        # Complementary filter parameter
-        self.alpha = 0.98  # Gyro weight (98% gyro, 2% accelerometer)
+        # Pitch drift compensation (renamed from yaw drift)
+        self.yaw_drift_rate = 0.0  # deg/s drift rate (actually pitch now)
+        self.yaw_reference_time = time.time()
+        self.yaw_zero_velocity_threshold = 0.5  # deg/s
+        self.yaw_zero_velocity_count = 0
+        self.yaw_drift_samples = []
         
-        # Calibration offsets (determined experimentally)
-        self.gyro_z_offset = 0.0
-        self.accel_offset = 0.0
+        # Filter parameters (adjustable for PD controller)
+        self.complementary_alpha = 0.9996  # Gyro weight (0.9996 = 99.96%)
+        self.output_filter_alpha = 0.9     # Output smoothing (90% previous, 10% new)
         
-    def calibrate_gyro(self, samples=1000):
-        """Calibrate gyroscope Z-axis offset"""
-        print("Calibrating gyroscope... Keep sensor still!")
-        gyro_sum = 0.0
+        # Control mode settings
+        self.use_gyro_only = True  # Use pure gyro for control (no accelerometer bias)
+        self.disable_accel_correction = False
+        self.angle_yaw_pure = 0.0  # Pure gyro integration for control
+        
+        # Initialize the sensor
+        self.initialize_sensor()
+    
+    def initialize_sensor(self):
+        """Initialize MPU6050 with proper configuration"""
+        try:
+            # Wake up the MPU6050 (it starts in sleep mode)
+            self.bus.write_byte_data(self.device_address, self.PWR_MGMT_1, 0)
+            
+            # Set sample rate to 250Hz (1000Hz / (1 + 3))
+            self.bus.write_byte_data(self.device_address, self.SMPLRT_DIV, 3)
+            
+            # Set accelerometer configuration (+/- 2g)
+            self.bus.write_byte_data(self.device_address, self.ACCEL_CONFIG, 0)
+            
+            # Set gyroscope configuration (+/- 250 deg/s)
+            self.bus.write_byte_data(self.device_address, self.GYRO_CONFIG, 0)
+            
+            # Set filter bandwidth to 21Hz
+            self.bus.write_byte_data(self.device_address, self.CONFIG, 0)
+            
+            print("MPU6050 initialized successfully!")
+            time.sleep(0.1)  # Give sensor time to stabilize
+            
+            # Perform calibration
+            self.calibrate_gyro()
+            
+        except Exception as e:
+            print(f"Error initializing MPU6050: {e}")
+            sys.exit(1)
+    
+    def calibrate_gyro(self, samples=2000):
+        """Calibrate gyroscope by averaging readings when stationary"""
+        print("Calibrating gyroscope... Keep sensor stationary!")
+        
+        gyro_x_sum = 0
+        gyro_y_sum = 0
+        gyro_z_sum = 0
         
         for i in range(samples):
-            _, _, _, _, _, gz = read_mpu()
-            gyro_sum += gz
-            if i % 100 == 0:
-                print(f"Calibration: {(i/samples)*100:.1f}%")
-            time.sleep(0.01)
+            gyro_x, gyro_y, gyro_z = self.read_gyroscope_raw()
+            gyro_x_sum += gyro_x
+            gyro_y_sum += gyro_y
+            gyro_z_sum += gyro_z
+            
+            if i % 200 == 0:
+                print(f"Calibration progress: {(i/samples)*100:.1f}%")
+            
+            time.sleep(0.004)  # 250Hz sampling
         
-        self.gyro_z_offset = gyro_sum / samples
-        print(f"Gyro Z offset: {self.gyro_z_offset:.3f} °/s")
+        self.gyro_x_cal = gyro_x_sum / samples
+        self.gyro_y_cal = gyro_y_sum / samples
+        self.gyro_z_cal = gyro_z_sum / samples
+        
+        print(f"Gyro calibration complete!")
+        print(f"Offsets - X: {self.gyro_x_cal:.3f}, Y: {self.gyro_y_cal:.3f}, Z: {self.gyro_z_cal:.3f}")
     
-    def update(self):
-        """Update yaw angle using complementary filter"""
+    def read_raw_data(self, addr):
+        """Read raw 16-bit data from sensor"""
+        high = self.bus.read_byte_data(self.device_address, addr)
+        low = self.bus.read_byte_data(self.device_address, addr + 1)
+        
+        # Combine high and low bytes
+        value = (high << 8) + low
+        
+        # Convert to signed 16-bit
+        if value >= 32768:
+            value = value - 65536
+            
+        return value
+    
+    def read_accelerometer(self):
+        """Read accelerometer data (x, y, z) in g"""
+        acc_x = self.read_raw_data(self.ACCEL_XOUT_H)
+        acc_y = self.read_raw_data(self.ACCEL_XOUT_H + 2)
+        acc_z = self.read_raw_data(self.ACCEL_XOUT_H + 4)
+        
+        # Convert to g (16384 LSB/g for +/- 2g range)
+        acc_x = acc_x / 16384.0
+        acc_y = acc_y / 16384.0
+        acc_z = acc_z / 16384.0
+        
+        return acc_x, acc_y, acc_z
+    
+    def read_gyroscope_raw(self):
+        """Read raw gyroscope data (x, y, z) in deg/s"""
+        gyro_x = self.read_raw_data(self.GYRO_XOUT_H)
+        gyro_y = self.read_raw_data(self.GYRO_XOUT_H + 2)
+        gyro_z = self.read_raw_data(self.GYRO_XOUT_H + 4)
+        
+        # Convert to deg/s (131 LSB/deg/s for +/- 250 deg/s range)
+        gyro_x = gyro_x / 131.0
+        gyro_y = gyro_y / 131.0
+        gyro_z = gyro_z / 131.0
+        
+        return gyro_x, gyro_y, gyro_z
+    
+    def read_gyroscope(self):
+        """Read calibrated gyroscope data (x, y, z) in deg/s"""
+        gyro_x, gyro_y, gyro_z = self.read_gyroscope_raw()
+        
+        # Apply calibration
+        gyro_x -= self.gyro_x_cal
+        gyro_y -= self.gyro_y_cal
+        gyro_z -= self.gyro_z_cal
+        
+        return gyro_x, gyro_y, gyro_z
+    
+    def update_angles(self):
+        """Update pitch, roll, and yaw angles using complementary filter"""
         current_time = time.time()
-        dt = current_time - self.last_time
+        self.dt = current_time - self.last_time
         self.last_time = current_time
         
         # Read sensor data
-        ax, ay, az, gx, gy, gz = read_mpu()
+        gyro_x, gyro_y, gyro_z = self.read_gyroscope()
+        acc_x, acc_y, acc_z = self.read_accelerometer()
         
-        # Apply gyro calibration
-        gz -= self.gyro_z_offset
+        # Gyro angle calculations (integration) - remapped for spacecraft convention
+        # Convert gyro rates to angle changes
+        dt_factor = self.dt  # Time step for integration
         
-        # Gyroscope integration (primary source for yaw)
-        self.yaw_gyro += gz * dt
+        self.angle_yaw += gyro_z * dt_factor      # Primary control (was pitch)
+        self.angle_roll += gyro_y * dt_factor
+        self.angle_pitch += gyro_x * dt_factor    # Secondary angle (was yaw)
         
-        # Accelerometer yaw estimation (for drift correction)
-        # Using atan2 for better quadrant handling
-        acc_magnitude = math.sqrt(ax*ax + ay*ay + az*az)
-        if acc_magnitude > 0.1:  # Avoid division by zero
-            # Simple yaw estimation from accelerometer (limited accuracy)
-            self.yaw_accel = math.degrees(math.atan2(ay, math.sqrt(ax*ax + az*az)))
+        # Pure gyro integration for control (no accelerometer bias)
+        if not hasattr(self, 'angle_yaw_pure'):
+            self.angle_yaw_pure = 0.0
+        self.angle_yaw_pure += gyro_z * dt_factor
         
-        # Complementary filter
-        if not self.initialized:
-            self.yaw_angle = self.yaw_accel
-            self.yaw_gyro = self.yaw_accel
-            self.initialized = True
-        else:
-            self.yaw_angle = self.alpha * self.yaw_gyro + (1 - self.alpha) * self.yaw_accel
+        # Pitch compensation for yaw and roll (transfer angles during pitch rotation)
+        pitch_rad = math.radians(gyro_x * dt_factor)
+        self.angle_yaw += self.angle_roll * math.sin(pitch_rad)
+        self.angle_roll -= self.angle_yaw * math.sin(pitch_rad)
+        
+        # Accelerometer angle calculations
+        acc_total_vector = math.sqrt(acc_x*acc_x + acc_y*acc_y + acc_z*acc_z)
+        
+        if acc_total_vector > 0:  # Avoid division by zero
+            # Calculate yaw and roll from accelerometer (remapped for spacecraft)
+            self.angle_yaw_acc = math.degrees(math.asin(acc_y / acc_total_vector))      # Primary (was pitch)
+            self.angle_roll_acc = math.degrees(math.asin(acc_z / acc_total_vector)) * -1
             
-        return self.yaw_angle, gz  # Return angle and gyro rate
+            # Apply accelerometer calibration
+            self.angle_yaw_acc -= self.accel_yaw_cal     # Primary calibration (was pitch_cal)
+            self.angle_roll_acc -= self.accel_roll_cal
+        else:
+            # Avoid invalid angle calculations
+            self.angle_yaw_acc = 0.0
+            self.angle_roll_acc = 0.0
+        
+        # Complementary filter (remapped for spacecraft convention)
+        if self.set_gyro_angles:
+            if self.use_gyro_only:
+                # CONTROL MODE: Use pure gyro integration (no accelerometer bias)
+                pass  # Keep gyro-integrated values as-is
+            elif self.disable_accel_correction:
+                # CONTROL MODE: Reduced accelerometer influence
+                weak_alpha = 0.9999  # Even weaker accelerometer influence
+                self.angle_yaw = (self.angle_yaw * weak_alpha + 
+                                 self.angle_yaw_acc * (1 - weak_alpha))
+                self.angle_roll = (self.angle_roll * weak_alpha + 
+                                 self.angle_roll_acc * (1 - weak_alpha))
+            else:
+                # NORMAL MODE: Standard complementary filter
+                self.angle_yaw = (self.angle_yaw * self.complementary_alpha + 
+                                 self.angle_yaw_acc * (1 - self.complementary_alpha))    # Primary
+                self.angle_roll = (self.angle_roll * self.complementary_alpha + 
+                                 self.angle_roll_acc * (1 - self.complementary_alpha))
+        else:
+            # First startup - use accelerometer values
+            self.angle_yaw = self.angle_yaw_acc      # Primary (was pitch)
+            self.angle_roll = self.angle_roll_acc
+            self.angle_yaw_pure = self.angle_yaw_acc  # Initialize pure gyro
+            self.set_gyro_angles = True
+        
+        # Apply output filtering for smooth control (remapped)
+        self.angle_yaw_output = (self.angle_yaw_output * self.output_filter_alpha + 
+                                self.angle_yaw * (1 - self.output_filter_alpha))        # Primary
+        self.angle_roll_output = (self.angle_roll_output * self.output_filter_alpha + 
+                                self.angle_roll * (1 - self.output_filter_alpha))
+        self.angle_pitch_output = (self.angle_pitch_output * self.output_filter_alpha + 
+                                 self.angle_pitch * (1 - self.output_filter_alpha))     # Secondary
     
-    def reset(self):
-        """Reset yaw angle to zero"""
-        self.yaw_angle = 0.0
-        self.yaw_gyro = 0.0
-        self.yaw_accel = 0.0
-        print("Yaw angle reset to 0°")
+    def get_yaw_for_control_pure(self):
+        """Get pure gyro-integrated yaw for control (no accelerometer bias)"""
+        self.update_angles()
+        return self.angle_yaw_pure if hasattr(self, 'angle_yaw_pure') else self.angle_yaw
+    
+    def calibrate_at_current_position(self):
+        """Calibrate the current position as zero reference"""
+        self.angle_yaw = 0.0        # Primary control (was pitch)
+        self.angle_roll = 0.0
+        self.angle_pitch = 0.0      # Secondary (was yaw)
+        self.angle_yaw_output = 0.0 # Primary output (was pitch_output)
+        self.angle_roll_output = 0.0
+        self.angle_pitch_output = 0.0  # Secondary output (was yaw_output)
+        self.angle_yaw_pure = 0.0   # Reset pure gyro integration
+        print("Position calibrated - current orientation set as zero reference")
 
 # ── PD BANG-BANG CONTROLLER ────────────────────────────────────────────
 class PDBangBangController:
@@ -275,17 +443,13 @@ def main():
     print("=" * 60)
     
     # Initialize components
-    yaw_estimator = YawEstimator()
+    mpu = MPU6050()  # Use the same MPU6050 class from mpu.py
     controller = PDBangBangController(
         kp=2.0,           # Proportional gain
         kd=0.5,           # Derivative gain
         deadband=1.0,     # ±1° deadband
         min_pulse_time=0.2  # 200ms minimum pulse
     )
-    
-    # Calibrate gyroscope
-    print("\nCalibrating gyroscope...")
-    yaw_estimator.calibrate_gyro(samples=500)
     
     print("\nSystem ready!")
     print("Commands:")
@@ -320,7 +484,7 @@ def main():
                     except:
                         print("\nInvalid target angle")
                 elif command == 'z':
-                    yaw_estimator.reset()
+                    mpu.calibrate_at_current_position()
                     controller.set_target(0.0)
                 elif command == 'l':
                     controller.start_logging()
@@ -338,8 +502,12 @@ def main():
                 elif command == 'q':
                     break
             
-            # Update yaw estimation
-            current_yaw, gyro_rate = yaw_estimator.update()
+            # Get yaw angle using the same method as mpu.py
+            current_yaw = mpu.get_yaw_for_control_pure()  # Pure gyro yaw (no accelerometer bias)
+            
+            # Get gyro rate for display
+            gyro_x, gyro_y, gyro_z = mpu.read_gyroscope()
+            gyro_rate = gyro_z  # Yaw rate
             
             # Calculate time step
             current_time = time.time()
