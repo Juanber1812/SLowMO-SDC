@@ -29,18 +29,33 @@ def rotate_counterclockwise_dc():
     print(f"[MOTOR] DIR_PIN={GPIO.input(DIR_PIN)}, ENABLE_PIN={GPIO.input(ENABLE_PIN)}")
 
 def stop_motor_dc():
-    """Disable driver (0 V to motor)."""
+    """Disable driver (0 V to motor) - Enhanced for CCW stop issue."""
     print("[MOTOR] Stopping motor")
-    GPIO.output(ENABLE_PIN, GPIO.LOW)
+    
+    # Enhanced stop sequence for better CCW stopping
+    GPIO.output(ENABLE_PIN, GPIO.LOW)    # Disable motor first
+    time.sleep(0.01)                     # Small delay
+    GPIO.output(DIR_PIN, GPIO.LOW)       # Reset direction to default
+    
     print(f"[MOTOR] DIR_PIN={GPIO.input(DIR_PIN)}, ENABLE_PIN={GPIO.input(ENABLE_PIN)}")
 
+def emergency_stop():
+    """Emergency stop with full driver reset."""
+    print("[MOTOR] EMERGENCY STOP")
+    GPIO.output(ENABLE_PIN, GPIO.LOW)
+    GPIO.output(DIR_PIN, GPIO.LOW)
+    GPIO.output(SLEEP_PIN, GPIO.LOW)     # Sleep the driver
+    time.sleep(0.05)
+    GPIO.output(SLEEP_PIN, GPIO.HIGH)    # Wake up driver
+    print(f"[MOTOR] Reset complete: DIR_PIN={GPIO.input(DIR_PIN)}, ENABLE_PIN={GPIO.input(ENABLE_PIN)}")
+
 def cleanup():
-    stop_motor_dc()
+    emergency_stop()  # Use emergency stop for cleanup
     GPIO.cleanup()
 
 # ── MANUAL TEST REPL ────────────────────────────────────────
 if __name__=="__main__":
-    print("cmd> 'cw','ccw','stop','quit'")
+    print("Motor Test - Commands: 'cw','ccw','stop','estop','quit'")
     try:
         while True:
             cmd = input("cmd> ").strip().lower()
@@ -50,9 +65,11 @@ if __name__=="__main__":
                 rotate_counterclockwise_dc()
             elif cmd=="stop":
                 stop_motor_dc()
+            elif cmd=="estop":
+                emergency_stop()
             elif cmd in ("q","quit","exit"):
                 break
             else:
-                print("Unknown")
+                print("Unknown command")
     finally:
         cleanup()
