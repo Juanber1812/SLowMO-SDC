@@ -1,20 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple Yaw PD Controller Test (Primary Con                # Live display (using PURE GYRO data - same as mpu.py)
-                print(f"\rYaw_PURE: {current_yaw:+6.2            elif cmd[0] == "status":
-                data = controller.mpu.read_all_data()
-                angles = data['angles']
-                print(f"\nCurrent Status:")
-                print(f"  Yaw_PURE: {angles['yaw_pure']:+6.2f}° (CONTROL - no accel bias)")
-                print(f"  Yaw_Filt: {angles['yaw']:+6.2f}° (filtered)")
-                print(f"  Roll:     {angles['roll']:+6.2f}°")
-                print(f"  Pitch:    {angles['pitch']:+6.2f}°")
-                print(f"  Target:   {controller.pd.target_angle:+6.2f}°")
-                print(f"  PD Gains: Kp={controller.pd.kp:.3f}, Kd={controller.pd.kd:.3f}")
-                print(f"  Deadband: {controller.pd.deadband:.1f}°")
-                print(f"  Running:  {controller.running}")t: {self.pd.target_angle:+6.2f}° | "
-                      f"Error: {error:+5.2f}° | Control: {control_output:+6.2f} | Motor: {status:<4}", 
-                      end='', flush=True) Angle)
+Simple Yaw PD Controller Test (Primary Control Angle)
 Tests bang-bang motor control with MPU6050 yaw feedback for horizontal stabilization
 """
 
@@ -35,6 +21,34 @@ class SimpleYawController:
         self.mpu.set_control_mode(use_gyro_only=True, verbose=True)
         
         # Initialize PD Controller with much more conservative settings
+        self.pd = PDController(kp=0.1, kd=0.01, deadband=2.0)
+        
+        # Control state
+        self.running = False
+        self.control_thread = None
+        
+        print("Simple Yaw Controller ready!")
+    
+    def live_data_display(self):
+        """Live data display - SAME AS MPU.PY"""
+        print("Starting live yaw data display (PURE GYRO MODE)")
+        print("Press Ctrl+C to stop")
+        print("=" * 60)
+        
+        try:
+            while True:
+                # Use EXACT same data collection as mpu.py
+                data = self.mpu.read_all_data()
+                angles = data['angles']
+                
+                # Display ONLY yaw_pure angle (same as mpu.py live display)
+                print(f"\rYaw_PURE: {angles['yaw_pure']:+7.2f}°", end='', flush=True)
+                
+                # Same timing as mpu.py
+                time.sleep(0.01)  # 100Hz display update
+                
+        except KeyboardInterrupt:
+            print("\nLive data display stopped.")
         self.pd = PDController(kp=0.1, kd=0.01, deadband=2.0)
         
         # Control state
@@ -64,7 +78,7 @@ class SimpleYawController:
                 # SAFETY: Stop if error is too large (system may be broken)
                 if abs(error) > 90:
                     stop_motor_dc()
-                    print(f"\\nSAFETY STOP: Error too large ({error:.1f}°)")
+                    print(f"\nSAFETY STOP: Error too large ({error:.1f}°)")
                     break
                 
                 # Bang-bang control logic (REACTION WHEEL CORRECTED)
@@ -83,20 +97,20 @@ class SimpleYawController:
                     stop_motor_dc()
                     status = "STOP"
                 
-                # Live display (updated for yaw control)
-                print(f"\\rYaw: {current_yaw:+6.2f}° | Target: {self.pd.target_angle:+6.2f}° | "
+                # Live display (using PURE GYRO data - same as mpu.py)
+                print(f"\rYaw_PURE: {current_yaw:+6.2f}° | Target: {self.pd.target_angle:+6.2f}° | "
                       f"Error: {error:+5.2f}° | Control: {control_output:+6.2f} | Motor: {status:<4}", 
                       end='', flush=True)
                 
                 time.sleep(0.05)  # 20Hz control loop
                 
             except Exception as e:
-                print(f"\\nControl error: {e}")
+                print(f"\nControl error: {e}")
                 stop_motor_dc()
                 break
         
         stop_motor_dc()
-        print("\\nControl loop stopped")
+        print("\nControl loop stopped")
     
     def start_control(self, target_angle=0.0):
         """Start pitch control"""
@@ -119,17 +133,17 @@ class SimpleYawController:
     def set_target(self, angle):
         """Change target angle"""
         self.pd.set_target(angle)
-        print(f"\\nTarget changed to {angle}°")
+        print(f"\nTarget changed to {angle}°")
     
     def tune_gains(self, kp, kd):
         """Tune PD gains"""
         self.pd.set_gains(kp, kd)
-        print(f"\\nGains updated: Kp={kp}, Kd={kd}")
+        print(f"\nGains updated: Kp={kp}, Kd={kd}")
     
     def calibrate_zero(self):
         """Set current position as zero reference"""
         self.mpu.calibrate_at_current_position()
-        print("\\nCurrent position set as 0° reference")
+        print("\nCurrent position set as 0° reference")
 
 def main():
     """Test interface"""
@@ -138,6 +152,7 @@ def main():
     print("="*60)
     print("🚀 USING PURE GYRO DATA (no accelerometer bias)")
     print("Commands:")
+    print("  live             - Live yaw data display (same as mpu.py)")
     print("  start <angle>    - Start control to target angle")
     print("  stop             - Stop control")
     print("  target <angle>   - Change target angle")
@@ -159,13 +174,16 @@ def main():
     
     try:
         while True:
-            cmd = input("\\nYaw> ").strip().split()
+            cmd = input("\nYaw> ").strip().split()
             
             if not cmd:
                 continue
             
             if cmd[0] == "quit" or cmd[0] == "q":
                 break
+            
+            elif cmd[0] == "live":
+                controller.live_data_display()
             
             elif cmd[0] == "start":
                 target = 0.0
@@ -199,7 +217,7 @@ def main():
                 try:
                     deadband = float(cmd[1])
                     controller.pd.set_deadband(deadband)
-                    print(f"\\nDeadband set to {deadband}°")
+                    print(f"\nDeadband set to {deadband}°")
                 except ValueError:
                     print("Invalid deadband")
             
@@ -209,14 +227,15 @@ def main():
             elif cmd[0] == "status":
                 data = controller.mpu.read_all_data()
                 angles = data['angles']
-                print(f"\\nCurrent Status:")
-                print(f"  Yaw:   {angles['yaw']:+6.2f}° (PRIMARY)")
-                print(f"  Roll:  {angles['roll']:+6.2f}°")
-                print(f"  Pitch: {angles['pitch']:+6.2f}°")
-                print(f"  Target: {controller.pd.target_angle:+6.2f}°")
+                print(f"\nCurrent Status:")
+                print(f"  Yaw_PURE: {angles['yaw_pure']:+6.2f}° (CONTROL - no accel bias)")
+                print(f"  Yaw_Filt: {angles['yaw']:+6.2f}° (filtered)")
+                print(f"  Roll:     {angles['roll']:+6.2f}°")
+                print(f"  Pitch:    {angles['pitch']:+6.2f}°")
+                print(f"  Target:   {controller.pd.target_angle:+6.2f}°")
                 print(f"  PD Gains: Kp={controller.pd.kp:.3f}, Kd={controller.pd.kd:.3f}")
                 print(f"  Deadband: {controller.pd.deadband:.1f}°")
-                print(f"  Running: {controller.running}")
+                print(f"  Running:  {controller.running}")
             
             elif cmd[0] == "manual" and len(cmd) == 2:
                 controller.stop_control()
@@ -236,7 +255,7 @@ def main():
                 print("Unknown command")
     
     except KeyboardInterrupt:
-        print("\\nInterrupted...")
+        print("\nInterrupted...")
     
     finally:
         controller.stop_control()
