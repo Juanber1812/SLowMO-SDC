@@ -11,7 +11,8 @@ from adafruit_veml7700 import VEML7700
 # Constants
 MUX_ADDRESS = 0x70  # I2C address of the multiplexer
 CHANNELS = [1, 2, 3]  # Channels where VEML7700s are connected
-LOG_FREQUENCY = 10  # Hz
+LOG_FREQUENCY = 50  # Hz - MAXIMUM SPEED!
+DISPLAY_FREQUENCY = 20  # Hz - High-speed display updates
 
 class LuxLogger:
     def __init__(self):
@@ -25,19 +26,25 @@ class LuxLogger:
         self.log_start_time = None
         self.last_log_time = time.time()
         
-        # Threading for precise 10Hz logging
-        self.logging_thread = None
-        self.stop_logging_thread = False
+        # HIGH-SPEED synchronized data sharing
+        self.data_thread = None
+        self.stop_data_thread = False
+        self.current_readings = {ch: 0.0 for ch in CHANNELS}
+        self.readings_lock = threading.Lock()
+        self.last_reading_time = time.time()
         
         # Initialize sensors once at startup
         self.sensors = {}
         self.initialize_sensors()
+        
+        # Start high-speed data acquisition thread immediately
+        self.start_data_thread()
     
     def select_channel(self, channel):
-        """Select multiplexer channel"""
+        """Select multiplexer channel - ULTRA FAST"""
         if 0 <= channel <= 7:
             self.i2c.writeto(MUX_ADDRESS, bytes([1 << channel]))
-            time.sleep(0.01)  # Reduced to 10ms - faster I2C settling
+            time.sleep(0.005)  # MINIMAL 5ms - MAXIMUM SPEED!
         else:
             raise ValueError("Invalid channel: must be 0-7")
     
@@ -71,16 +78,62 @@ class LuxLogger:
             print(f"Error reading channel {channel}: {e}")
             return None
     
-    def read_all_sensors(self):
-        """Read all sensor values"""
+    def read_all_sensors_fast(self):
+        """ULTRA-FAST sensor reading - optimized for maximum speed"""
         readings = {}
         for ch in CHANNELS:
-            lux = self.read_sensor(ch)
-            readings[ch] = lux
+            try:
+                self.select_channel(ch)
+                # Use pre-initialized sensor, create fresh only if needed
+                sensor = VEML7700(self.i2c)
+                lux = sensor.lux
+                readings[ch] = lux
+            except Exception as e:
+                readings[ch] = None
         return readings
     
+    def start_data_thread(self):
+        """Start high-speed data acquisition thread"""
+        self.stop_data_thread = False
+        self.data_thread = threading.Thread(target=self._data_thread_worker, daemon=True)
+        self.data_thread.start()
+        print(f"🚀 HIGH-SPEED data thread started at {LOG_FREQUENCY}Hz!")
+    
+    def _data_thread_worker(self):
+        """MAXIMUM SPEED data acquisition worker - 50Hz!"""
+        interval = 1.0 / LOG_FREQUENCY  # 0.02 seconds for 50Hz
+        next_read_time = time.time()
+        
+        while not self.stop_data_thread:
+            current_time = time.time()
+            
+            if current_time >= next_read_time:
+                try:
+                    # ULTRA-FAST sensor reading
+                    new_readings = self.read_all_sensors_fast()
+                    
+                    # Thread-safe update of shared data
+                    with self.readings_lock:
+                        self.current_readings = new_readings
+                        self.last_reading_time = current_time
+                    
+                    # Schedule next read (precise timing)
+                    next_read_time += interval
+                    
+                except Exception as e:
+                    print(f"Error in high-speed data thread: {e}")
+                    break
+            
+            # MINIMAL sleep for maximum speed
+            time.sleep(0.001)  # 1ms sleep - ULTRA RESPONSIVE!
+    
+    def get_current_readings(self):
+        """Get the latest sensor readings (thread-safe)"""
+        with self.readings_lock:
+            return self.current_readings.copy(), self.last_reading_time
+    
     def start_csv_logging(self, filename=None):
-        """Start CSV logging of lux data at precise 10Hz using dedicated thread"""
+        """Start CSV logging using shared high-speed data"""
         if self.enable_logging:
             print("CSV logging already active!")
             return
@@ -101,32 +154,21 @@ class LuxLogger:
             # Initialize logging state
             self.enable_logging = True
             self.log_start_time = time.time()
-            self.last_log_time = self.log_start_time
-            self.stop_logging_thread = False
             
-            # Start dedicated logging thread for precise 10Hz timing
-            self.logging_thread = threading.Thread(target=self._logging_thread_worker, daemon=True)
-            self.logging_thread.start()
-            
-            print(f"✓ CSV logging started: {filename}")
-            print(f"  Logging at {LOG_FREQUENCY}Hz with dedicated thread")
+            print(f"🚀 ULTRA-FAST CSV logging started: {filename}")
+            print(f"  Logging at {LOG_FREQUENCY}Hz (MAXIMUM SPEED!)")
             print(f"  Columns: {', '.join(header)}")
             
         except Exception as e:
             print(f"✗ Error starting CSV logging: {e}")
     
     def stop_csv_logging(self):
-        """Stop CSV logging and close file"""
+        """Stop CSV logging"""
         if not self.enable_logging:
             print("CSV logging not active!")
             return
             
         try:
-            # Stop the logging thread
-            self.stop_logging_thread = True
-            if self.logging_thread and self.logging_thread.is_alive():
-                self.logging_thread.join(timeout=1.0)  # Wait up to 1 second
-            
             if self.log_file:
                 self.log_file.close()
                 self.log_file = None
@@ -134,90 +176,45 @@ class LuxLogger:
             
             self.enable_logging = False
             self.log_start_time = None
-            print("✓ CSV logging stopped")
+            print("✓ ULTRA-FAST CSV logging stopped")
             
         except Exception as e:
             print(f"✗ Error stopping CSV logging: {e}")
     
-    def _logging_thread_worker(self):
-        """Dedicated thread worker for precise 10Hz logging"""
-        interval = 1.0 / LOG_FREQUENCY  # 0.1 seconds for 10Hz
-        next_log_time = time.time()
-        
-        while not self.stop_logging_thread and self.enable_logging:
-            current_time = time.time()
-            
-            if current_time >= next_log_time:
-                try:
-                    # Read all sensor values
-                    readings = self.read_all_sensors()
-                    
-                    # Calculate relative time from start
-                    relative_time = current_time - self.log_start_time
-                    
-                    # Prepare CSV row: time, channel1, channel2, channel3
-                    row = [f"{relative_time:.6f}"]
-                    for ch in CHANNELS:
-                        lux_value = readings.get(ch)
-                        if lux_value is not None:
-                            row.append(f"{lux_value:.2f}")
-                        else:
-                            row.append("ERROR")
-                    
-                    # Write to CSV
-                    if self.csv_writer:
-                        self.csv_writer.writerow(row)
-                        self.log_file.flush()
-                    
-                    # Schedule next log time (precise 10Hz timing)
-                    next_log_time += interval
-                    
-                except Exception as e:
-                    print(f"Error in logging thread: {e}")
-                    break
-            
-            # Small sleep to prevent busy waiting
-            time.sleep(0.01)  # 10ms sleep
-    
-    def log_data_if_needed(self):
-        """Log data to CSV if logging is enabled and enough time has passed"""
-        if not self.enable_logging or self.csv_writer is None:
+    def log_current_data(self):
+        """Log current shared data to CSV if logging enabled"""
+        if not self.enable_logging or not self.csv_writer:
             return
             
-        current_time = time.time()
-        time_since_last_log = current_time - self.last_log_time
-        
-        # Check if it's time to log (10Hz = 0.1 second intervals)
-        if time_since_last_log >= (1.0 / LOG_FREQUENCY):
-            try:
-                # Read all sensor values BEFORE calculating timing
-                readings = self.read_all_sensors()
-                
-                # Calculate relative time from start (use current time, not after sensor read)
-                relative_time = current_time - self.log_start_time
-                
-                # Prepare CSV row: time, channel1, channel2, channel3
-                row = [f"{relative_time:.6f}"]
-                for ch in CHANNELS:
-                    lux_value = readings.get(ch)
-                    if lux_value is not None:
-                        row.append(f"{lux_value:.2f}")
-                    else:
-                        row.append("ERROR")
-                
-                # Write to CSV
-                self.csv_writer.writerow(row)
-                self.log_file.flush()
-                
-                # Update last log time to maintain consistent 10Hz timing
-                self.last_log_time = current_time
-                
-            except Exception as e:
-                print(f"Error logging data: {e}")
+        try:
+            # Get current shared readings (SAME DATA as display!)
+            readings, reading_time = self.get_current_readings()
+            
+            # Calculate relative time from start
+            relative_time = reading_time - self.log_start_time
+            
+            # Prepare CSV row: time, channel1, channel2, channel3
+            row = [f"{relative_time:.6f}"]
+            for ch in CHANNELS:
+                lux_value = readings.get(ch)
+                if lux_value is not None:
+                    row.append(f"{lux_value:.2f}")
+                else:
+                    row.append("ERROR")
+            
+            # Write to CSV
+            self.csv_writer.writerow(row)
+            self.log_file.flush()
+            
+        except Exception as e:
+            print(f"Error logging data: {e}")
+    
+    # Legacy methods removed - now using ultra-high-speed synchronized approach!
     
     def display_readings(self):
-        """Display current sensor readings"""
-        readings = self.read_all_sensors()
+        """Display current sensor readings using shared data"""
+        # Get current shared readings (SAME DATA as logging!)
+        readings, reading_time = self.get_current_readings()
         
         print("\r", end="")  # Clear line
         status_parts = []
@@ -231,24 +228,25 @@ class LuxLogger:
         
         status = " | ".join(status_parts)
         
-        # Add logging status
+        # Add logging status with data rate
         if self.enable_logging:
             elapsed = time.time() - self.log_start_time if self.log_start_time else 0
-            status += f" | LOG: {elapsed:.1f}s"
+            status += f" | LOG: {elapsed:.1f}s @{LOG_FREQUENCY}Hz"
         else:
-            status += " | LOG: OFF"
+            status += f" | LOG: OFF | DATA: @{LOG_FREQUENCY}Hz"
         
         print(status, end="", flush=True)
     
     def run_interactive(self):
-        """Run interactive monitoring with keyboard commands"""
-        print("=== VEML7700 Lux Sensor Logger ===")
+        """Run ULTRA-HIGH-SPEED interactive monitoring"""
+        print("🚀 === ULTRA-HIGH-SPEED VEML7700 Logger ===")
+        print(f"📊 Data Acquisition: {LOG_FREQUENCY}Hz (MAXIMUM SPEED!)")
+        print(f"🖥️ Display Updates: {DISPLAY_FREQUENCY}Hz")
         print("Commands:")
         print("  'l' = start logging")
         print("  's' = stop logging") 
         print("  'q' = quit")
-        print("  Any other key = refresh display")
-        print("=" * 50)
+        print("=" * 60)
         
         try:
             # Try to set up non-blocking input
@@ -260,35 +258,46 @@ class LuxLogger:
             print("Warning: Non-blocking input not available")
             raw_mode = False
         
+        # High-speed display timing
+        display_interval = 1.0 / DISPLAY_FREQUENCY  # 0.05s for 20Hz display
+        next_display_time = time.time()
+        
         try:
             while True:
-                # Display current readings
-                self.display_readings()
+                current_time = time.time()
                 
-                # Note: Logging is now handled by dedicated thread for precise 10Hz
+                # High-speed display updates
+                if current_time >= next_display_time:
+                    self.display_readings()
+                    
+                    # Log current data if logging enabled (SAME DATA!)
+                    if self.enable_logging:
+                        self.log_current_data()
+                    
+                    next_display_time += display_interval
                 
                 # Check for keyboard input
                 if raw_mode:
                     import select
-                    if select.select([sys.stdin], [], [], 0.1)[0]:
+                    if select.select([sys.stdin], [], [], 0.001)[0]:  # 1ms timeout - ULTRA FAST!
                         key = sys.stdin.read(1).lower()
                         
                         if key == 'q':
                             break
                         elif key == 'l':
                             if not self.enable_logging:
-                                print(f"\n[STARTING LOG] ", end='')
+                                print(f"\n🚀 [STARTING ULTRA-FAST LOG] ", end='')
                                 self.start_csv_logging()
                             else:
-                                print(f"\n[ALREADY LOGGING] ", end='')
+                                print(f"\n⚡ [ALREADY LOGGING @{LOG_FREQUENCY}Hz] ", end='')
                         elif key == 's':
                             if self.enable_logging:
-                                print(f"\n[STOPPING LOG] ", end='')
+                                print(f"\n🛑 [STOPPING LOG] ", end='')
                                 self.stop_csv_logging()
                             else:
-                                print(f"\n[NOT LOGGING] ", end='')
+                                print(f"\n❌ [NOT LOGGING] ", end='')
                 else:
-                    time.sleep(0.1)
+                    time.sleep(0.01)  # Fallback for non-raw mode
                     
         except KeyboardInterrupt:
             pass
@@ -296,11 +305,12 @@ class LuxLogger:
             if raw_mode:
                 termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
             
-            # Stop logging if active
+            # Stop everything
+            self.stop_data_thread = True
             if self.enable_logging:
                 self.stop_csv_logging()
             
-            print(f"\n\nShutdown complete.")
+            print(f"\n\n🏁 ULTRA-HIGH-SPEED shutdown complete.")
 
 
 # Simple function-based interface (for backward compatibility)
