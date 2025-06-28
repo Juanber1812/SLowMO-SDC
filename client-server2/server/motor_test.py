@@ -16,17 +16,23 @@ GPIO.setup(SLEEP_PIN,  GPIO.OUT, initial=GPIO.HIGH)
 
 def rotate_clockwise_dc():
     """Full DC forward."""
+    print("[MOTOR] Starting clockwise rotation")
     GPIO.output(DIR_PIN, GPIO.LOW)
     GPIO.output(ENABLE_PIN, GPIO.HIGH)
+    print(f"[MOTOR] DIR_PIN={GPIO.input(DIR_PIN)}, ENABLE_PIN={GPIO.input(ENABLE_PIN)}")
 
 def rotate_counterclockwise_dc():
     """Full DC reverse."""
+    print("[MOTOR] Starting counterclockwise rotation")
     GPIO.output(DIR_PIN, GPIO.HIGH)
     GPIO.output(ENABLE_PIN, GPIO.HIGH)
+    print(f"[MOTOR] DIR_PIN={GPIO.input(DIR_PIN)}, ENABLE_PIN={GPIO.input(ENABLE_PIN)}")
 
 def stop_motor_dc():
     """Disable driver (0 V to motor)."""
+    print("[MOTOR] Stopping motor")
     GPIO.output(ENABLE_PIN, GPIO.LOW)
+    print(f"[MOTOR] DIR_PIN={GPIO.input(DIR_PIN)}, ENABLE_PIN={GPIO.input(ENABLE_PIN)}")
 
 def cleanup():
     stop_motor_dc()

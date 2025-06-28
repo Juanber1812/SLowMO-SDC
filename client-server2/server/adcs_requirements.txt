@@ -1,0 +1,26 @@
+# ADCS System Requirements
+# Install with: pip install -r adcs_requirements.txt
+
+# Core sensor libraries
+adafruit-circuitpython-veml7700>=1.1.0
+adafruit-circuitpython-busdevice
+adafruit-blinka
+smbus2
+
+# GPIO control
+RPi.GPIO
+
+# Data handling and math
+numpy
+pandas
+
+# Optional: For enhanced data analysis and plotting
+matplotlib
+scipy
+
+# Network integration (if using with Flask server)
+flask
+flask-socketio
+
+# System utilities
+pyserial

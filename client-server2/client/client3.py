@@ -84,7 +84,7 @@ from theme import (
 #                            CONFIGURATION                                  #
 ##############################################################################
 
-SERVER_URL = "http://192.168.39.89:5000"
+SERVER_URL = "http://192.168.1.146:5000"
 
 ##############################################################################
 #                        SOCKETIO AND BRIDGE SETUP                         #
@@ -819,11 +819,19 @@ class MainWindow(QWidget):
 
     def setup_subsystem_status_groups(self, parent_layout):
         """Setup all subsystem status monitoring groups"""
+        # Initialize label dictionaries for live data updates
+        self.power_labels = {}
+        self.thermal_labels = {}
+        self.adcs_labels = {}
+        self.cdh_labels = {}
+        self.error_labels = {}
+        self.overall_labels = {}
+        
         subsystems = [
-            ("Power Subsystem", ["Battery Voltage: Pending...", "Battery Current: Pending...", "Battery Temp: Pending...", "Status: Pending..."]),
-            ("Thermal Subsystem", ["Internal Temp: Pending...", "Status: Pending..."]),
+            ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Temperature: Pending...", "Status: Pending..."]),
+            ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
             ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Signal Strength: Pending...", "Data Rate: Pending..."]),
-            ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Sun Sensor: Pending...", "Wheel Rpm: Pending...", "Status: Pending..."]),
+            ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Lux1: Pending...","Lux2: Pending...","Lux3: Pending...", "RPM: Pending...", "Status: Pending..."]),
             ("Payload Subsystem", []),  # Special handling for payload
             ("Command & Data Handling Subsystem", ["Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
             ("Error Log", ["No Critical Errors Detected: Pending..."]),
@@ -836,7 +844,91 @@ class MainWindow(QWidget):
             layout.setSpacing(2)
             layout.setContentsMargins(2, 2, 2, 2)
 
-            if name == "Communication Subsystem":
+        for name, items in subsystems:
+            group = QGroupBox(name)
+            layout = QVBoxLayout()
+            layout.setSpacing(2)
+            layout.setContentsMargins(2, 2, 2, 2)
+
+            if name == "Power Subsystem":
+                # Store references to power labels for live updates
+                for i, text in enumerate(items):
+                    lbl = QLabel(text)
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    layout.addWidget(lbl)
+                    # Store label references to match your power.py data structure
+                    if "Current:" in text:
+                        self.power_labels["current"] = lbl
+                    elif "Voltage:" in text:
+                        self.power_labels["voltage"] = lbl
+                    elif "Power:" in text:
+                        self.power_labels["power"] = lbl
+                    elif "Energy:" in text:
+                        self.power_labels["energy"] = lbl
+                    elif "Temperature:" in text:
+                        self.power_labels["temperature"] = lbl
+                    elif "Status:" in text:
+                        self.power_labels["status"] = lbl
+                        
+            elif name == "Thermal Subsystem":
+                # Store references to thermal labels for live updates
+                for i, text in enumerate(items):
+                    lbl = QLabel(text)
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    layout.addWidget(lbl)
+                    # Store label references for your new thermal labels
+                    if "Pi:" in text:
+                        self.thermal_labels["pi_temp"] = lbl
+                    elif "Power PCB:" in text:
+                        self.thermal_labels["power_pcb_temp"] = lbl
+                    elif "Battery:" in text:
+                        self.thermal_labels["battery_temp"] = lbl
+                    elif "Status:" in text:
+                        self.thermal_labels["status"] = lbl
+                        
+            elif name == "ADCS Subsystem":
+                # Store references to ADCS labels for live updates
+                for i, text in enumerate(items):
+                    lbl = QLabel(text)
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    layout.addWidget(lbl)
+                    # Store label references for your new ADCS labels
+                    if "Gyro:" in text:
+                        self.adcs_labels["gyro"] = lbl
+                    elif "Orientation:" in text:
+                        self.adcs_labels["orientation"] = lbl
+                    elif "Lux1:" in text:
+                        self.adcs_labels["lux1"] = lbl
+                    elif "Lux2:" in text:
+                        self.adcs_labels["lux2"] = lbl
+                    elif "Lux3:" in text:
+                        self.adcs_labels["lux3"] = lbl
+                    elif "RPM:" in text:
+                        self.adcs_labels["rpm"] = lbl
+                    elif "Status:" in text:
+                        self.adcs_labels["status"] = lbl
+                        
+            elif name == "Command & Data Handling Subsystem":
+                # Store references to CDH labels for live updates
+                for i, text in enumerate(items):
+                    lbl = QLabel(text)
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    layout.addWidget(lbl)
+                    # Store label references
+                    if "Memory Usage" in text:
+                        self.cdh_labels["memory"] = lbl
+                    elif "Last Command" in text:
+                        self.cdh_labels["last_cmd"] = lbl
+                    elif "Uptime" in text:
+                        self.cdh_labels["uptime"] = lbl
+                    elif "Status" in text:
+                        self.cdh_labels["status"] = lbl
+                        
+            elif name == "Communication Subsystem":
                 # Add standard comm items
                 for text in items:
                     lbl = QLabel(text)
@@ -860,13 +952,22 @@ class MainWindow(QWidget):
                 self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.camera_ready_label)
             else:
-                # Standard subsystem items
+                # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
                     lbl = QLabel(text)
                     lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     if name != "Error Log" and name != "Overall Status":
                         lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
+                    
+                    # Store references for Error Log and Overall Status
+                    if name == "Error Log":
+                        self.error_labels["critical_errors"] = lbl
+                    elif name == "Overall Status":
+                        if "Anomalies" in text:
+                            self.overall_labels["anomalies"] = lbl
+                        elif "Recommended" in text:
+                            self.overall_labels["recommendations"] = lbl
 
             group.setLayout(layout)
             self.apply_groupbox_style(
@@ -1051,6 +1152,83 @@ class MainWindow(QWidget):
             except Exception as e:
                 logging.error(f"Failed to process LIDAR status: {e}")
 
+        @sio.on("adcs_broadcast")
+        def on_adcs_data(data):
+            """Handle ADCS subsystem data updates"""
+            try:
+                if hasattr(self, 'adcs_labels'):
+                    # Update ADCS labels in right column with your new labels
+                    if "gyro" in data:
+                        self.adcs_labels["gyro"].setText(f"Gyro: {data['gyro']}")
+                    if "orientation" in data:
+                        self.adcs_labels["orientation"].setText(f"Orientation: {data['orientation']}")
+                    if "lux1" in data:
+                        self.adcs_labels["lux1"].setText(f"Lux1: {data['lux1']}")
+                    if "lux2" in data:
+                        self.adcs_labels["lux2"].setText(f"Lux2: {data['lux2']}")
+                    if "lux3" in data:
+                        self.adcs_labels["lux3"].setText(f"Lux3: {data['lux3']}")
+                    if "rpm" in data:
+                        self.adcs_labels["rpm"].setText(f"RPM: {data['rpm']}")
+                    if "status" in data:
+                        self.adcs_labels["status"].setText(f"Status: {data['status']}")
+            except Exception as e:
+                logging.error(f"Failed to update ADCS data: {e}")
+
+        @sio.on("power_broadcast")
+        def on_power_data(data):
+            """Handle power subsystem data updates"""
+            try:
+                if hasattr(self, 'power_labels'):
+                    # Update power labels to match your power.py data structure
+                    if "current" in data:
+                        self.power_labels["current"].setText(f"Current: {data['current']:.2f} mA")
+                    if "voltage" in data:
+                        self.power_labels["voltage"].setText(f"Voltage: {data['voltage']:.2f} V")
+                    if "power" in data:
+                        self.power_labels["power"].setText(f"Power: {data['power']:.2f} mW")
+                    if "energy" in data:
+                        self.power_labels["energy"].setText(f"Energy: {data['energy']:.2f} J")
+                    if "temperature" in data:
+                        self.power_labels["temperature"].setText(f"Temperature: {data['temperature']:.1f}°C")
+                    if "status" in data:
+                        self.power_labels["status"].setText(f"Status: {data['status']}")
+            except Exception as e:
+                logging.error(f"Failed to update power data: {e}")
+
+        @sio.on("thermal_broadcast")
+        def on_thermal_data(data):
+            """Handle thermal subsystem data updates"""
+            try:
+                if hasattr(self, 'thermal_labels'):
+                    # Update thermal labels with your new labels
+                    if "pi_temp" in data:
+                        self.thermal_labels["pi_temp"].setText(f"Pi: {data['pi_temp']:.1f}°C")
+                    if "power_pcb_temp" in data:
+                        self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {data['power_pcb_temp']:.1f}°C")
+                    if "battery_temp" in data:
+                        self.thermal_labels["battery_temp"].setText(f"Battery: {data['battery_temp']:.1f}°C")
+                    if "status" in data:
+                        self.thermal_labels["status"].setText(f"Status: {data['status']}")
+            except Exception as e:
+                logging.error(f"Failed to update thermal data: {e}")
+
+        @sio.on("cdh_broadcast")
+        def on_cdh_data(data):
+            """Handle Command & Data Handling subsystem data updates"""
+            try:
+                if hasattr(self, 'cdh_labels'):
+                    if "memory_usage" in data:
+                        self.cdh_labels["memory"].setText(f"Memory Usage: {data['memory_usage']:.1f}%")
+                    if "last_command" in data:
+                        self.cdh_labels["last_cmd"].setText(f"Last Command: {data['last_command']}")
+                    if "uptime" in data:
+                        self.cdh_labels["uptime"].setText(f"Uptime: {data['uptime']}")
+                    if "status" in data:
+                        self.cdh_labels["status"].setText(f"Status: {data['status']}")
+            except Exception as e:
+                logging.error(f"Failed to update CDH data: {e}")
+                
     def handle_adcs_command(self, mode_name, command_name, value):
         data = {
             "mode":    mode_name,
