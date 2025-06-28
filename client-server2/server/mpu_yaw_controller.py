@@ -490,17 +490,23 @@ def main():
     )
     
     print("\nSystem ready!")
-    print("Commands:")
-    print("  start      - Start controller (enable motor control)")
-    print("  stop       - Stop controller (disable motor)")
-    print("  t <angle>  - Set target angle (e.g., 't 45')")
+    print("Single Key Commands (just press the key, no ENTER needed):")
+    print("  g          - Start controller (GO)")
+    print("  s          - Stop controller")
     print("  z          - Zero current position")
+    print("  1          - Target  10°")
+    print("  2          - Target  20°") 
+    print("  3          - Target  30°")
+    print("  4          - Target  40°")
+    print("  5          - Target  50°")
+    print("  6          - Target -10°")
+    print("  7          - Target -20°")
+    print("  8          - Target -30°")
+    print("  9          - Target -40°")
+    print("  0          - Target   0°")
     print("  l          - Start logging")
-    print("  s          - Stop logging and save")
-    print("  p <kp> <kd> - Set PD gains (e.g., 'p 2.0 0.5')")
+    print("  x          - Stop logging and save")
     print("  q          - Quit")
-    print("\nTIP: Press SPACE then type command and ENTER")
-    print("     This will pause controller while typing")
     print("-" * 60)
     
     # Set terminal to non-blocking mode
@@ -516,53 +522,42 @@ def main():
         last_time = time.time()
         
         while True:
-            # Check for keyboard commands
-            command = check_keyboard_input()
+            # Check for single-key commands
+            command = check_single_key_input()
             if command:
-                # Temporarily stop controller during command processing
-                was_enabled = controller.controller_enabled
-                if was_enabled:
-                    controller.input_mode = True
-                    stop_motor()  # Immediate stop for safety
-                
-                if command == 'start':
+                if command == 'g':
                     controller.start_controller()
-                    controller.input_mode = False
-                elif command == 'stop':
+                elif command == 's':
                     controller.stop_controller()
-                    controller.input_mode = False
-                elif command.startswith('t '):
-                    try:
-                        target = float(command.split()[1])
-                        controller.set_target(target)
-                        print(f" (Controller was {'paused' if was_enabled else 'stopped'} during input)")
-                    except:
-                        print("\nInvalid target angle")
-                    controller.input_mode = False
                 elif command == 'z':
                     mpu.calibrate_at_current_position()
                     controller.set_target(0.0)
-                    controller.input_mode = False
+                elif command == '1':
+                    controller.set_target(10.0)
+                elif command == '2':
+                    controller.set_target(20.0)
+                elif command == '3':
+                    controller.set_target(30.0)
+                elif command == '4':
+                    controller.set_target(40.0)
+                elif command == '5':
+                    controller.set_target(50.0)
+                elif command == '6':
+                    controller.set_target(-10.0)
+                elif command == '7':
+                    controller.set_target(-20.0)
+                elif command == '8':
+                    controller.set_target(-30.0)
+                elif command == '9':
+                    controller.set_target(-40.0)
+                elif command == '0':
+                    controller.set_target(0.0)
                 elif command == 'l':
                     controller.start_logging()
-                    controller.input_mode = False
-                elif command == 's':
+                elif command == 'x':
                     controller.stop_logging()
-                    controller.input_mode = False
-                elif command.startswith('p '):
-                    try:
-                        parts = command.split()
-                        kp, kd = float(parts[1]), float(parts[2])
-                        controller.kp = kp
-                        controller.kd = kd
-                        print(f"\nPD gains set: Kp={kp}, Kd={kd}")
-                    except:
-                        print("\nInvalid PD gains")
-                    controller.input_mode = False
                 elif command == 'q':
                     break
-                else:
-                    controller.input_mode = False
             
             # Get yaw angle using the same method as mpu.py
             current_yaw = mpu.get_yaw_for_control_pure()  # Pure gyro yaw (no accelerometer bias)
@@ -632,36 +627,16 @@ def main():
         
         print("Cleanup complete.")
 
-def check_keyboard_input():
-    """Check for keyboard input without blocking - improved version"""
+def check_single_key_input():
+    """Check for single key press without blocking"""
     try:
         if select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
-            line = ""
-            while True:
-                if select.select([sys.stdin], [], [], 0.01) == ([sys.stdin], [], []):
-                    char = sys.stdin.read(1)
-                    if char == '\n' or char == '\r':
-                        if line.strip():  # Only return non-empty commands
-                            return line.strip().lower()
-                        else:
-                            return None
-                    elif char == '\x03':  # Ctrl+C
-                        raise KeyboardInterrupt
-                    elif char == '\x7f' or char == '\b':  # Backspace
-                        if line:
-                            line = line[:-1]
-                            print('\b \b', end='', flush=True)
-                    elif char == '\x1b':  # Escape key - cancel current input
-                        # Clear the line
-                        for _ in range(len(line)):
-                            print('\b \b', end='', flush=True)
-                        return None
-                    elif ord(char) >= 32:  # Printable characters only
-                        line += char
-                        print(char, end='', flush=True)
-                else:
-                    # No more input available, return None to continue
-                    return None
+            char = sys.stdin.read(1)
+            # Return the character immediately, no need for Enter
+            if char and ord(char) >= 32:  # Printable character
+                return char.lower()
+            elif char == '\x03':  # Ctrl+C
+                raise KeyboardInterrupt
     except:
         pass
     return None
