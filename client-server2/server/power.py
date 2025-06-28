@@ -8,7 +8,11 @@ try:
 except ImportError as e:
     print(f"Error importing libraries: {e}")
     print("Make sure you have the required libraries installed.")
+    print("Juan, for the adafruit_ina228 library, you can install it using: pip install adafruit-circuitpython-ina228")
+    print("If it's not working let me know, I had some issues and had to use python 3.9 rather than 3.11")
     raise
+
+# Last edited 20250628T15:12
 
 def init_sensor():
     try:
@@ -84,7 +88,7 @@ def get_power_values(ina228):
             "power": ina228.power,
             "energy": ina228.energy,
             "temperature": ina228.die_temperature,
-            "battery_percentage": battery_percentage,  # Placeholder for battery percentage
+            "battery_percentage": battery_percentage,  # Placeholder for battery percentage, should return 0 until logic is added
         }
     except Exception as e:
         print(f"Error reading sensor data: {e}")
@@ -94,7 +98,7 @@ def get_power_values(ina228):
 def print_sensor_data_loop():
     ina228 = init_sensor()
     data_rows = []
-    headers = ['current', 'voltage', 'power', 'energy', 'temperature']
+    headers = ['current', 'voltage', 'power', 'energy', 'temperature', 'battery_percentage']
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     filename = f'power_log_{timestamp}.csv'
     try:

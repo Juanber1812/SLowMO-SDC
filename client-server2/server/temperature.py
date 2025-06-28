@@ -4,9 +4,9 @@ from w1thermsensor import W1ThermSensor
 # documentation: https://github.com/timofurrer/w1thermsensor
 # Example output:
 # {"battery": 25.0, "main": 26.5, "number_of_sensors": 2}
-# Last edited 20250625T21:06
+# Last edited 20250628T15:12
 
-BATTERY_SENSOR_ID = '0b24404e94cd'
+BATTERY_SENSOR_ID = '0b24404e94cd' # depending on setup, you may need to swap these
 MAIN_SENSOR_ID = '0b2440864105'
 
 def get_temperature(sensor_id):
