@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Simple Pitch PD Controller Test
-Tests bang-bang motor control with MPU6050 pitch feedback
+Simple Yaw PD Controller Test (Primary Control Angle)
+Tests bang-bang motor control with MPU6050 yaw feedback for horizontal stabilization
 """
 
 import time
@@ -10,9 +10,9 @@ import threading
 from mpu import MPU6050
 from pd_bangbang import PDController, rotate_clockwise_dc, rotate_counterclockwise_dc, stop_motor_dc, cleanup
 
-class SimplePitchController:
+class SimpleYawController:
     def __init__(self):
-        print("Initializing Simple Pitch Controller...")
+        print("Initializing Simple Yaw Controller (Primary Control)...")
         
         # Initialize MPU6050
         self.mpu = MPU6050()
@@ -24,21 +24,21 @@ class SimplePitchController:
         self.running = False
         self.control_thread = None
         
-        print("Simple Pitch Controller ready!")
+        print("Simple Yaw Controller ready!")
     
     def control_loop(self):
-        """Simple control loop for pitch stabilization"""
-        print(f"Starting pitch control - Target: {self.pd.target_angle}°")
+        """Simple control loop for yaw stabilization (horizontal control)"""
+        print(f"Starting yaw control - Target: {self.pd.target_angle}° (horizontal)")
         print("Press Ctrl+C to stop")
         
         while self.running:
             try:
-                # Get current pitch angle
+                # Get current yaw angle (primary control)
                 data = self.mpu.read_all_data()
-                current_pitch = data['angles']['pitch']
+                current_yaw = data['angles']['yaw']
                 
                 # Update PD controller
-                self.pd.update_current_angle(current_pitch)
+                self.pd.update_current_angle(current_yaw)
                 control_output, error, derivative = self.pd.calculate_control()
                 
                 # SAFETY: Limit control output to prevent runaway
@@ -66,8 +66,8 @@ class SimplePitchController:
                     stop_motor_dc()
                     status = "STOP"
                 
-                # Live display
-                print(f"\\rPitch: {current_pitch:+6.2f}° | Target: {self.pd.target_angle:+6.2f}° | "
+                # Live display (updated for yaw control)
+                print(f"\\rYaw: {current_yaw:+6.2f}° | Target: {self.pd.target_angle:+6.2f}° | "
                       f"Error: {error:+5.2f}° | Control: {control_output:+6.2f} | Motor: {status:<4}", 
                       end='', flush=True)
                 
@@ -117,7 +117,7 @@ class SimplePitchController:
 def main():
     """Test interface"""
     print("="*60)
-    print("🎯 SIMPLE PITCH PD CONTROLLER TEST")
+    print("🎯 SIMPLE YAW PD CONTROLLER TEST (HORIZONTAL CONTROL)")
     print("="*60)
     print("Commands:")
     print("  start <angle>    - Start control to target angle")
@@ -137,11 +137,11 @@ def main():
     print("  - If slow: slightly increase Kp")
     print("="*60)
     
-    controller = SimplePitchController()
+    controller = SimpleYawController()
     
     try:
         while True:
-            cmd = input("\\nPitch> ").strip().split()
+            cmd = input("\\nYaw> ").strip().split()
             
             if not cmd:
                 continue
@@ -192,9 +192,9 @@ def main():
                 data = controller.mpu.read_all_data()
                 angles = data['angles']
                 print(f"\\nCurrent Status:")
-                print(f"  Pitch: {angles['pitch']:+6.2f}°")
+                print(f"  Yaw:   {angles['yaw']:+6.2f}° (PRIMARY)")
                 print(f"  Roll:  {angles['roll']:+6.2f}°")
-                print(f"  Yaw:   {angles['yaw']:+6.2f}°")
+                print(f"  Pitch: {angles['pitch']:+6.2f}°")
                 print(f"  Target: {controller.pd.target_angle:+6.2f}°")
                 print(f"  PD Gains: Kp={controller.pd.kp:.3f}, Kd={controller.pd.kd:.3f}")
                 print(f"  Deadband: {controller.pd.deadband:.1f}°")

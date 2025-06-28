@@ -45,7 +45,8 @@ class InteractiveMPU:
         print("Commands:")
         print("  'l' - Start CSV logging (10Hz)")
         print("  's' - Stop CSV logging")
-        print("  'z' - Zero yaw angle")
+        print("  'z' - Zero pitch angle (secondary)")
+        print("  'r' - Reset yaw to zero (primary control)")
         print("  'c' - Calibrate gyroscope")
         print("  'h' - Show this help")
         print("  'q' - Quit")
@@ -70,8 +71,11 @@ class InteractiveMPU:
                         print("\nStopping CSV logging...")
                         self.mpu.stop_csv_logging()
                     elif char == 'z':
-                        print("\nZeroing yaw angle...")
-                        self.mpu.zero_yaw()
+                        print("\nZeroing pitch angle...")
+                        self.mpu.reset_pitch()
+                    elif char == 'r':
+                        print("\nResetting yaw to zero (primary control)...")
+                        self.mpu.calibrate_at_current_position()
                     elif char == 'c':
                         print("\nCalibrating gyroscope (keep sensor still)...")
                         self.mpu.calibrate_gyro()
@@ -89,12 +93,12 @@ class InteractiveMPU:
                 angles = data['angles']
                 temp = data['temperature']
                 
-                # Live display with logging status
+                # Live display with logging status (updated order: yaw first)
                 log_status = " [LOGGING]" if self.mpu.enable_logging else ""
                 live_display = (
-                    f"\rPitch: {angles['pitch']:+6.1f}° | "
+                    f"\rYaw: {angles['yaw']:+6.1f}° | "      # Primary control (was pitch)
                     f"Roll: {angles['roll']:+6.1f}° | "
-                    f"Yaw: {angles['yaw']:+6.1f}° | "
+                    f"Pitch: {angles['pitch']:+6.1f}° | "   # Secondary (was yaw)
                     f"Accel: X={accel['x']:+5.2f}g Y={accel['y']:+5.2f}g Z={accel['z']:+5.2f}g | "
                     f"Gyro: X={gyro['x']:+5.1f} Y={gyro['y']:+5.1f} Z={gyro['z']:+5.1f} °/s | "
                     f"T: {temp:4.1f}°C{log_status} | Press 'h' for help"
