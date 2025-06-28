@@ -45,11 +45,62 @@ class InteractiveMPU:
         print("Commands:")
         print("  'l' - Start CSV logging (10Hz)")
         print("  's' - Stop CSV logging")
+        print("  'f' - Show current CSV file path")
         print("  'z' - Zero pitch angle (secondary)")
         print("  'r' - Reset yaw to zero (primary control)")
         print("  'c' - Calibrate gyroscope")
         print("  'h' - Show this help")
         print("  'q' - Quit")
+        print("=" * 70)
+        
+    def show_csv_file_info(self):
+        """Show information about CSV files and current logging status"""
+        import os
+        import glob
+        from datetime import datetime
+        
+        print("\n" + "=" * 70)
+        print("CSV FILE INFORMATION")
+        print("=" * 70)
+        
+        # Show current working directory
+        current_dir = os.getcwd()
+        print(f"Current directory: {current_dir}")
+        
+        # Show current logging status
+        if self.mpu.enable_logging and hasattr(self.mpu, 'log_file') and self.mpu.log_file:
+            print(f"Currently logging to: {self.mpu.log_file.name}")
+            print(f"Logging status: ACTIVE")
+        else:
+            print("Logging status: INACTIVE")
+        
+        # Find all CSV files in current directory
+        csv_files = glob.glob("*.csv")
+        imu_csv_files = glob.glob("imu_data_*.csv")
+        
+        if imu_csv_files:
+            print(f"\nFound {len(imu_csv_files)} IMU CSV files:")
+            # Sort by modification time (newest first)
+            imu_csv_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+            
+            for i, file in enumerate(imu_csv_files[:5]):  # Show last 5 files
+                file_path = os.path.abspath(file)
+                file_size = os.path.getsize(file)
+                mod_time = datetime.fromtimestamp(os.path.getmtime(file))
+                
+                print(f"  {i+1}. {file}")
+                print(f"     Path: {file_path}")
+                print(f"     Size: {file_size} bytes")
+                print(f"     Modified: {mod_time.strftime('%Y-%m-%d %H:%M:%S')}")
+                print()
+                
+            if len(imu_csv_files) > 5:
+                print(f"     ... and {len(imu_csv_files) - 5} more files")
+        else:
+            print("\nNo IMU CSV files found in current directory")
+            if csv_files:
+                print(f"Other CSV files found: {len(csv_files)}")
+        
         print("=" * 70)
         
     def run(self):
@@ -70,6 +121,8 @@ class InteractiveMPU:
                     elif char == 's':
                         print("\nStopping CSV logging...")
                         self.mpu.stop_csv_logging()
+                    elif char == 'f':
+                        self.show_csv_file_info()
                     elif char == 'z':
                         print("\nZeroing pitch angle...")
                         self.mpu.reset_pitch()

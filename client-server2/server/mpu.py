@@ -71,6 +71,11 @@ class MPU6050:
         # Initialize the sensor
         self.initialize_sensor()
         
+        # Control mode settings
+        self.use_gyro_only = False
+        self.disable_accel_correction = False
+        self.angle_yaw_pure = 0.0  # Pure gyro integration for control
+        
         # Initialize CSV logging
         self.log_file = None
         self.csv_writer = None
@@ -213,6 +218,11 @@ class MPU6050:
         self.angle_roll += gyro_y * dt_factor
         self.angle_pitch += gyro_x * dt_factor    # Secondary angle (was yaw)
         
+        # Pure gyro integration for control (no accelerometer bias)
+        if not hasattr(self, 'angle_yaw_pure'):
+            self.angle_yaw_pure = 0.0
+        self.angle_yaw_pure += gyro_z * dt_factor
+        
         # Pitch compensation for yaw and roll (transfer angles during pitch rotation)
         pitch_rad = math.radians(gyro_x * dt_factor)
         self.angle_yaw += self.angle_roll * math.sin(pitch_rad)
@@ -229,18 +239,34 @@ class MPU6050:
             # Apply accelerometer calibration
             self.angle_yaw_acc -= self.accel_yaw_cal     # Primary calibration (was pitch_cal)
             self.angle_roll_acc -= self.accel_roll_cal
+        else:
+            # Avoid invalid angle calculations
+            self.angle_yaw_acc = 0.0
+            self.angle_roll_acc = 0.0
         
         # Complementary filter (remapped for spacecraft convention)
         if self.set_gyro_angles:
-            # Combine gyro and accelerometer data
-            self.angle_yaw = (self.angle_yaw * self.complementary_alpha + 
-                             self.angle_yaw_acc * (1 - self.complementary_alpha))    # Primary
-            self.angle_roll = (self.angle_roll * self.complementary_alpha + 
-                             self.angle_roll_acc * (1 - self.complementary_alpha))
+            if self.use_gyro_only:
+                # CONTROL MODE: Use pure gyro integration (no accelerometer bias)
+                pass  # Keep gyro-integrated values as-is
+            elif self.disable_accel_correction:
+                # CONTROL MODE: Reduced accelerometer influence
+                weak_alpha = 0.9999  # Even weaker accelerometer influence
+                self.angle_yaw = (self.angle_yaw * weak_alpha + 
+                                 self.angle_yaw_acc * (1 - weak_alpha))
+                self.angle_roll = (self.angle_roll * weak_alpha + 
+                                 self.angle_roll_acc * (1 - weak_alpha))
+            else:
+                # NORMAL MODE: Standard complementary filter
+                self.angle_yaw = (self.angle_yaw * self.complementary_alpha + 
+                                 self.angle_yaw_acc * (1 - self.complementary_alpha))    # Primary
+                self.angle_roll = (self.angle_roll * self.complementary_alpha + 
+                                 self.angle_roll_acc * (1 - self.complementary_alpha))
         else:
             # First startup - use accelerometer values
             self.angle_yaw = self.angle_yaw_acc      # Primary (was pitch)
             self.angle_roll = self.angle_roll_acc
+            self.angle_yaw_pure = self.angle_yaw_acc  # Initialize pure gyro
             self.set_gyro_angles = True
         
         # Pitch drift compensation (secondary angle, was yaw drift)
@@ -308,7 +334,8 @@ class MPU6050:
             'pitch': self.angle_pitch_output,    # Secondary angle (was yaw)
             'yaw_raw': self.angle_yaw,           # Primary raw (was pitch_raw)
             'roll_raw': self.angle_roll,
-            'pitch_raw': self.angle_pitch        # Secondary raw (was yaw_raw)
+            'pitch_raw': self.angle_pitch,       # Secondary raw (was yaw_raw)
+            'yaw_pure': getattr(self, 'angle_yaw_pure', 0.0)  # Pure gyro integration
         }
     
     def read_all_data(self):
@@ -454,9 +481,19 @@ class MPU6050:
     def get_yaw_for_control(self):
         """Get yaw angle optimized for control (primary control angle)"""
         self.update_angles()
-        # Return raw yaw for faster PD response, or filtered for stability
-        return self.angle_yaw  # Use raw for fast response
-        # return self.angle_yaw_output  # Use filtered for stability
+        
+        # Choose control angle based on mode
+        if self.use_gyro_only:
+            return self.angle_yaw_pure  # Pure gyro, no accelerometer bias
+        elif self.disable_accel_correction:
+            return self.angle_yaw  # Reduced accelerometer influence
+        else:
+            return self.angle_yaw  # Standard filtered angle
+    
+    def get_yaw_for_control_pure(self):
+        """Get pure gyro-integrated yaw for control (no accelerometer bias)"""
+        self.update_angles()
+        return self.angle_yaw_pure if hasattr(self, 'angle_yaw_pure') else self.angle_yaw
     
     def get_pitch_for_control(self):
         """Get pitch angle optimized for control (secondary angle, was yaw)"""
@@ -471,9 +508,26 @@ class MPU6050:
         self.angle_yaw_output = 0.0 # Primary output (was pitch_output)
         self.angle_roll_output = 0.0
         self.angle_pitch_output = 0.0  # Secondary output (was yaw_output)
+        self.angle_yaw_pure = 0.0   # Reset pure gyro integration
         print("Position calibrated - current orientation set as zero reference")
     
-
+    def set_control_mode(self, use_gyro_only=False, disable_accel_correction=False):
+        """Configure filter for control applications"""
+        self.use_gyro_only = use_gyro_only
+        self.disable_accel_correction = disable_accel_correction
+        
+        if use_gyro_only:
+            print("Control mode: GYRO ONLY (no accelerometer bias)")
+        elif disable_accel_correction:
+            print("Control mode: REDUCED ACCELEROMETER CORRECTION")
+        else:
+            print("Control mode: NORMAL (with accelerometer correction)")
+    
+    def get_yaw_for_control_pure(self):
+        """Get pure gyro-integrated yaw for control (no accelerometer bias)"""
+        self.update_angles()
+        return self.angle_yaw_pure if hasattr(self, 'angle_yaw_pure') else self.angle_yaw
+    
 def main(auto_log=False, log_filename=None):
     """Main loop to read and display MPU6050 data with attitude estimation"""
     print("Starting MPU6050 Attitude Estimation System...")
