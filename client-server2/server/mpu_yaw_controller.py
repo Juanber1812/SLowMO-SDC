@@ -20,8 +20,8 @@ import tty
 
 # ── GPIO PIN DEFINITIONS ───────────────────────────────────────────────
 # Motor control pins (from motor_test.py)
-IN1_PIN = 19    # Clockwise control
-IN2_PIN = 13    # Counterclockwise control  
+IN1_PIN = 13    # Clockwise control
+IN2_PIN = 19    # Counterclockwise control  
 SLEEP_PIN = 26  # Motor driver enable
 
 # ── MOTOR CONTROL SETUP ────────────────────────────────────────────────
