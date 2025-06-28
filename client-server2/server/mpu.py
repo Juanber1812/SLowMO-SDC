@@ -359,7 +359,7 @@ class MPU6050:
                     acc_x, acc_y, acc_z,
                     gyro_x, gyro_y, gyro_z,
                     temperature,
-                    angles['yaw'], angles['roll'], angles['pitch'],    # Remapped order
+                    angles['yaw_pure'], angles['roll'], angles['pitch'],    # Use pure gyro yaw
                     self.dt, self.yaw_drift_rate
                 ])
                 self.log_file.flush()  # Ensure data is written to file
