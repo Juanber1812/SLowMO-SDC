@@ -3,9 +3,7 @@ from w1thermsensor import W1ThermSensor
 # need to run sudo apt-get install python3-w1thermsensor
 # documentation: https://github.com/timofurrer/w1thermsensor
 # Example output:
-# Sensor 28-000007602ffa has temperature 22.50
-# Sensor 28-000007602ffb has temperature 23.00
-# Sensor 28-000007602ffb has temperature 23.00
+# {"battery": 25.0, "main": 26.5, "number_of_sensors": 2}
 # Last edited 20250625T21:06
 
 BATTERY_SENSOR_ID = '0b24404e94cd'
@@ -20,6 +18,8 @@ def get_temperature(sensor_id):
         print(f"Error reading temperature from sensor {sensor_id}: {e}")
         return None
 
+# Juan, you'll want to call this function to get a JSON of all temperatures
+# from all sensors, including the battery and main sensor.
 def get_all_temperatures():
     sensors = W1ThermSensor.get_available_sensors()
     temperatures = {}
