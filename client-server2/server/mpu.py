@@ -84,6 +84,7 @@ class MPU6050:
         self.csv_writer = None
         self.enable_logging = False
         self.last_log_time = time.time()  # For 10Hz logging timing
+        self.log_start_time = None  # For relative timestamp starting at 0
     
     def initialize_sensor(self):
         """Initialize MPU6050 with proper configuration"""
@@ -431,12 +432,13 @@ class MPU6050:
             self.log_file = open(filename, 'w', newline='')
             self.csv_writer = csv.writer(self.log_file)
             
-            # Write header (pure gyro yaw for control)
-            self.csv_writer.writerow(['timestamp', 'yaw_pure', 'roll', 'pitch'])
+            # Write simple 2-column header
+            self.csv_writer.writerow(['time', 'yaw'])
             self.log_file.flush()
             
             self.enable_logging = True
             self.last_log_time = time.time()
+            self.log_start_time = time.time()  # Set start time for relative timestamps
             print(f"CSV logging started: {filename}")
             
         except Exception as e:
@@ -468,12 +470,13 @@ class MPU6050:
         current_time = time.time()
         if current_time - self.last_log_time >= 0.1:  # 10Hz = 0.1 seconds
             try:
-                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]  # millisecond precision
+                # Calculate relative time from start (in seconds with high precision)
+                relative_time = current_time - self.log_start_time
+                
+                # Log only time and yaw with good decimal precision
                 self.csv_writer.writerow([
-                    timestamp,
-                    round(self.angle_yaw_pure, 3),        # PURE gyro yaw (no accelerometer bias)
-                    round(self.angle_roll_output, 3),
-                    round(self.angle_pitch_output, 3)     # Secondary (was yaw)
+                    f"{relative_time:.6f}",               # 6 decimal places for time
+                    f"{self.angle_yaw_pure:.6f}"          # 6 decimal places for yaw angle
                 ])
                 self.log_file.flush()  # Ensure data is written immediately
                 self.last_log_time = current_time
