@@ -5,6 +5,7 @@ Clean, no-spam comparison of filter behavior
 """
 
 import time
+import sys
 from mpu import MPU6050
 
 def clean_drift_test():
@@ -28,6 +29,7 @@ def clean_drift_test():
     print("-" * 50)
     
     try:
+        counter = 0
         while True:
             data = mpu.read_all_data()
             angles = data['angles']
@@ -36,14 +38,15 @@ def clean_drift_test():
             pure_yaw = angles.get('yaw_pure', 0)
             bias = pure_yaw - filtered_yaw
             
-            # Simple, clean display
-            print(f"\\rFiltered: {filtered_yaw:+6.1f}° | Pure: {pure_yaw:+6.1f}° | Bias: {bias:+5.1f}°", 
-                  end='', flush=True)
+            # Clear the line and print new data
+            counter += 1
+            sys.stdout.write(f"\rSample {counter:4d} | Filtered: {filtered_yaw:+6.1f}° | Pure: {pure_yaw:+6.1f}° | Bias: {bias:+5.1f}°")
+            sys.stdout.flush()
             
-            time.sleep(0.1)
+            time.sleep(0.2)  # Slower updates = less spam
             
     except KeyboardInterrupt:
-        print("\\n\\n" + "=" * 50)
+        print("\n\n" + "=" * 50)
         print("🎯 ANALYSIS COMPLETE")
         print("=" * 50)
         print("What you just saw:")
