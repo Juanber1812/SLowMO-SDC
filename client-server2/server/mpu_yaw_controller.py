@@ -163,18 +163,36 @@ class MPU6050:
         print(f"Offsets - X: {self.gyro_x_cal:.3f}, Y: {self.gyro_y_cal:.3f}, Z: {self.gyro_z_cal:.3f}")
     
     def read_raw_data(self, addr):
-        """Read raw 16-bit data from sensor"""
-        high = self.bus.read_byte_data(self.device_address, addr)
-        low = self.bus.read_byte_data(self.device_address, addr + 1)
-        
-        # Combine high and low bytes
-        value = (high << 8) + low
-        
-        # Convert to signed 16-bit
-        if value >= 32768:
-            value = value - 65536
+        """Read raw 16-bit data from sensor with error handling"""
+        try:
+            high = self.bus.read_byte_data(self.device_address, addr)
+            low = self.bus.read_byte_data(self.device_address, addr + 1)
             
-        return value
+            # Combine high and low bytes
+            value = (high << 8) + low
+            
+            # Convert to signed 16-bit
+            if value >= 32768:
+                value = value - 65536
+                
+            return value
+        except OSError as e:
+            if e.errno == 121:  # Remote I/O error
+                print(f"\nI2C communication error: {e}")
+                print("Trying to reconnect to MPU6050...")
+                time.sleep(0.1)
+                try:
+                    # Try to reinitialize the bus connection
+                    self.bus.close()
+                    self.bus = smbus2.SMBus(1)
+                    # Wake up the MPU6050 again
+                    self.bus.write_byte_data(self.device_address, self.PWR_MGMT_1, 0)
+                    return 0  # Return safe value
+                except:
+                    print("Failed to reconnect. Returning safe value.")
+                    return 0
+            else:
+                raise e
     
     def read_accelerometer(self):
         """Read accelerometer data (x, y, z) in g"""
@@ -332,6 +350,7 @@ class PDBangBangController:
         
         # Controller enable/disable
         self.controller_enabled = False  # Controller starts disabled
+        self.input_mode = False  # Flag to indicate when user is typing
         
         # Logging
         self.log_data = []
@@ -366,8 +385,8 @@ class PDBangBangController:
         Returns:
             motor_command: "CW", "CCW", or "STOP"
         """
-        # If controller is disabled, always return STOP
-        if not self.controller_enabled:
+        # If controller is disabled or in input mode, always return STOP
+        if not self.controller_enabled or self.input_mode:
             return "STOP", 0.0, 0.0
         
         # Calculate error
@@ -480,6 +499,8 @@ def main():
     print("  s          - Stop logging and save")
     print("  p <kp> <kd> - Set PD gains (e.g., 'p 2.0 0.5')")
     print("  q          - Quit")
+    print("\nTIP: Press SPACE then type command and ENTER")
+    print("     This will pause controller while typing")
     print("-" * 60)
     
     # Set terminal to non-blocking mode
@@ -498,23 +519,36 @@ def main():
             # Check for keyboard commands
             command = check_keyboard_input()
             if command:
+                # Temporarily stop controller during command processing
+                was_enabled = controller.controller_enabled
+                if was_enabled:
+                    controller.input_mode = True
+                    stop_motor()  # Immediate stop for safety
+                
                 if command == 'start':
                     controller.start_controller()
+                    controller.input_mode = False
                 elif command == 'stop':
                     controller.stop_controller()
+                    controller.input_mode = False
                 elif command.startswith('t '):
                     try:
                         target = float(command.split()[1])
                         controller.set_target(target)
+                        print(f" (Controller was {'paused' if was_enabled else 'stopped'} during input)")
                     except:
                         print("\nInvalid target angle")
+                    controller.input_mode = False
                 elif command == 'z':
                     mpu.calibrate_at_current_position()
                     controller.set_target(0.0)
+                    controller.input_mode = False
                 elif command == 'l':
                     controller.start_logging()
+                    controller.input_mode = False
                 elif command == 's':
                     controller.stop_logging()
+                    controller.input_mode = False
                 elif command.startswith('p '):
                     try:
                         parts = command.split()
@@ -524,8 +558,11 @@ def main():
                         print(f"\nPD gains set: Kp={kp}, Kd={kd}")
                     except:
                         print("\nInvalid PD gains")
+                    controller.input_mode = False
                 elif command == 'q':
                     break
+                else:
+                    controller.input_mode = False
             
             # Get yaw angle using the same method as mpu.py
             current_yaw = mpu.get_yaw_for_control_pure()  # Pure gyro yaw (no accelerometer bias)
@@ -542,8 +579,8 @@ def main():
             # Update PD controller
             motor_cmd, error, pd_output = controller.update(current_yaw, gyro_rate, dt)
             
-            # Execute motor command only if controller is enabled
-            if controller.controller_enabled:
+            # Execute motor command only if controller is enabled and not in input mode
+            if controller.controller_enabled and not controller.input_mode:
                 if motor_cmd == "CW":
                     rotate_clockwise()
                 elif motor_cmd == "CCW":
@@ -551,12 +588,17 @@ def main():
                 else:
                     stop_motor()
             else:
-                stop_motor()  # Ensure motor is stopped when controller is disabled
+                stop_motor()  # Ensure motor is stopped when controller is disabled or in input mode
             
             # Display status every 10 loops (~10Hz)
             if loop_count % 10 == 0:
                 log_status = " [LOG]" if controller.enable_logging else ""
-                ctrl_status = " [ON]" if controller.controller_enabled else " [OFF]"
+                if controller.input_mode:
+                    ctrl_status = " [PAUSE]"
+                elif controller.controller_enabled:
+                    ctrl_status = " [ON]"
+                else:
+                    ctrl_status = " [OFF]"
                 status = (
                     f"\rYaw: {current_yaw:+6.1f}° | "
                     f"Target: {controller.target_yaw:+6.1f}° | "
@@ -591,23 +633,35 @@ def main():
         print("Cleanup complete.")
 
 def check_keyboard_input():
-    """Check for keyboard input without blocking"""
+    """Check for keyboard input without blocking - improved version"""
     try:
         if select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
             line = ""
             while True:
-                char = sys.stdin.read(1)
-                if char == '\n' or char == '\r':
-                    return line.strip().lower()
-                elif char == '\x03':  # Ctrl+C
-                    raise KeyboardInterrupt
-                elif char == '\x7f':  # Backspace
-                    if line:
-                        line = line[:-1]
-                        print('\b \b', end='', flush=True)
+                if select.select([sys.stdin], [], [], 0.01) == ([sys.stdin], [], []):
+                    char = sys.stdin.read(1)
+                    if char == '\n' or char == '\r':
+                        if line.strip():  # Only return non-empty commands
+                            return line.strip().lower()
+                        else:
+                            return None
+                    elif char == '\x03':  # Ctrl+C
+                        raise KeyboardInterrupt
+                    elif char == '\x7f' or char == '\b':  # Backspace
+                        if line:
+                            line = line[:-1]
+                            print('\b \b', end='', flush=True)
+                    elif char == '\x1b':  # Escape key - cancel current input
+                        # Clear the line
+                        for _ in range(len(line)):
+                            print('\b \b', end='', flush=True)
+                        return None
+                    elif ord(char) >= 32:  # Printable characters only
+                        line += char
+                        print(char, end='', flush=True)
                 else:
-                    line += char
-                    print(char, end='', flush=True)
+                    # No more input available, return None to continue
+                    return None
     except:
         pass
     return None
