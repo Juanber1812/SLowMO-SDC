@@ -325,6 +325,29 @@ class MPU6050:
             'dt': self.dt,
             'yaw_drift_rate': self.yaw_drift_rate
         }
+    
+    def get_pitch_for_control(self):
+        """Get pitch angle optimized for control (less filtering for faster response)"""
+        self.update_angles()
+        # Return raw pitch for faster PD response, or filtered for stability
+        return self.angle_pitch  # Use raw for fast response
+        # return self.angle_pitch_output  # Use filtered for stability
+    
+    def get_yaw_for_control(self):
+        """Get yaw angle optimized for control"""
+        self.update_angles()
+        return self.angle_yaw  # Raw yaw for control
+    
+    def calibrate_at_current_position(self):
+        """Calibrate the current position as zero reference"""
+        self.angle_pitch = 0.0
+        self.angle_roll = 0.0
+        self.angle_yaw = 0.0
+        self.angle_pitch_output = 0.0
+        self.angle_roll_output = 0.0
+        self.angle_yaw_output = 0.0
+        print("Position calibrated - current orientation set as zero reference")
+    
 
 def main():
     """Main loop to read and display MPU6050 data with attitude estimation"""
