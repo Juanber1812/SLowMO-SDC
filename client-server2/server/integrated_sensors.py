@@ -53,6 +53,11 @@ class IntegratedSensorLogger:
             'lux': {ch: 0.0 for ch in LUX_CHANNELS}
         }
         
+        # MPU angle integration (EXACTLY like original MPU.py)
+        self.angle_yaw_pure = 0.0  # Pure gyro integration for yaw
+        self.last_time = time.time()
+        self.dt = 0.0
+        
         # Logging variables
         self.log_file = None
         self.csv_writer = None
@@ -193,25 +198,35 @@ class IntegratedSensorLogger:
             return 0.0
     
     def read_all_sensors_ultra_fast(self):
-        """ULTRA-FAST reading of all sensors - uses cached sensor instances"""
+        """ULTRA-FAST reading of all sensors - EXACT same yaw calculation as original MPU.py"""
         data = {
             'mpu': {'yaw': 0.0, 'roll': 0.0, 'pitch': 0.0, 'temp': 0.0},
             'lux': {ch: 0.0 for ch in LUX_CHANNELS}
         }
         
-        # Read MPU6050 (IMU)
+        # Read MPU6050 (IMU) - EXACTLY like original mpu.py
         gyro = self.read_mpu_gyro_raw()
         accel = self.read_mpu_accel_raw()
         temp = self.read_mpu_temp()
         
         if gyro and accel:
-            # Apply calibration
+            # Apply calibration to gyro readings
             gyro_cal = [gyro[i] - self.gyro_cal[i] for i in range(3)]
             
-            # Simple attitude calculation (spacecraft convention)
-            data['mpu']['yaw'] = math.degrees(math.atan2(accel[1], accel[2]))     # Primary
-            data['mpu']['roll'] = math.degrees(math.atan2(accel[0], accel[2]))    # Secondary  
-            data['mpu']['pitch'] = gyro_cal[0]  # Gyro rate for pitch
+            # Update timing for integration (EXACTLY like original)
+            current_time = time.time()
+            self.dt = current_time - self.last_time
+            self.last_time = current_time
+            
+            # Pure gyro integration for yaw (EXACTLY like original MPU.py)
+            # Original: self.angle_yaw_pure += gyro_z * dt_factor
+            dt_factor = self.dt
+            self.angle_yaw_pure += gyro_cal[2] * dt_factor  # Z-axis gyro for yaw
+            
+            # Set the MPU data EXACTLY like original
+            data['mpu']['yaw'] = self.angle_yaw_pure  # Pure gyro integration (PERFECT!)
+            data['mpu']['roll'] = math.degrees(math.atan2(accel[0], accel[2]))    # Roll from accel  
+            data['mpu']['pitch'] = gyro_cal[0]  # X-axis gyro rate for pitch
             data['mpu']['temp'] = temp
         
         # Read Lux sensors using CACHED instances for reliability
@@ -449,12 +464,17 @@ class IntegratedSensorLogger:
         except:
             time.sleep(2)
     
+    def zero_yaw_position(self):
+        """Zero the current yaw position (EXACTLY like original MPU.py)"""
+        self.angle_yaw_pure = 0.0
+        print("\nYaw position zeroed - current orientation set as zero reference")
+    
     def run_interactive(self):
         """Run integrated sensor monitoring"""
         print("🚀 === ULTRA-HIGH-SPEED INTEGRATED SENSOR LOGGER ===")
         print(f"📊 MPU6050 (IMU) + VEML7700 (Lux) @ {LOG_FREQUENCY}Hz")
         print(f"🖥️ Display: {DISPLAY_FREQUENCY}Hz")
-        print("Commands: 'l'=log 's'=stop 'd'=debug 'q'=quit")
+        print("Commands: 'l'=log 's'=stop 'd'=debug 'z'=zero_yaw 'q'=quit")
         print("=" * 80)
         
         try:
@@ -502,6 +522,9 @@ class IntegratedSensorLogger:
                         elif key == 'd':
                             print(f"\n🔍 [SENSOR DEBUG] ", end='')
                             self.debug_sensors()
+                        elif key == 'z':
+                            print(f"\n🎯 [YAW ZEROED] ", end='')
+                            self.zero_yaw_position()
                 else:
                     time.sleep(0.01)
                     
