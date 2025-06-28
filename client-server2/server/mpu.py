@@ -13,6 +13,9 @@ from datetime import datetime
 import sys
 import csv
 import os
+import select
+import termios
+import tty
 
 class MPU6050:
     def __init__(self, bus_number=1, device_address=0x68):
@@ -542,11 +545,40 @@ def main(auto_log=False, log_filename=None):
         if auto_log:
             mpu.start_csv_logging(log_filename)
         
-        print("System ready! Live data display active (angles + raw sensor data)")
-        print("Commands: 'l' = start logging, 's' = stop logging, 'q' = quit, 'z' = zero pitch")
+        print("System ready! Live data display active (PURE GYRO MODE)")
+        print("Commands: 'l' = start logging, 's' = stop logging, 'q' = quit, 'z' = zero position")
         print("=" * 90)
         
+        # Set terminal to non-blocking mode for keyboard input
+        old_settings = None
+        try:
+            old_settings = termios.tcgetattr(sys.stdin)
+            tty.setraw(sys.stdin.fileno())
+        except:
+            print("Warning: Could not set terminal mode for keyboard input")
+        
         while True:
+            # Check for keyboard commands
+            key = check_keyboard_input()
+            if key:
+                if key == 'l':
+                    if not mpu.enable_logging:
+                        mpu.start_csv_logging()
+                        print(f"\n[LOGGING STARTED] ", end='')
+                    else:
+                        print(f"\n[ALREADY LOGGING] ", end='')
+                elif key == 's':
+                    if mpu.enable_logging:
+                        mpu.stop_csv_logging()
+                        print(f"\n[LOGGING STOPPED] ", end='')
+                    else:
+                        print(f"\n[NOT LOGGING] ", end='')
+                elif key == 'z':
+                    mpu.calibrate_at_current_position()
+                    print(f"\n[POSITION ZEROED] ", end='')
+                elif key == 'q':
+                    break
+            
             # Read sensor data and update angles
             data = mpu.read_all_data()
             
@@ -583,6 +615,13 @@ def main(auto_log=False, log_filename=None):
         import traceback
         traceback.print_exc()
     finally:
+        # Restore terminal settings
+        if old_settings:
+            try:
+                termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+            except:
+                pass
+        
         # Ensure CSV logging is stopped and file is closed
         if 'mpu' in locals():
             mpu.stop_csv_logging()
@@ -622,6 +661,15 @@ def pd_controller_demo():
     except KeyboardInterrupt:
         print("\nPD Controller demo stopped.")
     
+def check_keyboard_input():
+    """Check for keyboard input without blocking"""
+    try:
+        if select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
+            return sys.stdin.read(1).lower()
+    except:
+        pass
+    return None
+
 if __name__ == "__main__":
     import sys
     import argparse
