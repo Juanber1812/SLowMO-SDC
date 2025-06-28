@@ -8,6 +8,8 @@ try:
 except ImportError as e:
     print(f"Error importing libraries: {e}")
     print("Make sure you have the required libraries installed.")
+    print("Juan, for the adafruit_ina228 library, you can install it using: pip install adafruit-circuitpython-ina228")
+    print("If it's not working let me know, I had some issues and had to use python 3.9 rather than 3.11")
     raise
 
 def init_sensor():
