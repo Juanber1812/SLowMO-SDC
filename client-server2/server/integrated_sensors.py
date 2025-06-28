@@ -90,24 +90,31 @@ class IntegratedSensorLogger:
             print(f"✗ MPU6050 initialization failed: {e}")
             self.mpu_bus = None
     
-    def calibrate_mpu6050(self):
-        """Quick MPU6050 calibration"""
-        print("🔧 Quick MPU6050 calibration...")
+    def calibrate_mpu6050(self, samples=2000):
+        """Thorough MPU6050 calibration - restored original method"""
+        print("🔧 Calibrating MPU6050... Keep sensor stationary!")
+        print("This may take 8-10 seconds for thorough calibration...")
+        
         gyro_sum = [0, 0, 0]
-        samples = 100
         
         for i in range(samples):
             gyro_data = self.read_mpu_gyro_raw()
             if gyro_data:
                 for j in range(3):
                     gyro_sum[j] += gyro_data[j]
-            time.sleep(0.01)
+            
+            # Progress indicator
+            if i % 200 == 0:
+                print(f"Calibration progress: {(i/samples)*100:.1f}%")
+            
+            time.sleep(0.004)  # 250Hz sampling for thorough calibration
         
         self.gyro_cal = [s / samples for s in gyro_sum]
-        print(f"✓ MPU6050 calibrated: {[f'{x:.2f}' for x in self.gyro_cal]}")
+        print(f"✓ MPU6050 thorough calibration complete!")
+        print(f"  Offsets - X: {self.gyro_cal[0]:.3f}, Y: {self.gyro_cal[1]:.3f}, Z: {self.gyro_cal[2]:.3f}")
     
     def init_lux_sensors(self):
-        """Initialize VEML7700 lux sensors with multiplexer"""
+        """Initialize VEML7700 lux sensors with multiplexer - cached for reliability"""
         try:
             self.lux_i2c = busio.I2C(board.SCL, board.SDA)
             self.lux_sensors = {}
@@ -116,12 +123,17 @@ class IntegratedSensorLogger:
             for ch in LUX_CHANNELS:
                 try:
                     self.select_lux_channel(ch)
+                    time.sleep(0.01)  # Extra settling time for initialization
                     sensor = VEML7700(self.lux_i2c)
+                    # Test the sensor by reading once
+                    test_read = sensor.lux
                     self.lux_sensors[ch] = sensor
-                    print(f"✓ Lux channel {ch} initialized")
+                    print(f"✓ Lux channel {ch} initialized (test reading: {test_read:.1f})")
                 except Exception as e:
                     print(f"✗ Lux channel {ch} failed: {e}")
                     self.lux_sensors[ch] = None
+            
+            print(f"✓ {len([s for s in self.lux_sensors.values() if s is not None])}/{len(LUX_CHANNELS)} lux sensors ready")
             
         except Exception as e:
             print(f"✗ Lux sensor initialization failed: {e}")
@@ -181,7 +193,7 @@ class IntegratedSensorLogger:
             return 0.0
     
     def read_all_sensors_ultra_fast(self):
-        """ULTRA-FAST reading of all sensors"""
+        """ULTRA-FAST reading of all sensors - uses cached sensor instances"""
         data = {
             'mpu': {'yaw': 0.0, 'roll': 0.0, 'pitch': 0.0, 'temp': 0.0},
             'lux': {ch: 0.0 for ch in LUX_CHANNELS}
@@ -202,15 +214,27 @@ class IntegratedSensorLogger:
             data['mpu']['pitch'] = gyro_cal[0]  # Gyro rate for pitch
             data['mpu']['temp'] = temp
         
-        # Read Lux sensors (if available)
-        if LUX_AVAILABLE and self.lux_i2c:
+        # Read Lux sensors using CACHED instances for reliability
+        if LUX_AVAILABLE and self.lux_i2c and hasattr(self, 'lux_sensors'):
             for ch in LUX_CHANNELS:
                 try:
-                    self.select_lux_channel(ch)
-                    sensor = VEML7700(self.lux_i2c)
-                    data['lux'][ch] = sensor.lux
-                except:
-                    data['lux'][ch] = 0.0
+                    if ch in self.lux_sensors and self.lux_sensors[ch] is not None:
+                        self.select_lux_channel(ch)
+                        # Use the cached sensor instance - much more reliable!
+                        data['lux'][ch] = self.lux_sensors[ch].lux
+                    else:
+                        data['lux'][ch] = 0.0
+                except Exception as e:
+                    # If cached sensor fails, try to reinitialize it once
+                    try:
+                        print(f"Warning: Lux channel {ch} error, reinitializing: {e}")
+                        self.select_lux_channel(ch)
+                        time.sleep(0.01)
+                        self.lux_sensors[ch] = VEML7700(self.lux_i2c)
+                        data['lux'][ch] = self.lux_sensors[ch].lux
+                    except:
+                        data['lux'][ch] = 0.0
+                        self.lux_sensors[ch] = None  # Mark as failed
         
         return data
     
@@ -352,12 +376,85 @@ class IntegratedSensorLogger:
         status = f"{mpu_status} | {lux_status} | {log_status}"
         print(status, end="", flush=True)
     
+    def debug_sensors(self):
+        """Debug sensor status and perform individual channel tests"""
+        print("\n" + "="*60)
+        print("🔍 SENSOR DEBUG REPORT")
+        print("="*60)
+        
+        # MPU6050 debug
+        print("📍 MPU6050 Status:")
+        if self.mpu_bus:
+            try:
+                gyro = self.read_mpu_gyro_raw()
+                accel = self.read_mpu_accel_raw()
+                temp = self.read_mpu_temp()
+                print(f"  ✓ Active - Gyro: {gyro}, Accel: {accel}, Temp: {temp:.1f}°C")
+                print(f"  📊 Calibration: {[f'{x:.3f}' for x in self.gyro_cal]}")
+            except Exception as e:
+                print(f"  ✗ Error: {e}")
+        else:
+            print("  ✗ Not initialized")
+        
+        # Lux sensors debug
+        print("\n💡 VEML7700 Lux Sensors:")
+        if LUX_AVAILABLE and self.lux_i2c:
+            for ch in LUX_CHANNELS:
+                print(f"  Channel {ch}:", end=" ")
+                if ch in self.lux_sensors and self.lux_sensors[ch] is not None:
+                    try:
+                        self.select_lux_channel(ch)
+                        time.sleep(0.01)
+                        reading = self.lux_sensors[ch].lux
+                        print(f"✓ Active - Reading: {reading:.2f} lux")
+                        
+                        # Test multiple readings for stability
+                        readings = []
+                        for i in range(5):
+                            try:
+                                readings.append(self.lux_sensors[ch].lux)
+                                time.sleep(0.02)
+                            except:
+                                readings.append(None)
+                        
+                        valid_readings = [r for r in readings if r is not None]
+                        if len(valid_readings) > 0:
+                            avg = sum(valid_readings) / len(valid_readings)
+                            print(f"    📊 5-sample test: {len(valid_readings)}/5 valid, avg: {avg:.2f}")
+                        else:
+                            print(f"    ⚠️ All test readings failed!")
+                            
+                    except Exception as e:
+                        print(f"✗ Read error: {e}")
+                        # Try to reinitialize
+                        try:
+                            print(f"    🔧 Attempting reinit...", end=" ")
+                            self.select_lux_channel(ch)
+                            time.sleep(0.02)
+                            self.lux_sensors[ch] = VEML7700(self.lux_i2c)
+                            test_read = self.lux_sensors[ch].lux
+                            print(f"✓ Success! New reading: {test_read:.2f}")
+                        except Exception as e2:
+                            print(f"✗ Reinit failed: {e2}")
+                            self.lux_sensors[ch] = None
+                else:
+                    print("✗ Not initialized or failed")
+        else:
+            print("  ✗ VEML7700 library not available")
+        
+        print("="*60)
+        print("Press any key to continue...")
+        try:
+            sys.stdin.read(1)
+        except:
+            time.sleep(2)
+    
     def run_interactive(self):
         """Run integrated sensor monitoring"""
         print("🚀 === ULTRA-HIGH-SPEED INTEGRATED SENSOR LOGGER ===")
         print(f"📊 MPU6050 (IMU) + VEML7700 (Lux) @ {LOG_FREQUENCY}Hz")
         print(f"🖥️ Display: {DISPLAY_FREQUENCY}Hz")
-        print("Commands: 'l'=log 's'=stop 'q'=quit")
+        print("Commands: 'l'=log 's'=stop 'd'=debug 'q'=quit")
         print("=" * 80)
         
         try:
@@ -402,6 +499,9 @@ class IntegratedSensorLogger:
                                 self.stop_csv_logging()
                             else:
                                 print(f"\n❌ [NOT LOGGING] ", end='')
+                        elif key == 'd':
+                            print(f"\n🔍 [SENSOR DEBUG] ", end='')
+                            self.debug_sensors()
                 else:
                     time.sleep(0.01)
                     
