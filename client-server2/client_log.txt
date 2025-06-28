@@ -1229,3 +1229,19 @@ ValueError: Client is not in a disconnected state
 2025-06-28 17:34:16,869 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
 2025-06-28 17:34:18,962 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.128.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751128456.871539 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000017DFB4F2A50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
 2025-06-28 17:34:19,214 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-28 18:54:17,609 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-28 18:54:17,892 - INFO - Connected to server
+2025-06-28 18:54:17,896 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 18:54:17,901 - INFO - [INFO] Successfully connected to server
+2025-06-28 18:55:00,490 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 18:55:00,493 - INFO - Stream paused for config application.
+2025-06-28 18:55:00,995 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-28 18:55:01,000 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-28 18:55:01,203 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-28 18:55:19,890 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 18:55:19,894 - INFO - Stream paused for config application.
+2025-06-28 18:55:20,423 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-28 18:55:20,489 - INFO - Detector calibration updated: calibrations/calibration_4608x2592.npz
+2025-06-28 18:55:20,692 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-28 18:56:16,383 - INFO - Disconnected from server: transport error
+2025-06-28 18:56:17,223 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.

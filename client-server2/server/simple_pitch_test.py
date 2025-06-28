@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 """
-Simple Yaw PD Controller Test (Primary Control Angle)
+Simple Yaw PD Controller Test (Primary Con                # Live display (using PURE GYRO data - same as mpu.py)
+                print(f"\rYaw_PURE: {current_yaw:+6.2            elif cmd[0] == "status":
+                data = controller.mpu.read_all_data()
+                angles = data['angles']
+                print(f"\nCurrent Status:")
+                print(f"  Yaw_PURE: {angles['yaw_pure']:+6.2f}° (CONTROL - no accel bias)")
+                print(f"  Yaw_Filt: {angles['yaw']:+6.2f}° (filtered)")
+                print(f"  Roll:     {angles['roll']:+6.2f}°")
+                print(f"  Pitch:    {angles['pitch']:+6.2f}°")
+                print(f"  Target:   {controller.pd.target_angle:+6.2f}°")
+                print(f"  PD Gains: Kp={controller.pd.kp:.3f}, Kd={controller.pd.kd:.3f}")
+                print(f"  Deadband: {controller.pd.deadband:.1f}°")
+                print(f"  Running:  {controller.running}")t: {self.pd.target_angle:+6.2f}° | "
+                      f"Error: {error:+5.2f}° | Control: {control_output:+6.2f} | Motor: {status:<4}", 
+                      end='', flush=True) Angle)
 Tests bang-bang motor control with MPU6050 yaw feedback for horizontal stabilization
 """
 
@@ -16,6 +30,9 @@ class SimpleYawController:
         
         # Initialize MPU6050
         self.mpu = MPU6050()
+        
+        # Set to GYRO-ONLY mode to disable accelerometer bias (same as mpu.py)
+        self.mpu.set_control_mode(use_gyro_only=True, verbose=True)
         
         # Initialize PD Controller with much more conservative settings
         self.pd = PDController(kp=0.1, kd=0.01, deadband=2.0)
@@ -33,9 +50,9 @@ class SimpleYawController:
         
         while self.running:
             try:
-                # Get current yaw angle (primary control)
+                # Get current yaw angle using PURE GYRO (same as mpu.py display)
                 data = self.mpu.read_all_data()
-                current_yaw = data['angles']['yaw']
+                current_yaw = data['angles']['yaw_pure']  # Pure gyro integration (no accelerometer bias)
                 
                 # Update PD controller
                 self.pd.update_current_angle(current_yaw)
@@ -117,8 +134,9 @@ class SimpleYawController:
 def main():
     """Test interface"""
     print("="*60)
-    print("🎯 SIMPLE YAW PD CONTROLLER TEST (HORIZONTAL CONTROL)")
+    print("🎯 SIMPLE YAW PD CONTROLLER TEST (PURE GYRO MODE)")
     print("="*60)
+    print("🚀 USING PURE GYRO DATA (no accelerometer bias)")
     print("Commands:")
     print("  start <angle>    - Start control to target angle")
     print("  stop             - Stop control")
