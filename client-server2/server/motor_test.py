@@ -32,6 +32,7 @@ def stop_motor_dc():
     """Disable driver (0 V to motor)."""
     print("[MOTOR] Stopping motor")
     GPIO.output(ENABLE_PIN, GPIO.LOW)
+    GPIO.output(DIR_PIN, GPIO.LOW)
     print(f"[MOTOR] DIR_PIN={GPIO.input(DIR_PIN)}, ENABLE_PIN={GPIO.input(ENABLE_PIN)}")
 
 def cleanup():

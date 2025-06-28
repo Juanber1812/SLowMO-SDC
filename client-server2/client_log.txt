@@ -851,3 +851,13 @@ ValueError: Client is not in a disconnected state
 2025-06-28 10:19:11,691 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
 2025-06-28 10:19:11,692 - INFO - [INFO] Successfully connected to server
 2025-06-28 10:19:17,665 - INFO - Disconnected from server: transport error
+2025-06-28 10:21:21,526 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-28 10:21:22,101 - INFO - Connected to server
+2025-06-28 10:21:22,104 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 10:21:23,526 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-28 10:21:23,662 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-28 10:21:24,382 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-28 10:21:24,482 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-28 10:21:25,113 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-28 10:21:25,282 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-28 10:23:07,351 - INFO - Disconnected from server: transport error
