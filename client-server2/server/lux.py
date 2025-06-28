@@ -4,6 +4,7 @@ import busio
 import csv
 import os
 import sys
+import threading
 from datetime import datetime
 from adafruit_veml7700 import VEML7700
 
@@ -24,6 +25,10 @@ class LuxLogger:
         self.log_start_time = None
         self.last_log_time = time.time()
         
+        # Threading for precise 10Hz logging
+        self.logging_thread = None
+        self.stop_logging_thread = False
+        
         # Initialize sensors once at startup
         self.sensors = {}
         self.initialize_sensors()
@@ -32,7 +37,7 @@ class LuxLogger:
         """Select multiplexer channel"""
         if 0 <= channel <= 7:
             self.i2c.writeto(MUX_ADDRESS, bytes([1 << channel]))
-            time.sleep(0.05)  # Allow I2C bus to settle
+            time.sleep(0.01)  # Reduced to 10ms - faster I2C settling
         else:
             raise ValueError("Invalid channel: must be 0-7")
     
@@ -75,7 +80,7 @@ class LuxLogger:
         return readings
     
     def start_csv_logging(self, filename=None):
-        """Start CSV logging of lux data at 10Hz"""
+        """Start CSV logging of lux data at precise 10Hz using dedicated thread"""
         if self.enable_logging:
             print("CSV logging already active!")
             return
@@ -97,9 +102,14 @@ class LuxLogger:
             self.enable_logging = True
             self.log_start_time = time.time()
             self.last_log_time = self.log_start_time
+            self.stop_logging_thread = False
+            
+            # Start dedicated logging thread for precise 10Hz timing
+            self.logging_thread = threading.Thread(target=self._logging_thread_worker, daemon=True)
+            self.logging_thread.start()
             
             print(f"✓ CSV logging started: {filename}")
-            print(f"  Logging at {LOG_FREQUENCY}Hz")
+            print(f"  Logging at {LOG_FREQUENCY}Hz with dedicated thread")
             print(f"  Columns: {', '.join(header)}")
             
         except Exception as e:
@@ -112,6 +122,11 @@ class LuxLogger:
             return
             
         try:
+            # Stop the logging thread
+            self.stop_logging_thread = True
+            if self.logging_thread and self.logging_thread.is_alive():
+                self.logging_thread.join(timeout=1.0)  # Wait up to 1 second
+            
             if self.log_file:
                 self.log_file.close()
                 self.log_file = None
@@ -124,6 +139,46 @@ class LuxLogger:
         except Exception as e:
             print(f"✗ Error stopping CSV logging: {e}")
     
+    def _logging_thread_worker(self):
+        """Dedicated thread worker for precise 10Hz logging"""
+        interval = 1.0 / LOG_FREQUENCY  # 0.1 seconds for 10Hz
+        next_log_time = time.time()
+        
+        while not self.stop_logging_thread and self.enable_logging:
+            current_time = time.time()
+            
+            if current_time >= next_log_time:
+                try:
+                    # Read all sensor values
+                    readings = self.read_all_sensors()
+                    
+                    # Calculate relative time from start
+                    relative_time = current_time - self.log_start_time
+                    
+                    # Prepare CSV row: time, channel1, channel2, channel3
+                    row = [f"{relative_time:.6f}"]
+                    for ch in CHANNELS:
+                        lux_value = readings.get(ch)
+                        if lux_value is not None:
+                            row.append(f"{lux_value:.2f}")
+                        else:
+                            row.append("ERROR")
+                    
+                    # Write to CSV
+                    if self.csv_writer:
+                        self.csv_writer.writerow(row)
+                        self.log_file.flush()
+                    
+                    # Schedule next log time (precise 10Hz timing)
+                    next_log_time += interval
+                    
+                except Exception as e:
+                    print(f"Error in logging thread: {e}")
+                    break
+            
+            # Small sleep to prevent busy waiting
+            time.sleep(0.01)  # 10ms sleep
+    
     def log_data_if_needed(self):
         """Log data to CSV if logging is enabled and enough time has passed"""
         if not self.enable_logging or self.csv_writer is None:
@@ -135,11 +190,11 @@ class LuxLogger:
         # Check if it's time to log (10Hz = 0.1 second intervals)
         if time_since_last_log >= (1.0 / LOG_FREQUENCY):
             try:
-                # Calculate relative time from start
-                relative_time = current_time - self.log_start_time
-                
-                # Read all sensor values
+                # Read all sensor values BEFORE calculating timing
                 readings = self.read_all_sensors()
+                
+                # Calculate relative time from start (use current time, not after sensor read)
+                relative_time = current_time - self.log_start_time
                 
                 # Prepare CSV row: time, channel1, channel2, channel3
                 row = [f"{relative_time:.6f}"]
@@ -153,6 +208,8 @@ class LuxLogger:
                 # Write to CSV
                 self.csv_writer.writerow(row)
                 self.log_file.flush()
+                
+                # Update last log time to maintain consistent 10Hz timing
                 self.last_log_time = current_time
                 
             except Exception as e:
@@ -208,8 +265,7 @@ class LuxLogger:
                 # Display current readings
                 self.display_readings()
                 
-                # Log data if needed
-                self.log_data_if_needed()
+                # Note: Logging is now handled by dedicated thread for precise 10Hz
                 
                 # Check for keyboard input
                 if raw_mode:
