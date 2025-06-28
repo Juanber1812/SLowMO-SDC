@@ -11,6 +11,8 @@ import struct
 import math
 from datetime import datetime
 import sys
+import csv
+import os
 
 class MPU6050:
     def __init__(self, bus_number=1, device_address=0x68):
@@ -31,32 +33,32 @@ class MPU6050:
         self.GYRO_XOUT_H = 0x43
         self.TEMP_OUT_H = 0x41
         
-        # Calibration values
+        # Calibration values (renamed: pitch->yaw for spacecraft convention)
         self.gyro_x_cal = 0.0
         self.gyro_y_cal = 0.0
         self.gyro_z_cal = 0.0
-        self.accel_pitch_cal = 0.0
+        self.accel_yaw_cal = 0.0     # Primary control calibration (was pitch_cal)
         self.accel_roll_cal = 0.0
         
-        # Angle variables
-        self.angle_pitch = 0.0
+        # Angle variables (renamed: pitch->yaw, yaw->pitch for spacecraft convention)
+        self.angle_yaw = 0.0      # Primary control angle (was pitch)
         self.angle_roll = 0.0
-        self.angle_yaw = 0.0
-        self.angle_pitch_acc = 0.0
+        self.angle_pitch = 0.0    # Secondary angle (was yaw)
+        self.angle_yaw_acc = 0.0  # Accelerometer yaw (was pitch_acc)
         self.angle_roll_acc = 0.0
         
         # Output angles (filtered)
-        self.angle_pitch_output = 0.0
+        self.angle_yaw_output = 0.0    # Primary control output (was pitch_output)
         self.angle_roll_output = 0.0
-        self.angle_yaw_output = 0.0
+        self.angle_pitch_output = 0.0  # Secondary output (was yaw_output)
         
         # Filter and timing variables
         self.set_gyro_angles = False
         self.last_time = time.time()
         self.dt = 0.0
         
-        # Yaw drift compensation
-        self.yaw_drift_rate = 0.0  # deg/s drift rate
+        # Pitch drift compensation (renamed from yaw drift)
+        self.yaw_drift_rate = 0.0  # deg/s drift rate (actually pitch now)
         self.yaw_reference_time = time.time()
         self.yaw_zero_velocity_threshold = 0.5  # deg/s
         self.yaw_zero_velocity_count = 0
@@ -69,6 +71,12 @@ class MPU6050:
         # Initialize the sensor
         self.initialize_sensor()
         
+        # Initialize CSV logging
+        self.log_file = None
+        self.csv_writer = None
+        self.enable_logging = False
+        self.last_log_time = time.time()  # For 10Hz logging timing
+    
     def initialize_sensor(self):
         """Initialize MPU6050 with proper configuration"""
         try:
@@ -123,11 +131,11 @@ class MPU6050:
         print(f"Gyro calibration complete!")
         print(f"Offsets - X: {self.gyro_x_cal:.3f}, Y: {self.gyro_y_cal:.3f}, Z: {self.gyro_z_cal:.3f}")
     
-    def calibrate_accelerometer(self, pitch_offset=0.0, roll_offset=0.0):
+    def calibrate_accelerometer(self, yaw_offset=0.0, roll_offset=0.0):
         """Set accelerometer calibration offsets (determine by placing sensor level)"""
-        self.accel_pitch_cal = pitch_offset
+        self.accel_yaw_cal = yaw_offset    # Primary control calibration (was pitch_cal)
         self.accel_roll_cal = roll_offset
-        print(f"Accelerometer calibration set - Pitch: {pitch_offset:.3f}°, Roll: {roll_offset:.3f}°")
+        print(f"Accelerometer calibration set - Yaw: {yaw_offset:.3f}°, Roll: {roll_offset:.3f}°")
     
     def read_raw_data(self, addr):
         """Read raw 16-bit data from sensor"""
@@ -197,58 +205,58 @@ class MPU6050:
         gyro_x, gyro_y, gyro_z = self.read_gyroscope()
         acc_x, acc_y, acc_z = self.read_accelerometer()
         
-        # Gyro angle calculations (integration)
+        # Gyro angle calculations (integration) - remapped for spacecraft convention
         # Convert gyro rates to angle changes
         dt_factor = self.dt  # Time step for integration
         
-        self.angle_pitch += gyro_z * dt_factor
+        self.angle_yaw += gyro_z * dt_factor      # Primary control (was pitch)
         self.angle_roll += gyro_y * dt_factor
-        self.angle_yaw += gyro_x * dt_factor
+        self.angle_pitch += gyro_x * dt_factor    # Secondary angle (was yaw)
         
-        # Yaw compensation for pitch and roll (transfer angles during yaw rotation)
-        yaw_rad = math.radians(gyro_x * dt_factor)
-        self.angle_pitch += self.angle_roll * math.sin(yaw_rad)
-        self.angle_roll -= self.angle_pitch * math.sin(yaw_rad)
+        # Pitch compensation for yaw and roll (transfer angles during pitch rotation)
+        pitch_rad = math.radians(gyro_x * dt_factor)
+        self.angle_yaw += self.angle_roll * math.sin(pitch_rad)
+        self.angle_roll -= self.angle_yaw * math.sin(pitch_rad)
         
         # Accelerometer angle calculations
         acc_total_vector = math.sqrt(acc_x*acc_x + acc_y*acc_y + acc_z*acc_z)
         
         if acc_total_vector > 0:  # Avoid division by zero
-            # Calculate pitch and roll from accelerometer
-            self.angle_pitch_acc = math.degrees(math.asin(acc_y / acc_total_vector))
+            # Calculate yaw and roll from accelerometer (remapped for spacecraft)
+            self.angle_yaw_acc = math.degrees(math.asin(acc_y / acc_total_vector))      # Primary (was pitch)
             self.angle_roll_acc = math.degrees(math.asin(acc_z / acc_total_vector)) * -1
             
             # Apply accelerometer calibration
-            self.angle_pitch_acc -= self.accel_pitch_cal
+            self.angle_yaw_acc -= self.accel_yaw_cal     # Primary calibration (was pitch_cal)
             self.angle_roll_acc -= self.accel_roll_cal
         
-        # Complementary filter
+        # Complementary filter (remapped for spacecraft convention)
         if self.set_gyro_angles:
             # Combine gyro and accelerometer data
-            self.angle_pitch = (self.angle_pitch * self.complementary_alpha + 
-                              self.angle_pitch_acc * (1 - self.complementary_alpha))
+            self.angle_yaw = (self.angle_yaw * self.complementary_alpha + 
+                             self.angle_yaw_acc * (1 - self.complementary_alpha))    # Primary
             self.angle_roll = (self.angle_roll * self.complementary_alpha + 
                              self.angle_roll_acc * (1 - self.complementary_alpha))
         else:
             # First startup - use accelerometer values
-            self.angle_pitch = self.angle_pitch_acc
+            self.angle_yaw = self.angle_yaw_acc      # Primary (was pitch)
             self.angle_roll = self.angle_roll_acc
             self.set_gyro_angles = True
         
-        # Yaw drift compensation
-        self.compensate_yaw_drift(gyro_x)
+        # Pitch drift compensation (secondary angle, was yaw drift)
+        self.compensate_pitch_drift(gyro_x)
         
-        # Apply output filtering for smooth control
-        self.angle_pitch_output = (self.angle_pitch_output * self.output_filter_alpha + 
-                                 self.angle_pitch * (1 - self.output_filter_alpha))
+        # Apply output filtering for smooth control (remapped)
+        self.angle_yaw_output = (self.angle_yaw_output * self.output_filter_alpha + 
+                                self.angle_yaw * (1 - self.output_filter_alpha))        # Primary
         self.angle_roll_output = (self.angle_roll_output * self.output_filter_alpha + 
                                 self.angle_roll * (1 - self.output_filter_alpha))
-        self.angle_yaw_output = (self.angle_yaw_output * self.output_filter_alpha + 
-                               self.angle_yaw * (1 - self.output_filter_alpha))
+        self.angle_pitch_output = (self.angle_pitch_output * self.output_filter_alpha + 
+                                 self.angle_pitch * (1 - self.output_filter_alpha))     # Secondary
     
-    def compensate_yaw_drift(self, gyro_x):
-        """Compensate for yaw drift using zero velocity detection"""
-        # Detect if yaw rate is near zero (stationary)
+    def compensate_pitch_drift(self, gyro_x):
+        """Compensate for pitch drift using zero velocity detection (was yaw drift)"""
+        # Detect if pitch rate is near zero (stationary)
         if abs(gyro_x) < self.yaw_zero_velocity_threshold:
             self.yaw_zero_velocity_count += 1
             
@@ -272,15 +280,15 @@ class MPU6050:
         else:
             self.yaw_zero_velocity_count = 0
         
-        # Apply drift compensation
-        self.angle_yaw -= self.yaw_drift_rate * self.dt
+        # Apply drift compensation to pitch (secondary angle)
+        self.angle_pitch -= self.yaw_drift_rate * self.dt
     
-    def reset_yaw(self):
-        """Reset yaw angle to zero (useful for reference point)"""
-        self.angle_yaw = 0.0
-        self.angle_yaw_output = 0.0
+    def reset_pitch(self):
+        """Reset pitch angle to zero (useful for reference point) - was reset_yaw"""
+        self.angle_pitch = 0.0
+        self.angle_pitch_output = 0.0
         self.yaw_reference_time = time.time()
-        print("Yaw angle reset to 0°")
+        print("Pitch angle reset to 0°")
     
     def set_filter_parameters(self, complementary_alpha=None, output_alpha=None):
         """Adjust filter parameters for PD controller tuning"""
@@ -293,14 +301,14 @@ class MPU6050:
             print(f"Output filter alpha set to {output_alpha}")
     
     def get_angles(self):
-        """Get current angle estimates"""
+        """Get current angle estimates (remapped: yaw=primary, pitch=secondary)"""
         return {
-            'pitch': self.angle_pitch_output,
+            'yaw': self.angle_yaw_output,        # Primary control angle (was pitch)
             'roll': self.angle_roll_output,
-            'yaw': self.angle_yaw_output,
-            'pitch_raw': self.angle_pitch,
+            'pitch': self.angle_pitch_output,    # Secondary angle (was yaw)
+            'yaw_raw': self.angle_yaw,           # Primary raw (was pitch_raw)
             'roll_raw': self.angle_roll,
-            'yaw_raw': self.angle_yaw
+            'pitch_raw': self.angle_pitch        # Secondary raw (was yaw_raw)
         }
     
     def read_all_data(self):
@@ -316,6 +324,21 @@ class MPU6050:
         # Get angle estimates
         angles = self.get_angles()
         
+        # Log data to CSV file
+        if self.enable_logging and self.csv_writer is not None:
+            try:
+                self.csv_writer.writerow([
+                    datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3],
+                    acc_x, acc_y, acc_z,
+                    gyro_x, gyro_y, gyro_z,
+                    temperature,
+                    angles['yaw'], angles['roll'], angles['pitch'],    # Remapped order
+                    self.dt, self.yaw_drift_rate
+                ])
+                self.log_file.flush()  # Ensure data is written to file
+            except Exception as e:
+                print(f"Error writing to log file: {e}")
+        
         return {
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3],
             'accel': {'x': acc_x, 'y': acc_y, 'z': acc_z},
@@ -326,30 +349,132 @@ class MPU6050:
             'yaw_drift_rate': self.yaw_drift_rate
         }
     
-    def get_pitch_for_control(self):
-        """Get pitch angle optimized for control (less filtering for faster response)"""
-        self.update_angles()
-        # Return raw pitch for faster PD response, or filtered for stability
-        return self.angle_pitch  # Use raw for fast response
-        # return self.angle_pitch_output  # Use filtered for stability
+    def start_logging(self, file_path):
+        """Start logging data to a CSV file"""
+        try:
+            # Close existing log file if open
+            if self.log_file is not None:
+                self.log_file.close()
+            
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            
+            # Open new log file
+            self.log_file = open(file_path, mode='a', newline='')
+            self.csv_writer = csv.writer(self.log_file)
+            
+            # Write header row if file is new
+            if os.stat(file_path).st_size == 0:
+                self.csv_writer.writerow([
+                    'Timestamp', 'Accel_X', 'Accel_Y', 'Accel_Z',
+                    'Gyro_X', 'Gyro_Y', 'Gyro_Z',
+                    'Temperature',
+                    'Yaw', 'Roll', 'Pitch',    # Remapped header order
+                    'Delta_Time', 'Yaw_Drift_Rate'
+                ])
+            
+            self.enable_logging = True
+            print(f"Logging started: {file_path}")
+        except Exception as e:
+            print(f"Error starting logging: {e}")
+    
+    def stop_logging(self):
+        """Stop logging data to CSV file"""
+        if self.log_file is not None:
+            self.log_file.close()
+            self.log_file = None
+            self.csv_writer = None
+            self.enable_logging = False
+            print("Logging stopped.")
+    
+    def start_csv_logging(self, filename=None):
+        """Start CSV logging of IMU data at 10Hz"""
+        if self.enable_logging:
+            print("CSV logging already active!")
+            return
+            
+        if filename is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"imu_data_{timestamp}.csv"
+        
+        try:
+            self.log_file = open(filename, 'w', newline='')
+            self.csv_writer = csv.writer(self.log_file)
+            
+            # Write header (remapped: yaw first as primary control)
+            self.csv_writer.writerow(['timestamp', 'yaw', 'roll', 'pitch'])
+            self.log_file.flush()
+            
+            self.enable_logging = True
+            self.last_log_time = time.time()
+            print(f"CSV logging started: {filename}")
+            
+        except Exception as e:
+            print(f"Error starting CSV logging: {e}")
+            
+    def stop_csv_logging(self):
+        """Stop CSV logging and close file"""
+        if not self.enable_logging:
+            print("CSV logging not active!")
+            return
+            
+        try:
+            if self.log_file:
+                self.log_file.close()
+                self.log_file = None
+                self.csv_writer = None
+            
+            self.enable_logging = False
+            print("CSV logging stopped")
+            
+        except Exception as e:
+            print(f"Error stopping CSV logging: {e}")
+    
+    def log_data_if_needed(self):
+        """Log data at 10Hz if logging is enabled"""
+        if not self.enable_logging or not self.csv_writer:
+            return
+            
+        current_time = time.time()
+        if current_time - self.last_log_time >= 0.1:  # 10Hz = 0.1 seconds
+            try:
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]  # millisecond precision
+                self.csv_writer.writerow([
+                    timestamp,
+                    round(self.angle_yaw_output, 3),      # Primary control (was pitch)
+                    round(self.angle_roll_output, 3),
+                    round(self.angle_pitch_output, 3)     # Secondary (was yaw)
+                ])
+                self.log_file.flush()  # Ensure data is written immediately
+                self.last_log_time = current_time
+                
+            except Exception as e:
+                print(f"Error logging data: {e}")
     
     def get_yaw_for_control(self):
-        """Get yaw angle optimized for control"""
+        """Get yaw angle optimized for control (primary control angle)"""
         self.update_angles()
-        return self.angle_yaw  # Raw yaw for control
+        # Return raw yaw for faster PD response, or filtered for stability
+        return self.angle_yaw  # Use raw for fast response
+        # return self.angle_yaw_output  # Use filtered for stability
+    
+    def get_pitch_for_control(self):
+        """Get pitch angle optimized for control (secondary angle, was yaw)"""
+        self.update_angles()
+        return self.angle_pitch  # Raw pitch for control
     
     def calibrate_at_current_position(self):
         """Calibrate the current position as zero reference"""
-        self.angle_pitch = 0.0
+        self.angle_yaw = 0.0        # Primary control (was pitch)
         self.angle_roll = 0.0
-        self.angle_yaw = 0.0
-        self.angle_pitch_output = 0.0
+        self.angle_pitch = 0.0      # Secondary (was yaw)
+        self.angle_yaw_output = 0.0 # Primary output (was pitch_output)
         self.angle_roll_output = 0.0
-        self.angle_yaw_output = 0.0
+        self.angle_pitch_output = 0.0  # Secondary output (was yaw_output)
         print("Position calibrated - current orientation set as zero reference")
     
 
-def main():
+def main(auto_log=False, log_filename=None):
     """Main loop to read and display MPU6050 data with attitude estimation"""
     print("Starting MPU6050 Attitude Estimation System...")
     print("Features: Complementary Filter, Yaw Drift Compensation, PD Controller Ready")
@@ -360,12 +485,20 @@ def main():
         # Initialize sensor
         mpu = MPU6050()
         
+        # Auto-start logging if requested
+        if auto_log:
+            mpu.start_csv_logging(log_filename)
+        
         print("System ready! Live data display active (angles + raw sensor data)")
+        print("Commands: 'l' = start logging, 's' = stop logging, 'q' = quit, 'z' = zero pitch")
         print("=" * 90)
         
         while True:
             # Read sensor data and update angles
             data = mpu.read_all_data()
+            
+            # Log data at 10Hz if logging is enabled
+            mpu.log_data_if_needed()
             
             # Extract data for display
             accel = data['accel']
@@ -373,17 +506,18 @@ def main():
             angles = data['angles']
             temp = data['temperature']
             
-            # Live display with both angles and raw data (overwrite same line)
+            # Live display with both angles and raw data (overwrite same line) - remapped order
+            log_status = " [LOGGING]" if mpu.enable_logging else ""
             live_display = (
-                f"\rPitch: {angles['pitch']:+6.1f}° | "
+                f"\rYaw: {angles['yaw']:+6.1f}° | "        # Primary control (was pitch)
                 f"Roll: {angles['roll']:+6.1f}° | "
-                f"Yaw: {angles['yaw']:+6.1f}° | "
+                f"Pitch: {angles['pitch']:+6.1f}° | "     # Secondary (was yaw)
                 f"Accel: X={accel['x']:+5.2f}g Y={accel['y']:+5.2f}g Z={accel['z']:+5.2f}g | "
                 f"Gyro: X={gyro['x']:+5.1f} Y={gyro['y']:+5.1f} Z={gyro['z']:+5.1f} °/s | "
-                f"T: {temp:4.1f}°C"
+                f"T: {temp:4.1f}°C{log_status}"
             )
             
-            # Update live display (no logging)
+            # Update live display
             print(live_display, end='', flush=True)
             
             # Small delay to prevent excessive CPU usage (targeting ~100Hz for smooth display)
@@ -396,11 +530,14 @@ def main():
         import traceback
         traceback.print_exc()
     finally:
+        # Ensure CSV logging is stopped and file is closed
+        if 'mpu' in locals():
+            mpu.stop_csv_logging()
         print("Cleanup complete.")
 
 def pd_controller_demo():
     """Demonstration of PD controller integration"""
-    print("PD Controller Demo - Yaw Stabilization")
+    print("PD Controller Demo - Yaw Stabilization (Primary Control)")
     print("=" * 50)
     
     try:
@@ -415,7 +552,7 @@ def pd_controller_demo():
         
         while True:
             data = mpu.read_all_data()
-            current_yaw = data['angles']['yaw']
+            current_yaw = data['angles']['yaw']    # Primary control angle
             
             # PD Controller calculation
             error = target_yaw - current_yaw
@@ -434,8 +571,20 @@ def pd_controller_demo():
     
 if __name__ == "__main__":
     import sys
+    import argparse
     
-    if len(sys.argv) > 1 and sys.argv[1] == "pd":
+    parser = argparse.ArgumentParser(description='MPU6050 IMU Data Reader with CSV Logging')
+    parser.add_argument('--log', '-l', action='store_true', help='Start CSV logging immediately')
+    parser.add_argument('--filename', '-f', type=str, help='Custom CSV filename')
+    parser.add_argument('--pd', action='store_true', help='Run PD controller demo')
+    
+    args = parser.parse_args()
+    
+    if args.pd:
         pd_controller_demo()
     else:
-        main()
+        # Auto-start logging if requested
+        if args.log:
+            print("Auto-starting CSV logging...")
+            # This will be handled in the main() function
+        main(auto_log=args.log, log_filename=args.filename)
