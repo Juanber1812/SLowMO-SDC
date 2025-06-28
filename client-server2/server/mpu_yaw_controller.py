@@ -394,6 +394,11 @@ class PDBangBangController:
         self.log_data = []
         self.enable_logging = False
         
+        # Yaw data logging for settling time analysis
+        self.yaw_log_data = []
+        self.enable_yaw_logging = False
+        self.yaw_log_start_time = None
+        
     def set_target(self, target_angle):
         """Set target yaw angle in degrees"""
         self.target_yaw = target_angle
@@ -481,6 +486,20 @@ class PDBangBangController:
                 'gyro_rate': gyro_rate
             })
         
+        # Log yaw data for settling time analysis
+        if self.enable_yaw_logging:
+            relative_time = current_time - self.yaw_log_start_time if self.yaw_log_start_time else 0
+            self.yaw_log_data.append({
+                'time': current_time,
+                'relative_time': relative_time, 
+                'yaw_angle': current_yaw,
+                'target_yaw': self.target_yaw,
+                'error': error,
+                'gyro_rate': gyro_rate,
+                'motor_cmd': motor_command,
+                'controller_active': self.controller_enabled
+            })
+        
         return motor_command, error, pd_output
     
     def start_logging(self):
@@ -511,6 +530,106 @@ class PDBangBangController:
             print(f"Log saved to: {filename}")
         except Exception as e:
             print(f"Error saving log: {e}")
+    
+    def start_yaw_logging(self):
+        """Start yaw data logging for settling time analysis"""
+        self.yaw_log_data = []
+        self.enable_yaw_logging = True
+        self.yaw_log_start_time = time.time()
+        print("Yaw data logging started for settling time analysis")
+    
+    def stop_yaw_logging(self, filename=None):
+        """Stop yaw logging and save to CSV"""
+        if not self.enable_yaw_logging:
+            print("Yaw logging not active!")
+            return
+            
+        self.enable_yaw_logging = False
+        
+        if filename is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"yaw_settling_data_{timestamp}.csv"
+        
+        try:
+            with open(filename, 'w', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=[
+                    'time', 'relative_time', 'yaw_angle', 'target_yaw', 'error', 
+                    'gyro_rate', 'motor_cmd', 'controller_active'
+                ])
+                writer.writeheader()
+                writer.writerows(self.yaw_log_data)
+            print(f"Yaw settling data saved to: {filename}")
+            
+            # Calculate and display settling time analysis
+            self.analyze_settling_time()
+            
+        except Exception as e:
+            print(f"Error saving yaw log: {e}")
+    
+    def analyze_settling_time(self):
+        """Analyze settling time from logged data"""
+        if not self.yaw_log_data:
+            return
+            
+        print("\n" + "="*50)
+        print("SETTLING TIME ANALYSIS")
+        print("="*50)
+        
+        # Find target changes
+        target_changes = []
+        current_target = None
+        
+        for i, data in enumerate(self.yaw_log_data):
+            if current_target is None or abs(data['target_yaw'] - current_target) > 0.1:
+                current_target = data['target_yaw']
+                target_changes.append({
+                    'time': data['relative_time'],
+                    'target': current_target,
+                    'index': i
+                })
+        
+        # Calculate settling time for each target change
+        settling_threshold = 2.0  # degrees - within 2° of target
+        settling_time_threshold = 1.0  # seconds - must stay within threshold for this long
+        
+        for j, change in enumerate(target_changes):
+            target = change['target']
+            start_time = change['time']
+            start_index = change['index']
+            
+            # Find when it first reaches within threshold
+            first_in_threshold = None
+            settling_time = None
+            
+            # Look for settling from this target change onwards
+            for i in range(start_index, len(self.yaw_log_data)):
+                data = self.yaw_log_data[i]
+                error = abs(data['error'])
+                
+                if error <= settling_threshold:
+                    if first_in_threshold is None:
+                        first_in_threshold = data['relative_time']
+                    
+                    # Check if it stays within threshold for required time
+                    check_time = data['relative_time']
+                    if check_time - first_in_threshold >= settling_time_threshold:
+                        # Verify it stayed within threshold
+                        stayed_in_threshold = True
+                        for k in range(i - int(settling_time_threshold * 100), i):  # Assuming ~100Hz logging
+                            if k >= 0 and k < len(self.yaw_log_data):
+                                if abs(self.yaw_log_data[k]['error']) > settling_threshold:
+                                    stayed_in_threshold = False
+                                    break
+                        
+                        if stayed_in_threshold:
+                            settling_time = check_time - start_time
+                            break
+                else:
+                    first_in_threshold = None
+            
+            print(f"Target: {target:+6.1f}° | Start: {start_time:6.2f}s | Settling Time: {settling_time:6.2f}s" if settling_time else f"Target: {target:+6.1f}° | Start: {start_time:6.2f}s | Did not settle")
+        
+        print("="*50)
 
 # ── MAIN CONTROL LOOP ──────────────────────────────────────────────────
 def main():
@@ -533,18 +652,22 @@ def main():
     print("  s          - Stop controller")
     print("  z          - Zero current position")
     print("  r          - Reconnect sensor")
-    print("  1          - Target  10°")
-    print("  2          - Target  20°") 
-    print("  3          - Target  30°")
-    print("  4          - Target  40°")
-    print("  5          - Target  50°")
-    print("  6          - Target -10°")
-    print("  7          - Target -20°")
-    print("  8          - Target -30°")
-    print("  9          - Target -40°")
-    print("  0          - Target   0°")
-    print("  l          - Start logging")
-    print("  x          - Stop logging and save")
+    print("TARGET ANGLES:")
+    print("  1          - Target   +20°")
+    print("  2          - Target   +45°") 
+    print("  3          - Target   +90°")
+    print("  4          - Target  +135°")
+    print("  5          - Target  +180°")
+    print("  6          - Target   -20°")
+    print("  7          - Target   -45°")
+    print("  8          - Target   -90°")
+    print("  9          - Target  -135°")
+    print("  0          - Target     0°")
+    print("LOGGING:")
+    print("  l          - Start PD logging")
+    print("  x          - Stop PD logging and save")
+    print("  y          - Start YAW logging (settling time)")
+    print("  t          - Stop YAW logging and analyze")
     print("  q          - Quit")
     print("-" * 60)
     
@@ -581,29 +704,33 @@ def main():
                     else:
                         print("\nError: Sensor not ready! Cannot zero position.")
                 elif command == '1':
-                    controller.set_target(10.0)
-                elif command == '2':
                     controller.set_target(20.0)
+                elif command == '2':
+                    controller.set_target(45.0)
                 elif command == '3':
-                    controller.set_target(30.0)
+                    controller.set_target(90.0)
                 elif command == '4':
-                    controller.set_target(40.0)
+                    controller.set_target(135.0)
                 elif command == '5':
-                    controller.set_target(50.0)
+                    controller.set_target(180.0)
                 elif command == '6':
-                    controller.set_target(-10.0)
-                elif command == '7':
                     controller.set_target(-20.0)
+                elif command == '7':
+                    controller.set_target(-45.0)
                 elif command == '8':
-                    controller.set_target(-30.0)
+                    controller.set_target(-90.0)
                 elif command == '9':
-                    controller.set_target(-40.0)
+                    controller.set_target(-135.0)
                 elif command == '0':
                     controller.set_target(0.0)
                 elif command == 'l':
                     controller.start_logging()
                 elif command == 'x':
                     controller.stop_logging()
+                elif command == 'y':
+                    controller.start_yaw_logging()
+                elif command == 't':
+                    controller.stop_yaw_logging()
                 elif command == 'q':
                     break
             
@@ -640,7 +767,8 @@ def main():
             
             # Display status every 10 loops (~10Hz)
             if loop_count % 10 == 0:
-                log_status = " [LOG]" if controller.enable_logging else ""
+                pd_log_status = " [PD-LOG]" if controller.enable_logging else ""
+                yaw_log_status = " [YAW-LOG]" if controller.enable_yaw_logging else ""
                 sensor_status = " [SENSOR OK]" if mpu.sensor_ready else " [SENSOR ERR]"
                 if controller.input_mode:
                     ctrl_status = " [PAUSE]"
@@ -649,12 +777,12 @@ def main():
                 else:
                     ctrl_status = " [OFF]"
                 status = (
-                    f"\rYaw: {current_yaw:+6.1f}° | "
-                    f"Target: {controller.target_yaw:+6.1f}° | "
+                    f"\rYaw: {current_yaw:+7.1f}° | "
+                    f"Target: {controller.target_yaw:+7.1f}° | "
                     f"Error: {error:+6.1f}° | "
                     f"Rate: {gyro_rate:+5.1f}°/s | "
                     f"PD: {pd_output:+6.2f} | "
-                    f"Motor: {motor_cmd:>4s}{ctrl_status}{sensor_status}{log_status}"
+                    f"Motor: {motor_cmd:>4s}{ctrl_status}{sensor_status}{pd_log_status}{yaw_log_status}"
                 )
                 print(status, end='', flush=True)
             
@@ -678,6 +806,8 @@ def main():
         # Save any remaining log data
         if controller.enable_logging:
             controller.stop_logging()
+        if controller.enable_yaw_logging:
+            controller.stop_yaw_logging()
         
         print("Cleanup complete.")
 
