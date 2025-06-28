@@ -330,7 +330,6 @@ def main():
     """Main loop to read and display MPU6050 data with attitude estimation"""
     print("Starting MPU6050 Attitude Estimation System...")
     print("Features: Complementary Filter, Yaw Drift Compensation, PD Controller Ready")
-    print("Commands: 'r' = Reset Yaw, 'q' = Quit")
     print("Press Ctrl+C to exit")
     print("-" * 90)
     
@@ -338,24 +337,12 @@ def main():
         # Initialize sensor
         mpu = MPU6050()
         
-        # Optional: Set custom calibration if known
-        # mpu.calibrate_accelerometer(pitch_offset=0.0, roll_offset=0.0)
-        
-        # Variables for controlled logging
-        last_log_time = 0
-        log_interval = 1.0  # Log every 1 second to avoid spam
-        
-        # Performance monitoring
-        loop_count = 0
-        start_time = time.time()
-        
-        print("System ready! Attitude estimation active.")
+        print("System ready! Live data display active (angles + raw sensor data)")
         print("=" * 90)
         
         while True:
             # Read sensor data and update angles
             data = mpu.read_all_data()
-            current_time = time.time()
             
             # Extract data for display
             accel = data['accel']
@@ -363,39 +350,21 @@ def main():
             angles = data['angles']
             temp = data['temperature']
             
-            # Live display (overwrite same line)
+            # Live display with both angles and raw data (overwrite same line)
             live_display = (
                 f"\rPitch: {angles['pitch']:+6.1f}° | "
                 f"Roll: {angles['roll']:+6.1f}° | "
                 f"Yaw: {angles['yaw']:+6.1f}° | "
+                f"Accel: X={accel['x']:+5.2f}g Y={accel['y']:+5.2f}g Z={accel['z']:+5.2f}g | "
                 f"Gyro: X={gyro['x']:+5.1f} Y={gyro['y']:+5.1f} Z={gyro['z']:+5.1f} °/s | "
                 f"T: {temp:4.1f}°C"
             )
             
-            # Update live display
+            # Update live display (no logging)
             print(live_display, end='', flush=True)
             
-            # Periodic detailed logging (to avoid spam)
-            if current_time - last_log_time >= log_interval:
-                print()  # New line
-                print(f"[{data['timestamp']}]")
-                print(f"  Angles (°):    Pitch={angles['pitch']:+7.2f}  Roll={angles['roll']:+7.2f}  Yaw={angles['yaw']:+7.2f}")
-                print(f"  Gyro (°/s):    X={gyro['x']:+7.2f}  Y={gyro['y']:+7.2f}  Z={gyro['z']:+7.2f}")
-                print(f"  Accel (g):     X={accel['x']:+7.3f}  Y={accel['y']:+7.3f}  Z={accel['z']:+7.3f}")
-                print(f"  System:        dt={data['dt']*1000:.1f}ms  Drift={data['yaw_drift_rate']:+.3f}°/s  Temp={temp:.1f}°C")
-                
-                # Performance stats
-                loop_count += 1
-                if loop_count % 10 == 0:
-                    elapsed = current_time - start_time
-                    avg_freq = loop_count / elapsed if elapsed > 0 else 0
-                    print(f"  Performance:   Loop frequency: {avg_freq:.1f} Hz")
-                
-                print("-" * 90)
-                last_log_time = current_time
-            
-            # Small delay to prevent excessive CPU usage (targeting ~250Hz)
-            time.sleep(0.004)
+            # Small delay to prevent excessive CPU usage (targeting ~100Hz for smooth display)
+            time.sleep(0.01)
             
     except KeyboardInterrupt:
         print("\n\nExiting MPU6050 attitude estimation...")
