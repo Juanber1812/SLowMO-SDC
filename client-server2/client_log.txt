@@ -2536,3 +2536,27 @@ ValueError: Client is not in a disconnected state
 2025-06-29 22:36:51,196 - INFO - [INFO] Closing application...
 2025-06-29 22:36:51,198 - INFO - Stopping LIDAR...
 2025-06-29 22:36:51,199 - INFO - Sending cleanup signals to server...
+2025-06-29 22:50:39,906 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 22:50:40,842 - INFO - Client WiFi signal: -36 dBm (92%)
+2025-06-29 22:50:41,505 - INFO - Connected to server
+2025-06-29 22:50:41,507 - INFO - Sending current camera configuration to server...
+2025-06-29 22:50:41,508 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:50:41,511 - INFO - [INFO] Successfully connected to server
+2025-06-29 22:50:54,249 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:50:54,252 - INFO - Stream paused for config application.
+2025-06-29 22:50:54,812 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 22:50:54,816 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 22:50:55,018 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 22:51:11,851 - INFO - Requesting LIDAR streaming start
+2025-06-29 22:51:11,884 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 22:51:14,840 - INFO - Requesting LIDAR streaming stop
+2025-06-29 22:51:14,844 - INFO - Back button clicked in LidarWidget
+2025-06-29 22:51:14,887 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 22:51:18,376 - INFO - Requesting LIDAR streaming start
+2025-06-29 22:51:18,464 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 22:51:19,838 - INFO - Requesting LIDAR streaming stop
+2025-06-29 22:51:19,840 - INFO - Back button clicked in LidarWidget
+2025-06-29 22:51:19,947 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 22:51:23,832 - INFO - [INFO] Closing application...
+2025-06-29 22:51:23,834 - INFO - Stopping LIDAR...
+2025-06-29 22:51:23,836 - INFO - Sending cleanup signals to server...

@@ -590,7 +590,6 @@ def communication_data_callback(comm_data):
             "uplink_frequency": "0.0",
             "downlink_frequency": "0.0",
             "server_signal_strength": 0,
-            "client_signal_strength": 0,
             "connection_quality": "Error",
             "network_latency": "0.0",
             "packet_loss": "0.0",
