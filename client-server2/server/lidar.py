@@ -57,8 +57,7 @@ class LidarController:
     def start_collection(self):
         """Start LIDAR data collection"""
         if self.is_collecting:
-            print("⚠️ LIDAR collection already running")
-            return
+            return  # Already running, no need to spam logs
             
         self.connect_to_server()
         if not self.connected:
@@ -75,8 +74,7 @@ class LidarController:
     def stop_collection(self):
         """Stop LIDAR data collection"""
         if not self.is_collecting:
-            print("⚠️ LIDAR collection not running")
-            return
+            return  # Not running, no need to spam logs
             
         self.is_collecting = False
         if self.collection_thread:
@@ -96,9 +94,9 @@ class LidarController:
                     else:
                         self.error_count += 1
                     
-                    # Send status update every 5 seconds
+                    # Send status update every second
                     current_time = time.time()
-                    if current_time - self.last_status_time >= 5.0:
+                    if current_time - self.last_status_time >= 1.0:
                         self._send_status_update()
                         self.last_status_time = current_time
                     
@@ -131,7 +129,8 @@ class LidarController:
         try:
             sio.emit("lidar_status", status_data)
         except Exception as e:
-            print(f"❌ Failed to send LIDAR status: {e}")
+            # Silently handle status update failures to avoid log spam
+            pass
 
 # Create global controller instance
 lidar_controller = LidarController()
