@@ -79,7 +79,6 @@ class LidarController:
         self.is_collecting = False
         if self.collection_thread:
             self.collection_thread.join(timeout=1.0)
-        print("🔴 LIDAR collection stopped")
         
     def _collection_loop(self):
         """Main data collection loop"""
@@ -115,12 +114,19 @@ class LidarController:
         elapsed_time = time.time() - self.start_time if self.start_time else 0
         collection_rate = self.data_count / elapsed_time if elapsed_time > 0 else 0
         
+        # Determine status based on connection and collection state
+        if not self.connected:
+            status = "disconnected"
+        elif self.is_collecting:
+            status = "active"
+        else:
+            status = "connected"
+        
         status_data = {
-            "status": "collecting" if self.is_collecting else "stopped",
+            "status": status,
             "is_collecting": self.is_collecting,
             "is_active": self.is_collecting,  # For compatibility with client
             "collection_rate_hz": round(collection_rate, 2),
-            "data_count": self.data_count,
             "error_count": self.error_count,
             "uptime_seconds": round(elapsed_time, 1),
             "timestamp": datetime.now().strftime("%H:%M:%S")

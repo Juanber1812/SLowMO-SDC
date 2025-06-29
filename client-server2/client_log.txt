@@ -1581,3 +1581,67 @@ ValueError: Client is not in a disconnected state
 2025-06-29 17:40:30,764 - INFO - LIDAR Status Update - collecting, Rate: 13.14 Hz
 2025-06-29 17:40:35,769 - INFO - LIDAR Status Update - collecting, Rate: 12.97 Hz
 2025-06-29 17:40:38,605 - INFO - Disconnected from server: client disconnect
+2025-06-29 17:45:28,790 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 17:45:29,546 - INFO - Connected to server
+2025-06-29 17:45:29,548 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:45:29,550 - INFO - [INFO] Successfully connected to server
+2025-06-29 17:45:35,830 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:45:35,852 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:45:35,912 - INFO - LIDAR Status Update - collecting, Rate: 72.43 Hz
+2025-06-29 17:45:36,909 - INFO - LIDAR Status Update - collecting, Rate: 16.55 Hz
+2025-06-29 17:45:36,991 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:45:36,997 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:45:37,096 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 17:45:38,659 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:45:38,688 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:45:38,752 - INFO - LIDAR Status Update - collecting, Rate: 73.5 Hz
+2025-06-29 17:45:39,882 - INFO - LIDAR Status Update - collecting, Rate: 16.52 Hz
+2025-06-29 17:45:40,263 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:45:40,272 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:45:40,375 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 17:45:41,461 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:45:41,495 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:45:41,562 - INFO - LIDAR Status Update - collecting, Rate: 78.92 Hz
+2025-06-29 17:45:42,545 - INFO - LIDAR Status Update - collecting, Rate: 16.77 Hz
+2025-06-29 17:45:43,602 - INFO - LIDAR Status Update - collecting, Rate: 16.39 Hz
+2025-06-29 17:45:44,639 - INFO - LIDAR Status Update - collecting, Rate: 16.25 Hz
+2025-06-29 17:45:45,689 - INFO - LIDAR Status Update - collecting, Rate: 16.19 Hz
+2025-06-29 17:45:46,695 - INFO - LIDAR Status Update - collecting, Rate: 16.12 Hz
+2025-06-29 17:45:47,662 - INFO - LIDAR Status Update - collecting, Rate: 16.07 Hz
+2025-06-29 17:45:48,743 - INFO - LIDAR Status Update - collecting, Rate: 16.03 Hz
+2025-06-29 17:45:49,783 - INFO - LIDAR Status Update - collecting, Rate: 16.0 Hz
+2025-06-29 17:45:50,709 - INFO - LIDAR Status Update - collecting, Rate: 15.97 Hz
+2025-06-29 17:45:51,782 - INFO - LIDAR Status Update - collecting, Rate: 15.95 Hz
+2025-06-29 17:45:52,779 - INFO - LIDAR Status Update - collecting, Rate: 15.94 Hz
+2025-06-29 17:45:53,805 - INFO - LIDAR Status Update - collecting, Rate: 15.95 Hz
+2025-06-29 17:45:54,990 - INFO - LIDAR Status Update - collecting, Rate: 15.95 Hz
+2025-06-29 17:45:55,880 - INFO - LIDAR Status Update - collecting, Rate: 15.96 Hz
+2025-06-29 17:45:56,529 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:45:56,533 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:45:56,695 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 17:47:31,782 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:47:31,784 - INFO - Stream paused for config application.
+2025-06-29 17:47:32,288 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 17:47:32,295 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 17:47:32,498 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 17:47:37,779 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:47:37,781 - INFO - Stream paused for config application.
+2025-06-29 17:47:38,284 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 17:47:38,290 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 17:47:38,494 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 17:47:41,621 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:47:41,625 - INFO - Stream paused for config application.
+2025-06-29 17:47:42,128 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 17:47:42,134 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 17:47:42,340 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 17:47:46,212 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:47:46,216 - INFO - Stream paused for config application.
+2025-06-29 17:47:46,729 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 17:47:46,793 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 17:47:46,998 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 17:47:59,370 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:47:59,374 - INFO - Stream paused for config application.
+2025-06-29 17:47:59,876 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 17:47:59,883 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 17:48:00,089 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 17:48:51,152 - INFO - Disconnected from server: client disconnect

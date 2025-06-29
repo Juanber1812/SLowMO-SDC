@@ -939,11 +939,6 @@ class MainWindow(QWidget):
                 self.lidar_rate_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.lidar_rate_label)
                 
-                self.lidar_measurements_label = QLabel("Measurements: 0")
-                self.lidar_measurements_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.lidar_measurements_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.lidar_measurements_label)
-                
                 self.lidar_errors_label = QLabel("Errors: 0")
                 self.lidar_errors_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.lidar_errors_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -956,7 +951,6 @@ class MainWindow(QWidget):
                 self.payload_labels["camera_status"] = self.camera_ready_label
                 self.payload_labels["lidar_status"] = self.lidar_status_label
                 self.payload_labels["lidar_rate"] = self.lidar_rate_label
-                self.payload_labels["lidar_measurements"] = self.lidar_measurements_label
                 self.payload_labels["lidar_errors"] = self.lidar_errors_label
             else:
                 # Standard subsystem items (Error Log, Overall Status)
@@ -1169,15 +1163,19 @@ class MainWindow(QWidget):
                 # Update Payload Subsystem LIDAR labels
                 if hasattr(self, 'payload_labels'):
                     if "status" in data:
-                        self.payload_labels["lidar_status"].setText(f"LIDAR: {data['status']}")
+                        status = data['status']
+                        if status == "disconnected":
+                            self.payload_labels["lidar_status"].setText("LIDAR: Disconnected")
+                        elif status == "connected":
+                            self.payload_labels["lidar_status"].setText("LIDAR: Connected")
+                        elif status == "active":
+                            self.payload_labels["lidar_status"].setText("LIDAR: Active")
+                        else:
+                            self.payload_labels["lidar_status"].setText(f"LIDAR: {status}")
                         
                     if "collection_rate_hz" in data:
                         rate = data["collection_rate_hz"]
                         self.payload_labels["lidar_rate"].setText(f"Collection Rate: {rate} Hz")
-                        
-                    if "data_count" in data:
-                        measurements = data["data_count"]
-                        self.payload_labels["lidar_measurements"].setText(f"Measurements: {measurements}")
                         
                     if "error_count" in data:
                         errors = data["error_count"]
@@ -1185,9 +1183,9 @@ class MainWindow(QWidget):
                         
                     # Update color coding based on status
                     status = data.get("status", "Unknown")
-                    if status == "collecting":
+                    if status == "active":
                         self.payload_labels["lidar_status"].setStyleSheet(f"color: #0f0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
-                    elif status == "stopped":
+                    elif status == "connected":
                         self.payload_labels["lidar_status"].setStyleSheet(f"color: #ff0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
                     else:
                         self.payload_labels["lidar_status"].setStyleSheet(f"color: #f00; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
