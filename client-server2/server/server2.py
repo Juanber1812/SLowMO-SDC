@@ -103,8 +103,8 @@ def periodic_payload_status_updates():
 def handle_connect():
     print(f"[INFO] Client connected: {request.sid}")
     connected_clients.add(request.sid)
-    # Send initial camera and LIDAR status to newly connected client
-    socketio.emit('camera_status', {'status': camera_state}, room=request.sid)
+    # Send initial payload status to newly connected client
+    send_payload_status_update()
     # Start communication monitoring if not already running
     if communication_monitor and not communication_monitor.is_monitoring:
         communication_monitor.set_update_callback(communication_data_callback)
@@ -149,7 +149,6 @@ def handle_start_camera():
     try:
         emit('start_camera', {}, broadcast=True)
         camera_state = "Streaming"
-        socketio.emit('camera_status', {'status': camera_state})
         send_payload_status_update()
     except Exception as e:
         print(f"[ERROR] start_camera: {e}")
@@ -161,7 +160,6 @@ def handle_stop_camera():
     try:
         emit('stop_camera', {}, broadcast=True)
         camera_state = "Idle"
-        socketio.emit('camera_status', {'status': camera_state})
         send_payload_status_update()
     except Exception as e:
         print(f"[ERROR] stop_camera: {e}")
@@ -236,24 +234,59 @@ def handle_sensor_data(data):
 
 @socketio.on("camera_status")
 def handle_camera_status(data):
+    """Handle camera status updates - deprecated, now handled by payload_broadcast"""
     try:
-        # Broadcast the camera status to all connected clients
-        emit("camera_status", data, broadcast=True)
+        # Legacy handler - log the status but don't send separate broadcast
+        logging.info(f"Camera status update received (legacy): {data}")
     except Exception as e:
         print(f"[ERROR] camera_status: {e}")
 
 
 @socketio.on('get_camera_status')
 def handle_get_camera_status():
-    # Send the current camera state to the requesting client
-    emit('camera_status', {'status': camera_state})
+    """Send current payload status instead of just camera status"""
+    send_payload_status_update()
 
 
 @socketio.on("camera_info")
 def on_camera_info(data):
     try:
-        # Broadcast the camera info to all connected clients
-        emit("camera_info", data, broadcast=True)
+        # Enhanced payload broadcast that includes camera performance data
+        # Get LIDAR status
+        lidar_status = "Disconnected"
+        lidar_collecting = False
+        if hasattr(lidar, 'lidar_controller'):
+            if lidar.lidar_controller.connected:
+                if lidar.lidar_controller.is_collecting:
+                    lidar_status = "Active"
+                    lidar_collecting = True
+                else:
+                    lidar_status = "Connected"
+            else:
+                lidar_status = "Disconnected"
+        
+        # Get camera status
+        camera_connected = True  # Assume connected if server is running
+        camera_streaming = camera_state == "Streaming"
+        
+        # Create enhanced payload data with camera performance info
+        payload_data = {
+            "camera_status": camera_state,
+            "camera_connected": camera_connected,
+            "camera_streaming": camera_streaming,
+            "lidar_status": lidar_status, 
+            "lidar_connected": lidar_status != "Disconnected",
+            "lidar_collecting": lidar_collecting,
+            "overall_status": "OK" if camera_connected else "ERROR",
+            # Include camera performance data
+            "fps": data.get("fps", 0),
+            "frame_size": data.get("frame_size", 0),
+            "upload_speed": data.get("upload_speed", 0)
+        }
+        
+        # Send enhanced payload broadcast instead of separate camera_info
+        emit("payload_broadcast", payload_data, broadcast=True)
+        
     except Exception as e:
         print("Camera info error:", e)
 
@@ -263,7 +296,6 @@ def handle_set_camera_idle():
     global camera_state
     try:
         camera_state = "Idle"
-        socketio.emit('camera_status', {'status': camera_state})
         send_payload_status_update()
         print("[INFO] Camera set to idle by client request.")
     except Exception as e:
@@ -395,18 +427,48 @@ def handle_stop_lidar():
 
 @socketio.on("lidar_status")
 def handle_lidar_status(data):
-    """Handle comprehensive LIDAR status updates and broadcast to clients"""
+    """Handle comprehensive LIDAR status updates and broadcast enhanced payload data"""
     try:
-        # Broadcast enhanced status to all clients
-        emit("lidar_status_broadcast", data, broadcast=True)
+        # Get LIDAR status
+        lidar_status = "Disconnected"
+        lidar_collecting = False
+        if hasattr(lidar, 'lidar_controller'):
+            if lidar.lidar_controller.connected:
+                if lidar.lidar_controller.is_collecting:
+                    lidar_status = "Active"
+                    lidar_collecting = True
+                else:
+                    lidar_status = "Connected"
+            else:
+                lidar_status = "Disconnected"
+        
+        # Get camera status
+        camera_connected = True  # Assume connected if server is running
+        camera_streaming = camera_state == "Streaming"
+        
+        # Create enhanced payload data with LIDAR status info
+        payload_data = {
+            "camera_status": camera_state,
+            "camera_connected": camera_connected,
+            "camera_streaming": camera_streaming,
+            "lidar_status": lidar_status, 
+            "lidar_connected": lidar_status != "Disconnected",
+            "lidar_collecting": lidar_collecting,
+            "overall_status": "OK" if camera_connected else "ERROR",
+            # Include LIDAR performance data if available
+            "collection_rate_hz": data.get("collection_rate_hz", 0)
+        }
+        
+        # Send enhanced payload broadcast instead of separate lidar_status_broadcast
+        emit("payload_broadcast", payload_data, broadcast=True)
+        
     except Exception as e:
         print(f"[ERROR] lidar_status: {e}")
 
 def set_camera_state(new_state):
     global camera_state
     camera_state = new_state
-    socketio.emit('camera_status', {'status': camera_state})
-    # Also send payload status update
+    # Send enhanced payload status update instead of separate camera_status
     send_payload_status_update()
 
 def send_payload_status_update():

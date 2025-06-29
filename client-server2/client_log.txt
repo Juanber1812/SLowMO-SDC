@@ -2247,3 +2247,292 @@ ValueError: Client is not in a disconnected state
 2025-06-29 21:06:00,121 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
 2025-06-29 21:06:00,122 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
 2025-06-29 21:06:00,204 - ERROR - Failed to update communication subsystem: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:37:22,512 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 21:37:22,706 - INFO - Connected to server
+2025-06-29 21:37:22,708 - INFO - Sending current camera configuration to server...
+2025-06-29 21:37:22,709 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:37:22,710 - INFO - [INFO] Successfully connected to server
+2025-06-29 21:37:27,541 - ERROR - Error measuring Wi-Fi signal: 'wifi_signal'
+2025-06-29 21:39:43,148 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 21:39:43,342 - INFO - Connected to server
+2025-06-29 21:39:43,343 - INFO - Sending current camera configuration to server...
+2025-06-29 21:39:43,344 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:39:43,346 - INFO - [INFO] Successfully connected to server
+2025-06-29 21:39:48,125 - ERROR - Error measuring Wi-Fi signal: 'wifi_signal'
+2025-06-29 21:41:24,342 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 21:41:24,553 - INFO - Connected to server
+2025-06-29 21:41:24,555 - INFO - Sending current camera configuration to server...
+2025-06-29 21:41:24,556 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:41:24,558 - INFO - [INFO] Successfully connected to server
+2025-06-29 21:41:45,736 - INFO - Requesting LIDAR streaming start
+2025-06-29 21:41:45,766 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 21:41:45,773 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 21:41:46,831 - INFO - Requesting LIDAR streaming stop
+2025-06-29 21:41:46,837 - INFO - Back button clicked in LidarWidget
+2025-06-29 21:41:46,871 - INFO - LIDAR widget streaming state updated to: True
+2025-06-29 21:41:46,893 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:41:46,963 - INFO - LIDAR widget streaming state updated to: False
+2025-06-29 21:41:46,965 - INFO - LIDAR Status Update - connected, Rate: 10.56 Hz
+2025-06-29 21:41:53,922 - INFO - Requesting LIDAR streaming start
+2025-06-29 21:41:53,948 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 21:41:54,008 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 21:41:57,815 - INFO - Requesting LIDAR streaming stop
+2025-06-29 21:41:57,820 - INFO - Back button clicked in LidarWidget
+2025-06-29 21:41:57,855 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:41:57,918 - INFO - LIDAR Status Update - connected, Rate: 15.86 Hz
+2025-06-29 21:41:59,250 - INFO - Requesting LIDAR streaming start
+2025-06-29 21:41:59,275 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 21:41:59,342 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 21:42:07,939 - INFO - Requesting LIDAR streaming stop
+2025-06-29 21:42:07,944 - INFO - Back button clicked in LidarWidget
+2025-06-29 21:42:08,008 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:42:08,015 - INFO - LIDAR Status Update - connected, Rate: 15.85 Hz
+2025-06-29 21:42:37,837 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 21:42:39,285 - INFO - Connected to server
+2025-06-29 21:42:39,287 - INFO - Sending current camera configuration to server...
+2025-06-29 21:42:39,290 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:42:39,291 - INFO - [INFO] Successfully connected to server
+2025-06-29 21:42:39,389 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-29 21:42:43,091 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-29 21:42:44,911 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-29 21:42:52,462 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:42:52,465 - INFO - Stream paused for config application.
+2025-06-29 21:42:52,970 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 21:42:52,975 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 21:42:53,181 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 21:43:05,033 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:43:05,036 - INFO - Stream paused for config application.
+2025-06-29 21:43:05,539 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 21:43:05,545 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 21:43:05,751 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 21:43:10,557 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:43:10,562 - INFO - Stream paused for config application.
+2025-06-29 21:43:11,075 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 21:43:11,095 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 21:43:11,302 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 21:43:23,179 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:43:23,182 - INFO - Stream paused for config application.
+2025-06-29 21:43:23,686 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 21:43:23,692 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 21:43:23,898 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 21:43:29,258 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:43:29,263 - INFO - Stream paused for config application.
+2025-06-29 21:43:29,766 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 21:43:29,772 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 21:43:29,976 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 21:44:29,961 - INFO - Requesting LIDAR streaming start
+2025-06-29 21:44:29,993 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 21:44:30,003 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 21:44:32,295 - INFO - Requesting LIDAR streaming stop
+2025-06-29 21:44:32,299 - INFO - Back button clicked in LidarWidget
+2025-06-29 21:44:32,370 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:44:32,378 - INFO - LIDAR Status Update - connected, Rate: 15.74 Hz
+2025-06-29 21:44:35,860 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-29 21:44:37,563 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-29 21:44:40,852 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:44:41,357 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-29 21:44:41,362 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 21:44:50,061 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:44:50,566 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-29 21:44:50,573 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 21:44:57,842 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:44:58,347 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-29 21:44:58,353 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-29 21:46:58,859 - INFO - Stopping camera stream...
+2025-06-29 21:46:58,862 - INFO - Stopping LIDAR...
+2025-06-29 21:46:58,865 - INFO - Sending cleanup signals to server...
+2025-06-29 21:49:35,234 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 21:49:35,476 - INFO - Connected to server
+2025-06-29 21:49:35,480 - INFO - Sending current camera configuration to server...
+2025-06-29 21:49:35,481 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:49:35,482 - INFO - [INFO] Successfully connected to server
+2025-06-29 21:50:18,578 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 21:50:18,858 - INFO - Connected to server
+2025-06-29 21:50:18,861 - INFO - Sending current camera configuration to server...
+2025-06-29 21:50:18,862 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:50:18,865 - INFO - [INFO] Successfully connected to server
+2025-06-29 21:50:32,403 - INFO - Requesting LIDAR streaming start
+2025-06-29 21:50:32,490 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 21:50:32,498 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 21:50:34,267 - INFO - Requesting LIDAR streaming stop
+2025-06-29 21:50:34,272 - INFO - Back button clicked in LidarWidget
+2025-06-29 21:50:34,427 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:50:34,480 - INFO - LIDAR Status Update - connected, Rate: 9.13 Hz
+2025-06-29 21:50:39,821 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-29 21:50:43,943 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-29 21:50:45,364 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-29 21:50:46,376 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-06-29 21:50:46,938 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-06-29 21:50:47,073 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-06-29 21:50:48,655 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-06-29 21:50:48,838 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-06-29 21:50:49,995 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-06-29 21:51:07,159 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:51:07,164 - INFO - Stream paused for config application.
+2025-06-29 21:51:07,668 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 21:51:07,673 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 21:51:07,877 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 21:51:08,577 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:51:08,580 - INFO - Stream paused for config application.
+2025-06-29 21:51:09,084 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 21:51:09,090 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 21:51:09,293 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 21:51:18,054 - INFO - Stopping camera stream...
+2025-06-29 21:51:18,057 - INFO - Stopping LIDAR...
+2025-06-29 21:51:18,060 - INFO - Sending cleanup signals to server...
+2025-06-29 21:55:43,228 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 21:55:43,455 - INFO - Connected to server
+2025-06-29 21:55:43,457 - INFO - Sending current camera configuration to server...
+2025-06-29 21:55:43,458 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:55:43,459 - INFO - [INFO] Successfully connected to server
+2025-06-29 21:56:12,269 - INFO - [INFO] Closing application...
+2025-06-29 21:56:12,273 - INFO - Stopping camera stream...
+2025-06-29 21:56:12,275 - INFO - Stopping LIDAR...
+2025-06-29 21:56:12,278 - INFO - Sending cleanup signals to server...
+2025-06-29 22:07:10,909 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 22:07:11,104 - INFO - Connected to server
+2025-06-29 22:07:11,105 - INFO - Sending current camera configuration to server...
+2025-06-29 22:07:11,106 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:07:11,107 - INFO - [INFO] Successfully connected to server
+2025-06-29 22:07:11,839 - INFO - [DEBUG] netsh WiFi check - Connected: True
+2025-06-29 22:07:11,841 - ERROR - Error measuring Wi-Fi signal: cannot access local variable 'signal_match' where it is not associated with a value
+2025-06-29 22:07:13,833 - INFO - [DEBUG] netsh WiFi check - Connected: True
+2025-06-29 22:07:13,836 - ERROR - Error measuring Wi-Fi signal: cannot access local variable 'signal_match' where it is not associated with a value
+2025-06-29 22:07:15,826 - INFO - [DEBUG] netsh WiFi check - Connected: True
+2025-06-29 22:07:15,830 - ERROR - Error measuring Wi-Fi signal: cannot access local variable 'signal_match' where it is not associated with a value
+2025-06-29 22:07:20,835 - INFO - [DEBUG] netsh WiFi check - Connected: True
+2025-06-29 22:07:20,838 - ERROR - Error measuring Wi-Fi signal: cannot access local variable 'signal_match' where it is not associated with a value
+2025-06-29 22:07:21,454 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:22,468 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:23,513 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:24,525 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:25,524 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:25,814 - INFO - [DEBUG] netsh WiFi check - Connected: True
+2025-06-29 22:07:25,816 - ERROR - Error measuring Wi-Fi signal: cannot access local variable 'signal_match' where it is not associated with a value
+2025-06-29 22:07:27,689 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:28,691 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:29,700 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:30,698 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:30,868 - INFO - [DEBUG] netsh WiFi check - Connected: True
+2025-06-29 22:07:30,870 - ERROR - Error measuring Wi-Fi signal: cannot access local variable 'signal_match' where it is not associated with a value
+2025-06-29 22:07:31,721 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:32,704 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:33,711 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:34,715 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:35,734 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:35,831 - INFO - [DEBUG] netsh WiFi check - Connected: True
+2025-06-29 22:07:35,834 - ERROR - Error measuring Wi-Fi signal: cannot access local variable 'signal_match' where it is not associated with a value
+2025-06-29 22:07:36,741 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:38,168 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:39,035 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:40,056 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:40,824 - INFO - [DEBUG] netsh WiFi check - Connected: True
+2025-06-29 22:07:40,826 - ERROR - Error measuring Wi-Fi signal: cannot access local variable 'signal_match' where it is not associated with a value
+2025-06-29 22:07:41,049 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:42,044 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:43,116 - INFO - [DEBUG] Payload status updated - Camera: False, LIDAR: True, Overall: Status: Degraded
+2025-06-29 22:07:45,826 - INFO - [DEBUG] netsh WiFi check - Connected: True
+2025-06-29 22:07:45,830 - ERROR - Error measuring Wi-Fi signal: cannot access local variable 'signal_match' where it is not associated with a value
+2025-06-29 22:07:46,847 - INFO - [INFO] Closing application...
+2025-06-29 22:07:46,850 - INFO - Stopping LIDAR...
+2025-06-29 22:07:46,853 - INFO - Sending cleanup signals to server...
+2025-06-29 22:12:42,232 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 22:12:42,888 - INFO - [DEBUG] Payload status updated - Camera: True, LIDAR: True, Overall: Status: Operational
+2025-06-29 22:12:42,890 - INFO - Connected to server
+2025-06-29 22:12:42,892 - INFO - Sending current camera configuration to server...
+2025-06-29 22:12:42,894 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:12:42,899 - INFO - [INFO] Successfully connected to server
+2025-06-29 22:13:12,367 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 22:13:12,569 - INFO - [DEBUG] Payload status updated - Camera: True, LIDAR: True, Overall: Status: Operational
+2025-06-29 22:13:12,571 - INFO - Connected to server
+2025-06-29 22:13:12,572 - INFO - Sending current camera configuration to server...
+2025-06-29 22:13:12,573 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:13:12,574 - INFO - [INFO] Successfully connected to server
+2025-06-29 22:13:43,469 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:13:43,472 - INFO - Stream paused for config application.
+2025-06-29 22:13:43,976 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 22:13:43,983 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 22:13:44,185 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 22:13:50,589 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:13:50,592 - INFO - Stream paused for config application.
+2025-06-29 22:13:51,095 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 22:13:51,101 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 22:13:51,304 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 22:14:00,850 - INFO - [INFO] Closing application...
+2025-06-29 22:14:00,852 - INFO - Stopping camera stream...
+2025-06-29 22:14:00,854 - INFO - Stopping LIDAR...
+2025-06-29 22:14:00,855 - INFO - Sending cleanup signals to server...
+2025-06-29 22:22:16,965 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 22:22:17,194 - INFO - Payload status changed: None -> Status: Operational
+2025-06-29 22:22:17,196 - INFO - Connected to server
+2025-06-29 22:22:17,196 - INFO - Sending current camera configuration to server...
+2025-06-29 22:22:17,197 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:22:17,198 - INFO - [INFO] Successfully connected to server
+2025-06-29 22:22:34,028 - INFO - Requesting LIDAR streaming start
+2025-06-29 22:22:34,076 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 22:22:34,086 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 22:22:42,141 - INFO - [INFO] Closing application...
+2025-06-29 22:22:42,144 - INFO - Stopping camera stream...
+2025-06-29 22:22:42,146 - INFO - Stopping LIDAR...
+2025-06-29 22:22:42,148 - INFO - Sending cleanup signals to server...
+2025-06-29 22:31:17,531 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 22:31:17,734 - INFO - Payload status changed: None -> Status: Operational
+2025-06-29 22:31:17,736 - INFO - Connected to server
+2025-06-29 22:31:17,737 - INFO - Sending current camera configuration to server...
+2025-06-29 22:31:17,738 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:31:17,739 - INFO - [INFO] Successfully connected to server
+2025-06-29 22:31:18,459 - INFO - Client WiFi signal: -40 dBm (86%)
+2025-06-29 22:31:35,477 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:31:35,481 - INFO - Stream paused for config application.
+2025-06-29 22:31:35,984 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 22:31:35,989 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 22:31:36,193 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 22:32:08,366 - INFO - [INFO] Closing application...
+2025-06-29 22:32:08,369 - INFO - Stopping camera stream...
+2025-06-29 22:32:08,372 - INFO - Stopping LIDAR...
+2025-06-29 22:32:08,374 - INFO - Sending cleanup signals to server...
+2025-06-29 22:35:56,423 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 22:35:56,605 - INFO - Payload status changed: None -> Status: Operational
+2025-06-29 22:35:56,606 - INFO - Connected to server
+2025-06-29 22:35:56,608 - INFO - Sending current camera configuration to server...
+2025-06-29 22:35:56,609 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:35:56,610 - INFO - [INFO] Successfully connected to server
+2025-06-29 22:35:57,426 - INFO - Client WiFi signal: -40 dBm (86%)
+2025-06-29 22:36:15,337 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 22:36:15,545 - INFO - Payload status changed: None -> Status: Operational
+2025-06-29 22:36:15,547 - INFO - Connected to server
+2025-06-29 22:36:15,548 - INFO - Sending current camera configuration to server...
+2025-06-29 22:36:15,549 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 22:36:15,550 - INFO - [INFO] Successfully connected to server
+2025-06-29 22:36:16,288 - INFO - Client WiFi signal: -40 dBm (86%)
+2025-06-29 22:36:34,787 - INFO - Requesting LIDAR streaming start
+2025-06-29 22:36:34,825 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 22:36:34,883 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 22:36:37,097 - INFO - Requesting LIDAR streaming stop
+2025-06-29 22:36:37,100 - INFO - Back button clicked in LidarWidget
+2025-06-29 22:36:37,171 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 22:36:37,180 - INFO - LIDAR Status Update - connected, Rate: 15.9 Hz
+2025-06-29 22:36:37,635 - INFO - Requesting LIDAR streaming start
+2025-06-29 22:36:37,657 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 22:36:37,738 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 22:36:38,437 - INFO - Requesting LIDAR streaming stop
+2025-06-29 22:36:38,440 - INFO - Back button clicked in LidarWidget
+2025-06-29 22:36:38,501 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 22:36:38,507 - INFO - LIDAR Status Update - connected, Rate: 15.48 Hz
+2025-06-29 22:36:39,092 - INFO - Requesting LIDAR streaming start
+2025-06-29 22:36:39,114 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 22:36:39,176 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 22:36:39,684 - INFO - Requesting LIDAR streaming stop
+2025-06-29 22:36:39,689 - INFO - Back button clicked in LidarWidget
+2025-06-29 22:36:39,764 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 22:36:39,775 - INFO - LIDAR Status Update - connected, Rate: 16.01 Hz
+2025-06-29 22:36:40,334 - INFO - Requesting LIDAR streaming start
+2025-06-29 22:36:40,401 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 22:36:40,407 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 22:36:41,550 - INFO - Requesting LIDAR streaming stop
+2025-06-29 22:36:41,555 - INFO - Back button clicked in LidarWidget
+2025-06-29 22:36:41,629 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 22:36:41,635 - INFO - LIDAR Status Update - connected, Rate: 15.9 Hz
+2025-06-29 22:36:51,196 - INFO - [INFO] Closing application...
+2025-06-29 22:36:51,198 - INFO - Stopping LIDAR...
+2025-06-29 22:36:51,199 - INFO - Sending cleanup signals to server...
