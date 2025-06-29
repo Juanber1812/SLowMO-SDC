@@ -2081,3 +2081,29 @@ ValueError: Client is not in a disconnected state
 2025-06-29 19:27:46,836 - INFO - Stopping LIDAR...
 2025-06-29 19:27:46,848 - INFO - Sending cleanup signals to server...
 2025-06-29 19:27:46,943 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:28:34,560 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 19:28:34,916 - INFO - Connected to server
+2025-06-29 19:28:34,921 - INFO - Sending current camera configuration to server...
+2025-06-29 19:28:34,923 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:28:34,925 - INFO - [INFO] Successfully connected to server
+2025-06-29 19:28:43,623 - INFO - Stopping LIDAR...
+2025-06-29 19:28:43,631 - INFO - Sending cleanup signals to server...
+2025-06-29 19:28:43,728 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:53:28,134 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 19:53:28,837 - INFO - Connected to server
+2025-06-29 19:53:28,839 - INFO - Sending current camera configuration to server...
+2025-06-29 19:53:28,841 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:53:28,844 - INFO - [INFO] Successfully connected to server
+2025-06-29 19:54:04,320 - INFO - Disconnected from server: transport error
+2025-06-29 19:54:09,670 - INFO - Connected to server
+2025-06-29 19:54:09,672 - INFO - Sending current camera configuration to server...
+2025-06-29 19:54:09,673 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:54:09,675 - INFO - Stream paused for config application.
+2025-06-29 19:54:41,098 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:54:41,603 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-29 19:54:41,611 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 19:55:03,520 - INFO - Disconnected from server: transport error
+2025-06-29 19:55:22,140 - INFO - Connected to server
+2025-06-29 19:55:22,142 - INFO - Sending current camera configuration to server...
+2025-06-29 19:55:22,142 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:55:22,144 - INFO - Stream paused for config application.

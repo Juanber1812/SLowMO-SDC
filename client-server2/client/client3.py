@@ -780,8 +780,11 @@ class MainWindow(QWidget):
         self.error_labels = {}
         self.overall_labels = {}
         
+        # Track if we've received real power data
+        self.received_real_power_data = False
+        
         subsystems = [
-            ("Power Subsystem", ["Current: 0.3 A", "Voltage: 7.2 V", "Power: 2.16 W", "Energy: 1.24 Wh", "Temperature: 28.5°C", "Battery: 85%", "Status: Nominal"]),
+            ("Power Subsystem", ["Current: -- A", "Voltage: -- V", "Power: -- W", "Energy: -- Wh", "Temperature: --°C", "Battery: --%", "Status: Not Connected"]),
             ("Thermal Subsystem", ["Pi: 55.2°C", "Power PCB: 32.1°C", "Battery: 25.8°C", "Status: Normal"]),
             ("Communication Subsystem", ["Downlink Frequency: 2.4 GHz", "Uplink Frequency: 2.4 GHz", "Signal Strength: -65 dBm", "Data Rate: 54 Mbps"]),
             ("ADCS Subsystem", ["Gyro: 0.02°/s", "Orientation: [0.1, -0.3, 89.7]°", "Lux1: 125 lx","Lux2: 90 lx","Lux3: 11 lx", "RPM: 0", "Status: Stable"]),
@@ -1300,6 +1303,9 @@ class MainWindow(QWidget):
                 if not hasattr(self, 'power_labels') or not self.power_labels:
                     return
                 
+                # Mark that we've received real power data from server
+                self.received_real_power_data = True
+                
                 # Update power labels to match the server2.py power data format
                 if "current" in data:
                     current_label = self.power_labels.get("current")
@@ -1334,7 +1340,12 @@ class MainWindow(QWidget):
                 if "status" in data:
                     status_label = self.power_labels.get("status")
                     if status_label and hasattr(status_label, 'setText'):
-                        status_label.setText(f"Status: {data['status']}")
+                        # Add indicator if this is real data vs disconnected
+                        status_text = data['status']
+                        if status_text == "Disconnected":
+                            status_label.setText(f"Status: {status_text} (No Hardware)")
+                        else:
+                            status_label.setText(f"Status: {status_text} (Live Data)")
                         
             except Exception as e:
                 logging.error(f"Failed to update power data: {e}")

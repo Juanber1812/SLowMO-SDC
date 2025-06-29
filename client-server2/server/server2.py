@@ -8,6 +8,7 @@ import sensors
 import lidar
 import threading
 import logging
+import time
 
 # Import power monitoring
 try:
@@ -34,20 +35,27 @@ def print_server_status(status):
 
 
 def start_background_tasks():
-    threading.Thread(target=camera.start_stream, daemon=True).start()
-    threading.Thread(target=sensors.start_sensors, daemon=True).start()
-    threading.Thread(target=lidar.start_lidar, daemon=True).start()
+    """Start background tasks with a delay to ensure server is ready"""
+    def delayed_start():
+        time.sleep(2)  # Give the server time to start
+        print("\n[INFO] Starting background tasks...")
+        threading.Thread(target=camera.start_stream, daemon=True).start()
+        threading.Thread(target=sensors.start_sensors, daemon=True).start()
+        threading.Thread(target=lidar.start_lidar, daemon=True).start()
+        
+        # Start periodic payload status updates
+        threading.Thread(target=periodic_payload_status_updates, daemon=True).start()
+        
+        # Start power monitoring
+        if power_monitor:
+            power_monitor.set_update_callback(power_data_callback)
+            if power_monitor.start_monitoring():
+                logging.info("Power monitoring started successfully")
+            else:
+                logging.error("Failed to start power monitoring")
     
-    # Start periodic payload status updates
-    threading.Thread(target=periodic_payload_status_updates, daemon=True).start()
-    
-    # Start power monitoring
-    if power_monitor:
-        power_monitor.set_update_callback(power_data_callback)
-        if power_monitor.start_monitoring():
-            logging.info("Power monitoring started successfully")
-        else:
-            logging.error("Failed to start power monitoring")
+    # Start the delayed initialization in a separate thread
+    threading.Thread(target=delayed_start, daemon=True).start()
 
     # Tachometer task
 #    from tachometer import run_tachometer
@@ -478,9 +486,13 @@ def handle_power_data(data):
         logging.error(f"Error handling power data: {e}")
 
 if __name__ == "__main__":
-    print("🚀 Server running at http://0.0.0.0:5000")
+    print("🚀 Server starting at http://0.0.0.0:5000")
+    print("Background tasks will start after server initialization.")
     print("Press Ctrl+C to stop the server and clean up resources.")
+    
+    # Start background tasks with delay
     start_background_tasks()
+    
     try:
         socketio.run(app, host="0.0.0.0", port=5000)
     except KeyboardInterrupt:
