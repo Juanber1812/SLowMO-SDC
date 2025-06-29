@@ -26,17 +26,16 @@ def start_background_tasks():
     # Tachometer task
 #    from tachometer import run_tachometer
 #
- #   # helper that prints & pushes via SocketIO
-  #  def report_rpm(rpm):
-   #     print(f"[TACHO] RPM: {rpm:.1f}")                             # <-- print
-    #    # remove the old `broadcast` arg
-     #   socketio.emit("tachometer_data", {"rpm": rpm})
-
-    # launch the tachometer loop in its own thread
- #   threading.Thread(
-  #      target=lambda: run_tachometer(report_rpm),
-   #     daemon=True
-    #).start()
+#    # helper that prints & pushes via SocketIO
+#    def report_rpm(rpm):
+#        print(f"[TACHO] RPM: {rpm:.1f}")
+#        socketio.emit("tachometer_data", {"rpm": rpm})
+#
+#    # launch the tachometer loop in its own thread
+#    threading.Thread(
+#        target=lambda: run_tachometer(report_rpm),
+#        daemon=True
+#    ).start()
 
 
 @socketio.on('connect')
@@ -215,6 +214,22 @@ def handle_lidar_data(data):
         emit("lidar_broadcast", data, broadcast=True)
     except Exception as e:
         print(f"[ERROR] lidar_data: {e}")
+
+
+@socketio.on("payload_data")
+def handle_payload_data(data):
+    try:
+        emit("payload_broadcast", data, broadcast=True)
+    except Exception as e:
+        print(f"[ERROR] payload_data: {e}")
+
+
+@socketio.on("tachometer_data")
+def handle_tachometer_data(data):
+    try:
+        emit("tachometer_broadcast", data, broadcast=True)
+    except Exception as e:
+        print(f"[ERROR] tachometer_data: {e}")
 
 
 @socketio.on('download_image')

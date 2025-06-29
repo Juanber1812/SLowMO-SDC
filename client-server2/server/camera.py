@@ -199,6 +199,12 @@ streamer = CameraStreamer()
 @sio.event
 def connect():
     streamer.connected = True
+    print("📡 Connected to server from camera.py")
+    # Send payload subsystem status
+    sio.emit("payload_data", {
+        "camera_status": "OPERATIONAL",
+        "status": "OK"
+    })
 
 @sio.event
 def disconnect():
@@ -206,6 +212,12 @@ def disconnect():
     streamer.streaming = False
     if hasattr(streamer, "picam") and getattr(streamer.picam, "started", False):
         streamer.picam.stop()
+    print("🔌 Camera disconnected")
+    # Send payload subsystem status
+    sio.emit("payload_data", {
+        "camera_status": "DISCONNECTED", 
+        "status": "ERROR"
+    })
 
 @sio.on("start_camera")
 def on_start_camera(_):
@@ -213,11 +225,21 @@ def on_start_camera(_):
     if not streamer.picam.started:
         streamer.picam.start()
     sio.emit("camera_status", {"status": "Streaming"})
+    # Send payload subsystem status
+    sio.emit("payload_data", {
+        "camera_status": "STREAMING",
+        "status": "OK"
+    })
 
 @sio.on("stop_camera")
 def on_stop_camera(_):
     streamer.streaming = False
     sio.emit("camera_status", {"status": "Idle"})
+    # Send payload subsystem status
+    sio.emit("payload_data", {
+        "camera_status": "IDLE",
+        "status": "OK"
+    })
 
 @sio.on("camera_config")
 def on_camera_config(data):
@@ -225,6 +247,11 @@ def on_camera_config(data):
     if not streamer.streaming:
         streamer.apply_config()
         sio.emit("camera_status", {"status": "Ready"})
+        # Send payload subsystem status
+        sio.emit("payload_data", {
+            "camera_status": "OPERATIONAL",
+            "status": "OK"
+        })
 
 @sio.on("get_camera_status")
 def on_get_camera_status(_):

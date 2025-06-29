@@ -1257,3 +1257,53 @@ ValueError: Client is not in a disconnected state
 2025-06-28 21:07:06,600 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
 2025-06-28 21:07:09,088 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
 2025-06-28 21:07:44,882 - INFO - Disconnected from server: client disconnect
+2025-06-28 22:46:09,268 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-28 22:46:11,764 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.128.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751147169.2702434 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000017E90CE2A50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-06-28 22:46:13,323 - INFO - Attempting to reconnect to http://192.168.128.89:5000...
+2025-06-28 22:46:15,483 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.128.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751147173.3261461 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000017E90D391D0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-06-28 22:46:31,007 - INFO - Attempting to reconnect to http://192.168.128.89:5000...
+2025-06-28 22:46:31,385 - INFO - Connected to server
+2025-06-28 22:46:31,387 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 22:46:55,613 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 22:46:55,618 - INFO - Stream paused for config application.
+2025-06-28 22:46:56,121 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-28 22:46:56,126 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-28 22:46:56,331 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-28 22:47:02,825 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 22:47:02,828 - INFO - Stream paused for config application.
+2025-06-28 22:47:03,356 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-28 22:47:03,443 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-28 22:47:03,647 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-28 22:47:07,949 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 22:47:07,954 - INFO - Stream paused for config application.
+2025-06-28 22:47:08,457 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-28 22:47:08,463 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-28 22:47:08,667 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-28 22:47:13,960 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 22:47:13,962 - INFO - Stream paused for config application.
+2025-06-28 22:47:14,465 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-28 22:47:14,470 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-06-28 22:47:14,673 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-28 22:47:18,297 - INFO - Requesting LIDAR streaming start
+2025-06-28 22:47:27,382 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-28 22:47:44,954 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 22:47:44,956 - INFO - Stream paused for config application.
+2025-06-28 22:47:45,465 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-28 22:47:45,469 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-28 22:47:45,671 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-28 22:53:49,841 - INFO - Disconnected from server: client disconnect
+2025-06-28 22:53:58,621 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-28 22:53:59,043 - INFO - Connected to server
+2025-06-28 22:53:59,045 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 22:53:59,049 - INFO - [INFO] Successfully connected to server
+2025-06-28 22:54:01,109 - INFO - Disconnected from server: client disconnect
+2025-06-28 23:04:44,585 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-28 23:04:45,326 - INFO - Connected to server
+2025-06-28 23:04:45,329 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 23:04:45,334 - INFO - [INFO] Successfully connected to server
+2025-06-28 23:05:18,210 - INFO - Disconnected from server: client disconnect
+2025-06-28 23:06:55,948 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-28 23:06:56,396 - INFO - Connected to server
+2025-06-28 23:06:56,400 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-28 23:06:56,405 - INFO - [INFO] Successfully connected to server
+2025-06-28 23:36:34,465 - INFO - Disconnected from server: client disconnect

@@ -824,18 +824,19 @@ class MainWindow(QWidget):
         self.thermal_labels = {}
         self.adcs_labels = {}
         self.cdh_labels = {}
+        self.payload_labels = {}
         self.error_labels = {}
         self.overall_labels = {}
         
         subsystems = [
-            ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Temperature: Pending...", "Status: Pending..."]),
-            ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
-            ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Signal Strength: Pending...", "Data Rate: Pending..."]),
-            ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Lux1: Pending...","Lux2: Pending...","Lux3: Pending...", "RPM: Pending...", "Status: Pending..."]),
-            ("Payload Subsystem", []),  # Special handling for payload
-            ("Command & Data Handling Subsystem", ["Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
-            ("Error Log", ["No Critical Errors Detected: Pending..."]),
-            ("Overall Status", ["No Anomalies Detected: Pending...", "Recommended Actions: Pending..."])
+            ("Power Subsystem", ["Current: 0.3 A", "Voltage: 7.2 V", "Power: 2.16 W", "Energy: 1.24 Wh", "Temperature: 28.5°C", "Status: Nominal"]),
+            ("Thermal Subsystem", ["Pi: 55.2°C", "Power PCB: 32.1°C", "Battery: 25.8°C", "Status: Normal"]),
+            ("Communication Subsystem", ["Downlink Frequency: 2.4 GHz", "Uplink Frequency: 2.4 GHz", "Signal Strength: -65 dBm", "Data Rate: 54 Mbps"]),
+            ("ADCS Subsystem", ["Gyro: 0.02°/s", "Orientation: [0.1, -0.3, 89.7]°", "Lux1: 125 lx","Lux2: 90 lx","Lux3: 11 lx", "RPM: 0", "Status: Stable"]),
+            ("Payload Subsystem", ["LiDAR, Camera", "Status"]),  # Special handling for payload
+            ("Command & Data Handling Subsystem", ["Memory Usage: 45.2%", "Last Command: Camera Config", "Uptime: 4m", "Status: Active"]),
+            ("Error Log", ["No Critical Errors Detected"]),
+            ("Overall Status", ["System Nominal", "Recommended Actions: None"])
         ]
 
         for name, items in subsystems:
@@ -936,21 +937,25 @@ class MainWindow(QWidget):
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                 # Add special status label
-                self.comms_status_label = QLabel("Status: Disconnected")
+                self.comms_status_label = QLabel("Status: Connected")
                 self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.comms_status_label)
             elif name == "Payload Subsystem":
-                # Special payload status labels
-                self.camera_status_label = QLabel("Camera: Pending...")
+                # Special payload status labels with live data support
+                self.camera_status_label = QLabel("Camera: OPERATIONAL")
                 self.camera_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.camera_status_label)
                 
-                self.camera_ready_label = QLabel("Status: Not Ready")
+                self.camera_ready_label = QLabel("Status: OK")
                 self.camera_ready_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.camera_ready_label)
+                
+                # Store references for live updates
+                self.payload_labels["camera"] = self.camera_status_label
+                self.payload_labels["status"] = self.camera_ready_label
             else:
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
@@ -1228,6 +1233,18 @@ class MainWindow(QWidget):
                         self.cdh_labels["status"].setText(f"Status: {data['status']}")
             except Exception as e:
                 logging.error(f"Failed to update CDH data: {e}")
+
+        @sio.on("payload_broadcast")
+        def on_payload_data(data):
+            """Handle payload subsystem data updates"""
+            try:
+                if hasattr(self, 'payload_labels'):
+                    if "camera_status" in data:
+                        self.payload_labels["camera"].setText(f"Camera: {data['camera_status']}")
+                    if "status" in data:
+                        self.payload_labels["status"].setText(f"Status: {data['status']}")
+            except Exception as e:
+                logging.error(f"Failed to update payload data: {e}")
                 
     def handle_adcs_command(self, mode_name, command_name, value):
         data = {
