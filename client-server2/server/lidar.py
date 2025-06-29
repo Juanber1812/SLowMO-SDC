@@ -69,7 +69,6 @@ class LidarController:
         self.start_time = time.time()
         self.collection_thread = threading.Thread(target=self._collection_loop, daemon=True)
         self.collection_thread.start()
-        print("� LIDAR collection started")
         
     def stop_collection(self):
         """Stop LIDAR data collection"""
@@ -79,6 +78,9 @@ class LidarController:
         self.is_collecting = False
         if self.collection_thread:
             self.collection_thread.join(timeout=1.0)
+        
+        # Send status update to show we're now connected but not collecting
+        self._send_status_update()
         
     def _collection_loop(self):
         """Main data collection loop"""
@@ -102,7 +104,6 @@ class LidarController:
                     time.sleep(0.05)  # 20 Hz collection rate
                     
         except Exception as e:
-            print(f"❌ LIDAR collection error: {e}")
             self.error_count += 1
             self.is_collecting = False
             

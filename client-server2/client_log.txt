@@ -1645,3 +1645,59 @@ ValueError: Client is not in a disconnected state
 2025-06-29 17:47:59,883 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
 2025-06-29 17:48:00,089 - INFO - Stream restart scheduled (if it was on before apply_config).
 2025-06-29 17:48:51,152 - INFO - Disconnected from server: client disconnect
+2025-06-29 17:57:47,535 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 17:57:47,731 - INFO - Connected to server
+2025-06-29 17:57:47,732 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:57:47,735 - INFO - [INFO] Successfully connected to server
+2025-06-29 17:57:55,960 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:57:55,985 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:57:56,060 - INFO - LIDAR Status Update - active, Rate: 72.86 Hz
+2025-06-29 17:57:57,027 - INFO - LIDAR Status Update - active, Rate: 16.6 Hz
+2025-06-29 17:57:57,158 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:57:57,163 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:57:57,187 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 17:57:58,219 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:57:58,248 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:57:58,335 - INFO - LIDAR Status Update - active, Rate: 78.28 Hz
+2025-06-29 17:57:59,247 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:57:59,252 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:57:59,347 - INFO - LIDAR widget streaming state updated to: True
+2025-06-29 17:57:59,349 - INFO - LIDAR Status Update - active, Rate: 16.8 Hz
+2025-06-29 17:57:59,452 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 17:58:02,613 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:58:02,620 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:58:02,993 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 17:58:03,047 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:58:03,166 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:58:03,276 - INFO - LIDAR Status Update - active, Rate: 72.62 Hz
+2025-06-29 17:58:04,339 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:58:04,388 - INFO - LIDAR widget streaming state updated to: True
+2025-06-29 17:58:04,392 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:58:04,393 - INFO - LIDAR Status Update - active, Rate: 16.58 Hz
+2025-06-29 17:58:04,397 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:58:04,447 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 17:58:04,448 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 17:58:04,929 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:58:04,970 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:58:05,245 - INFO - LIDAR Status Update - active, Rate: 18.6 Hz
+2025-06-29 17:58:06,286 - INFO - LIDAR Status Update - active, Rate: 16.38 Hz
+2025-06-29 17:58:07,284 - INFO - LIDAR Status Update - active, Rate: 16.11 Hz
+2025-06-29 17:58:08,284 - INFO - LIDAR Status Update - active, Rate: 16.01 Hz
+2025-06-29 17:58:09,044 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-06-29 17:58:09,319 - INFO - LIDAR Status Update - active, Rate: 15.95 Hz
+2025-06-29 17:58:10,364 - INFO - LIDAR Status Update - active, Rate: 15.95 Hz
+2025-06-29 17:58:11,384 - INFO - LIDAR Status Update - active, Rate: 15.98 Hz
+2025-06-29 17:58:12,465 - INFO - LIDAR Status Update - active, Rate: 15.27 Hz
+2025-06-29 17:58:13,500 - INFO - LIDAR Status Update - active, Rate: 14.76 Hz
+2025-06-29 17:58:14,559 - INFO - LIDAR Status Update - active, Rate: 14.82 Hz
+2025-06-29 17:58:15,580 - INFO - LIDAR Status Update - active, Rate: 14.48 Hz
+2025-06-29 17:58:16,641 - INFO - LIDAR Status Update - active, Rate: 14.63 Hz
+2025-06-29 17:58:17,655 - INFO - LIDAR Status Update - active, Rate: 14.75 Hz
+2025-06-29 17:58:18,727 - INFO - LIDAR Status Update - active, Rate: 14.85 Hz
+2025-06-29 17:58:19,793 - INFO - LIDAR Status Update - active, Rate: 14.94 Hz
+2025-06-29 17:58:20,841 - INFO - LIDAR Status Update - active, Rate: 14.99 Hz
+2025-06-29 17:58:21,862 - INFO - LIDAR Status Update - active, Rate: 15.05 Hz
+2025-06-29 17:58:22,833 - INFO - LIDAR Status Update - active, Rate: 15.1 Hz
+2025-06-29 17:58:23,790 - INFO - LIDAR Status Update - active, Rate: 15.15 Hz
+2025-06-29 17:58:24,876 - INFO - LIDAR Status Update - active, Rate: 15.18 Hz
+2025-06-29 17:58:25,274 - INFO - Disconnected from server: client disconnect

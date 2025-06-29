@@ -307,7 +307,6 @@ def handle_lidar_status(data):
     try:
         # Broadcast enhanced status to all clients
         emit("lidar_status_broadcast", data, broadcast=True)
-        print(f"📊 LIDAR Status - {data.get('status', 'Unknown')}, Rate: {data.get('collection_rate_hz', 0)} Hz")
     except Exception as e:
         print(f"[ERROR] lidar_status: {e}")
 
