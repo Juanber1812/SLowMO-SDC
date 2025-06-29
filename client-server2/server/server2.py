@@ -7,11 +7,26 @@ import camera
 import sensors
 import lidar
 import threading
+import logging
+
+# Import power monitoring
+try:
+    from power import PowerMonitor
+    POWER_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"Power monitoring not available: {e}")
+    PowerMonitor = None
+    POWER_AVAILABLE = False
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 camera_state = "Idle"  # Default camera state
+
+# Initialize power monitor
+power_monitor = None
+if POWER_AVAILABLE:
+    power_monitor = PowerMonitor(update_interval=2.0, mock_mode=True)  # Start in mock mode for safety
 
 
 def print_server_status(status):
@@ -25,6 +40,14 @@ def start_background_tasks():
     
     # Start periodic payload status updates
     threading.Thread(target=periodic_payload_status_updates, daemon=True).start()
+    
+    # Start power monitoring
+    if power_monitor:
+        power_monitor.set_update_callback(power_data_callback)
+        if power_monitor.start_monitoring():
+            logging.info("Power monitoring started successfully")
+        else:
+            logging.error("Failed to start power monitoring")
 
     # Tachometer task
 #    from tachometer import run_tachometer
@@ -373,6 +396,70 @@ def send_payload_status_update():
     except Exception as e:
         print(f"[ERROR] send_payload_status_update: {e}")
 
+def power_data_callback(power_data):
+    """Callback function to handle power data updates and broadcast to clients"""
+    try:
+        # Format data for client consumption (matching expected format)
+        formatted_data = {
+            "current": f"{power_data['current_ma'] / 1000:.3f}",  # Convert mA to A 
+            "voltage": f"{power_data['voltage_v']:.1f}",
+            "power": f"{power_data['power_mw'] / 1000:.2f}",  # Convert mW to W
+            "energy": f"{power_data['energy_j'] / 3600:.2f}",  # Convert J to Wh
+            "temperature": f"{power_data['temperature_c']:.1f}",
+            "battery_percentage": power_data['battery_percentage'],
+            "status": "Nominal" if power_data['status'] == "Operational" else power_data['status']
+        }
+        
+        # Broadcast to all connected clients
+        socketio.emit("power_broadcast", formatted_data)
+        
+        # Debug logging (reduced frequency)
+        import time
+        if not hasattr(power_data_callback, 'last_log') or time.time() - power_data_callback.last_log > 10:
+            logging.debug(f"Power broadcast: {power_data['power_mw']:.1f}mW, {power_data['voltage_v']:.2f}V, {power_data['current_ma']:.1f}mA")
+            power_data_callback.last_log = time.time()
+            
+    except Exception as e:
+        logging.error(f"Error in power data callback: {e}")
+
+# Power monitoring socket events
+@socketio.on("get_power_status")
+def handle_get_power_status():
+    """Get current power monitoring status"""
+    try:
+        if power_monitor:
+            status = power_monitor.get_status()
+            latest_data = power_monitor.get_latest_data()
+            
+            response = {
+                "success": True,
+                "status": status,
+                "latest_data": latest_data
+            }
+        else:
+            response = {
+                "success": False,
+                "error": "Power monitoring not available"
+            }
+        
+        emit("power_status_response", response)
+        
+    except Exception as e:
+        emit("power_status_response", {
+            "success": False,
+            "error": str(e)
+        })
+        logging.error(f"Error getting power status: {e}")
+
+@socketio.on("power_data")
+def handle_power_data(data):
+    """Handle power data from client (if needed)"""
+    try:
+        # Currently not used, but could be for manual power data input
+        # or for testing purposes
+        logging.debug(f"Received power data from client: {data}")
+    except Exception as e:
+        logging.error(f"Error handling power data: {e}")
 
 if __name__ == "__main__":
     print("🚀 Server running at http://0.0.0.0:5000")
@@ -397,6 +484,14 @@ if __name__ == "__main__":
             print("[INFO] Sensors stopped.")
         except Exception as e:
             print(f"[WARN] Could not stop sensors: {e}")
+
+        # Stop power monitoring
+        try:
+            if power_monitor:
+                power_monitor.stop_monitoring()
+                print("[INFO] Power monitoring stopped.")
+        except Exception as e:
+            print(f"[WARN] Could not stop power monitoring: {e}")
 
         print("[INFO] Server exited cleanly.")
         exit(0)

@@ -1954,3 +1954,113 @@ ValueError: Client is not in a disconnected state
 2025-06-29 18:37:09,971 - INFO - Sending cleanup signals to server...
 2025-06-29 18:37:09,992 - INFO - LIDAR Command Success: LIDAR collection stopped
 2025-06-29 18:37:10,065 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 18:51:21,511 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 18:51:21,937 - INFO - Connected to server
+2025-06-29 18:51:21,939 - INFO - Sending current camera configuration to server...
+2025-06-29 18:51:21,943 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 18:51:21,946 - INFO - [INFO] Successfully connected to server
+2025-06-29 18:51:48,374 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 18:51:48,380 - INFO - Stream paused for config application.
+2025-06-29 18:51:48,883 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 18:51:48,891 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 18:51:49,095 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 18:52:01,149 - INFO - Requesting LIDAR streaming start
+2025-06-29 18:52:01,219 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 18:52:01,231 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 18:52:14,568 - INFO - Requesting LIDAR streaming stop
+2025-06-29 18:52:14,575 - INFO - Back button clicked in LidarWidget
+2025-06-29 18:52:14,671 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 18:52:14,698 - INFO - LIDAR Status Update - connected, Rate: 11.52 Hz
+2025-06-29 18:52:15,731 - INFO - Requesting LIDAR streaming start
+2025-06-29 18:52:15,808 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 18:52:15,820 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 18:52:18,353 - INFO - Requesting LIDAR streaming stop
+2025-06-29 18:52:18,357 - INFO - Back button clicked in LidarWidget
+2025-06-29 18:52:18,514 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 18:52:18,523 - INFO - LIDAR Status Update - connected, Rate: 11.73 Hz
+2025-06-29 18:52:22,096 - INFO - Stopping camera stream...
+2025-06-29 18:52:22,098 - INFO - Stopping LIDAR...
+2025-06-29 18:52:22,100 - INFO - Sending cleanup signals to server...
+2025-06-29 18:52:22,207 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 18:52:22,217 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 18:52:22,224 - ERROR - Frame processing error: wrapped C/C++ object of type Bridge has been deleted
+2025-06-29 18:52:22,230 - ERROR - Frame processing error: wrapped C/C++ object of type Bridge has been deleted
+2025-06-29 19:01:34,609 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 19:01:34,899 - INFO - Connected to server
+2025-06-29 19:01:34,901 - INFO - Sending current camera configuration to server...
+2025-06-29 19:01:34,904 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:01:34,906 - INFO - [INFO] Successfully connected to server
+2025-06-29 19:01:39,182 - INFO - Requesting LIDAR streaming start
+2025-06-29 19:01:39,268 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 19:01:39,277 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 19:01:40,578 - INFO - Requesting LIDAR streaming stop
+2025-06-29 19:01:40,583 - INFO - Back button clicked in LidarWidget
+2025-06-29 19:01:40,648 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:01:40,654 - INFO - LIDAR Status Update - connected, Rate: 15.61 Hz
+2025-06-29 19:01:41,164 - INFO - Requesting LIDAR streaming start
+2025-06-29 19:01:41,192 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 19:01:41,252 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 19:01:41,626 - INFO - Requesting LIDAR streaming stop
+2025-06-29 19:01:41,633 - INFO - Back button clicked in LidarWidget
+2025-06-29 19:01:41,718 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:01:41,730 - INFO - LIDAR Status Update - connected, Rate: 15.58 Hz
+2025-06-29 19:01:42,241 - INFO - Requesting LIDAR streaming start
+2025-06-29 19:01:42,269 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 19:01:42,326 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 19:01:43,142 - INFO - Requesting LIDAR streaming stop
+2025-06-29 19:01:43,146 - INFO - Back button clicked in LidarWidget
+2025-06-29 19:01:43,212 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:01:43,219 - INFO - LIDAR Status Update - connected, Rate: 15.9 Hz
+2025-06-29 19:01:43,709 - INFO - Requesting LIDAR streaming start
+2025-06-29 19:01:43,729 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 19:01:43,798 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 19:01:45,519 - INFO - Requesting LIDAR streaming stop
+2025-06-29 19:01:45,524 - INFO - Back button clicked in LidarWidget
+2025-06-29 19:01:45,554 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:01:45,619 - INFO - LIDAR Status Update - connected, Rate: 15.89 Hz
+2025-06-29 19:01:53,056 - INFO - Requesting LIDAR streaming start
+2025-06-29 19:01:53,119 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 19:01:53,128 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 19:01:55,586 - INFO - Requesting LIDAR streaming stop
+2025-06-29 19:01:55,589 - INFO - Back button clicked in LidarWidget
+2025-06-29 19:01:55,692 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:01:55,713 - INFO - LIDAR Status Update - connected, Rate: 11.57 Hz
+2025-06-29 19:02:00,074 - INFO - Requesting LIDAR streaming start
+2025-06-29 19:02:00,132 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 19:02:00,201 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 19:02:01,130 - INFO - Requesting LIDAR streaming stop
+2025-06-29 19:02:01,134 - INFO - Back button clicked in LidarWidget
+2025-06-29 19:02:01,251 - INFO - LIDAR Status Update - connected, Rate: 11.98 Hz
+2025-06-29 19:02:01,310 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:02:01,319 - INFO - LIDAR Status Update - connected, Rate: 11.1 Hz
+2025-06-29 19:02:15,892 - INFO - Stopping camera stream...
+2025-06-29 19:02:15,900 - INFO - Stopping LIDAR...
+2025-06-29 19:02:15,908 - INFO - Sending cleanup signals to server...
+2025-06-29 19:02:15,972 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:02:15,994 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:02:37,169 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 19:02:37,666 - INFO - Connected to server
+2025-06-29 19:02:37,671 - INFO - Sending current camera configuration to server...
+2025-06-29 19:02:37,674 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:02:37,676 - INFO - [INFO] Successfully connected to server
+2025-06-29 19:02:44,858 - INFO - Stopping LIDAR...
+2025-06-29 19:02:44,861 - INFO - Sending cleanup signals to server...
+2025-06-29 19:02:44,885 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:02:44,957 - ERROR - Camera status update error: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:02:44,959 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:02:44,960 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:02:44,962 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:02:44,964 - ERROR - Camera status update error: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:02:44,966 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:03:05,852 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 19:03:06,221 - INFO - Connected to server
+2025-06-29 19:03:06,225 - INFO - Sending current camera configuration to server...
+2025-06-29 19:03:06,226 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:03:06,228 - INFO - [INFO] Successfully connected to server
+2025-06-29 19:03:33,749 - INFO - Stopping LIDAR...
+2025-06-29 19:03:33,751 - INFO - Sending cleanup signals to server...
+2025-06-29 19:03:33,773 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:03:33,856 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:06:38,167 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 19:06:43,176 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.128.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751220398.1725574 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000027CB632A900>, 'Connection to 192.168.128.89 timed out. (connect timeout=5)'))
+2025-06-29 19:06:58,716 - INFO - Stopping LIDAR...

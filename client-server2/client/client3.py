@@ -781,7 +781,7 @@ class MainWindow(QWidget):
         self.overall_labels = {}
         
         subsystems = [
-            ("Power Subsystem", ["Current: 0.3 A", "Voltage: 7.2 V", "Power: 2.16 W", "Energy: 1.24 Wh", "Temperature: 28.5°C", "Status: Nominal"]),
+            ("Power Subsystem", ["Current: 0.3 A", "Voltage: 7.2 V", "Power: 2.16 W", "Energy: 1.24 Wh", "Temperature: 28.5°C", "Battery: 85%", "Status: Nominal"]),
             ("Thermal Subsystem", ["Pi: 55.2°C", "Power PCB: 32.1°C", "Battery: 25.8°C", "Status: Normal"]),
             ("Communication Subsystem", ["Downlink Frequency: 2.4 GHz", "Uplink Frequency: 2.4 GHz", "Signal Strength: -65 dBm", "Data Rate: 54 Mbps"]),
             ("ADCS Subsystem", ["Gyro: 0.02°/s", "Orientation: [0.1, -0.3, 89.7]°", "Lux1: 125 lx","Lux2: 90 lx","Lux3: 11 lx", "RPM: 0", "Status: Stable"]),
@@ -821,6 +821,8 @@ class MainWindow(QWidget):
                         self.power_labels["energy"] = lbl
                     elif "Temperature:" in text:
                         self.power_labels["temperature"] = lbl
+                    elif "Battery:" in text:
+                        self.power_labels["battery"] = lbl
                     elif "Status:" in text:
                         self.power_labels["status"] = lbl
                         
@@ -889,43 +891,63 @@ class MainWindow(QWidget):
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                 
-                # Add upload speed label
-                self.comms_upload_speed_label = QLabel("Upload Speed: -- KB/s")
+                # Add WiFi speed label (separate from upload speed)
+                self.comms_wifi_speed_label = QLabel("WiFi Speed: -- Mbps".ljust(30))
+                self.comms_wifi_speed_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.comms_wifi_speed_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_wifi_speed_label.setMinimumWidth(220)  # Consistent with payload labels
+                self.comms_wifi_speed_label.setMaximumWidth(220)  # Fixed maximum width
+                layout.addWidget(self.comms_wifi_speed_label)
+                
+                # Add upload speed label (from camera data)
+                self.comms_upload_speed_label = QLabel("Upload Speed: -- KB/s".ljust(30))
                 self.comms_upload_speed_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.comms_upload_speed_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_upload_speed_label.setMinimumWidth(220)  # Consistent with payload labels
+                self.comms_upload_speed_label.setMaximumWidth(220)  # Fixed maximum width
                 layout.addWidget(self.comms_upload_speed_label)
                 
                 # Add special status label
-                self.comms_status_label = QLabel("Status: Connected")
+                self.comms_status_label = QLabel("Status: Connected".ljust(30))
                 self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_status_label.setMinimumWidth(220)  # Consistent with payload labels
+                self.comms_status_label.setMaximumWidth(220)  # Fixed maximum width
                 layout.addWidget(self.comms_status_label)
             elif name == "Payload Subsystem":
                 # Camera status label with FPS integrated - fixed width
-                self.camera_status_label = QLabel("Camera: Disconnected      ")
+                self.camera_status_label = QLabel("Camera: Disconnected".ljust(30))
                 self.camera_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.camera_status_label.setMinimumWidth(180)  # Fixed minimum width
+                self.camera_status_label.setMinimumWidth(220)  # Increased minimum width
+                self.camera_status_label.setMaximumWidth(220)  # Also set maximum width to prevent expansion
+                self.camera_status_label.setFixedHeight(20)    # Fixed height
                 layout.addWidget(self.camera_status_label)
                 
-                self.camera_frame_size_label = QLabel("Frame Size: -- KB       ")
+                self.camera_frame_size_label = QLabel("Frame Size: -- KB".ljust(30))
                 self.camera_frame_size_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_frame_size_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.camera_frame_size_label.setMinimumWidth(180)  # Fixed minimum width
+                self.camera_frame_size_label.setMinimumWidth(220)  # Increased minimum width
+                self.camera_frame_size_label.setMaximumWidth(220)  # Also set maximum width
+                self.camera_frame_size_label.setFixedHeight(20)    # Fixed height
                 layout.addWidget(self.camera_frame_size_label)
                 
                 # LIDAR status label with collection rate integrated - fixed width
-                self.lidar_status_label = QLabel("LIDAR: Disconnected      ")
+                self.lidar_status_label = QLabel("LIDAR: Disconnected".ljust(30))
                 self.lidar_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.lidar_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.lidar_status_label.setMinimumWidth(180)  # Fixed minimum width
+                self.lidar_status_label.setMinimumWidth(220)  # Increased minimum width
+                self.lidar_status_label.setMaximumWidth(220)  # Also set maximum width
+                self.lidar_status_label.setFixedHeight(20)    # Fixed height
                 layout.addWidget(self.lidar_status_label)
                 
                 # Overall payload subsystem status - fixed width
-                self.payload_status_label = QLabel("Status: Unknown          ")
+                self.payload_status_label = QLabel("Status: Unknown".ljust(30))
                 self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.payload_status_label.setMinimumWidth(180)  # Fixed minimum width
+                self.payload_status_label.setMinimumWidth(220)  # Increased minimum width
+                self.payload_status_label.setMaximumWidth(220)  # Also set maximum width
+                self.payload_status_label.setFixedHeight(20)    # Fixed height
                 layout.addWidget(self.payload_status_label)
                 
                 # Store references for live updates
@@ -1027,7 +1049,7 @@ class MainWindow(QWidget):
         @sio.event
         def connect():
             logging.info("Connected to server")
-            self.comms_status_label.setText("Status: Connected")
+            self.comms_status_label.setText("Status: Connected".ljust(30))
             self.camera_controls.toggle_btn.setEnabled(True)
             self.detector_controls.detector_btn.setEnabled(True)
             # self.camera_controls.crop_btn.setEnabled(True) # DELETED
@@ -1045,7 +1067,7 @@ class MainWindow(QWidget):
         @sio.event
         def disconnect(reason=None):
             logging.info(f"Disconnected from server: {reason}")
-            self.comms_status_label.setText("Status: Disconnected")
+            self.comms_status_label.setText("Status: Disconnected".ljust(30))
             self.camera_controls.toggle_btn.setEnabled(False)
             self.detector_controls.detector_btn.setEnabled(False)
             # self.camera_controls.crop_btn.setEnabled(False) # DELETED
@@ -1079,24 +1101,38 @@ class MainWindow(QWidget):
         def on_camera_info(data):
             """Handle camera performance data and update payload subsystem"""
             try:
-                if hasattr(self, 'payload_labels'):
+                # Check if widgets still exist and we have the labels dictionary
+                if hasattr(self, 'payload_labels') and self.payload_labels:
                     # Update camera status to include FPS when available
                     if "fps" in data:
-                        fps = data['fps']
-                        # Get current camera status and add FPS with fixed width
-                        current_status = self.payload_labels["camera"].text().split(" - ")[0].strip()  # Get base status
-                        camera_text = f"{current_status} - {fps}FPS".ljust(25)
-                        self.payload_labels["camera"].setText(camera_text)
+                        camera_label = self.payload_labels.get("camera")
+                        if camera_label and hasattr(camera_label, 'setText'):
+                            fps = data['fps']
+                            # Get current camera status and add FPS with fixed width
+                            try:
+                                current_status = camera_label.text().split(" - ")[0].strip()  # Get base status
+                                camera_text = f"{current_status} - {fps}FPS".ljust(30)
+                                camera_label.setText(camera_text)
+                            except:
+                                # Fallback if getting current text fails
+                                camera_text = f"Camera: Active - {fps}FPS".ljust(30)
+                                camera_label.setText(camera_text)
+                    
                     if "frame_size" in data:
-                        frame_size_text = f"Frame Size: {data['frame_size']} KB".ljust(25)
-                        self.payload_labels["frame_size"].setText(frame_size_text)
+                        frame_size_label = self.payload_labels.get("frame_size")
+                        if frame_size_label and hasattr(frame_size_label, 'setText'):
+                            frame_size_text = f"Frame Size: {data['frame_size']} KB".ljust(30)
+                            frame_size_label.setText(frame_size_text)
                 
                 # Upload speed to Communication Subsystem
                 if "upload_speed" in data and hasattr(self, 'comms_upload_speed_label'):
-                    upload_speed = data["upload_speed"]
-                    self.comms_upload_speed_label.setText(f"Upload Speed: {upload_speed} KB/s")
+                    if hasattr(self.comms_upload_speed_label, 'setText'):
+                        upload_speed = data["upload_speed"]
+                        upload_text = f"Upload Speed: {upload_speed} KB/s".ljust(30)
+                        self.comms_upload_speed_label.setText(upload_text)
                     
             except Exception as e:
+                logging.error(f"Failed to update camera info: {e}")
                 logging.error(f"Failed to update camera info: {e}")
 
         @sio.on("image_captured")
@@ -1150,33 +1186,36 @@ class MainWindow(QWidget):
             """Handle comprehensive LIDAR status updates from server"""
             try:
                 # Update Payload Subsystem LIDAR labels
-                if hasattr(self, 'payload_labels'):
+                if hasattr(self, 'payload_labels') and self.payload_labels:
                     if "status" in data:
-                        status = data['status']
-                        if status == "disconnected":
-                            lidar_text = "LIDAR: Disconnected".ljust(25)
-                        elif status == "connected":
-                            lidar_text = "LIDAR: Connected".ljust(25)
-                        elif status == "active":
-                            # Include collection rate in the status when active
-                            rate = data.get("collection_rate_hz", 0)
-                            lidar_text = f"LIDAR: Active - {rate}Hz".ljust(25)
-                        else:
-                            lidar_text = f"LIDAR: {status}".ljust(25)
+                        lidar_label = self.payload_labels.get("lidar_status")
+                        if lidar_label and hasattr(lidar_label, 'setText'):
+                            status = data['status']
+                            if status == "disconnected":
+                                lidar_text = "LIDAR: Disconnected".ljust(30)
+                            elif status == "connected":
+                                lidar_text = "LIDAR: Connected".ljust(30)
+                            elif status == "active":
+                                # Include collection rate in the status when active
+                                rate = data.get("collection_rate_hz", 0)
+                                lidar_text = f"LIDAR: Active - {rate}Hz".ljust(30)
+                            else:
+                                lidar_text = f"LIDAR: {status}".ljust(30)
+                            
+                            lidar_label.setText(lidar_text)
                         
-                        self.payload_labels["lidar_status"].setText(lidar_text)
+                        # Update color coding based on status
+                        status = data.get("status", "Unknown")
+                        if lidar_label and hasattr(lidar_label, 'setStyleSheet'):
+                            if status == "active":
+                                lidar_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                            elif status == "connected":
+                                lidar_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                            else:
+                                lidar_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                         
-                    # Update color coding based on status
-                    status = data.get("status", "Unknown")
-                    if status == "active":
-                        self.payload_labels["lidar_status"].setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                    elif status == "connected":
-                        self.payload_labels["lidar_status"].setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                    else:
-                        self.payload_labels["lidar_status"].setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                    
-                    # Update overall payload status
-                    self.update_payload_status()
+                        # Update overall payload status
+                        self.update_payload_status()
                 
                 # Update LIDAR widget streaming state if present
                 if hasattr(self, 'lidar_widget') and self.lidar_widget:
@@ -1257,20 +1296,46 @@ class MainWindow(QWidget):
         def on_power_data(data):
             """Handle power subsystem data updates"""
             try:
-                if hasattr(self, 'power_labels'):
-                    # Update power labels to match your power.py data structure
-                    if "current" in data:
-                        self.power_labels["current"].setText(f"Current: {data['current']:.2f} mA")
-                    if "voltage" in data:
-                        self.power_labels["voltage"].setText(f"Voltage: {data['voltage']:.2f} V")
-                    if "power" in data:
-                        self.power_labels["power"].setText(f"Power: {data['power']:.2f} mW")
-                    if "energy" in data:
-                        self.power_labels["energy"].setText(f"Energy: {data['energy']:.2f} J")
-                    if "temperature" in data:
-                        self.power_labels["temperature"].setText(f"Temperature: {data['temperature']:.1f}°C")
-                    if "status" in data:
-                        self.power_labels["status"].setText(f"Status: {data['status']}")
+                # Check if widgets still exist and we have the labels dictionary
+                if not hasattr(self, 'power_labels') or not self.power_labels:
+                    return
+                
+                # Update power labels to match the server2.py power data format
+                if "current" in data:
+                    current_label = self.power_labels.get("current")
+                    if current_label and hasattr(current_label, 'setText'):
+                        current_label.setText(f"Current: {data['current']} A")
+                        
+                if "voltage" in data:
+                    voltage_label = self.power_labels.get("voltage")
+                    if voltage_label and hasattr(voltage_label, 'setText'):
+                        voltage_label.setText(f"Voltage: {data['voltage']} V")
+                        
+                if "power" in data:
+                    power_label = self.power_labels.get("power")
+                    if power_label and hasattr(power_label, 'setText'):
+                        power_label.setText(f"Power: {data['power']} W")
+                        
+                if "energy" in data:
+                    energy_label = self.power_labels.get("energy")
+                    if energy_label and hasattr(energy_label, 'setText'):
+                        energy_label.setText(f"Energy: {data['energy']} Wh")
+                        
+                if "temperature" in data:
+                    temp_label = self.power_labels.get("temperature")
+                    if temp_label and hasattr(temp_label, 'setText'):
+                        temp_label.setText(f"Temperature: {data['temperature']}°C")
+                        
+                if "battery_percentage" in data:
+                    battery_label = self.power_labels.get("battery")
+                    if battery_label and hasattr(battery_label, 'setText'):
+                        battery_label.setText(f"Battery: {data['battery_percentage']}%")
+                        
+                if "status" in data:
+                    status_label = self.power_labels.get("status")
+                    if status_label and hasattr(status_label, 'setText'):
+                        status_label.setText(f"Status: {data['status']}")
+                        
             except Exception as e:
                 logging.error(f"Failed to update power data: {e}")
 
@@ -1311,59 +1376,72 @@ class MainWindow(QWidget):
         def on_payload_data(data):
             """Handle payload subsystem status updates"""
             try:
-                if hasattr(self, 'payload_labels'):
-                    # Update camera status with proper formatting and fixed width
-                    if "camera_status" in data:
+                # Check if widgets still exist and we have the labels dictionary
+                if not hasattr(self, 'payload_labels') or not self.payload_labels:
+                    return
+                
+                # Update camera status with proper formatting and fixed width
+                if "camera_status" in data:
+                    camera_label = self.payload_labels.get("camera")
+                    if camera_label and hasattr(camera_label, 'setText'):
                         status = data['camera_status']
                         # Pad the text to maintain consistent width
                         camera_text = f"Camera: {status}"
                         # Check if we need to preserve FPS info
-                        current_text = self.payload_labels["camera"].text()
-                        if " - " in current_text and "FPS" in current_text:
-                            fps_part = current_text.split(" - ")[1]
-                            camera_text = f"Camera: {status} - {fps_part}"
+                        try:
+                            current_text = camera_label.text()
+                            if " - " in current_text and "FPS" in current_text:
+                                fps_part = current_text.split(" - ")[1].strip()
+                                camera_text = f"Camera: {status} - {fps_part}"
+                        except:
+                            pass  # Use default text if getting current text fails
                         
-                        # Pad to ensure consistent width (about 25 characters)
-                        camera_text = camera_text.ljust(25)
-                        self.payload_labels["camera"].setText(camera_text)
+                        # Pad to ensure consistent width (30 characters)
+                        camera_text = camera_text.ljust(30)
+                        camera_label.setText(camera_text)
                         
                         # Update color based on status
                         if status.lower() in ["streaming", "active", "operational"]:
-                            self.payload_labels["camera"].setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                            camera_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                         elif status.lower() in ["idle", "connected", "ready"]:
-                            self.payload_labels["camera"].setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                            camera_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                         else:
-                            self.payload_labels["camera"].setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                    
-                    # Update LIDAR status with proper formatting and fixed width
-                    if "lidar_status" in data:
+                            camera_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                
+                # Update LIDAR status with proper formatting and fixed width
+                if "lidar_status" in data:
+                    lidar_label = self.payload_labels.get("lidar_status")
+                    if lidar_label and hasattr(lidar_label, 'setText'):
                         status = data['lidar_status']
-                        lidar_text = f"LIDAR: {status}".ljust(25)  # Pad to ensure consistent width
-                        self.payload_labels["lidar_status"].setText(lidar_text)
+                        lidar_text = f"LIDAR: {status}".ljust(30)  # Pad to ensure consistent width
+                        lidar_label.setText(lidar_text)
                         
                         # Update color based on status
                         if status.lower() in ["active", "collecting"]:
-                            self.payload_labels["lidar_status"].setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                            lidar_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                         elif status.lower() in ["connected", "ready"]:
-                            self.payload_labels["lidar_status"].setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                            lidar_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                         else:
-                            self.payload_labels["lidar_status"].setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                    
-                    # Update overall payload status with proper formatting and fixed width
-                    if "overall_status" in data:
+                            lidar_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                
+                # Update overall payload status with proper formatting and fixed width
+                if "overall_status" in data:
+                    status_label = self.payload_labels.get("payload_status")
+                    if status_label and hasattr(status_label, 'setText'):
                         status = data['overall_status']
-                        status_text = f"Status: {status}".ljust(25)  # Pad to ensure consistent width
-                        self.payload_labels["payload_status"].setText(status_text)
+                        status_text = f"Status: {status}".ljust(30)  # Pad to ensure consistent width
+                        status_label.setText(status_text)
                         
                         # Update color based on status
                         if status.lower() in ["ok", "operational", "normal"]:
-                            self.payload_labels["payload_status"].setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                            status_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                         elif status.lower() in ["warning", "degraded"]:
-                            self.payload_labels["payload_status"].setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                            status_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                         else:
-                            self.payload_labels["payload_status"].setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                    
+                            status_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                
             except Exception as e:
+                logging.error(f"Failed to update payload data: {e}")
                 logging.error(f"Failed to update payload data: {e}")
                 
     def handle_adcs_command(self, mode_name, command_name, value):
@@ -1413,24 +1491,32 @@ class MainWindow(QWidget):
     def update_camera_status(self, data):
         """Update camera status display"""
         try:
+            # Check if widgets still exist and we have the labels dictionary
+            if not hasattr(self, 'payload_labels') or not self.payload_labels:
+                return
+            
+            camera_label = self.payload_labels.get("camera")
+            if not camera_label or not hasattr(camera_label, 'setText'):
+                return
+            
             status = data.get("status", "Unknown")
             # Check if we already have FPS info to preserve it
-            current_text = self.payload_labels["camera"].text()
+            current_text = camera_label.text()
             if " - " in current_text and "FPS" in current_text:
-                fps_part = current_text.split(" - ")[1]  # Get the FPS part
-                camera_text = f"Camera: {status} - {fps_part}".ljust(25)
+                fps_part = current_text.split(" - ")[1].strip()  # Get the FPS part
+                camera_text = f"Camera: {status} - {fps_part}".ljust(30)
             else:
-                camera_text = f"Camera: {status}".ljust(25)
+                camera_text = f"Camera: {status}".ljust(30)
             
-            self.payload_labels["camera"].setText(camera_text)
+            camera_label.setText(camera_text)
             
             # Update color based on status
             if status.lower() in ("streaming", "active", "operational"):
-                self.payload_labels["camera"].setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                camera_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
             elif status.lower() in ("idle", "ready", "connected"):
-                self.payload_labels["camera"].setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                camera_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
             else:
-                self.payload_labels["camera"].setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                camera_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
             
             # Update overall payload status
             self.update_payload_status()
@@ -1881,7 +1967,7 @@ class MainWindow(QWidget):
 
     def measure_speed(self):
         """Measure internet speed for performance monitoring"""
-        self.comms_upload_speed_label.setText("Upload: Testing...")
+        self.comms_upload_speed_label.setText("Upload Speed: Testing...".ljust(30))
 
         def run_speedtest():
             try:
@@ -1901,9 +1987,9 @@ class MainWindow(QWidget):
     def update_speed_labels(self, upload_mbps, max_frame_size_kb):
         """Update speed test results in UI"""
         if upload_mbps < 0:
-            self.comms_upload_speed_label.setText("Upload: Error")
+            self.comms_upload_speed_label.setText("Upload Speed: Error".ljust(30))
         else:
-            self.comms_upload_speed_label.setText(f"Upload: {upload_mbps:.2f} Mbps")
+            self.comms_upload_speed_label.setText(f"Upload Speed: {upload_mbps:.2f} Mbps".ljust(30))
 
     def timerEvent(self, event):
         """Handle timer events for FPS calculation"""
@@ -2037,11 +2123,20 @@ class MainWindow(QWidget):
     def update_payload_status(self):
         """Update overall payload subsystem status based on camera and LIDAR states"""
         try:
-            if not hasattr(self, 'payload_labels'):
+            # Check if widgets still exist and we have the labels dictionary
+            if not hasattr(self, 'payload_labels') or not self.payload_labels:
+                return
+            
+            camera_label = self.payload_labels.get("camera")
+            lidar_label = self.payload_labels.get("lidar_status")
+            payload_label = self.payload_labels.get("payload_status")
+            
+            # Check if all required labels exist and are valid
+            if not all(label and hasattr(label, 'setText') for label in [camera_label, lidar_label, payload_label]):
                 return
                 
-            camera_text = self.payload_labels["camera"].text()
-            lidar_text = self.payload_labels["lidar_status"].text()
+            camera_text = camera_label.text()
+            lidar_text = lidar_label.text()
             
             # Determine camera status - check for operational states
             camera_ok = False
@@ -2055,17 +2150,17 @@ class MainWindow(QWidget):
             
             # Set overall status with fixed width
             if camera_ok and lidar_ok:
-                status_text = "Status: Operational".ljust(25)
-                self.payload_labels["payload_status"].setText(status_text)
-                self.payload_labels["payload_status"].setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                status_text = "Status: Operational".ljust(30)
+                payload_label.setText(status_text)
+                payload_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
             elif camera_ok or lidar_ok:
-                status_text = "Status: Degraded".ljust(25)
-                self.payload_labels["payload_status"].setText(status_text)
-                self.payload_labels["payload_status"].setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                status_text = "Status: Degraded".ljust(30)
+                payload_label.setText(status_text)
+                payload_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
             else:
-                status_text = "Status: Offline".ljust(25)
-                self.payload_labels["payload_status"].setText(status_text)
-                self.payload_labels["payload_status"].setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                status_text = "Status: Offline".ljust(30)
+                payload_label.setText(status_text)
+                payload_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 
         except Exception as e:
             logging.error(f"Payload status update error: {e}")
