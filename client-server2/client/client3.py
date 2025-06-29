@@ -43,7 +43,7 @@ logging.basicConfig(
 )
 
 
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
+from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer, QMutexLocker
 from PyQt6.QtGui import QPixmap, QImage, QFont, QPainter, QPen
 
 
@@ -1192,15 +1192,16 @@ class MainWindow(QWidget):
                     else:
                         self.payload_labels["lidar_status"].setStyleSheet(f"color: #f00; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
                 
-                # Update LIDAR widget if present
+                # Update LIDAR widget streaming state if present
                 if hasattr(self, 'lidar_widget') and self.lidar_widget:
                     is_active = data.get("is_active", False)
+                    # Sync widget state with server state
                     if hasattr(self.lidar_widget, 'is_streaming'):
+                        # Only update if there's a mismatch to avoid unnecessary changes
                         if is_active != self.lidar_widget.is_streaming:
-                            self.lidar_widget.is_streaming = is_active
-                            self.lidar_widget.start_stop_button.setText(
-                                "Stop LIDAR" if is_active else "Start LIDAR"
-                            )
+                            with QMutexLocker(self.lidar_widget.data_mutex):
+                                self.lidar_widget.is_streaming = is_active
+                            logging.info(f"LIDAR widget streaming state updated to: {is_active}")
                             
                 logging.info(f"LIDAR Status Update - {data.get('status', 'Unknown')}, Rate: {data.get('collection_rate_hz', 0)} Hz")
                 
@@ -1230,14 +1231,13 @@ class MainWindow(QWidget):
                 streaming = data.get('streaming', False)
                 logging.info(f"Legacy LIDAR Status: {status}, Streaming: {streaming}")
                 
-                # Update LIDAR widget streaming state if needed
-                if hasattr(self.lidar_widget, 'is_streaming'):
-                    if streaming != self.lidar_widget.is_streaming:
-                        # Sync widget state with server state
-                        self.lidar_widget.is_streaming = streaming
-                        self.lidar_widget.start_stop_button.setText(
-                            "Stop LIDAR" if streaming else "Start LIDAR"
-                        )
+                # Update LIDAR widget streaming state if needed (legacy support)
+                if hasattr(self, 'lidar_widget') and self.lidar_widget:
+                    if hasattr(self.lidar_widget, 'is_streaming'):
+                        if streaming != self.lidar_widget.is_streaming:
+                            with QMutexLocker(self.lidar_widget.data_mutex):
+                                self.lidar_widget.is_streaming = streaming
+                            logging.info(f"LIDAR widget streaming state updated (legacy): {streaming}")
             except Exception as e:
                 logging.error(f"Failed to process LIDAR status: {e}")
 
@@ -1326,7 +1326,7 @@ class MainWindow(QWidget):
                     if "camera_status" in data:
                         self.payload_labels["camera"].setText(f"Camera: {data['camera_status']}")
                     if "status" in data:
-                        self.payload_labels["status"].setText(f"Status: {data['status']}")
+                        self.payload_labels["camera_status"].setText(f"Status: {data['status']}")
             except Exception as e:
                 logging.error(f"Failed to update payload data: {e}")
                 

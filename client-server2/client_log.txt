@@ -1323,3 +1323,192 @@ ValueError: Client is not in a disconnected state
 2025-06-29 17:05:33,897 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
 2025-06-29 17:05:38,904 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.128.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751213133.8985438 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001BE6CA96900>, 'Connection to 192.168.128.89 timed out. (connect timeout=5)'))
 2025-06-29 17:06:40,132 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-06-29 17:20:30,706 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 17:20:30,919 - INFO - Connected to server
+2025-06-29 17:20:30,920 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:20:30,922 - INFO - [INFO] Successfully connected to server
+2025-06-29 17:20:32,763 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:34,970 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:36,731 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:38,708 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:40,789 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:42,710 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:44,709 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:46,818 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:48,702 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:50,699 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:52,146 - ERROR - Failed to update payload data: 'status'
+2025-06-29 17:20:52,713 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:54,749 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:20:55,408 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:20:55,498 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:20:56,744 - ERROR - Failed to process LIDAR status update: 'LidarWidget' object has no attribute 'start_stop_button'
+2025-06-29 17:20:57,943 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:20:58,661 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:20:58,710 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:20:58,726 - ERROR - Failed to process LIDAR status update: 'LidarWidget' object has no attribute 'start_stop_button'
+2025-06-29 17:20:59,761 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:21:00,738 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:02,760 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:04,761 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:06,759 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:08,725 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:10,726 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:12,743 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:14,762 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:16,712 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:18,706 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:20,727 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:22,726 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:24,772 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:26,725 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:28,756 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:30,748 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:32,710 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:34,738 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:36,730 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:38,727 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:40,717 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:42,722 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:44,725 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:46,727 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:21:47,480 - INFO - Disconnected from server: transport error
+2025-06-29 17:25:52,023 - INFO - Connected to server
+2025-06-29 17:25:52,027 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:25:52,028 - INFO - Stream paused for config application.
+2025-06-29 17:25:52,116 - ERROR - Failed to update payload data: 'status'
+2025-06-29 17:25:52,638 - ERROR - Failed to update payload data: 'status'
+2025-06-29 17:25:53,759 - INFO - Disconnected from server: client disconnect
+2025-06-29 17:26:00,934 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 17:26:01,117 - INFO - Connected to server
+2025-06-29 17:26:01,119 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:26:01,120 - INFO - [INFO] Successfully connected to server
+2025-06-29 17:26:01,919 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:03,880 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:05,625 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:26:05,629 - INFO - Stream paused for config application.
+2025-06-29 17:26:05,847 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:06,136 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 17:26:06,142 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 17:26:06,347 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 17:26:07,863 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:09,870 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:11,891 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:12,027 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:26:12,077 - INFO - Stream paused for config application.
+2025-06-29 17:26:12,652 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 17:26:12,658 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 17:26:12,864 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 17:26:13,930 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:15,864 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:17,861 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:19,921 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:21,916 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:22,323 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:26:22,325 - INFO - Stream paused for config application.
+2025-06-29 17:26:22,828 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 17:26:22,834 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 17:26:23,040 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 17:26:23,898 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:25,919 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:27,927 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:29,946 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:31,957 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:32,043 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:26:32,121 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:26:33,976 - INFO - LIDAR widget streaming state updated to: False
+2025-06-29 17:26:33,977 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:35,981 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:37,998 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:38,418 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:26:38,963 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:26:39,041 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:26:40,011 - INFO - LIDAR widget streaming state updated to: False
+2025-06-29 17:26:40,014 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:42,016 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:44,032 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:46,047 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:48,057 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:50,065 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:52,103 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:54,112 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:56,151 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:26:58,174 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:00,151 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:02,183 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:04,209 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:06,217 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:08,230 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:10,255 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:12,472 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:14,314 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:16,306 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:18,305 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:20,332 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:22,324 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:24,640 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:26,356 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:28,364 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:30,371 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:32,668 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:34,420 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:36,429 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:38,411 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:40,444 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:42,762 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:44,449 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:46,448 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:48,485 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:50,732 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:52,491 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:54,487 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:56,514 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:27:58,553 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:00,543 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:02,548 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:04,560 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:06,584 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:08,581 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:10,647 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:12,753 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:14,626 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:16,654 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:18,645 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:20,671 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:22,679 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:24,695 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:26,715 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:28,722 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:30,742 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:32,808 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:34,814 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:36,791 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:38,808 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:40,811 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:43,033 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:44,843 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:46,843 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:48,862 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:50,878 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:52,928 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:54,907 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:56,945 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:28:58,960 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:29:00,983 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:29:03,018 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:29:05,025 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:29:07,047 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:29:09,060 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:29:09,253 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:29:09,799 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:29:09,899 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:29:10,198 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:29:10,202 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:29:10,256 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 17:29:10,754 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:29:10,817 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 17:29:11,076 - INFO - LIDAR widget streaming state updated to: False
+2025-06-29 17:29:11,078 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:29:11,081 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:29:13,111 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
+2025-06-29 17:29:14,517 - INFO - Disconnected from server: client disconnect

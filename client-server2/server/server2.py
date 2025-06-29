@@ -281,8 +281,8 @@ def handle_download_image(data):
 def handle_start_lidar():
     """Handle client request to start LIDAR data collection"""
     try:
-        # Send command to LIDAR module to start collection
-        lidar.sio.emit("start_lidar_collection")
+        # Direct function call to LIDAR controller instead of socketio
+        lidar.lidar_controller.start_collection()
         print("🟢 LIDAR collection start requested")
         emit("lidar_command_response", {"success": True, "message": "LIDAR collection started"})
     except Exception as e:
@@ -293,8 +293,8 @@ def handle_start_lidar():
 def handle_stop_lidar():
     """Handle client request to stop LIDAR data collection"""
     try:
-        # Send command to LIDAR module to stop collection
-        lidar.sio.emit("stop_lidar_collection")
+        # Direct function call to LIDAR controller instead of socketio
+        lidar.lidar_controller.stop_collection()
         print("🔴 LIDAR collection stop requested")
         emit("lidar_command_response", {"success": True, "message": "LIDAR collection stopped"})
     except Exception as e:
