@@ -2165,3 +2165,21 @@ ValueError: Client is not in a disconnected state
 2025-06-29 20:13:56,332 - INFO - LIDAR Command Success: LIDAR collection stopped
 2025-06-29 20:13:56,557 - INFO - LIDAR Command Success: LIDAR collection stopped
 2025-06-29 20:13:56,573 - INFO - Disconnected from server: client disconnect
+2025-06-29 20:36:05,730 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 20:36:06,160 - INFO - Connected to server
+2025-06-29 20:36:06,162 - INFO - Sending current camera configuration to server...
+2025-06-29 20:36:06,164 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 20:36:06,166 - INFO - [INFO] Successfully connected to server
+2025-06-29 20:36:26,975 - INFO - Stopping LIDAR...
+2025-06-29 20:36:26,978 - INFO - Sending cleanup signals to server...
+2025-06-29 20:36:27,013 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 20:36:27,091 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:36:27,093 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:36:27,095 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:36:27,095 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:36:27,096 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 20:36:27,097 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:36:27,099 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:36:27,100 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:36:27,102 - ERROR - Failed to distribute sensor data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:36:27,103 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted

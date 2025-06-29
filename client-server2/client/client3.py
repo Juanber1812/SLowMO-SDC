@@ -374,7 +374,7 @@ class MainWindow(QWidget):
         self.speed_timer = QTimer()
         self.speed_timer.timeout.connect(self.measure_speed)
         self.speed_timer.start(5000)
-
+        
         # Setup communication monitoring timer
         self.comm_timer = QTimer()
         self.comm_timer.timeout.connect(self.update_client_signal_strength)
@@ -1129,9 +1129,12 @@ class MainWindow(QWidget):
                             frame_size_text = f"Frame size: {data['frame_size']} kb".ljust(30)
                             frame_size_label.setText(frame_size_text)
                 
-                # Upload speed is now handled by communication_broadcast, not here
-                # This ensures WiFi speed test results go to WiFi speed label
-                # and actual upload data goes to upload speed label
+                # Upload speed to Communication Subsystem
+                if "upload_speed" in data and hasattr(self, 'comms_upload_speed_label'):
+                    if hasattr(self.comms_upload_speed_label, 'setText'):
+                        upload_speed = data["upload_speed"]
+                        upload_text = f"Upload speed: {upload_speed} kb/s".ljust(30)
+                        self.comms_upload_speed_label.setText(upload_text)
                     
             except Exception as e:
                 logging.error(f"Failed to update camera info: {e}")
@@ -1348,6 +1351,23 @@ class MainWindow(QWidget):
             except Exception as e:
                 logging.error(f"Failed to update power data: {e}")
 
+        @sio.on("thermal_broadcast")
+        def on_thermal_data(data):
+            """Handle thermal subsystem data updates"""
+            try:
+                if hasattr(self, 'thermal_labels'):
+                    # Update thermal labels with your new labels
+                    if "pi_temp" in data:
+                        self.thermal_labels["pi_temp"].setText(f"Pi: {data['pi_temp']:.1f}°C")
+                    if "power_pcb_temp" in data:
+                        self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {data['power_pcb_temp']:.1f}°C")
+                    if "battery_temp" in data:
+                        self.thermal_labels["battery_temp"].setText(f"Battery: {data['battery_temp']:.1f}°C")
+                    if "status" in data:
+                        self.thermal_labels["status"].setText(f"Status: {data['status']}")
+            except Exception as e:
+                logging.error(f"Failed to update thermal data: {e}")
+
         @sio.on("communication_broadcast")
         def on_communication_data(data):
             """Handle communication subsystem data updates"""
@@ -1421,300 +1441,4 @@ class MainWindow(QWidget):
                 
             except Exception as e:
                 logging.error(f"Failed to update communication data: {e}")
-
-    def timerEvent(self, event):
-        """Handle timer events for FPS calculation"""
-        # live FPS (incoming)
-        self.current_fps = self.frame_counter
-        self.frame_counter = 0
-
-        # display FPS
-        self.current_display_fps   = self.display_frame_counter
-        self.display_frame_counter = 0
-
-        # FPS and frame size are now handled by camera_info socket event
-        # No need to update labels here since they're updated by server data
-    #=========================================================================
-    #                          UTILITY METHODS                              
-    #=========================================================================
-
-    def handle_adcs_command(self, mode_name, command_name, value):
-        data = {
-            "mode": mode_name,
-            "command": command_name,
-            "value": value
-        }
-        sio.emit("adcs_command", data)
-        print(f"[CLIENT] ADCS command sent: {data}")
-
-    def try_reconnect(self):
-        """Attempt to reconnect to server"""
-        threading.Thread(target=self.reconnect_socket, daemon=True).start()
-
-    def reconnect_socket(self):
-        """Handle socket reconnection logic"""
-        was_streaming = self.streaming
-        try:
-            if was_streaming: # if it was streaming, stop it first
-                self.streaming = False
-                self.camera_controls.toggle_btn.setText("Start Stream")
-                sio.emit("stop_camera")
-                time.sleep(0.5) # give server time to process
-            sio.disconnect()
-        except Exception as e: # Catch specific socketio errors if possible, or general Exception
-            logging.error(f"Error during disconnect phase of reconnect: {e}")
-            # pass # Or log the error
-        
-        try:
-            logging.info(f"Attempting to reconnect to {SERVER_URL}...")
-            sio.connect(SERVER_URL, wait_timeout=5)
-            # If connect is successful, connect() handler should be called by socketio
-            # which in turn calls self.apply_config()
-            # self.apply_config() # This might be redundant if 'connect' event handler does it.
-                                # However, if 'connect' handler isn't reliably called or if
-                                # apply_config needs to happen immediately after this specific reconnect, keep it.
-            
-            if was_streaming: # if it was streaming before, restart it
-                # Add a small delay to ensure server is ready after (re)connection and config
-                QTimer.singleShot(500, self._restart_stream_after_reconnect)
-                
-        except socketio.exceptions.ConnectionError as e:
-            logging.error(f"Reconnect failed: ConnectionError - {e}")
-        except Exception as e:
-            logging.exception(f"Reconnect failed with an unexpected error: {e}")
-
-    def _restart_stream_after_reconnect(self):
-        """Helper to restart stream after a delay, ensuring it's still desired."""
-        if self.streaming == False and hasattr(self, 'camera_controls'): # Check if it wasn't already restarted and if UI is available
-            # Check if the original intent was to stream (was_streaming was true)
-            # This requires was_streaming to be accessible, e.g. by making it an instance var if needed,
-            # or by always attempting to restart if self.streaming is false here.
-            # For simplicity, assuming if self.streaming is false now, we try to restart.
-            logging.info("Restarting stream after reconnect...")
-            sio.emit("start_camera")
-            self.streaming = True # Update state
-            self.camera_controls.toggle_btn.setText("Stop Stream")
-        elif self.streaming:
-            logging.info("Stream already running after reconnect or restart not needed.")
-
-    def show_message(self, title, message, icon=QMessageBox.Icon.Information):
-        """Display styled message box"""
-        msg_box = QMessageBox(self)
-        msg_box.setWindowTitle(title)
-        msg_box.setText(message)
-        msg_box.setIcon(icon)
-        msg_box.setStyleSheet("""
-            QMessageBox {
-                background-color: #3b3e44;
-            }
-            QMessageBox QLabel {
-                color: #f0f0f0;
-                background-color: transparent;
-                font-family: 'Roboto Condensed', 'Segoe UI', sans-serif;
-                font-size: 10pt;
-            }
-            QMessageBox QPushButton {
-                background-color: #40444b;
-                color: #ffcc00;
-                border: 2px solid #777;
-                border-radius: 2px;
-                padding: 6px 12px;
-                font-size: 9pt;
-                font-family: 'Roboto Condensed', 'Segoe UI', sans-serif;
-                       }
-            QMessageBox QPushButton:hover {
-                background-color: #50575f;
-                border: 2px solid #ffcc00;
-            }
-        """)
-        msg_box.exec()
-
-    def reset_camera_to_default(self):
-        """Reset camera to default configuration"""
-        # Set the crop state to False using the CameraSettingsWidget's method
-        # This will also trigger UI updates within CameraSettingsWidget
-        self.camera_settings.set_crop_state(False) 
-
-        # The following logic for "Custom (Cropped)" might need review.
-        # _populate_res_dropdown in CameraSettingsWidget should handle the (Cropped) suffix.
-        # If a specific "Custom (Cropped)" item needs explicit removal, that logic would remain,
-        # but ensure it's still relevant with the new setup.
-        # For now, assuming set_crop_state(False) and subsequent apply_config is sufficient.
-        # idx = self.camera_settings.res_dropdown.findText("Custom (Cropped)") 
-        # if idx != -1:
-        #     self.camera_settings.res_dropdown.removeItem(idx)
-        
-        self.camera_settings.res_dropdown.setCurrentIndex(0) # Reset dropdown to the first item
-        
-        # Apply the configuration which will now have cropping disabled
-        config = self.camera_settings.get_config() 
-        sio.emit("camera_config", config)
-        time.sleep(0.2) # Keep delay if necessary for server to process
-
-    def update_payload_status(self):
-        """Update overall payload subsystem status based on camera and LIDAR states"""
-        try:
-            # Check if widgets still exist and we have the labels dictionary
-            if not hasattr(self, 'payload_labels') or not self.payload_labels:
-                return
-            
-            camera_label = self.payload_labels.get("camera")
-            lidar_label = self.payload_labels.get("lidar_status")
-            payload_label = self.payload_labels.get("payload_status")
-            
-            # Check if all required labels exist and are valid
-            if not all(label and hasattr(label, 'setText') for label in [camera_label, lidar_label, payload_label]):
-                return
-                
-            camera_text = camera_label.text()
-            lidar_text = lidar_label.text()
-            
-            # Determine camera status - check for operational states
-            camera_ok = False
-            if any(state in camera_text.upper() for state in ["STREAMING", "READY", "IDLE", "OPERATIONAL"]):
-                camera_ok = True
-            
-            # Determine LIDAR status - check for connected or active states
-            lidar_ok = False
-            if any(state in lidar_text.upper() for state in ["CONNECTED", "ACTIVE"]):
-                lidar_ok = True
-            
-            # Set overall status with fixed width
-            if camera_ok and lidar_ok:
-                status_text = "Status: Operational".ljust(30)
-                payload_label.setText(status_text)
-                payload_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-            elif camera_ok or lidar_ok:
-                status_text = "Status: Degraded".ljust(30)
-                payload_label.setText(status_text)
-                payload_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-            else:
-                status_text = "Status: Offline".ljust(30)
-                payload_label.setText(status_text)
-                payload_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-        except Exception as e:
-            logging.error(f"Payload status update error: {e}")
-
-    #=========================================================================
-    #                           EVENT HANDLERS                              
-    #=========================================================================
-
-    def closeEvent(self, event):
-        """Handle application closure - properly stop all components"""
-        try:
-            logging.info("[INFO] 🛑 Closing application...")
-            
-            # Stop detector first
-            if self.detector_active:
-                logging.info("Stopping detector...")
-                self.detector_active = False
-                self.clear_queue()  # Clear frame queue
-            
-            # Stop streaming
-            if self.streaming:
-                logging.info("Stopping camera stream...")
-                if sio.connected:
-                    sio.emit("stop_camera")
-                self.streaming = False
-                if hasattr(self, 'camera_controls'):
-                    self.camera_controls.toggle_btn.setText("Start Stream")
-            
-            # Stop LIDAR
-            if hasattr(self, 'lidar_widget') and self.lidar_widget:
-                logging.info("Stopping LIDAR...")
-                if sio.connected:
-                    sio.emit("stop_lidar")
-            
-            # Stop any recording
-            if hasattr(self, 'graph_section') and self.graph_section:
-                if getattr(self.graph_section, 'is_recording', False):
-                    logging.info("Stopping recording...")
-                    self.graph_section.toggle_recording()
-            
-            # Send final cleanup signals to server
-            if sio.connected:
-                logging.info("Sending cleanup signals to server...")
-                sio.emit("stop_camera")
-                sio.emit("stop_lidar")
-                QTimer.singleShot(200, lambda: sio.disconnect())
-            
-            # Remove log handler to prevent runtime errors
-            if hasattr(self, 'qt_log_handler') and self.qt_log_handler is not None:
-                logging.getLogger().removeHandler(self.qt_log_handler)
-                self.qt_log_handler.close()
-                self.qt_log_handler = None
-            
-            # Call parent closeEvent
-            super().closeEvent(event)
-            
-        except Exception as e:
-            logging.error(f"Error during client closure: {e}")
-            super().closeEvent(event)
-
-    def keyPressEvent(self, event):
-        """Handle keyboard events"""
-        if event.key() == Qt.Key.Key_Escape:
-            self.close()
-        else:
-            super().keyPressEvent(event)
-
-##############################################################################
-#                            UTILITY FUNCTIONS                              #
-##############################################################################
-
-def check_all_calibrations():
-    """Check status of all calibration files"""
-    logging.info("=== Calibration Status ===")
-    total = len(CALIBRATION_FILES)
-    found = 0
-    
-    for resolution, filename in CALIBRATION_FILES.items():
-        if not os.path.isabs(filename):
-            filepath = os.path.join(os.path.dirname(__file__), filename)
-            filepath = os.path.normpath(filepath)
-        else:
-            filepath = filename
-        if os.path.exists(filepath):
-            if resolution == "legacy":
-                logging.info(f"OLD (Legacy) - {filename}")
-            else:
-                logging.info(f"{resolution[0]}x{resolution[1]} - {filename}")
-            found += 1
-        else:
-            if resolution == "legacy":
-                logging.info(f"❌ OLD (Legacy) - {filename} (MISSING)")
-            else:
-                               logging.info(f"❌ {resolution[0]}x{resolution[1]} - {filename} (MISSING)")
-    
-    logging.info(f"\nStatus: {found}/{total} calibrations available")
-    
-    if found == total:
-        logging.info("🎉 All calibrations complete!")
-    else:
-        logging.info(f"⚠️  Missing {total - found} calibrations")
-
-############################################################################
-#                              MAIN EXECUTION                               #
-##############################################################################
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    
-    app.setApplicationName("SLowMO Client")
-    app.setApplicationVersion("3.0")
-    
-    window = MainWindow()
-    window.showMaximized()
-    
-    def connect_to_server():
-        try:
-            logging.info(f"[INFO] Attempting to connect to {SERVER_URL}")
-            sio.connect(SERVER_URL, wait_timeout=10)
-            logging.info("[INFO] Successfully connected to server")
-        except Exception as e:
-            logging.info(f"[ERROR] Failed to connect to server: {e}")
-    
-    threading.Thread(target=connect_to_server, daemon=True).start()
-    
-    sys.exit(app.exec())
+   
