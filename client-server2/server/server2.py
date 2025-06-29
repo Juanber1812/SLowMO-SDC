@@ -133,8 +133,11 @@ def handle_frame(data):
         # Track upload data for communication monitoring
         if communication_monitor and isinstance(data, (bytes, bytearray)):
             communication_monitor.record_upload_data(len(data))
+            communication_monitor.record_data_transmission(len(data))
         elif communication_monitor and isinstance(data, str):
-            communication_monitor.record_upload_data(len(data.encode('utf-8')))
+            data_bytes = len(data.encode('utf-8'))
+            communication_monitor.record_upload_data(data_bytes)
+            communication_monitor.record_data_transmission(data_bytes)
             
     except Exception as e:
         print(f"[ERROR] frame broadcast: {e}")
@@ -486,12 +489,19 @@ def power_data_callback(power_data):
 def communication_data_callback(comm_data):
     """Callback function to handle communication data updates and broadcast to clients"""
     try:
-        # Format communication data for client
+        # Send the raw communication data to clients (they will format it)
         formatted_data = {
-            "wifi_speed": f"{comm_data.get('wifi_download_speed', 0.0):.1f}",  # Mbps
-            "upload_speed": f"{comm_data.get('data_upload_speed', 0.0):.1f}",  # KB/s
+            "wifi_download_speed": comm_data.get('wifi_download_speed', 0.0),  # Mbps
+            "wifi_upload_speed": comm_data.get('wifi_upload_speed', 0.0),  # Mbps
+            "data_upload_speed": comm_data.get('data_upload_speed', 0.0),  # KB/s
+            "data_transmission_rate": comm_data.get('data_transmission_rate', 0.0),  # KB/s
+            "uplink_frequency": comm_data.get('uplink_frequency', 0.0),  # GHz
+            "downlink_frequency": comm_data.get('downlink_frequency', 0.0),  # GHz
             "server_signal_strength": comm_data.get('server_signal_strength', 0),  # dBm
             "client_signal_strength": comm_data.get('client_signal_strength', 0),  # dBm
+            "connection_quality": comm_data.get('connection_quality', 'Unknown'),
+            "network_latency": comm_data.get('network_latency', 0.0),  # ms
+            "packet_loss": comm_data.get('packet_loss', 0.0),  # %
             "status": comm_data.get('status', 'Disconnected')
         }
         
@@ -500,9 +510,14 @@ def communication_data_callback(comm_data):
         
         # Log periodically (every 30 seconds)
         if not hasattr(communication_data_callback, 'last_log') or time.time() - communication_data_callback.last_log > 30:
-            print(f"\n[COMM] WiFi: {formatted_data['wifi_speed']} Mbps, "
-                  f"Upload: {formatted_data['upload_speed']} KB/s, "
+            print(f"\n[COMM] WiFi: {formatted_data['wifi_download_speed']:.1f}↓/{formatted_data['wifi_upload_speed']:.1f}↑ Mbps, "
+                  f"Upload: {formatted_data['data_upload_speed']:.1f} KB/s, "
+                  f"Data Rate: {formatted_data['data_transmission_rate']:.1f} KB/s, "
+                  f"Freq: {formatted_data['uplink_frequency']:.1f} GHz, "
                   f"Signal: {formatted_data['server_signal_strength']} dBm, "
+                  f"Latency: {formatted_data['network_latency']:.1f} ms, "
+                  f"Loss: {formatted_data['packet_loss']:.1f}%, "
+                  f"Quality: {formatted_data['connection_quality']}, "
                   f"Status: {formatted_data['status']}")
             communication_data_callback.last_log = time.time()
             
@@ -511,9 +526,15 @@ def communication_data_callback(comm_data):
         # Send error state
         socketio.emit("communication_broadcast", {
             "wifi_speed": "0.0",
-            "upload_speed": "0.0", 
+            "upload_speed": "0.0",
+            "transmission_rate": "0.0",
+            "uplink_frequency": "0.0",
+            "downlink_frequency": "0.0",
             "server_signal_strength": 0,
             "client_signal_strength": 0,
+            "connection_quality": "Error",
+            "network_latency": "0.0",
+            "packet_loss": "0.0",
             "status": "Error"
         })
 

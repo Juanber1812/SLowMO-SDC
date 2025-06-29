@@ -2229,3 +2229,21 @@ ValueError: Client is not in a disconnected state
 2025-06-29 21:02:05,353 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
 2025-06-29 21:02:05,355 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
 2025-06-29 21:02:05,436 - ERROR - Failed to update power data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:05:17,930 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 21:05:19,164 - INFO - Connected to server
+2025-06-29 21:05:19,167 - INFO - Sending current camera configuration to server...
+2025-06-29 21:05:19,169 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:05:19,170 - INFO - [INFO] Successfully connected to server
+2025-06-29 21:05:59,978 - INFO - Stopping LIDAR...
+2025-06-29 21:05:59,986 - INFO - Sending cleanup signals to server...
+2025-06-29 21:06:00,029 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:06:00,111 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:06:00,112 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:06:00,115 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:06:00,116 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:06:00,117 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:06:00,118 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:06:00,119 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:06:00,121 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:06:00,122 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:06:00,204 - ERROR - Failed to update communication subsystem: wrapped C/C++ object of type QLabel has been deleted

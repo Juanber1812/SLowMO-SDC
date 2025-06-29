@@ -6,6 +6,8 @@
 import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os
 import pandas as pd
 import traceback
+import subprocess
+import platform
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea,
@@ -374,6 +376,11 @@ class MainWindow(QWidget):
         self.speed_timer = QTimer()
         self.speed_timer.timeout.connect(self.measure_speed)
         self.speed_timer.start(5000)
+        
+        # Signal strength measurement timer
+        self.signal_timer = QTimer()
+        self.signal_timer.timeout.connect(self.measure_client_signal_strength)
+        self.signal_timer.start(10000)  # Measure every 10 seconds
 
     #=========================================================================
     #                          UI SETUP METHODS                             
@@ -921,6 +928,46 @@ class MainWindow(QWidget):
                 self.comms_client_signal_label.setMaximumWidth(220)
                 layout.addWidget(self.comms_client_signal_label)
                 
+                # Data transmission rate label
+                self.comms_transmission_rate_label = QLabel("Data rate: -- kb/s".ljust(30))
+                self.comms_transmission_rate_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.comms_transmission_rate_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_transmission_rate_label.setMinimumWidth(220)
+                self.comms_transmission_rate_label.setMaximumWidth(220)
+                layout.addWidget(self.comms_transmission_rate_label)
+                
+                # WiFi frequency label
+                self.comms_frequency_label = QLabel("Frequency: -- GHz".ljust(30))
+                self.comms_frequency_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.comms_frequency_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_frequency_label.setMinimumWidth(220)
+                self.comms_frequency_label.setMaximumWidth(220)
+                layout.addWidget(self.comms_frequency_label)
+                
+                # Network latency label
+                self.comms_latency_label = QLabel("Latency: -- ms".ljust(30))
+                self.comms_latency_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.comms_latency_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_latency_label.setMinimumWidth(220)
+                self.comms_latency_label.setMaximumWidth(220)
+                layout.addWidget(self.comms_latency_label)
+                
+                # Packet loss label
+                self.comms_packet_loss_label = QLabel("Packet loss: -- %".ljust(30))
+                self.comms_packet_loss_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.comms_packet_loss_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_packet_loss_label.setMinimumWidth(220)
+                self.comms_packet_loss_label.setMaximumWidth(220)
+                layout.addWidget(self.comms_packet_loss_label)
+                
+                # Connection quality label
+                self.comms_quality_label = QLabel("Quality: Unknown".ljust(30))
+                self.comms_quality_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.comms_quality_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_quality_label.setMinimumWidth(220)
+                self.comms_quality_label.setMaximumWidth(220)
+                layout.addWidget(self.comms_quality_label)
+                
                 # Status label
                 self.comms_status_label = QLabel("Status: not connected".ljust(30))
                 self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
@@ -1132,24 +1179,89 @@ class MainWindow(QWidget):
             try:
                 # WiFi speed (Mbps)
                 if hasattr(self, 'comms_wifi_speed_label'):
-                    wifi_speed = data.get('wifi_speed', '--')
+                    wifi_download = data.get('wifi_download_speed', 0)
+                    wifi_upload = data.get('wifi_upload_speed', 0)
+                    if wifi_download > 0 or wifi_upload > 0:
+                        wifi_speed = f"{wifi_download:.1f}↓/{wifi_upload:.1f}↑"
+                    else:
+                        wifi_speed = '--'
                     self.comms_wifi_speed_label.setText(f"Wifi speed: {wifi_speed} mbps".ljust(30))
-                # Upload speed (KB/s)
+                
+                # Upload speed (KB/s) - actual data upload
                 if hasattr(self, 'comms_upload_speed_label'):
-                    upload_speed = data.get('upload_speed', '--')
-                    self.comms_upload_speed_label.setText(f"Upload speed: {upload_speed} kb/s".ljust(30))
+                    upload_speed = data.get('data_upload_speed', 0)
+                    upload_text = f"{upload_speed:.1f}" if upload_speed > 0 else '--'
+                    self.comms_upload_speed_label.setText(f"Upload speed: {upload_text} kb/s".ljust(30))
+                
+                # Data transmission rate (KB/s) - current real-time rate
+                if hasattr(self, 'comms_transmission_rate_label'):
+                    transmission_rate = data.get('data_transmission_rate', 0)
+                    transmission_text = f"{transmission_rate:.1f}" if transmission_rate > 0 else '--'
+                    self.comms_transmission_rate_label.setText(f"Data rate: {transmission_text} kb/s".ljust(30))
+                
+                # WiFi frequency (GHz)
+                if hasattr(self, 'comms_frequency_label'):
+                    uplink_freq = data.get('uplink_frequency', 0)
+                    downlink_freq = data.get('downlink_frequency', 0)
+                    if uplink_freq > 0 and downlink_freq > 0:
+                        if uplink_freq == downlink_freq:
+                            freq_text = f"{uplink_freq:.1f}"
+                        else:
+                            freq_text = f"{uplink_freq:.1f}↑/{downlink_freq:.1f}↓"
+                    else:
+                        freq_text = '--'
+                    self.comms_frequency_label.setText(f"Frequency: {freq_text} GHz".ljust(30))
+                
+                # Network latency (ms)
+                if hasattr(self, 'comms_latency_label'):
+                    latency = data.get('network_latency', 0)
+                    latency_text = f"{latency:.1f}" if latency > 0 else '--'
+                    self.comms_latency_label.setText(f"Latency: {latency_text} ms".ljust(30))
+                
+                # Packet loss (%)
+                if hasattr(self, 'comms_packet_loss_label'):
+                    packet_loss = data.get('packet_loss', 0)
+                    loss_text = f"{packet_loss:.1f}" if packet_loss >= 0 else '--'
+                    self.comms_packet_loss_label.setText(f"Packet loss: {loss_text} %".ljust(30))
+                
+                # Connection quality
+                if hasattr(self, 'comms_quality_label'):
+                    quality = data.get('connection_quality', 'Unknown')
+                    # Color code the quality
+                    if quality == 'Excellent':
+                        color = '#00ff00'  # Green
+                    elif quality == 'Good':
+                        color = '#90ee90'  # Light Green
+                    elif quality == 'Fair':
+                        color = '#ffff00'  # Yellow
+                    elif quality == 'Poor':
+                        color = '#ff6666'  # Light Red
+                    else:
+                        color = '#bbb'     # Default gray
+                    
+                    self.comms_quality_label.setText(f"Quality: {quality}".ljust(30))
+                    self.comms_quality_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                
                 # Server signal strength (dBm)
                 if hasattr(self, 'comms_server_signal_label'):
-                    server_signal = data.get('server_signal_strength', '--')
-                    self.comms_server_signal_label.setText(f"Server signal: {server_signal} dbm".ljust(30))
+                    server_signal = data.get('server_signal_strength', 0)
+                    signal_text = f"{server_signal}" if server_signal != 0 else '--'
+                    self.comms_server_signal_label.setText(f"Server signal: {signal_text} dbm".ljust(30))
+                
                 # Client signal strength (dBm)
                 if hasattr(self, 'comms_client_signal_label'):
-                    client_signal = data.get('client_signal_strength', '--')
-                    self.comms_client_signal_label.setText(f"Client signal: {client_signal} dbm".ljust(30))
+                    client_signal = data.get('client_signal_strength', 0)
+                    signal_text = f"{client_signal}" if client_signal != 0 else '--'
+                    self.comms_client_signal_label.setText(f"Client signal: {signal_text} dbm".ljust(30))
+                
                 # Status
                 if hasattr(self, 'comms_status_label'):
-                    status = data.get('status', '--')
+                    status = data.get('status', 'Disconnected')
+                    # Color code the status
+                    status_color = '#00ff00' if status == 'Connected' else '#ff6666'
                     self.comms_status_label.setText(f"Status: {status}".ljust(30))
+                    self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {status_color}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    
             except Exception as e:
                 logging.error(f"Failed to update communication subsystem: {e}")
 
