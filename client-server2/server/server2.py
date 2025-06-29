@@ -22,6 +22,9 @@ def start_background_tasks():
     threading.Thread(target=camera.start_stream, daemon=True).start()
     threading.Thread(target=sensors.start_sensors, daemon=True).start()
     threading.Thread(target=lidar.start_lidar, daemon=True).start()
+    
+    # Start periodic payload status updates
+    threading.Thread(target=periodic_payload_status_updates, daemon=True).start()
 
     # Tachometer task
 #    from tachometer import run_tachometer
@@ -37,10 +40,23 @@ def start_background_tasks():
 #        daemon=True
 #    ).start()
 
+def periodic_payload_status_updates():
+    """Send payload status updates every 5 seconds"""
+    import time
+    while True:
+        try:
+            time.sleep(5)
+            send_payload_status_update()
+        except Exception as e:
+            print(f"[ERROR] periodic_payload_status_updates: {e}")
+            time.sleep(5)
+
 
 @socketio.on('connect')
 def handle_connect():
     print(f"[INFO] Client connected: {request.sid}")
+    # Send initial camera and LIDAR status to newly connected client
+    socketio.emit('camera_status', {'status': camera_state}, room=request.sid)
 
 
 @socketio.on('disconnect')
@@ -63,6 +79,7 @@ def handle_start_camera():
         emit('start_camera', {}, broadcast=True)
         camera_state = "Streaming"
         socketio.emit('camera_status', {'status': camera_state})
+        send_payload_status_update()
     except Exception as e:
         print(f"[ERROR] start_camera: {e}")
 
@@ -74,6 +91,7 @@ def handle_stop_camera():
         emit('stop_camera', {}, broadcast=True)
         camera_state = "Idle"
         socketio.emit('camera_status', {'status': camera_state})
+        send_payload_status_update()
     except Exception as e:
         print(f"[ERROR] stop_camera: {e}")
 
@@ -175,6 +193,7 @@ def handle_set_camera_idle():
     try:
         camera_state = "Idle"
         socketio.emit('camera_status', {'status': camera_state})
+        send_payload_status_update()
         print("[INFO] Camera set to idle by client request.")
     except Exception as e:
         print(f"[ERROR] set_camera_idle: {e}")
@@ -285,6 +304,7 @@ def handle_start_lidar():
         lidar.lidar_controller.start_collection()
         print("🟢 LIDAR collection start requested")
         emit("lidar_command_response", {"success": True, "message": "LIDAR collection started"})
+        send_payload_status_update()
     except Exception as e:
         print(f"[ERROR] start_lidar: {e}")
         emit("lidar_command_response", {"success": False, "message": str(e)})
@@ -297,6 +317,7 @@ def handle_stop_lidar():
         lidar.lidar_controller.stop_collection()
         print("🔴 LIDAR collection stop requested")
         emit("lidar_command_response", {"success": True, "message": "LIDAR collection stopped"})
+        send_payload_status_update()
     except Exception as e:
         print(f"[ERROR] stop_lidar: {e}")
         emit("lidar_command_response", {"success": False, "message": str(e)})
@@ -314,6 +335,43 @@ def set_camera_state(new_state):
     global camera_state
     camera_state = new_state
     socketio.emit('camera_status', {'status': camera_state})
+    # Also send payload status update
+    send_payload_status_update()
+
+def send_payload_status_update():
+    """Send comprehensive payload subsystem status update"""
+    try:
+        # Get LIDAR status
+        lidar_status = "Disconnected"
+        lidar_collecting = False
+        if hasattr(lidar, 'lidar_controller'):
+            if lidar.lidar_controller.connected:
+                if lidar.lidar_controller.is_collecting:
+                    lidar_status = "Active"
+                    lidar_collecting = True
+                else:
+                    lidar_status = "Connected"
+            else:
+                lidar_status = "Disconnected"
+        
+        # Get camera status
+        camera_connected = True  # Assume connected if server is running
+        camera_streaming = camera_state == "Streaming"
+        
+        payload_data = {
+            "camera_status": camera_state,
+            "camera_connected": camera_connected,
+            "camera_streaming": camera_streaming,
+            "lidar_status": lidar_status, 
+            "lidar_connected": lidar_status != "Disconnected",
+            "lidar_collecting": lidar_collecting,
+            "overall_status": "OK" if camera_connected else "ERROR"
+        }
+        
+        socketio.emit('payload_broadcast', payload_data)
+        
+    except Exception as e:
+        print(f"[ERROR] send_payload_status_update: {e}")
 
 
 if __name__ == "__main__":

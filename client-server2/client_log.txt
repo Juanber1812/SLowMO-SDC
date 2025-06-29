@@ -1919,3 +1919,38 @@ ValueError: Client is not in a disconnected state
 2025-06-29 18:25:45,858 - ERROR - Failed to update payload data: 'camera_status'
 2025-06-29 18:25:46,779 - INFO - LIDAR Status Update - active, Rate: 15.19 Hz
 2025-06-29 18:25:46,978 - INFO - Disconnected from server: client disconnect
+2025-06-29 18:36:24,871 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 18:36:25,334 - INFO - Connected to server
+2025-06-29 18:36:25,337 - INFO - Sending current camera configuration to server...
+2025-06-29 18:36:25,340 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 18:36:25,341 - INFO - [INFO] Successfully connected to server
+2025-06-29 18:36:42,517 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 18:36:42,521 - INFO - Stream paused for config application.
+2025-06-29 18:36:43,025 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-29 18:36:43,030 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 18:36:43,234 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-29 18:36:52,250 - INFO - Requesting LIDAR streaming start
+2025-06-29 18:36:52,342 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 18:36:52,346 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 18:36:53,489 - INFO - Requesting LIDAR streaming stop
+2025-06-29 18:36:53,494 - INFO - Back button clicked in LidarWidget
+2025-06-29 18:36:53,572 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 18:36:53,575 - INFO - LIDAR Status Update - connected, Rate: 14.92 Hz
+2025-06-29 18:36:54,247 - INFO - Requesting LIDAR streaming start
+2025-06-29 18:36:54,331 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 18:36:54,333 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 18:36:55,782 - INFO - Requesting LIDAR streaming stop
+2025-06-29 18:36:55,787 - INFO - Back button clicked in LidarWidget
+2025-06-29 18:36:55,949 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 18:36:55,953 - INFO - LIDAR Status Update - connected, Rate: 14.84 Hz
+2025-06-29 18:36:56,573 - INFO - Requesting LIDAR streaming start
+2025-06-29 18:36:56,641 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 18:36:56,644 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 18:36:57,994 - INFO - Requesting LIDAR streaming stop
+2025-06-29 18:36:58,000 - INFO - Back button clicked in LidarWidget
+2025-06-29 18:36:58,065 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 18:36:58,077 - INFO - LIDAR Status Update - connected, Rate: 15.63 Hz
+2025-06-29 18:37:09,967 - INFO - Stopping LIDAR...
+2025-06-29 18:37:09,971 - INFO - Sending cleanup signals to server...
+2025-06-29 18:37:09,992 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 18:37:10,065 - INFO - LIDAR Command Success: LIDAR collection stopped
