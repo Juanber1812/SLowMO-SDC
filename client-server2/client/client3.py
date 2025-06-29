@@ -375,6 +375,11 @@ class MainWindow(QWidget):
         self.speed_timer.timeout.connect(self.measure_speed)
         self.speed_timer.start(5000)
 
+        # Setup communication monitoring timer
+        self.comm_timer = QTimer()
+        self.comm_timer.timeout.connect(self.update_client_signal_strength)
+        self.comm_timer.start(30000)  # Update every 30 seconds
+
     #=========================================================================
     #                          UI SETUP METHODS                             
     #=========================================================================
@@ -784,14 +789,14 @@ class MainWindow(QWidget):
         self.received_real_power_data = False
         
         subsystems = [
-            ("Power Subsystem", ["Current: -- A", "Voltage: -- V", "Power: -- W", "Energy: -- Wh", "Temperature: --°C", "Battery: --%", "Status: Not Connected"]),
-            ("Thermal Subsystem", ["Pi: 55.2°C", "Power PCB: 32.1°C", "Battery: 25.8°C", "Status: Normal"]),
-            ("Communication Subsystem", ["Downlink Frequency: 2.4 GHz", "Uplink Frequency: 2.4 GHz", "Signal Strength: -65 dBm", "Data Rate: 54 Mbps"]),
-            ("ADCS Subsystem", ["Gyro: 0.02°/s", "Orientation: [0.1, -0.3, 89.7]°", "Lux1: 125 lx","Lux2: 90 lx","Lux3: 11 lx", "RPM: 0", "Status: Stable"]),
-            ("Payload Subsystem", ["LiDAR, Camera", "Status"]),  # Special handling for payload
-            ("Command & Data Handling Subsystem", ["Memory Usage: 45.2%", "Last Command: Camera Config", "Uptime: 4m", "Status: Active"]),
-            ("Error Log", ["No Critical Errors Detected"]),
-            ("Overall Status", ["System Nominal", "Recommended Actions: None"])
+            ("Power Subsystem", ["Current: -- a", "Voltage: -- v", "Power: -- w", "Energy: -- wh", "Temperature: --°c", "Battery: --%", "Status: not connected"]),
+            ("Thermal Subsystem", ["Pi: 55.2°c", "Power pcb: 32.1°c", "Battery: 25.8°c", "Status: normal"]),
+            ("Communication Subsystem", []),  # Will be handled specially with dynamic labels
+            ("ADCS Subsystem", ["Gyro: 0.02°/s", "Orientation: [0.1, -0.3, 89.7]°", "Lux1: 125 lx","Lux2: 90 lx","Lux3: 11 lx", "Rpm: 0", "Status: stable"]),
+            ("Payload Subsystem", ["Lidar, camera", "Status"]),  # Special handling for payload
+            ("Command & Data Handling Subsystem", ["Memory usage: 45.2%", "Last command: camera config", "Uptime: 4m", "Status: active"]),
+            ("Error Log", ["No critical errors detected"]),
+            ("Overall Status", ["System nominal", "Recommended actions: none"])
         ]
 
         for name, items in subsystems:
@@ -839,7 +844,7 @@ class MainWindow(QWidget):
                     # Store label references for your new thermal labels
                     if "Pi:" in text:
                         self.thermal_labels["pi_temp"] = lbl
-                    elif "Power PCB:" in text:
+                    elif "Power pcb:" in text:
                         self.thermal_labels["power_pcb_temp"] = lbl
                     elif "Battery:" in text:
                         self.thermal_labels["battery_temp"] = lbl
@@ -864,7 +869,7 @@ class MainWindow(QWidget):
                         self.adcs_labels["lux2"] = lbl
                     elif "Lux3:" in text:
                         self.adcs_labels["lux3"] = lbl
-                    elif "RPM:" in text:
+                    elif "Rpm:" in text:
                         self.adcs_labels["rpm"] = lbl
                     elif "Status:" in text:
                         self.adcs_labels["status"] = lbl
@@ -877,9 +882,9 @@ class MainWindow(QWidget):
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references
-                    if "Memory Usage" in text:
+                    if "Memory usage" in text:
                         self.cdh_labels["memory"] = lbl
-                    elif "Last Command" in text:
+                    elif "Last command" in text:
                         self.cdh_labels["last_cmd"] = lbl
                     elif "Uptime" in text:
                         self.cdh_labels["uptime"] = lbl
@@ -887,39 +892,50 @@ class MainWindow(QWidget):
                         self.cdh_labels["status"] = lbl
                         
             elif name == "Communication Subsystem":
-                # Add standard comm items
-                for text in items:
-                    lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                    lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                    layout.addWidget(lbl)
+                # No dummy data - create all labels with placeholders
                 
-                # Add WiFi speed label (separate from upload speed)
-                self.comms_wifi_speed_label = QLabel("WiFi Speed: -- Mbps".ljust(30))
+                # WiFi speed label (actual internet speed test)
+                self.comms_wifi_speed_label = QLabel("Wifi speed: -- mbps".ljust(30))
                 self.comms_wifi_speed_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.comms_wifi_speed_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_wifi_speed_label.setMinimumWidth(220)  # Consistent with payload labels
-                self.comms_wifi_speed_label.setMaximumWidth(220)  # Fixed maximum width
+                self.comms_wifi_speed_label.setMinimumWidth(220)
+                self.comms_wifi_speed_label.setMaximumWidth(220)
                 layout.addWidget(self.comms_wifi_speed_label)
                 
-                # Add upload speed label (from camera data)
-                self.comms_upload_speed_label = QLabel("Upload Speed: -- KB/s".ljust(30))
+                # Upload speed label (actual data upload from camera/sensors)
+                self.comms_upload_speed_label = QLabel("Upload speed: -- kb/s".ljust(30))
                 self.comms_upload_speed_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.comms_upload_speed_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_upload_speed_label.setMinimumWidth(220)  # Consistent with payload labels
-                self.comms_upload_speed_label.setMaximumWidth(220)  # Fixed maximum width
+                self.comms_upload_speed_label.setMinimumWidth(220)
+                self.comms_upload_speed_label.setMaximumWidth(220)
                 layout.addWidget(self.comms_upload_speed_label)
                 
-                # Add special status label
-                self.comms_status_label = QLabel("Status: Connected".ljust(30))
+                # Server signal strength label
+                self.comms_server_signal_label = QLabel("Server signal: -- dbm".ljust(30))
+                self.comms_server_signal_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.comms_server_signal_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_server_signal_label.setMinimumWidth(220)
+                self.comms_server_signal_label.setMaximumWidth(220)
+                layout.addWidget(self.comms_server_signal_label)
+                
+                # Client signal strength label
+                self.comms_client_signal_label = QLabel("Client signal: -- dbm".ljust(30))
+                self.comms_client_signal_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.comms_client_signal_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                self.comms_client_signal_label.setMinimumWidth(220)
+                self.comms_client_signal_label.setMaximumWidth(220)
+                layout.addWidget(self.comms_client_signal_label)
+                
+                # Status label
+                self.comms_status_label = QLabel("Status: not connected".ljust(30))
                 self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_status_label.setMinimumWidth(220)  # Consistent with payload labels
-                self.comms_status_label.setMaximumWidth(220)  # Fixed maximum width
+                self.comms_status_label.setMinimumWidth(220)
+                self.comms_status_label.setMaximumWidth(220)
                 layout.addWidget(self.comms_status_label)
             elif name == "Payload Subsystem":
                 # Camera status label with FPS integrated - fixed width
-                self.camera_status_label = QLabel("Camera: Disconnected".ljust(30))
+                self.camera_status_label = QLabel("Camera: disconnected".ljust(30))
                 self.camera_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 self.camera_status_label.setMinimumWidth(220)  # Increased minimum width
@@ -927,7 +943,7 @@ class MainWindow(QWidget):
                 self.camera_status_label.setFixedHeight(20)    # Fixed height
                 layout.addWidget(self.camera_status_label)
                 
-                self.camera_frame_size_label = QLabel("Frame Size: -- KB".ljust(30))
+                self.camera_frame_size_label = QLabel("Frame size: -- kb".ljust(30))
                 self.camera_frame_size_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_frame_size_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 self.camera_frame_size_label.setMinimumWidth(220)  # Increased minimum width
@@ -936,7 +952,7 @@ class MainWindow(QWidget):
                 layout.addWidget(self.camera_frame_size_label)
                 
                 # LIDAR status label with collection rate integrated - fixed width
-                self.lidar_status_label = QLabel("LIDAR: Disconnected".ljust(30))
+                self.lidar_status_label = QLabel("Lidar: disconnected".ljust(30))
                 self.lidar_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.lidar_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 self.lidar_status_label.setMinimumWidth(220)  # Increased minimum width
@@ -945,7 +961,7 @@ class MainWindow(QWidget):
                 layout.addWidget(self.lidar_status_label)
                 
                 # Overall payload subsystem status - fixed width
-                self.payload_status_label = QLabel("Status: Unknown".ljust(30))
+                self.payload_status_label = QLabel("Status: unknown".ljust(30))
                 self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 self.payload_status_label.setMinimumWidth(220)  # Increased minimum width
@@ -1106,36 +1122,18 @@ class MainWindow(QWidget):
             try:
                 # Check if widgets still exist and we have the labels dictionary
                 if hasattr(self, 'payload_labels') and self.payload_labels:
-                    # Update camera status to include FPS when available
-                    if "fps" in data:
-                        camera_label = self.payload_labels.get("camera")
-                        if camera_label and hasattr(camera_label, 'setText'):
-                            fps = data['fps']
-                            # Get current camera status and add FPS with fixed width
-                            try:
-                                current_status = camera_label.text().split(" - ")[0].strip()  # Get base status
-                                camera_text = f"{current_status} - {fps}FPS".ljust(30)
-                                camera_label.setText(camera_text)
-                            except:
-                                # Fallback if getting current text fails
-                                camera_text = f"Camera: Active - {fps}FPS".ljust(30)
-                                camera_label.setText(camera_text)
-                    
+                    # Only update frame size, don't automatically change camera status
                     if "frame_size" in data:
                         frame_size_label = self.payload_labels.get("frame_size")
                         if frame_size_label and hasattr(frame_size_label, 'setText'):
-                            frame_size_text = f"Frame Size: {data['frame_size']} KB".ljust(30)
+                            frame_size_text = f"Frame size: {data['frame_size']} kb".ljust(30)
                             frame_size_label.setText(frame_size_text)
                 
-                # Upload speed to Communication Subsystem
-                if "upload_speed" in data and hasattr(self, 'comms_upload_speed_label'):
-                    if hasattr(self.comms_upload_speed_label, 'setText'):
-                        upload_speed = data["upload_speed"]
-                        upload_text = f"Upload Speed: {upload_speed} KB/s".ljust(30)
-                        self.comms_upload_speed_label.setText(upload_text)
+                # Upload speed is now handled by communication_broadcast, not here
+                # This ensures WiFi speed test results go to WiFi speed label
+                # and actual upload data goes to upload speed label
                     
             except Exception as e:
-                logging.error(f"Failed to update camera info: {e}")
                 logging.error(f"Failed to update camera info: {e}")
 
         @sio.on("image_captured")
@@ -1350,657 +1348,79 @@ class MainWindow(QWidget):
             except Exception as e:
                 logging.error(f"Failed to update power data: {e}")
 
-        @sio.on("thermal_broadcast")
-        def on_thermal_data(data):
-            """Handle thermal subsystem data updates"""
+        @sio.on("communication_broadcast")
+        def on_communication_data(data):
+            """Handle communication subsystem data updates"""
             try:
-                if hasattr(self, 'thermal_labels'):
-                    # Update thermal labels with your new labels
-                    if "pi_temp" in data:
-                        self.thermal_labels["pi_temp"].setText(f"Pi: {data['pi_temp']:.1f}°C")
-                    if "power_pcb_temp" in data:
-                        self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {data['power_pcb_temp']:.1f}°C")
-                    if "battery_temp" in data:
-                        self.thermal_labels["battery_temp"].setText(f"Battery: {data['battery_temp']:.1f}°C")
-                    if "status" in data:
-                        self.thermal_labels["status"].setText(f"Status: {data['status']}")
-            except Exception as e:
-                logging.error(f"Failed to update thermal data: {e}")
-
-        @sio.on("cdh_broadcast")
-        def on_cdh_data(data):
-            """Handle Command & Data Handling subsystem data updates"""
-            try:
-                if hasattr(self, 'cdh_labels'):
-                    if "memory_usage" in data:
-                        self.cdh_labels["memory"].setText(f"Memory Usage: {data['memory_usage']:.1f}%")
-                    if "last_command" in data:
-                        self.cdh_labels["last_cmd"].setText(f"Last Command: {data['last_command']}")
-                    if "uptime" in data:
-                        self.cdh_labels["uptime"].setText(f"Uptime: {data['uptime']}")
-                    if "status" in data:
-                        self.cdh_labels["status"].setText(f"Status: {data['status']}")
-            except Exception as e:
-                logging.error(f"Failed to update CDH data: {e}")
-
-        @sio.on("payload_broadcast")
-        def on_payload_data(data):
-            """Handle payload subsystem status updates"""
-            try:
-                # Check if widgets still exist and we have the labels dictionary
-                if not hasattr(self, 'payload_labels') or not self.payload_labels:
-                    return
-                
-                # Update camera status with proper formatting and fixed width
-                if "camera_status" in data:
-                    camera_label = self.payload_labels.get("camera")
-                    if camera_label and hasattr(camera_label, 'setText'):
-                        status = data['camera_status']
-                        # Pad the text to maintain consistent width
-                        camera_text = f"Camera: {status}"
-                        # Check if we need to preserve FPS info
-                        try:
-                            current_text = camera_label.text()
-                            if " - " in current_text and "FPS" in current_text:
-                                fps_part = current_text.split(" - ")[1].strip()
-                                camera_text = f"Camera: {status} - {fps_part}"
-                        except:
-                            pass  # Use default text if getting current text fails
-                        
-                        # Pad to ensure consistent width (30 characters)
-                        camera_text = camera_text.ljust(30)
-                        camera_label.setText(camera_text)
-                        
-                        # Update color based on status
-                        if status.lower() in ["streaming", "active", "operational"]:
-                            camera_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                        elif status.lower() in ["idle", "connected", "ready"]:
-                            camera_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                        else:
-                            camera_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-                # Update LIDAR status with proper formatting and fixed width
-                if "lidar_status" in data:
-                    lidar_label = self.payload_labels.get("lidar_status")
-                    if lidar_label and hasattr(lidar_label, 'setText'):
-                        status = data['lidar_status']
-                        lidar_text = f"LIDAR: {status}".ljust(30)  # Pad to ensure consistent width
-                        lidar_label.setText(lidar_text)
-                        
-                        # Update color based on status
-                        if status.lower() in ["active", "collecting"]:
-                            lidar_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                        elif status.lower() in ["connected", "ready"]:
-                            lidar_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                        else:
-                            lidar_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-                # Update overall payload status with proper formatting and fixed width
-                if "overall_status" in data:
-                    status_label = self.payload_labels.get("payload_status")
-                    if status_label and hasattr(status_label, 'setText'):
-                        status = data['overall_status']
-                        status_text = f"Status: {status}".ljust(30)  # Pad to ensure consistent width
-                        status_label.setText(status_text)
-                        
-                        # Update color based on status
-                        if status.lower() in ["ok", "operational", "normal"]:
-                            status_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                        elif status.lower() in ["warning", "degraded"]:
-                            status_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                        else:
-                            status_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-            except Exception as e:
-                logging.error(f"Failed to update payload data: {e}")
-                logging.error(f"Failed to update payload data: {e}")
-                
-    def handle_adcs_command(self, mode_name, command_name, value):
-        data = {
-            "mode":    mode_name,
-            "command": command_name,
-            "value":   value
-        }
-        sio.emit("adcs_command", data)
-        print(f"[CLIENT] ADCS command sent: {data}")
-
-    def start_lidar_streaming(self):
-        """Start LIDAR data streaming from server"""
-        if sio.connected:
-            logging.info("Requesting LIDAR streaming start")
-            sio.emit("start_lidar")
-        else:
-            logging.warning("Cannot start LIDAR - not connected to server")
-
-    def stop_lidar_streaming(self):
-        """Stop LIDAR data streaming from server"""
-        if sio.connected:
-            logging.info("Requesting LIDAR streaming stop")
-            sio.emit("stop_lidar")
-        else:
-            logging.warning("Cannot stop LIDAR - not connected to server")
-
-    def delayed_server_setup(self):
-        """Called shortly after connect—override if needed."""
-        pass
-
-    def handle_frame_data(self, data):
-        """Process incoming frame data"""
-        try:
-            arr = np.frombuffer(data, np.uint8)
-            frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-            if frame is not None:
-                    
-                self.current_frame_size = len(data)
-                self.frame_counter += 1
-                bridge.frame_received.emit(frame)
-            else:
-                logging.warning("Frame decode failed")
-        except Exception as e:
-            logging.error(f"Frame processing error: {e}")
-
-    def update_camera_status(self, data):
-        """Update camera status display"""
-        try:
-            # Check if widgets still exist and we have the labels dictionary
-            if not hasattr(self, 'payload_labels') or not self.payload_labels:
-                return
-            
-            camera_label = self.payload_labels.get("camera")
-            if not camera_label or not hasattr(camera_label, 'setText'):
-                return
-            
-            status = data.get("status", "Unknown")
-            # Check if we already have FPS info to preserve it
-            current_text = camera_label.text()
-            if " - " in current_text and "FPS" in current_text:
-                fps_part = current_text.split(" - ")[1].strip()  # Get the FPS part
-                camera_text = f"Camera: {status} - {fps_part}".ljust(30)
-            else:
-                camera_text = f"Camera: {status}".ljust(30)
-            
-            camera_label.setText(camera_text)
-            
-            # Update color based on status
-            if status.lower() in ("streaming", "active", "operational"):
-                camera_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-            elif status.lower() in ("idle", "ready", "connected"):
-                camera_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-            else:
-                camera_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-            
-            # Update overall payload status
-            self.update_payload_status()
-                
-        except Exception as e:
-            logging.error(f"Camera status update error: {e}")
-
-    def handle_image_capture_response(self, data):
-        """Handle server response to image capture request"""
-        try:
-            if data["success"]:
-                logging.info(f"Image captured: {data['path']} ({data['size_mb']} MB)")
-                self.download_captured_image(data['path'])
-            else:
-                logging.error(f"Image capture failed: {data['error']}")
-        except Exception as e:
-            logging.error(f"Failed to handle capture response: {e}")
-
-    def handle_image_download(self, data):
-        """Handle downloaded image from server"""
-        try:
-            if data["success"]:
-                image_data = base64.b64decode(data["data"])
-                
-                local_dir = os.path.join(os.path.dirname(__file__), "captured_images")
-                os.makedirs(local_dir, exist_ok=True)
-                local_path = os.path.join(local_dir, data["filename"])
-                
-                with open(local_path, 'wb') as f:
-                    f.write(image_data)
-                
-                logging.info(f"Image saved: {local_path} ({data['size']/1024:.1f} KB)")
-            else:
-                logging.error(f"Image download failed: {data['error']}")
-                
-        except Exception as e:
-            logging.error(f"Failed to save downloaded image: {e}")
-
-    #=========================================================================
-    #                        CAMERA AND DETECTION                           
-    #=========================================================================
-
-    def toggle_stream(self):
-        """Toggle video stream on/off"""
-        if not sio.connected:
-            return
-        self.streaming = not self.streaming
-        sio.emit("start_camera" if self.streaming else "stop_camera")
-
-    def apply_config(self):
-        """Apply camera configuration changes"""
-        logging.info("Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.")
-        
-        # Capture current streaming state for this specific call
-        was_streaming_for_this_call = self.streaming
-
-        # 1. Pause stream immediately if active
-        if was_streaming_for_this_call:
-            if self.streaming: # Double check, as state might change
-                sio.emit("stop_camera")
-                self.streaming = False
-                self.camera_controls.toggle_btn.setText("Start Stream")
-                logging.info("Stream paused for config application.")
-
-
-        # 2. Initiate graph pause immediately
-        self.calibration_change_time = time.time()
-        # Keep the existing 1-second timer for resuming graphs.
-        QTimer.singleShot(1000, self.resume_after_calibration_change)
-
-        # 3. Schedule the actual config sending and detector update after 0.5 seconds
-        # Pass the captured streaming state as an argument
-        QTimer.singleShot(500, lambda: self._execute_config_application_after_pause(was_streaming_for_this_call))
-
-    def _execute_config_application_after_pause(self, was_streaming_at_call_time):
-        """Helper method to get/send config and update detector after the initial 0.5s pause."""
-        logging.info(f"0.5s pause complete. Getting/sending configuration (stream was {was_streaming_at_call_time}).")
-        
-        # Get and send configuration
-        config = self.camera_settings.get_config()
-        sio.emit("camera_config", config)
-        
-        # Store the applied configuration for detector use
-        self.active_config_for_detector = config.copy()
-        
-        # Update detector calibration
-        self.update_detector_calibration(config)
-
-        # Resume stream if it was active before applying config
-        if was_streaming_at_call_time:
-            # Add a small delay for server to process config before restarting stream
-            def restart_stream_if_needed():
-                if not self.streaming: # Check if it wasn't restarted by another process
-                    sio.emit("start_camera")
-                    self.streaming = True
-                    self.camera_controls.toggle_btn.setText("Stop Stream")
-                    logging.info("Stream restart scheduled (if it was on before apply_config).")
-
-            threading.Timer(0.2, restart_stream_if_needed).start()
-        
-        # No need to delete an instance attribute as it's passed by argument.
-
-    def resume_after_calibration_change(self):
-        """Resume display after configuration change"""
-        if hasattr(self, 'calibration_change_time'):
-            delattr(self, 'calibration_change_time')
-
-    def update_detector_calibration(self, config):
-        """Update detector with new calibration settings"""
-        try:
-            calibration_path = config.get('calibration_file', 'calibrations/calibration_default.npz')
-            preset_type = config.get('preset_type', 'standard')
-            
-            
-            if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
-                success = detector4.detector_instance.update_calibration(calibration_path)
-                if success:
-                    logging.info(f"Detector calibration updated: {calibration_path}")
-                    # Verify the calibration was actually loaded
-                    if hasattr(detector4.detector_instance, 'mtx'):
-                        cy = detector4.detector_instance.mtx[1, 2] if detector4.detector_instance.mtx is not None else "None"
-                else:
-                    logging.info(f"[WARNING] ❌ Failed to update detector calibration")
-            else:
-                logging.info(f"[WARNING] Detector instance not available for calibration update")
-            
-        except Exception as e:
-            logging.info(f"[ERROR] Calibration update failed: {e}")
-
-    def toggle_detector(self):
-        """Toggle object detection on/off"""
-        self.detector_active = not self.detector_active
-
-        if self.detector_active:
-            logging.info("[INFO] 🚀 Starting detector...")
-            threading.Thread(target=self.run_detector, daemon=True).start()
-        else:
-            logging.info("[INFO] 🛑 Stopping detector...")
-            self.clear_queue()
-
-    def show_full_image(self):
-        """Cover UI with a full-screen image and tiny back button."""
-        try:
-            # Hide main tabs
-            self.tab_widget.hide()
-            
-            # Create full-screen image label
-            self._full_lbl = QLabel(self)
-            self._full_lbl.setGeometry(0, 0, self.width(), self.height())  # Fill entire window
-            self._full_lbl.setStyleSheet("background-color: black;")  # Black background
-            
-            # Load and scale image
-            image_path = r"C:\Users\juanb\OneDrive\Imágenes\Camera Roll\WIN_20250221_12_17_13_Pro.jpg"
-            
-            if os.path.exists(image_path):
-                pix = QPixmap(image_path)
-                if not pix.isNull():
-                    # Scale image to fit screen while maintaining aspect ratio
-                    scaled_pix = pix.scaled(
-                        self.size(), 
-                        Qt.AspectRatioMode.KeepAspectRatio,
-                        Qt.TransformationMode.SmoothTransformation
-                    )
-                    self._full_lbl.setPixmap(scaled_pix)
-                    self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                else:
-                    logging.info(f"[ERROR] Failed to load image: {image_path}")
-                    self._full_lbl.setText("Failed to load image")
-                    self._full_lbl.setStyleSheet(f"background-color: black; color: {TEXT_COLOR}; font-size: 24pt;")
-                    self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    self._full_lbl.show()
-            else:
-                logging.info(f"[ERROR] Image file not found: {image_path}")
-                self._full_lbl.setText("Image file not found")
-                self._full_lbl.setStyleSheet(f"background-color: black; color: {TEXT_COLOR}; font-size: 24pt;")
-                self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                self._full_lbl.show()
-            
-            # Create back button
-            self._back_btn = QPushButton("← Back", self)
-            self._back_btn.setGeometry(20, 20, 100, 40)  # Top-left corner
-            self._back_btn.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: rgba(0, 0, 0, 180);
-                    color: {TEXT_COLOR};
-                    border: 2px solid {BUTTON_COLOR};
-                    border-radius: 8px;
-                    font-size: 14pt;
-                    font-family: {FONT_FAMILY};
-                    font-weight: bold;
-                }}
-                QPushButton:hover {{
-                    background-color: {BUTTON_HOVER};
-                    color: black;
-                }}
-            """)
-            self._back_btn.clicked.connect(self.hide_full_image)
-            
-            # Show widgets
-            self._full_lbl.show()
-            self._back_btn.show()
-            
-            # Raise to top to ensure they're visible
-            self._full_lbl.raise_()
-            self._back_btn.raise_()
-            
-            logging.info("[INFO] Full image view activated")
-            
-        except Exception as e:
-            logging.info(f"[ERROR] Failed to show full image: {e}")
-            # Fallback: restore normal view
-            if hasattr(self, '_full_lbl'):
-                self._full_lbl.hide()
-            if hasattr(self, '_back_btn'):
-                self._back_btn.hide()
-            self.tab_widget.show()
-
-    def hide_full_image(self):
-        """Remove full-screen image and back button, restore main UI"""
-        try:
-            # Remove full-screen image and back button
-            if hasattr(self, '_full_lbl'):
-                self._full_lbl.hide()
-                self._full_lbl.deleteLater()
-                delattr(self, '_full_lbl')
-                
-            if hasattr(self, '_back_btn'):
-                self._back_btn.hide()
-                self._back_btn.deleteLater()
-                delattr(self, '_back_btn')
-            
-            # Restore main UI
-            self.tab_widget.show()
-            
-            logging.info("[INFO] Returned to normal view")
-            
-        except Exception as e:
-            logging.info(f"[ERROR] Failed to hide full image: {e}")
-            # Force restore main UI
-            self.tab_widget.show()
-
-    def run_detector(self):
-        """Main detector processing loop"""
-        while self.detector_active:
-            try:
-                frame = self.frame_queue.get(timeout=0.1)
-                
-                # Use the server-acknowledged config (applied settings) instead of live UI
-                if self.active_config_for_detector is None:
-                    config = self.camera_settings.get_config() # Fallback only
-                else:
-                    config = self.active_config_for_detector # Use last applied config
-                
-                is_cropped = config.get('cropped', False)
-                
-                original_height = None
-                if is_cropped:
-                    current_height = frame.shape[0]
-                    crop_factor = config.get('crop_factor')
-                    
-                    if crop_factor is not None and crop_factor > 1.0:
-                        original_height = int(current_height * crop_factor)
+                # Update WiFi speed (actual internet speed test)
+                if "wifi_speed" in data and hasattr(self, 'comms_wifi_speed_label'):
+                    wifi_speed = float(data['wifi_speed']) if data['wifi_speed'] != "0.0" else 0.0
+                    if wifi_speed > 0:
+                        self.comms_wifi_speed_label.setText(f"Wifi speed: {wifi_speed:.1f} mbps".ljust(30))
+                        self.comms_wifi_speed_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     else:
-                        logging.info(f"[WARNING] Invalid crop_factor: {crop_factor}")
-                        original_height = current_height 
+                        self.comms_wifi_speed_label.setText("Wifi speed: -- mbps".ljust(30))
+                        self.comms_wifi_speed_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 
-                # Process frame with detector
-                try:
-                    latency_ms = 0.0  # Default value
-                    pose = None       # Default value
-                    analysed = frame  # Default to original frame if detection fails early
-
-                    if hasattr(detector4, 'detector_instance') and detector4.detector_instance:
-                        analysed, pose, latency_ms = detector4.detector_instance.detect_and_draw(
-                            frame,
-                            return_pose=True,
-                            is_cropped=is_cropped,
-                            original_height=original_height
-                        )
+                # Update upload speed (actual data upload speed)
+                if "upload_speed" in data and hasattr(self, 'comms_upload_speed_label'):
+                    upload_speed = float(data['upload_speed']) if data['upload_speed'] != "0.0" else 0.0
+                    if upload_speed > 0:
+                        self.comms_upload_speed_label.setText(f"Upload speed: {upload_speed:.1f} kb/s".ljust(30))
+                        self.comms_upload_speed_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     else:
-                        # This branch is taken if detector_instance is None or not found.
-                        # The global detector4.detect_and_draw will then also find detector_instance to be None
-                        # and likely return 2 values: (frame, None).
-                        # If detector4.detect_and_draw's return is inconsistent (sometimes 2, sometimes 3 values in this path),
-                        # this unpacking needs to be more robust or the global function made consistent.
-                        # Assuming 2-value return if hasattr(detector4, 'detector_instance') is false:
-                        _result = detector4.detect_and_draw(frame, return_pose=True)
-                        if isinstance(_result, tuple) and len(_result) == 2:
-                            analysed, pose = _result
-                            # latency_ms remains 0.0 as it's not provided by a 2-value return
-                        elif isinstance(_result, tuple) and len(_result) == 3: # Handle unexpected 3-value return
-                            analysed, pose, latency_ms = _result
-                            logging.info("[WARNING] detector4.detect_and_draw returned 3 values in an unexpected path.")
-                        else: # Fallback if return is not as expected
-                            analysed = frame 
-                            pose = None
-                            logging.info("[ERROR] Unexpected return type/length from detector4.detect_and_draw in else branch.")
-                    self.latencyUpdated.emit(latency_ms)
-                    bridge.analysed_frame.emit(analysed)
-
-                    # 1) always update all calculators
-                    # Apply your recommended safe check structure here
-                    if pose is not None and isinstance(pose, (list, tuple)) and len(pose) == 2:
-                        rvec, tvec = pose
-                        # Further check rvec and tvec for robustness
-                        if (rvec is not None and isinstance(rvec, np.ndarray) and rvec.size > 0 and
-                            tvec is not None and isinstance(tvec, np.ndarray) and tvec.size > 0):
-                            
-                            # All clear to use rvec and tvec
-                            self.spin_plotter.update(rvec, tvec) # Pass only rvec, timestamp will default to time.time()
-                            self.distance_plotter.update(rvec, tvec)
-                            self.angular_plotter.update(rvec, tvec)
-
-                            # 2) update the three small live‐value labels WITH UNITS
-                            self.graph_section.live_labels["SPIN MODE"]             \
-                                .setText(f"{self.spin_plotter.current_angle:.0f}°")  # Added degree symbol
-                            self.graph_section.live_labels["DISTANCE MEASURING MODE"] \
-                                .setText(f"{self.distance_plotter.current_distance:.3f}m")  # Added meter unit
-                            self.graph_section.live_labels["SCANNING MODE"]         \
-                                .setText(f"{self.angular_plotter.current_ang:.1f}°")  # Added degree symbol
-
-                            # 2b) update the big "detail" label for the active graph WITH UNITS
-                            detail = getattr(self.graph_section, "current_detail_label", None)
-                            mode   = getattr(self.graph_section, "current_graph_mode", None)
-                           
-                            if detail and mode:
-                                if mode == "SPIN MODE":
-                                    metrics = self.spin_plotter.get_spin_metrics()
-                                    detail.setText(
-                                        f"Live: {metrics['current']:.0f}°\n"
-                                        f"Avg:  {metrics['average']:.0f}°\n"
-                                    )
-                                elif mode == "DISTANCE MEASURING MODE":
-                                    metrics = self.distance_plotter.get_distance_metrics()
-                                    detail.setText(
-                                        f"Live: {metrics['current']:.3f}m\n"
-                                        f"Avg:  {metrics['average']:.3f}m\n"
-                                        f"Live: {metrics['current_velocity']:.3f}m/s\n"
-                                        f"Avg:  {metrics['average_velocity']:.3f}m/s"
-                                    )
-                                else:  # SCANNING MODE (RelativeAnglePlotter)
-                                    metrics = self.angular_plotter.get_angle_metrics()
-                                    detail.setText(
-                                        f"Live: {metrics['current']:.1f}°\n"
-                                        f"Avg:  {metrics['average']:.1f}°\n"
-                                    )
-
-                                # ── if we're recording, grab that same label value ─────────────────
-                                if self.graph_section.is_recording:
-                                    ts = time.time()
-                                    val = None
-                                    try:
-                                        if mode == "SPIN MODE":
-                                            val = self.spin_plotter.current_angle
-                                        elif mode == "DISTANCE MEASURING MODE":
-                                            # Assuming you want to record the live distance.
-                                            # If you want to record velocity, use self.distance_plotter.current_velocity
-                                            val = self.distance_plotter.current_distance
-                                        elif mode == "SCANNING MODE": # RelativeAnglePlotter
-                                            val = self.angular_plotter.current_ang
-                                        
-                                        if val is not None:
-                                            self.graph_section.add_data_point(ts, float(val))
-                                        else:
-                                            logging.info(f"[WARNING] No value to record for mode: {mode}")
-                                            
-                                    except AttributeError as e:
-                                        logging.info(f"[ERROR] Could not get value for recording from plotter: {e}")
-                                    except ValueError as e:
-                                        logging.info(f"[ERROR] Value from plotter could not be converted to float for recording: {val}, Error: {e}")
-                                    except Exception as e:
-                                        logging.info(f"[ERROR] Unexpected error during data preparation for recording: {e}")
+                        self.comms_upload_speed_label.setText("Upload speed: -- kb/s".ljust(30))
+                        self.comms_upload_speed_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 
-                            # 3) continue with your throttled redraw / recording logic…
-                            if self.should_update_graphs() and self.graph_section.graph_widget:
-                                # Call update on the active graph_widget with appropriate arguments
-                                current_mode = self.graph_section.current_graph_mode
-                                if current_mode == "SPIN MODE":
-                                    # AngularPositionPlotter.update(self, rvec, timestamp=None)
-                                    # We want to use the default timestamping within the plotter
-                                    self.graph_section.graph_widget.update(rvec, tvec) 
-                                elif current_mode == "DISTANCE MEASURING MODE":
-                                    # RelativeDistancePlotter.update(self, rvec, tvec, timestamp=None)
-                                    self.graph_section.graph_widget.update(rvec, tvec)
-                                elif current_mode == "SCANNING MODE":
-                                    # RelativeAnglePlotter.update(self, rvec, tvec, timestamp=None)
-                                    self.graph_section.graph_widget.update(rvec, tvec)
-                                else:
-                                    logging.info(f"[WARNING] Unknown graph mode for update: {current_mode}")
-                                # … recording code …
+                # Update server signal strength
+                if "server_signal_strength" in data and hasattr(self, 'comms_server_signal_label'):
+                    server_signal = data['server_signal_strength']
+                    if server_signal != 0:
+                        self.comms_server_signal_label.setText(f"Server signal: {server_signal} dbm".ljust(30))
+                        # Color based on signal strength
+                        if server_signal > -50:
+                            color = "#4CAF50"  # Good signal (green)
+                        elif server_signal > -70:
+                            color = "#FF9800"  # Fair signal (orange)
                         else:
-                            # This case means pose was a 2-element tuple, but rvec/tvec were invalid
-                            if rvec is None or not isinstance(rvec, np.ndarray) or not rvec.size > 0:
-                                logging.info(f"[WARNING] rvec is invalid after unpacking. Type: {type(rvec)}, Value: {rvec}")
-                            if tvec is None or not isinstance(tvec, np.ndarray) or not tvec.size > 0:
-                                logging.info(f"[WARNING] tvec is invalid after unpacking. Type: {type(tvec)}, Value: {tvec}")
-                    elif pose is not None: # pose was not None, but not a 2-element tuple
-                        logging.info(f"[WARNING] Pose is not None but has unexpected structure: {type(pose)}, value: {pose}")
-                    # If pose is None, normal operation (no detection), calculations are skipped.
-
-                except Exception as e:
-                    logging.info(f"[ERROR] Detector processing error: {e}")
-                    import traceback
-                    traceback.print_exc() # Add traceback for better debugging
-            except queue.Empty:
-                continue
+                            color = "#F44336"  # Poor signal (red)
+                        self.comms_server_signal_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    else:
+                        self.comms_server_signal_label.setText("Server signal: -- dbm".ljust(30))
+                        self.comms_server_signal_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                
+                # Update client signal strength
+                if "client_signal_strength" in data and hasattr(self, 'comms_client_signal_label'):
+                    client_signal = data['client_signal_strength']
+                    if client_signal != 0:
+                        self.comms_client_signal_label.setText(f"Client signal: {client_signal} dbm".ljust(30))
+                        # Color based on signal strength
+                        if client_signal > -50:
+                            color = "#4CAF50"  # Good signal (green)
+                        elif client_signal > -70:
+                            color = "#FF9800"  # Fair signal (orange)
+                        else:
+                            color = "#F44336"  # Poor signal (red)
+                        self.comms_client_signal_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    else:
+                        self.comms_client_signal_label.setText("Client signal: -- dbm".ljust(30))
+                        self.comms_client_signal_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                
+                # Update status
+                if "status" in data and hasattr(self, 'comms_status_label'):
+                    status = data['status']
+                    if status.lower() == "connected":
+                        self.comms_status_label.setText(f"Status: {status}".ljust(30))
+                        self.comms_status_label.setStyleSheet(f"QLabel {{ color: #4CAF50; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    elif status.lower() == "disconnected":
+                        self.comms_status_label.setText(f"Status: {status}".ljust(30))
+                        self.comms_status_label.setStyleSheet(f"QLabel {{ color: #F44336; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    else:
+                        self.comms_status_label.setText(f"Status: {status}".ljust(30))
+                        self.comms_status_label.setStyleSheet(f"QLabel {{ color: #FF9800; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                
             except Exception as e:
-                logging.info(f"[ERROR] Detector thread error: {e}")
-
-    def should_update_graphs(self):
-        """Check if graphs should be updated (not during calibration pause)"""
-        if hasattr(self, 'calibration_change_time'):
-            time_since_change = time.time() - self.calibration_change_time
-            return time_since_change >= 1.0
-        return True
-
-    def capture_image(self):
-        """Request image capture from server"""
-        if not sio.connected:
-            logging.info("[WARNING] Cannot capture image - not connected to server")
-            return
-        
-        try:
-            sio.emit("capture_image", {})
-            logging.info("[INFO] 📸 Image capture requested")
-        except Exception as e:
-            logging.info(f"[ERROR] Failed to request image capture: {e}")
-
-    def download_captured_image(self, server_path):
-        """Download captured image from server"""
-        try:
-            filename = os.path.basename(server_path)
-            sio.emit("download_image", {"server_path": server_path, "filename": filename})
-        except Exception as e:
-            logging.info(f"[ERROR] Failed to request image download: {e}")
-
-    def clear_queue(self):
-        """Clear the frame queue"""
-        while not self.frame_queue.empty():
-            try:
-                self.frame_queue.get_nowait()
-            except queue.Empty:
-                break
-
-    #=========================================================================
-    #                       PERFORMANCE MONITORING                          
-    #=========================================================================
-
-    def measure_speed(self):
-        """Measure internet speed for performance monitoring"""
-        self.comms_upload_speed_label.setText("Upload Speed: Testing...".ljust(30))
-
-        def run_speedtest():
-            try:
-                import speedtest
-                st = speedtest.Speedtest()
-                upload = st.upload()
-                upload_mbps = upload / 1_000_000
-                fps = self.camera_settings.fps_slider.value()
-                max_bytes_per_sec = upload / 8
-                max_frame_size = max_bytes_per_sec / fps
-                self.speedtest_result.emit(upload_mbps, max_frame_size / 1024)
-            except Exception:
-                self.speedtest_result.emit(-1, -1)
-
-        threading.Thread(target=run_speedtest, daemon=True).start()
-
-    def update_speed_labels(self, upload_mbps, max_frame_size_kb):
-        """Update speed test results in UI"""
-        if upload_mbps < 0:
-            self.comms_upload_speed_label.setText("Upload Speed: Error".ljust(30))
-        else:
-            self.comms_upload_speed_label.setText(f"Upload Speed: {upload_mbps:.2f} Mbps".ljust(30))
+                logging.error(f"Failed to update communication data: {e}")
 
     def timerEvent(self, event):
         """Handle timer events for FPS calculation"""

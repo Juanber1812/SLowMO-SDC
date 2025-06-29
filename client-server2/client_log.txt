@@ -2107,3 +2107,61 @@ ValueError: Client is not in a disconnected state
 2025-06-29 19:55:22,142 - INFO - Sending current camera configuration to server...
 2025-06-29 19:55:22,142 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
 2025-06-29 19:55:22,144 - INFO - Stream paused for config application.
+2025-06-29 19:59:00,990 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 19:59:01,422 - INFO - Connected to server
+2025-06-29 19:59:01,424 - INFO - Sending current camera configuration to server...
+2025-06-29 19:59:01,426 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:59:01,429 - INFO - [INFO] Successfully connected to server
+2025-06-29 19:59:10,620 - INFO - Requesting LIDAR streaming start
+2025-06-29 19:59:10,710 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 19:59:10,724 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 19:59:15,492 - INFO - Stopping camera stream...
+2025-06-29 19:59:15,496 - INFO - Stopping LIDAR...
+2025-06-29 19:59:15,502 - INFO - Sending cleanup signals to server...
+2025-06-29 19:59:15,629 - ERROR - Camera status update error: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,632 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,633 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,635 - ERROR - Camera status update error: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,636 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,637 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:59:15,637 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,638 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,639 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,640 - ERROR - Camera status update error: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,640 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,641 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,641 - ERROR - Camera status update error: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,642 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,643 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,652 - ERROR - Frame processing error: wrapped C/C++ object of type Bridge has been deleted
+2025-06-29 19:59:15,657 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 19:59:15,658 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,658 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 19:59:15,659 - ERROR - Failed to process LIDAR status update: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:12:50,547 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 20:12:51,604 - INFO - Connected to server
+2025-06-29 20:12:51,607 - INFO - Sending current camera configuration to server...
+2025-06-29 20:12:51,609 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 20:12:51,611 - INFO - [INFO] Successfully connected to server
+2025-06-29 20:13:26,235 - INFO - Stopping LIDAR...
+2025-06-29 20:13:26,238 - INFO - Sending cleanup signals to server...
+2025-06-29 20:13:26,293 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 20:13:26,406 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:13:26,407 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:13:26,409 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:13:26,410 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:13:26,411 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 20:13:26,413 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:13:26,414 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:13:26,415 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:13:26,416 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:13:34,995 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 20:13:35,493 - INFO - Connected to server
+2025-06-29 20:13:35,495 - INFO - Sending current camera configuration to server...
+2025-06-29 20:13:35,497 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 20:13:35,499 - INFO - [INFO] Successfully connected to server
+2025-06-29 20:13:56,281 - INFO - Stopping LIDAR...
+2025-06-29 20:13:56,285 - INFO - Sending cleanup signals to server...
+2025-06-29 20:13:56,332 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 20:13:56,557 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 20:13:56,573 - INFO - Disconnected from server: client disconnect

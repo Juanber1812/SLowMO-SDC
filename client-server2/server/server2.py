@@ -19,6 +19,15 @@ except ImportError as e:
     PowerMonitor = None
     POWER_AVAILABLE = False
 
+# Import communication monitoring
+try:
+    from communication import CommunicationMonitor
+    COMMUNICATION_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"Communication monitoring not available: {e}")
+    CommunicationMonitor = None
+    COMMUNICATION_AVAILABLE = False
+
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -28,6 +37,11 @@ camera_state = "Idle"  # Default camera state
 power_monitor = None
 if POWER_AVAILABLE:
     power_monitor = PowerMonitor(update_interval=2.0)  # Will try to connect to real hardware
+
+# Initialize communication monitor
+communication_monitor = None
+if COMMUNICATION_AVAILABLE:
+    communication_monitor = CommunicationMonitor()
 
 
 def print_server_status(status):
@@ -53,6 +67,14 @@ def start_background_tasks():
                 logging.info("Power monitoring started successfully")
             else:
                 logging.error("Failed to start power monitoring")
+        
+        # Start communication monitoring
+        if communication_monitor:
+            communication_monitor.set_update_callback(communication_data_callback)
+            if communication_monitor.start_monitoring():
+                logging.info("Communication monitoring started successfully")
+            else:
+                logging.error("Failed to start communication monitoring")
     
     # Start the delayed initialization in a separate thread
     threading.Thread(target=delayed_start, daemon=True).start()
@@ -99,6 +121,13 @@ def handle_disconnect():
 def handle_frame(data):
     try:
         emit('frame', data, broadcast=True)
+        
+        # Track upload data for communication monitoring
+        if communication_monitor and isinstance(data, (bytes, bytearray)):
+            communication_monitor.record_upload_data(len(data))
+        elif communication_monitor and isinstance(data, str):
+            communication_monitor.record_upload_data(len(data.encode('utf-8')))
+            
     except Exception as e:
         print(f"[ERROR] frame broadcast: {e}")
 
@@ -446,6 +475,40 @@ def power_data_callback(power_data):
     except Exception as e:
         logging.error(f"Error in power data callback: {e}")
 
+def communication_data_callback(comm_data):
+    """Callback function to handle communication data updates and broadcast to clients"""
+    try:
+        # Format communication data for client
+        formatted_data = {
+            "wifi_speed": f"{comm_data.get('wifi_download_speed', 0.0):.1f}",  # Mbps
+            "upload_speed": f"{comm_data.get('data_upload_speed', 0.0):.1f}",  # KB/s
+            "server_signal_strength": comm_data.get('server_signal_strength', 0),  # dBm
+            "client_signal_strength": comm_data.get('client_signal_strength', 0),  # dBm
+            "status": comm_data.get('status', 'Disconnected')
+        }
+        
+        # Broadcast to all connected clients
+        socketio.emit("communication_broadcast", formatted_data, broadcast=True)
+        
+        # Log periodically (every 30 seconds)
+        if not hasattr(communication_data_callback, 'last_log') or time.time() - communication_data_callback.last_log > 30:
+            print(f"\n[COMM] WiFi: {formatted_data['wifi_speed']} Mbps, "
+                  f"Upload: {formatted_data['upload_speed']} KB/s, "
+                  f"Signal: {formatted_data['server_signal_strength']} dBm, "
+                  f"Status: {formatted_data['status']}")
+            communication_data_callback.last_log = time.time()
+            
+    except Exception as e:
+        logging.error(f"Error in communication data callback: {e}")
+        # Send error state
+        socketio.emit("communication_broadcast", {
+            "wifi_speed": "0.0",
+            "upload_speed": "0.0", 
+            "server_signal_strength": 0,
+            "client_signal_strength": 0,
+            "status": "Error"
+        }, broadcast=True)
+
 # Power monitoring socket events
 @socketio.on("get_power_status")
 def handle_get_power_status():
@@ -484,6 +547,17 @@ def handle_power_data(data):
         logging.debug(f"Received power data from client: {data}")
     except Exception as e:
         logging.error(f"Error handling power data: {e}")
+
+@socketio.on("client_signal_strength")
+def handle_client_signal_strength(data):
+    """Handle client signal strength updates"""
+    try:
+        signal_strength = data.get("signal_strength", 0)
+        if communication_monitor:
+            communication_monitor.update_client_signal_strength(signal_strength)
+        logging.debug(f"Client signal strength updated: {signal_strength} dBm")
+    except Exception as e:
+        logging.error(f"Error handling client signal strength: {e}")
 
 if __name__ == "__main__":
     print("🚀 Server starting at http://0.0.0.0:5000")
