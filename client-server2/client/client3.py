@@ -901,57 +901,34 @@ class MainWindow(QWidget):
                 self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.comms_status_label)
             elif name == "Payload Subsystem":
-                # Special payload status labels with live data support
-                self.camera_status_label = QLabel("Camera: OPERATIONAL")
+                # Camera status label with FPS integrated
+                self.camera_status_label = QLabel("Camera: Streaming - --FPS")
                 self.camera_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.camera_status_label)
-                
-                self.camera_fps_label = QLabel("FPS: --")
-                self.camera_fps_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.camera_fps_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.camera_fps_label)
                 
                 self.camera_frame_size_label = QLabel("Frame Size: -- KB")
                 self.camera_frame_size_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_frame_size_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.camera_frame_size_label)
                 
-                self.camera_ready_label = QLabel("Status: OK")
-                self.camera_ready_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.camera_ready_label)
-                
-                # Add separator line
-                separator = QLabel("─────────────────")
-                separator.setStyleSheet(f"QLabel {{ color: #444; margin: 4px 0px; padding: 0px; font-family: {FONT_FAMILY}; }}")
-                separator.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                layout.addWidget(separator)
-                
-                # LIDAR status labels
+                # LIDAR status label with collection rate integrated
                 self.lidar_status_label = QLabel("LIDAR: Disconnected")
                 self.lidar_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.lidar_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.lidar_status_label)
                 
-                self.lidar_rate_label = QLabel("Collection Rate: -- Hz")
-                self.lidar_rate_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.lidar_rate_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.lidar_rate_label)
-                
-                self.lidar_errors_label = QLabel("Errors: 0")
-                self.lidar_errors_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.lidar_errors_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.lidar_errors_label)
+                # Overall payload subsystem status
+                self.payload_status_label = QLabel("Status: OK")
+                self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.payload_status_label)
                 
                 # Store references for live updates
                 self.payload_labels["camera"] = self.camera_status_label
-                self.payload_labels["fps"] = self.camera_fps_label
                 self.payload_labels["frame_size"] = self.camera_frame_size_label
-                self.payload_labels["camera_status"] = self.camera_ready_label
                 self.payload_labels["lidar_status"] = self.lidar_status_label
-                self.payload_labels["lidar_rate"] = self.lidar_rate_label
-                self.payload_labels["lidar_errors"] = self.lidar_errors_label
+                self.payload_labels["payload_status"] = self.payload_status_label
             else:
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
@@ -1056,6 +1033,8 @@ class MainWindow(QWidget):
             self.print_report_btn.setEnabled(True)
             # ── end patch
 
+            # Send current camera configuration to server automatically
+            logging.info("Sending current camera configuration to server...")
             self.apply_config()
             QTimer.singleShot(100, self.delayed_server_setup)
 
@@ -1097,8 +1076,12 @@ class MainWindow(QWidget):
             """Handle camera performance data and update payload subsystem"""
             try:
                 if hasattr(self, 'payload_labels'):
+                    # Update camera status to include FPS when available
                     if "fps" in data:
-                        self.payload_labels["fps"].setText(f"FPS: {data['fps']}")
+                        fps = data['fps']
+                        # Get current camera status and add FPS
+                        current_status = self.payload_labels["camera"].text().split(" - ")[0]  # Get base status
+                        self.payload_labels["camera"].setText(f"{current_status} - {fps}FPS")
                     if "frame_size" in data:
                         self.payload_labels["frame_size"].setText(f"Frame Size: {data['frame_size']} KB")
                 
@@ -1169,17 +1152,11 @@ class MainWindow(QWidget):
                         elif status == "connected":
                             self.payload_labels["lidar_status"].setText("LIDAR: Connected")
                         elif status == "active":
-                            self.payload_labels["lidar_status"].setText("LIDAR: Active")
+                            # Include collection rate in the status when active
+                            rate = data.get("collection_rate_hz", 0)
+                            self.payload_labels["lidar_status"].setText(f"LIDAR: Active - {rate}Hz")
                         else:
                             self.payload_labels["lidar_status"].setText(f"LIDAR: {status}")
-                        
-                    if "collection_rate_hz" in data:
-                        rate = data["collection_rate_hz"]
-                        self.payload_labels["lidar_rate"].setText(f"Collection Rate: {rate} Hz")
-                        
-                    if "error_count" in data:
-                        errors = data["error_count"]
-                        self.payload_labels["lidar_errors"].setText(f"Errors: {errors}")
                         
                     # Update color coding based on status
                     status = data.get("status", "Unknown")
@@ -1189,6 +1166,9 @@ class MainWindow(QWidget):
                         self.payload_labels["lidar_status"].setStyleSheet(f"color: #ff0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
                     else:
                         self.payload_labels["lidar_status"].setStyleSheet(f"color: #f00; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+                    
+                    # Update overall payload status
+                    self.update_payload_status()
                 
                 # Update LIDAR widget streaming state if present
                 if hasattr(self, 'lidar_widget') and self.lidar_widget:
@@ -1200,8 +1180,10 @@ class MainWindow(QWidget):
                             with QMutexLocker(self.lidar_widget.data_mutex):
                                 self.lidar_widget.is_streaming = is_active
                             logging.info(f"LIDAR widget streaming state updated to: {is_active}")
-                            
-                logging.info(f"LIDAR Status Update - {data.get('status', 'Unknown')}, Rate: {data.get('collection_rate_hz', 0)} Hz")
+                
+                # Only log significant status changes, not rate updates
+                if data.get("status") in ["connected", "disconnected"] or data.get("collection_rate_hz", 0) == 0:
+                    logging.info(f"LIDAR Status Update - {data.get('status', 'Unknown')}, Rate: {data.get('collection_rate_hz', 0)} Hz")
                 
             except Exception as e:
                 logging.error(f"Failed to process LIDAR status update: {e}")
@@ -1322,9 +1304,20 @@ class MainWindow(QWidget):
             try:
                 if hasattr(self, 'payload_labels'):
                     if "camera_status" in data:
-                        self.payload_labels["camera"].setText(f"Camera: {data['camera_status']}")
-                    if "status" in data:
-                        self.payload_labels["camera_status"].setText(f"Status: {data['status']}")
+                        # Update camera status while preserving FPS if present
+                        current_text = self.payload_labels["camera"].text()
+                        if " - " in current_text and "FPS" in current_text:
+                            fps_part = current_text.split(" - ")[1]
+                            self.payload_labels["camera"].setText(f"Camera: {data['camera_status']} - {fps_part}")
+                        else:
+                            self.payload_labels["camera"].setText(f"Camera: {data['camera_status']}")
+                    
+                    if "payload_status" in data:
+                        self.payload_labels["payload_status"].setText(f"Status: {data['payload_status']}")
+                    
+                    # Update overall payload status after any changes
+                    self.update_payload_status()
+                    
             except Exception as e:
                 logging.error(f"Failed to update payload data: {e}")
                 
@@ -1376,16 +1369,22 @@ class MainWindow(QWidget):
         """Update camera status display"""
         try:
             status = data.get("status", "Unknown")
-            self.camera_status_label.setText(f"Camera: {status}")
-            
-            if status.lower() in ("streaming", "idle", "ready"):
-                self.camera_status_label.setStyleSheet("color: white;")
-                self.camera_ready_label.setText("Status: Ready")
-                self.camera_ready_label.setStyleSheet("color: #0f0;")
+            # Check if we already have FPS info to preserve it
+            current_text = self.payload_labels["camera"].text()
+            if " - " in current_text and "FPS" in current_text:
+                fps_part = current_text.split(" - ")[1]  # Get the FPS part
+                self.payload_labels["camera"].setText(f"Camera: {status} - {fps_part}")
             else:
-                self.camera_status_label.setStyleSheet("color: #bbb;")
-                self.camera_ready_label.setText("Status: Not Ready")
-                self.camera_ready_label.setStyleSheet("color: #f00;")
+                self.payload_labels["camera"].setText(f"Camera: {status}")
+            
+            # Update color based on status
+            if status.lower() in ("streaming", "idle", "ready"):
+                self.payload_labels["camera"].setStyleSheet(f"color: #0f0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+            else:
+                self.payload_labels["camera"].setStyleSheet(f"color: #f00; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+            
+            # Update overall payload status
+            self.update_payload_status()
                 
         except Exception as e:
             logging.error(f"Camera status update error: {e}")
@@ -1707,6 +1706,7 @@ class MainWindow(QWidget):
                             # 2b) update the big "detail" label for the active graph WITH UNITS
                             detail = getattr(self.graph_section, "current_detail_label", None)
                             mode   = getattr(self.graph_section, "current_graph_mode", None)
+                           
                             if detail and mode:
                                 if mode == "SPIN MODE":
                                     metrics = self.spin_plotter.get_spin_metrics()
@@ -1985,47 +1985,94 @@ class MainWindow(QWidget):
         sio.emit("camera_config", config)
         time.sleep(0.2) # Keep delay if necessary for server to process
 
+    def update_payload_status(self):
+        """Update overall payload subsystem status based on camera and LIDAR states"""
+        try:
+            if not hasattr(self, 'payload_labels'):
+                return
+                
+            camera_text = self.payload_labels["camera"].text()
+            lidar_text = self.payload_labels["lidar_status"].text()
+            
+            # Determine camera status - check for operational states
+            camera_ok = False
+            if any(state in camera_text.upper() for state in ["STREAMING", "READY", "IDLE", "OPERATIONAL"]):
+                camera_ok = True
+            
+            # Determine LIDAR status - check for connected or active states
+            lidar_ok = False
+            if any(state in lidar_text.upper() for state in ["CONNECTED", "ACTIVE"]):
+                lidar_ok = True
+            
+            # Set overall status
+            if camera_ok and lidar_ok:
+                self.payload_labels["payload_status"].setText("Status: Operational")
+                self.payload_labels["payload_status"].setStyleSheet(f"color: #0f0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+            elif camera_ok or lidar_ok:
+                self.payload_labels["payload_status"].setText("Status: Degraded")
+                self.payload_labels["payload_status"].setStyleSheet(f"color: #ff0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+            else:
+                self.payload_labels["payload_status"].setText("Status: Offline")
+                self.payload_labels["payload_status"].setStyleSheet(f"color: #f00; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+                
+        except Exception as e:
+            logging.error(f"Payload status update error: {e}")
+
     #=========================================================================
     #                           EVENT HANDLERS                              
     #=========================================================================
 
     def closeEvent(self, event):
-        """Handle application close event"""
+        """Handle application closure - properly stop all components"""
         try:
             logging.info("[INFO] 🛑 Closing application...")
             
-            # Remove QtLogHandler from logging FIRST to prevent RuntimeError at exit
+            # Stop detector first
+            if self.detector_active:
+                logging.info("Stopping detector...")
+                self.detector_active = False
+                self.clear_queue()  # Clear frame queue
+            
+            # Stop streaming
+            if self.streaming:
+                logging.info("Stopping camera stream...")
+                if sio.connected:
+                    sio.emit("stop_camera")
+                self.streaming = False
+                if hasattr(self, 'camera_controls'):
+                    self.camera_controls.toggle_btn.setText("Start Stream")
+            
+            # Stop LIDAR
+            if hasattr(self, 'lidar_widget') and self.lidar_widget:
+                logging.info("Stopping LIDAR...")
+                if sio.connected:
+                    sio.emit("stop_lidar")
+            
+            # Stop any recording
+            if hasattr(self, 'graph_section') and self.graph_section:
+                if getattr(self.graph_section, 'is_recording', False):
+                    logging.info("Stopping recording...")
+                    self.graph_section.toggle_recording()
+            
+            # Send final cleanup signals to server
+            if sio.connected:
+                logging.info("Sending cleanup signals to server...")
+                sio.emit("stop_camera")
+                sio.emit("stop_lidar")
+                QTimer.singleShot(200, lambda: sio.disconnect())
+            
+            # Remove log handler to prevent runtime errors
             if hasattr(self, 'qt_log_handler') and self.qt_log_handler is not None:
                 logging.getLogger().removeHandler(self.qt_log_handler)
-                self.qt_log_handler.close() # Good practice, though base Handler.close() is no-op
-                self.qt_log_handler = None # Clear reference
+                self.qt_log_handler.close()
+                self.qt_log_handler = None
             
-            if self.detector_active:
-               
-                self.detector_active = False
-    
-            self.reset_camera_to_default() # This might log
-            time.sleep(0.5)
-    
-            if self.streaming:
-                sio.emit("stop_camera") # This might log
-                self.streaming = False
-                if hasattr(self, 'camera_controls'): # Check if camera_controls exists
-                    self.camera_controls.toggle_btn.setText("Start Stream")
-                time.sleep(0.5)
-    
-            sio.emit("set_camera_idle") # This might log
-            time.sleep(0.5)
-    
-            if sio.connected:
-                sio.disconnect() # This might log
-                time.sleep(0.2)
+            # Call parent closeEvent
+            super().closeEvent(event)
             
         except Exception as e:
-            logging.info(f"[DEBUG] Cleanup error during closeEvent: {e}")
-            traceback.print_exc() # Add traceback for more details on cleanup errors
-
-        event.accept()
+            logging.error(f"Error during client closure: {e}")
+            super().closeEvent(event)
 
     def keyPressEvent(self, event):
         """Handle keyboard events"""

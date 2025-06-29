@@ -20,12 +20,15 @@ def connect():
     print("📡 LIDAR connected to server")
     if 'lidar_controller' in globals():
         lidar_controller.connected = True
+        # Send status update immediately to show connected state in client
+        lidar_controller._send_status_update()
 
 @sio.event
 def disconnect():
     print("🔌 LIDAR disconnected from server")
     if 'lidar_controller' in globals():
         lidar_controller.connected = False
+        # Note: Can't send status update here since we're disconnected
 
 def read_distance(bus):
     try:
@@ -121,7 +124,7 @@ class LidarController:
             return
             
         elapsed_time = time.time() - self.start_time if self.start_time else 0
-        collection_rate = self.data_count / elapsed_time if elapsed_time > 0 else 0
+        collection_rate = self.data_count / elapsed_time if elapsed_time > 0 and self.start_time else 0
         
         # Determine status based on connection and collection state
         if not self.connected:
