@@ -23,18 +23,21 @@ class PowerMonitor:
     
     def __init__(self, update_interval=2.0, mock_mode=False):
         self.update_interval = update_interval
-        self.mock_mode = mock_mode or (board is None or adafruit_ina228 is None)
+        # Never use mock mode - if hardware isn't available, show disconnected
+        self.mock_mode = False
+        self.hardware_available = board is not None and adafruit_ina228 is not None
         self.running = False
         self.thread = None
         self.ina228 = None
         self.callback = None
         self.last_data = {}
+        self.sensor_connected = False
         
         # CSV logging
         self.log_data = []
         self.csv_headers = ['timestamp', 'current_ma', 'voltage_v', 'power_mw', 'energy_j', 'temperature_c', 'battery_percentage']
         
-        logging.info(f"PowerMonitor initialized (mock_mode: {self.mock_mode})")
+        logging.info(f"PowerMonitor initialized (hardware_available: {self.hardware_available})")
         
     def set_update_callback(self, callback):
         """Set callback function to receive power data updates"""
@@ -42,19 +45,26 @@ class PowerMonitor:
         
     def init_sensor(self):
         """Initialize the INA228 sensor"""
-        if self.mock_mode:
-            logging.info("Power sensor in mock mode - using simulated data")
-            return True
+        if not self.hardware_available:
+            logging.warning("Power sensor libraries not available - status will be disconnected")
+            self.sensor_connected = False
+            return False
             
         try:
             i2c = board.I2C()
-            self.ina228 = adafruit_ina228.INA228(i2c)
-            logging.info("INA228 power sensor initialized successfully")
+            # Try to initialize INA228 at default address 0x40
+            self.ina228 = adafruit_ina228.INA228(i2c, address=0x40)
+            
+            # Test if we can actually read from the sensor
+            test_voltage = self.ina228.bus_voltage
+            logging.info(f"INA228 power sensor initialized successfully at 0x40, test voltage: {test_voltage:.2f}V")
+            self.sensor_connected = True
             return True
+            
         except Exception as e:
-            logging.error(f"Error initializing INA228 sensor: {e}")
-            self.mock_mode = True
-            logging.info("Falling back to mock mode")
+            logging.error(f"Error initializing INA228 sensor at 0x40: {e}")
+            logging.info("Power sensor hardware not responding - status will be disconnected")
+            self.sensor_connected = False
             return False
 
     def get_battery_percentage(self, voltage=7.4):
@@ -70,43 +80,27 @@ class PowerMonitor:
         else:
             return int(((voltage - 6.0) / (8.4 - 6.0)) * 100)
 
-    def get_mock_data(self):
-        """Generate mock power data for testing"""
-        import random
-        import time
-        
-        # Simulate realistic power consumption patterns
-        base_current = 300 + random.uniform(-50, 50)  # 300mA ±50mA
-        base_voltage = 7.4 + random.uniform(-0.2, 0.2)  # 7.4V ±0.2V
-        power_mw = (base_current * base_voltage)  # mW
-        energy_j = power_mw * (time.time() % 1000) / 1000  # Accumulated energy
-        temperature = 25 + random.uniform(-2, 8)  # 25°C ±2-8°C
-        battery_pct = self.get_battery_percentage(base_voltage)
-        
-        return {
-            "current_ma": base_current,
-            "voltage_v": base_voltage,
-            "power_mw": power_mw,
-            "energy_j": energy_j,
-            "temperature_c": temperature,
-            "battery_percentage": battery_pct,
-            "status": "Mock Data"
-        }
-
     def get_power_values(self):
-        """Read power values from sensor or return mock data"""
-        if self.mock_mode:
-            return self.get_mock_data()
+        """Read power values from sensor or return disconnected status"""
+        if not self.sensor_connected or not self.ina228:
+            # Return disconnected status with no data
+            return {
+                "current_ma": 0.0,
+                "voltage_v": 0.0,
+                "power_mw": 0.0,
+                "energy_j": 0.0,
+                "temperature_c": 0.0,
+                "battery_percentage": 0,
+                "status": "Disconnected"
+            }
             
         try:
-            if not self.ina228:
-                raise Exception("Sensor not initialized")
-                
-            current_ma = self.ina228.current
+            # Read actual values from INA228
+            current_ma = self.ina228.current * 1000  # Convert A to mA
             voltage_v = self.ina228.bus_voltage
-            power_mw = self.ina228.power
-            energy_j = self.ina228.energy
-            temperature_c = self.ina228.die_temperature
+            power_mw = self.ina228.power * 1000  # Convert W to mW
+            energy_j = getattr(self.ina228, 'energy', 0.0)  # Some versions may not have energy
+            temperature_c = getattr(self.ina228, 'die_temperature', 25.0)  # Fallback temp
             battery_pct = self.get_battery_percentage(voltage_v)
             
             return {
@@ -121,6 +115,8 @@ class PowerMonitor:
             
         except Exception as e:
             logging.error(f"Error reading sensor data: {e}")
+            # If we get an error reading, mark as disconnected
+            self.sensor_connected = False
             return {
                 "current_ma": 0.0,
                 "voltage_v": 0.0,
@@ -128,11 +124,15 @@ class PowerMonitor:
                 "energy_j": 0.0,
                 "temperature_c": 0.0,
                 "battery_percentage": 0,
-                "status": "Error"
+                "status": "Error - Disconnected"
             }
 
     def log_data_to_csv(self, data):
-        """Log power data to CSV file"""
+        """Log power data to CSV file - only log real data, not disconnected status"""
+        # Don't log disconnected or error states
+        if data.get('status') in ['Disconnected', 'Error - Disconnected']:
+            return
+            
         try:
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             row = [
@@ -216,11 +216,12 @@ class PowerMonitor:
             logging.warning("Power monitoring already running")
             return False
             
-        # Initialize sensor
-        if not self.init_sensor():
-            logging.error("Failed to initialize power sensor")
-            if not self.mock_mode:
-                return False
+        # Try to initialize sensor
+        sensor_init_success = self.init_sensor()
+        if not sensor_init_success:
+            logging.warning("Starting power monitoring without sensor - will show disconnected status")
+        else:
+            logging.info("Power sensor connected successfully")
                 
         self.running = True
         self.thread = threading.Thread(target=self.monitoring_loop, daemon=True)
@@ -251,8 +252,8 @@ class PowerMonitor:
         """Get power monitor status"""
         return {
             "running": self.running,
-            "mock_mode": self.mock_mode,
-            "sensor_connected": self.ina228 is not None,
+            "sensor_connected": self.sensor_connected,
+            "hardware_available": self.hardware_available,
             "last_update": datetime.now().isoformat() if self.last_data else None
         }
 
@@ -277,15 +278,18 @@ def get_power_values(ina228_or_monitor):
 # Print until the script is stopped - FOR TESTING ONLY
 def print_sensor_data_loop():
     """Legacy testing function - now uses PowerMonitor class"""
-    monitor = PowerMonitor(update_interval=1.0, mock_mode=True)
+    monitor = PowerMonitor(update_interval=1.0)
     
     def print_callback(data):
-        print(f"Power Data: Current: {data['current_ma']:.1f}mA, "
-              f"Voltage: {data['voltage_v']:.2f}V, "
-              f"Power: {data['power_mw']:.1f}mW, "
-              f"Energy: {data['energy_j']:.2f}J, "
-              f"Temp: {data['temperature_c']:.1f}°C, "
-              f"Battery: {data['battery_percentage']}%")
+        if data.get('status') == 'Disconnected':
+            print("Power Monitor: Disconnected - No data available")
+        else:
+            print(f"Power Data: Current: {data['current_ma']:.1f}mA, "
+                  f"Voltage: {data['voltage_v']:.2f}V, "
+                  f"Power: {data['power_mw']:.1f}mW, "
+                  f"Energy: {data['energy_j']:.2f}J, "
+                  f"Temp: {data['temperature_c']:.1f}°C, "
+                  f"Battery: {data['battery_percentage']}%")
     
     monitor.set_update_callback(print_callback)
     
@@ -306,8 +310,8 @@ def print_sensor_data_loop():
         print("Power monitoring stopped")
 
 if __name__ == "__main__":
-    # Test the power monitor
-    monitor = PowerMonitor(mock_mode=True)
+    # Test the power monitor - will connect to real hardware if available
+    monitor = PowerMonitor()
     
     if monitor.start_monitoring():
         try:

@@ -2064,3 +2064,20 @@ ValueError: Client is not in a disconnected state
 2025-06-29 19:06:38,167 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
 2025-06-29 19:06:43,176 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.128.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751220398.1725574 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000027CB632A900>, 'Connection to 192.168.128.89 timed out. (connect timeout=5)'))
 2025-06-29 19:06:58,716 - INFO - Stopping LIDAR...
+2025-06-29 19:17:41,043 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 19:17:41,259 - INFO - Connected to server
+2025-06-29 19:17:41,262 - INFO - Sending current camera configuration to server...
+2025-06-29 19:17:41,263 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:17:41,265 - INFO - [INFO] Successfully connected to server
+2025-06-29 19:19:52,307 - INFO - Disconnected from server: transport error
+2025-06-29 19:27:21,149 - INFO - Connected to server
+2025-06-29 19:27:21,154 - INFO - Sending current camera configuration to server...
+2025-06-29 19:27:21,156 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:27:39,920 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 19:27:40,264 - INFO - Connected to server
+2025-06-29 19:27:40,266 - INFO - Sending current camera configuration to server...
+2025-06-29 19:27:40,276 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 19:27:40,282 - INFO - [INFO] Successfully connected to server
+2025-06-29 19:27:46,836 - INFO - Stopping LIDAR...
+2025-06-29 19:27:46,848 - INFO - Sending cleanup signals to server...
+2025-06-29 19:27:46,943 - INFO - LIDAR Command Success: LIDAR collection stopped

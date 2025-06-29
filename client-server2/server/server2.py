@@ -26,7 +26,7 @@ camera_state = "Idle"  # Default camera state
 # Initialize power monitor
 power_monitor = None
 if POWER_AVAILABLE:
-    power_monitor = PowerMonitor(update_interval=2.0, mock_mode=True)  # Start in mock mode for safety
+    power_monitor = PowerMonitor(update_interval=2.0)  # Will try to connect to real hardware
 
 
 def print_server_status(status):
@@ -399,16 +399,29 @@ def send_payload_status_update():
 def power_data_callback(power_data):
     """Callback function to handle power data updates and broadcast to clients"""
     try:
-        # Format data for client consumption (matching expected format)
-        formatted_data = {
-            "current": f"{power_data['current_ma'] / 1000:.3f}",  # Convert mA to A 
-            "voltage": f"{power_data['voltage_v']:.1f}",
-            "power": f"{power_data['power_mw'] / 1000:.2f}",  # Convert mW to W
-            "energy": f"{power_data['energy_j'] / 3600:.2f}",  # Convert J to Wh
-            "temperature": f"{power_data['temperature_c']:.1f}",
-            "battery_percentage": power_data['battery_percentage'],
-            "status": "Nominal" if power_data['status'] == "Operational" else power_data['status']
-        }
+        # Check if power monitor is disconnected
+        if power_data.get('status') in ['Disconnected', 'Error - Disconnected']:
+            # Send disconnected status with no data values
+            formatted_data = {
+                "current": "0.000",
+                "voltage": "0.0", 
+                "power": "0.00",
+                "energy": "0.00",
+                "temperature": "0.0",
+                "battery_percentage": 0,
+                "status": "Disconnected"
+            }
+        else:
+            # Format data for client consumption (matching expected format)
+            formatted_data = {
+                "current": f"{power_data['current_ma'] / 1000:.3f}",  # Convert mA to A 
+                "voltage": f"{power_data['voltage_v']:.1f}",
+                "power": f"{power_data['power_mw'] / 1000:.2f}",  # Convert mW to W
+                "energy": f"{power_data['energy_j'] / 3600:.2f}",  # Convert J to Wh
+                "temperature": f"{power_data['temperature_c']:.1f}",
+                "battery_percentage": power_data['battery_percentage'],
+                "status": "Nominal" if power_data['status'] == "Operational" else power_data['status']
+            }
         
         # Broadcast to all connected clients
         socketio.emit("power_broadcast", formatted_data)
@@ -416,7 +429,10 @@ def power_data_callback(power_data):
         # Debug logging (reduced frequency)
         import time
         if not hasattr(power_data_callback, 'last_log') or time.time() - power_data_callback.last_log > 10:
-            logging.debug(f"Power broadcast: {power_data['power_mw']:.1f}mW, {power_data['voltage_v']:.2f}V, {power_data['current_ma']:.1f}mA")
+            if power_data.get('status') == 'Disconnected':
+                logging.debug("Power broadcast: Disconnected")
+            else:
+                logging.debug(f"Power broadcast: {power_data['power_mw']:.1f}mW, {power_data['voltage_v']:.2f}V, {power_data['current_ma']:.1f}mA")
             power_data_callback.last_log = time.time()
             
     except Exception as e:

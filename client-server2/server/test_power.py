@@ -16,17 +16,20 @@ def test_power_monitor():
     """Test the PowerMonitor class functionality"""
     print("🔋 Testing PowerMonitor...")
     
-    # Initialize power monitor in mock mode
-    monitor = PowerMonitor(update_interval=1.0, mock_mode=True)
+    # Initialize power monitor - will try to connect to real hardware
+    monitor = PowerMonitor(update_interval=1.0)
     
     def power_callback(data):
-        print(f"📊 Power Data: "
-              f"Current: {data['current_ma']:.1f}mA, "
-              f"Voltage: {data['voltage_v']:.2f}V, "
-              f"Power: {data['power_mw']:.1f}mW, "
-              f"Energy: {data['energy_j']:.2f}J, "
-              f"Temp: {data['temperature_c']:.1f}°C, "
-              f"Battery: {data['battery_percentage']}%")
+        if data.get('status') == 'Disconnected':
+            print("📊 Power Monitor: Disconnected - No hardware detected")
+        else:
+            print(f"📊 Power Data: "
+                  f"Current: {data['current_ma']:.1f}mA, "
+                  f"Voltage: {data['voltage_v']:.2f}V, "
+                  f"Power: {data['power_mw']:.1f}mW, "
+                  f"Energy: {data['energy_j']:.2f}J, "
+                  f"Temp: {data['temperature_c']:.1f}°C, "
+                  f"Battery: {data['battery_percentage']}%")
     
     # Set callback
     monitor.set_update_callback(power_callback)
