@@ -498,10 +498,8 @@ def communication_data_callback(comm_data):
             "uplink_frequency": comm_data.get('uplink_frequency', 0.0),  # GHz
             "downlink_frequency": comm_data.get('downlink_frequency', 0.0),  # GHz
             "server_signal_strength": comm_data.get('server_signal_strength', 0),  # dBm
-            "client_signal_strength": comm_data.get('client_signal_strength', 0),  # dBm
             "connection_quality": comm_data.get('connection_quality', 'Unknown'),
             "network_latency": comm_data.get('network_latency', 0.0),  # ms
-            "packet_loss": comm_data.get('packet_loss', 0.0),  # %
             "status": comm_data.get('status', 'Disconnected')
         }
         
@@ -516,7 +514,6 @@ def communication_data_callback(comm_data):
                   f"Freq: {formatted_data['uplink_frequency']:.1f} GHz, "
                   f"Signal: {formatted_data['server_signal_strength']} dBm, "
                   f"Latency: {formatted_data['network_latency']:.1f} ms, "
-                  f"Loss: {formatted_data['packet_loss']:.1f}%, "
                   f"Quality: {formatted_data['connection_quality']}, "
                   f"Status: {formatted_data['status']}")
             communication_data_callback.last_log = time.time()
@@ -576,17 +573,6 @@ def handle_power_data(data):
         logging.debug(f"Received power data from client: {data}")
     except Exception as e:
         logging.error(f"Error handling power data: {e}")
-
-@socketio.on("client_signal_strength")
-def handle_client_signal_strength(data):
-    """Handle client signal strength updates"""
-    try:
-        signal_strength = data.get("signal_strength", 0)
-        if communication_monitor:
-            communication_monitor.update_client_signal_strength(signal_strength)
-        logging.debug(f"Client signal strength updated: {signal_strength} dBm")
-    except Exception as e:
-        logging.error(f"Error handling client signal strength: {e}")
 
 if __name__ == "__main__":
     print("🚀 Server starting at http://0.0.0.0:5000")

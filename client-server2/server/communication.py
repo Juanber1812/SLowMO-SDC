@@ -30,10 +30,8 @@ class CommunicationMonitor:
             'uplink_frequency': 0.0,  # WiFi uplink frequency in GHz
             'downlink_frequency': 0.0,  # WiFi downlink frequency in GHz
             'server_signal_strength': 0,
-            'client_signal_strength': 0,
             'connection_quality': 'Unknown',  # Poor, Fair, Good, Excellent
             'network_latency': 0.0,  # Ping latency in ms
-            'packet_loss': 0.0,  # Packet loss percentage
             'status': 'Disconnected'
         }
         
@@ -49,7 +47,6 @@ class CommunicationMonitor:
         
         # Network performance tracking
         self.latency_history = []
-        self.packet_loss_history = []
         
         # Lock for thread-safe operations
         self.lock = threading.Lock()
@@ -307,33 +304,25 @@ class CommunicationMonitor:
             if self.latency_history:
                 avg_latency = sum(self.latency_history) / len(self.latency_history)
                 self.current_data['network_latency'] = round(avg_latency, 1)
-                
-                # Simple packet loss calculation (failed pings)
-                failed_pings = sum(1 for lat in self.latency_history[-5:] if lat >= 999.0)
-                packet_loss = (failed_pings / min(5, len(self.latency_history))) * 100
-                self.current_data['packet_loss'] = round(packet_loss, 1)
             else:
                 self.current_data['network_latency'] = 0.0
-                self.current_data['packet_loss'] = 0.0
                 
         except Exception as e:
             self.logger.error(f"Error updating network performance: {e}")
             self.current_data['network_latency'] = 0.0
-            self.current_data['packet_loss'] = 0.0
     
     def _update_connection_quality(self):
-        """Update connection quality based on signal strength, latency, and packet loss."""
+        """Update connection quality based on signal strength and latency."""
         try:
             signal = self.current_data['server_signal_strength']
             latency = self.current_data['network_latency']
-            packet_loss = self.current_data['packet_loss']
             
-            # Quality assessment based on multiple factors
-            if signal >= -50 and latency <= 20 and packet_loss <= 1:
+            # Quality assessment based on signal strength and latency
+            if signal >= -50 and latency <= 20:
                 quality = 'Excellent'
-            elif signal >= -60 and latency <= 50 and packet_loss <= 3:
+            elif signal >= -60 and latency <= 50:
                 quality = 'Good'
-            elif signal >= -70 and latency <= 100 and packet_loss <= 5:
+            elif signal >= -70 and latency <= 100:
                 quality = 'Fair'
             else:
                 quality = 'Poor'
@@ -424,11 +413,6 @@ class CommunicationMonitor:
                     
         except Exception as e:
             self.logger.error(f"Error recording upload data: {e}")
-    
-    def update_client_signal_strength(self, signal_strength: int):
-        """Update client signal strength (received from client)."""
-        with self.lock:
-            self.current_data['client_signal_strength'] = signal_strength
     
     def get_current_data(self) -> Dict[str, Any]:
         """Get current communication data."""

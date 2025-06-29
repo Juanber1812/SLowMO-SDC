@@ -30,9 +30,16 @@ logging.getLogger('socketio').setLevel(logging.ERROR)
 class SafeStreamHandler(logging.StreamHandler):
     def flush(self):
         try:
-            super().flush()
-        except OSError:
-            pass  # Ignore Windows flush errors
+            if self.stream and not self.stream.closed:
+                super().flush()
+        except (OSError, ValueError):
+            pass  # Ignore Windows flush errors and closed stream errors
+    
+    def close(self):
+        try:
+            super().close()
+        except (OSError, ValueError):
+            pass  # Ignore errors during close
 
 # Configure logging properly at the module level
 logging.basicConfig(
@@ -952,14 +959,6 @@ class MainWindow(QWidget):
                 self.comms_latency_label.setMaximumWidth(220)
                 layout.addWidget(self.comms_latency_label)
                 
-                # Packet loss label
-                self.comms_packet_loss_label = QLabel("Packet loss: -- %".ljust(30))
-                self.comms_packet_loss_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_packet_loss_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_packet_loss_label.setMinimumWidth(220)
-                self.comms_packet_loss_label.setMaximumWidth(220)
-                layout.addWidget(self.comms_packet_loss_label)
-                
                 # Connection quality label
                 self.comms_quality_label = QLabel("Quality: Unknown".ljust(30))
                 self.comms_quality_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
@@ -1217,12 +1216,6 @@ class MainWindow(QWidget):
                     latency = data.get('network_latency', 0)
                     latency_text = f"{latency:.1f}" if latency > 0 else '--'
                     self.comms_latency_label.setText(f"Latency: {latency_text} ms".ljust(30))
-                
-                # Packet loss (%)
-                if hasattr(self, 'comms_packet_loss_label'):
-                    packet_loss = data.get('packet_loss', 0)
-                    loss_text = f"{packet_loss:.1f}" if packet_loss >= 0 else '--'
-                    self.comms_packet_loss_label.setText(f"Packet loss: {loss_text} %".ljust(30))
                 
                 # Connection quality
                 if hasattr(self, 'comms_quality_label'):
@@ -2349,10 +2342,25 @@ class MainWindow(QWidget):
                 QTimer.singleShot(200, lambda: sio.disconnect())
             
             # Remove log handler to prevent runtime errors
-            if hasattr(self, 'qt_log_handler') and self.qt_log_handler is not None:
-                logging.getLogger().removeHandler(self.qt_log_handler)
-                self.qt_log_handler.close()
-                self.qt_log_handler = None
+            try:
+                if hasattr(self, 'qt_log_handler') and self.qt_log_handler is not None:
+                    logging.getLogger().removeHandler(self.qt_log_handler)
+                    if hasattr(self.qt_log_handler, 'close'):
+                        self.qt_log_handler.close()
+                    self.qt_log_handler = None
+                
+                # Also clean up all logging handlers to prevent shutdown errors
+                logger = logging.getLogger()
+                for handler in logger.handlers[:]:  # Make a copy of the list
+                    try:
+                        logger.removeHandler(handler)
+                        if hasattr(handler, 'close'):
+                            handler.close()
+                    except:
+                        pass  # Ignore any errors during cleanup
+                        
+            except Exception as e:
+                pass  # Ignore any logging cleanup errors
             
             # Call parent closeEvent
             super().closeEvent(event)
