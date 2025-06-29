@@ -1512,3 +1512,23 @@ ValueError: Client is not in a disconnected state
 2025-06-29 17:29:11,081 - INFO - Back button clicked in LidarWidget
 2025-06-29 17:29:13,111 - INFO - LIDAR Status Update - Connected - Idle, Rate: 0.0 Hz
 2025-06-29 17:29:14,517 - INFO - Disconnected from server: client disconnect
+2025-06-29 17:33:22,262 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 17:33:22,991 - INFO - Connected to server
+2025-06-29 17:33:22,993 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 17:33:22,997 - INFO - [INFO] Successfully connected to server
+2025-06-29 17:33:23,241 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:33:23,400 - ERROR - LIDAR Command Failed: module 'lidar' has no attribute 'lidar_controller'
+2025-06-29 17:33:24,318 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:33:24,323 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:33:24,336 - ERROR - LIDAR Command Failed: module 'lidar' has no attribute 'lidar_controller'
+2025-06-29 17:33:25,261 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:33:25,348 - ERROR - LIDAR Command Failed: module 'lidar' has no attribute 'lidar_controller'
+2025-06-29 17:33:28,734 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:33:28,740 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:33:28,810 - ERROR - LIDAR Command Failed: module 'lidar' has no attribute 'lidar_controller'
+2025-06-29 17:33:29,612 - INFO - Requesting LIDAR streaming start
+2025-06-29 17:33:29,701 - ERROR - LIDAR Command Failed: module 'lidar' has no attribute 'lidar_controller'
+2025-06-29 17:33:30,723 - INFO - Requesting LIDAR streaming stop
+2025-06-29 17:33:30,728 - INFO - Back button clicked in LidarWidget
+2025-06-29 17:33:30,851 - ERROR - LIDAR Command Failed: module 'lidar' has no attribute 'lidar_controller'
+2025-06-29 17:33:34,689 - INFO - Disconnected from server: client disconnect

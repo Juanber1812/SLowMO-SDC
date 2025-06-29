@@ -1175,8 +1175,8 @@ class MainWindow(QWidget):
                         rate = data["collection_rate_hz"]
                         self.payload_labels["lidar_rate"].setText(f"Collection Rate: {rate} Hz")
                         
-                    if "total_measurements" in data:
-                        measurements = data["total_measurements"]
+                    if "data_count" in data:
+                        measurements = data["data_count"]
                         self.payload_labels["lidar_measurements"].setText(f"Measurements: {measurements}")
                         
                     if "error_count" in data:
@@ -1185,9 +1185,9 @@ class MainWindow(QWidget):
                         
                     # Update color coding based on status
                     status = data.get("status", "Unknown")
-                    if "Active" in status:
+                    if status == "collecting":
                         self.payload_labels["lidar_status"].setStyleSheet(f"color: #0f0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
-                    elif "Idle" in status or "Connected" in status:
+                    elif status == "stopped":
                         self.payload_labels["lidar_status"].setStyleSheet(f"color: #ff0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
                     else:
                         self.payload_labels["lidar_status"].setStyleSheet(f"color: #f00; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
