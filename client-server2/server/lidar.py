@@ -17,11 +17,15 @@ sio = socketio.Client()
 
 @sio.event
 def connect():
-    print("📡 Connected to server from lidar.py")
+    print("📡 LIDAR connected to server")
+    if 'lidar_controller' in globals():
+        lidar_controller.connected = True
 
 @sio.event
 def disconnect():
-    print("🔌 LIDAR disconnected")
+    print("🔌 LIDAR disconnected from server")
+    if 'lidar_controller' in globals():
+        lidar_controller.connected = False
 
 def read_distance(bus):
     try:
@@ -49,7 +53,6 @@ class LidarController:
             try:
                 sio.connect(SERVER_URL)
                 self.connected = True
-                print("📡 LIDAR connected to server")
             except Exception as e:
                 print(f"❌ LIDAR connection failed: {e}")
                 self.connected = False
@@ -69,6 +72,9 @@ class LidarController:
         self.start_time = time.time()
         self.collection_thread = threading.Thread(target=self._collection_loop, daemon=True)
         self.collection_thread.start()
+        
+        # Send immediate status update to show we're now active
+        self._send_status_update()
         
     def stop_collection(self):
         """Stop LIDAR data collection"""
@@ -104,8 +110,10 @@ class LidarController:
                     time.sleep(0.05)  # 20 Hz collection rate
                     
         except Exception as e:
+            print(f"❌ LIDAR collection error: {e}")
             self.error_count += 1
             self.is_collecting = False
+            self.connected = False  # Assume disconnection on error
             
     def _send_status_update(self):
         """Send status update to server"""
