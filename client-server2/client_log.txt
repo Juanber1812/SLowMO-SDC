@@ -2183,3 +2183,49 @@ ValueError: Client is not in a disconnected state
 2025-06-29 20:36:27,100 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
 2025-06-29 20:36:27,102 - ERROR - Failed to distribute sensor data: wrapped C/C++ object of type QLabel has been deleted
 2025-06-29 20:36:27,103 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 20:49:01,497 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 20:49:04,089 - INFO - Connected to server
+2025-06-29 20:49:04,092 - INFO - Sending current camera configuration to server...
+2025-06-29 20:49:04,093 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 20:49:04,095 - INFO - [INFO] Successfully connected to server
+2025-06-29 20:49:41,613 - INFO - Manual orientation crosshairs enabled
+2025-06-29 20:49:42,799 - INFO - Manual orientation crosshairs disabled
+2025-06-29 20:49:43,332 - INFO - Manual orientation crosshairs enabled
+2025-06-29 20:49:46,110 - INFO - Manual orientation crosshairs disabled
+2025-06-29 20:49:46,778 - INFO - Manual orientation crosshairs enabled
+2025-06-29 20:49:47,862 - INFO - Manual orientation crosshairs disabled
+2025-06-29 20:49:48,817 - INFO - Manual orientation crosshairs enabled
+2025-06-29 20:49:49,420 - INFO - Manual orientation crosshairs disabled
+2025-06-29 20:49:52,374 - INFO - Requesting LIDAR streaming start
+2025-06-29 20:49:52,545 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 20:49:52,551 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 20:49:58,907 - INFO - Requesting LIDAR streaming stop
+2025-06-29 20:49:58,912 - INFO - Back button clicked in LidarWidget
+2025-06-29 20:49:58,920 - INFO - LIDAR widget streaming state updated to: True
+2025-06-29 20:49:59,085 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 20:49:59,090 - INFO - LIDAR widget streaming state updated to: False
+2025-06-29 20:49:59,092 - INFO - LIDAR Status Update - connected, Rate: 10.07 Hz
+2025-06-29 20:50:11,220 - INFO - Requesting LIDAR streaming start
+2025-06-29 20:50:11,288 - INFO - LIDAR Command Success: LIDAR collection started
+2025-06-29 20:50:11,316 - INFO - LIDAR Status Update - active, Rate: 0.0 Hz
+2025-06-29 20:50:19,775 - INFO - Requesting LIDAR streaming stop
+2025-06-29 20:50:19,781 - INFO - Back button clicked in LidarWidget
+2025-06-29 20:50:19,882 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 20:50:19,891 - INFO - LIDAR Status Update - connected, Rate: 10.18 Hz
+2025-06-29 20:50:21,942 - INFO - Stopping camera stream...
+2025-06-29 20:50:21,945 - INFO - Stopping LIDAR...
+2025-06-29 20:50:21,949 - INFO - Sending cleanup signals to server...
+2025-06-29 20:50:22,052 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 20:50:22,061 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:01:47,880 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 21:01:48,985 - INFO - Connected to server
+2025-06-29 21:01:48,988 - INFO - Sending current camera configuration to server...
+2025-06-29 21:01:48,990 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 21:01:48,992 - INFO - [INFO] Successfully connected to server
+2025-06-29 21:02:05,253 - INFO - Stopping LIDAR...
+2025-06-29 21:02:05,256 - INFO - Sending cleanup signals to server...
+2025-06-29 21:02:05,281 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:02:05,344 - INFO - LIDAR Command Success: LIDAR collection stopped
+2025-06-29 21:02:05,353 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:02:05,355 - ERROR - Failed to update payload data: wrapped C/C++ object of type QLabel has been deleted
+2025-06-29 21:02:05,436 - ERROR - Failed to update power data: wrapped C/C++ object of type QLabel has been deleted

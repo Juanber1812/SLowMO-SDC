@@ -48,6 +48,9 @@ def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
 
 
+
+connected_clients = set()
+
 def start_background_tasks():
     """Start background tasks with a delay to ensure server is ready"""
     def delayed_start():
@@ -56,10 +59,8 @@ def start_background_tasks():
         threading.Thread(target=camera.start_stream, daemon=True).start()
         threading.Thread(target=sensors.start_sensors, daemon=True).start()
         threading.Thread(target=lidar.start_lidar, daemon=True).start()
-        
         # Start periodic payload status updates
         threading.Thread(target=periodic_payload_status_updates, daemon=True).start()
-        
         # Start power monitoring
         if power_monitor:
             power_monitor.set_update_callback(power_data_callback)
@@ -67,15 +68,7 @@ def start_background_tasks():
                 logging.info("Power monitoring started successfully")
             else:
                 logging.error("Failed to start power monitoring")
-        
-        # Start communication monitoring
-        if communication_monitor:
-            communication_monitor.set_update_callback(communication_data_callback)
-            if communication_monitor.start_monitoring():
-                logging.info("Communication monitoring started successfully")
-            else:
-                logging.error("Failed to start communication monitoring")
-    
+        # Do NOT start communication monitoring here; start on client connect
     # Start the delayed initialization in a separate thread
     threading.Thread(target=delayed_start, daemon=True).start()
 
@@ -105,16 +98,31 @@ def periodic_payload_status_updates():
             time.sleep(5)
 
 
+
 @socketio.on('connect')
 def handle_connect():
     print(f"[INFO] Client connected: {request.sid}")
+    connected_clients.add(request.sid)
     # Send initial camera and LIDAR status to newly connected client
     socketio.emit('camera_status', {'status': camera_state}, room=request.sid)
+    # Start communication monitoring if not already running
+    if communication_monitor and not communication_monitor.is_monitoring:
+        communication_monitor.set_update_callback(communication_data_callback)
+        if communication_monitor.start_monitoring():
+            logging.info("Communication monitoring started (on client connect)")
+        else:
+            logging.error("Failed to start communication monitoring (on client connect)")
+
 
 
 @socketio.on('disconnect')
 def handle_disconnect():
     print(f"[INFO] Client disconnected: {request.sid}")
+    connected_clients.discard(request.sid)
+    # Stop communication monitoring if no clients remain
+    if communication_monitor and len(connected_clients) == 0:
+        communication_monitor.stop_monitoring()
+        logging.info("Communication monitoring stopped (no clients connected)")
 
 
 @socketio.on('frame')
@@ -488,7 +496,7 @@ def communication_data_callback(comm_data):
         }
         
         # Broadcast to all connected clients
-        socketio.emit("communication_broadcast", formatted_data, broadcast=True)
+        socketio.emit("communication_broadcast", formatted_data)
         
         # Log periodically (every 30 seconds)
         if not hasattr(communication_data_callback, 'last_log') or time.time() - communication_data_callback.last_log > 30:
@@ -507,7 +515,7 @@ def communication_data_callback(comm_data):
             "server_signal_strength": 0,
             "client_signal_strength": 0,
             "status": "Error"
-        }, broadcast=True)
+        })
 
 # Power monitoring socket events
 @socketio.on("get_power_status")
