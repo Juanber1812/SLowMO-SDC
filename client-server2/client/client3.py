@@ -684,9 +684,6 @@ class MainWindow(QWidget):
         info_layout.setContentsMargins(2, 2, 2, 2)
         info_container.setStyleSheet(f"background-color: {self.COLOR_BOX_BG_RIGHT};")
 
-        # System performance info
-        self.setup_system_performance_group(info_layout)
-        
         # Subsystem status groups
         self.setup_subsystem_status_groups(info_layout)
         
@@ -740,11 +737,7 @@ class MainWindow(QWidget):
         try:
             lines = []
 
-            # 1) system performance labels
-            for key, lbl in self.info_labels.items():
-                lines.append(lbl.text())
-
-            # 2) each subsystem status group
+            # Export each subsystem status group
             if hasattr(self, 'info_container'):
                 groups = self.info_container.findChildren(QGroupBox)
                 for grp in groups:
@@ -775,47 +768,6 @@ class MainWindow(QWidget):
                 QMessageBox.Icon.Critical
             )
             logging(f"[ERROR] Health report export failed: {e}")
-
-    def setup_system_performance_group(self, parent_layout):
-        """Setup system performance monitoring group"""
-        info_group = QGroupBox("System Info")
-        info_layout_inner = QVBoxLayout()
-        # ── patch ──
-        # add fps_server label
-        self.info_labels = {
-            "temp":      QLabel("Temp: -- °C"),
-            "cpu":       QLabel("CPU: --%"),
-            "speed":     QLabel("Upload: -- Mbps"),
-            "max_frame": QLabel("Max Frame: -- KB"),
-            "fps":       QLabel("Live FPS: --"),
-            "frame_size":QLabel("Frame Size: -- KB"),
-            "disp_fps" : QLabel("Display FPS: --")
-            }
-    
-
-        # Corrected stylesheet application
-        info_label_style = f"""
-            QLabel {{
-                color: {TEXT_COLOR};
-                font-size: {FONT_SIZE_NORMAL}pt;
-                font-family: {FONT_FAMILY};
-                margin: 2px 0px; 
-                padding: 2px 0px;
-            }}
-        """
-        for lbl in self.info_labels.values():
-            lbl.setStyleSheet(info_label_style)
-            info_layout_inner.addWidget(lbl)
-            
-        info_group.setLayout(info_layout_inner)
-        self.apply_groupbox_style(
-            info_group, 
-            self.COLOR_BOX_BORDER_RIGHT, 
-            self.COLOR_BOX_BG_RIGHT, 
-            self.COLOR_BOX_TITLE_RIGHT,
-            is_part_of_right_column=True # Explicitly flag as right column item
-        )
-        parent_layout.addWidget(info_group)
 
     def setup_subsystem_status_groups(self, parent_layout):
         """Setup all subsystem status monitoring groups"""
@@ -936,6 +888,13 @@ class MainWindow(QWidget):
                     lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
+                
+                # Add upload speed label
+                self.comms_upload_speed_label = QLabel("Upload Speed: -- KB/s")
+                self.comms_upload_speed_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.comms_upload_speed_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.comms_upload_speed_label)
+                
                 # Add special status label
                 self.comms_status_label = QLabel("Status: Connected")
                 self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
@@ -948,14 +907,57 @@ class MainWindow(QWidget):
                 self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.camera_status_label)
                 
+                self.camera_fps_label = QLabel("FPS: --")
+                self.camera_fps_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.camera_fps_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.camera_fps_label)
+                
+                self.camera_frame_size_label = QLabel("Frame Size: -- KB")
+                self.camera_frame_size_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.camera_frame_size_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.camera_frame_size_label)
+                
                 self.camera_ready_label = QLabel("Status: OK")
                 self.camera_ready_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.camera_ready_label)
                 
+                # Add separator line
+                separator = QLabel("─────────────────")
+                separator.setStyleSheet(f"QLabel {{ color: #444; margin: 4px 0px; padding: 0px; font-family: {FONT_FAMILY}; }}")
+                separator.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                layout.addWidget(separator)
+                
+                # LIDAR status labels
+                self.lidar_status_label = QLabel("LIDAR: Disconnected")
+                self.lidar_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.lidar_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.lidar_status_label)
+                
+                self.lidar_rate_label = QLabel("Collection Rate: -- Hz")
+                self.lidar_rate_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.lidar_rate_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.lidar_rate_label)
+                
+                self.lidar_measurements_label = QLabel("Measurements: 0")
+                self.lidar_measurements_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.lidar_measurements_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.lidar_measurements_label)
+                
+                self.lidar_errors_label = QLabel("Errors: 0")
+                self.lidar_errors_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.lidar_errors_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.lidar_errors_label)
+                
                 # Store references for live updates
                 self.payload_labels["camera"] = self.camera_status_label
-                self.payload_labels["status"] = self.camera_ready_label
+                self.payload_labels["fps"] = self.camera_fps_label
+                self.payload_labels["frame_size"] = self.camera_frame_size_label
+                self.payload_labels["camera_status"] = self.camera_ready_label
+                self.payload_labels["lidar_status"] = self.lidar_status_label
+                self.payload_labels["lidar_rate"] = self.lidar_rate_label
+                self.payload_labels["lidar_measurements"] = self.lidar_measurements_label
+                self.payload_labels["lidar_errors"] = self.lidar_errors_label
             else:
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
@@ -1078,19 +1080,41 @@ class MainWindow(QWidget):
 
         @sio.on("sensor_broadcast")
         def on_sensor_data(data):
-            # update temps/CPU
-            self.update_sensor_display(data)
-            # server already computes FPS in camera.py and sends it
-            if "fps" in data:
-                # format with one decimal place
-                self.info_labels["fps_server"].setText(
-                    f"Server FPS: {data['fps']:.1f}"
-                )
+            # Distribute sensor data to appropriate subsystems
+            try:
+                # Temperature to Thermal Subsystem
+                if "temperature" in data and hasattr(self, 'thermal_labels'):
+                    temp = data["temperature"]
+                    self.thermal_labels["pi_temp"].setText(f"Pi: {temp:.1f}°C")
+                
+                # CPU usage to CDH Subsystem
+                if "cpu_percent" in data and hasattr(self, 'cdh_labels'):
+                    cpu = data["cpu_percent"]
+                    self.cdh_labels["memory"].setText(f"CPU Usage: {cpu:.1f}%")
+            except Exception as e:
+                logging.error(f"Failed to distribute sensor data: {e}")
 
         @sio.on("camera_status")
         def on_camera_status(data):
             self.update_camera_status(data)
 
+        @sio.on("camera_info")
+        def on_camera_info(data):
+            """Handle camera performance data and update payload subsystem"""
+            try:
+                if hasattr(self, 'payload_labels'):
+                    if "fps" in data:
+                        self.payload_labels["fps"].setText(f"FPS: {data['fps']}")
+                    if "frame_size" in data:
+                        self.payload_labels["frame_size"].setText(f"Frame Size: {data['frame_size']} KB")
+                
+                # Upload speed to Communication Subsystem
+                if "upload_speed" in data and hasattr(self, 'comms_upload_speed_label'):
+                    upload_speed = data["upload_speed"]
+                    self.comms_upload_speed_label.setText(f"Upload Speed: {upload_speed} KB/s")
+                    
+            except Exception as e:
+                logging.error(f"Failed to update camera info: {e}")
 
         @sio.on("image_captured")
         def on_image_captured(data):
@@ -1138,13 +1162,73 @@ class MainWindow(QWidget):
                 import traceback
                 traceback.print_exc()
 
+        @sio.on("lidar_status_broadcast")
+        def on_lidar_status_broadcast(data):
+            """Handle comprehensive LIDAR status updates from server"""
+            try:
+                # Update Payload Subsystem LIDAR labels
+                if hasattr(self, 'payload_labels'):
+                    if "status" in data:
+                        self.payload_labels["lidar_status"].setText(f"LIDAR: {data['status']}")
+                        
+                    if "collection_rate_hz" in data:
+                        rate = data["collection_rate_hz"]
+                        self.payload_labels["lidar_rate"].setText(f"Collection Rate: {rate} Hz")
+                        
+                    if "total_measurements" in data:
+                        measurements = data["total_measurements"]
+                        self.payload_labels["lidar_measurements"].setText(f"Measurements: {measurements}")
+                        
+                    if "error_count" in data:
+                        errors = data["error_count"]
+                        self.payload_labels["lidar_errors"].setText(f"Errors: {errors}")
+                        
+                    # Update color coding based on status
+                    status = data.get("status", "Unknown")
+                    if "Active" in status:
+                        self.payload_labels["lidar_status"].setStyleSheet(f"color: #0f0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+                    elif "Idle" in status or "Connected" in status:
+                        self.payload_labels["lidar_status"].setStyleSheet(f"color: #ff0; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+                    else:
+                        self.payload_labels["lidar_status"].setStyleSheet(f"color: #f00; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;")
+                
+                # Update LIDAR widget if present
+                if hasattr(self, 'lidar_widget') and self.lidar_widget:
+                    is_active = data.get("is_active", False)
+                    if hasattr(self.lidar_widget, 'is_streaming'):
+                        if is_active != self.lidar_widget.is_streaming:
+                            self.lidar_widget.is_streaming = is_active
+                            self.lidar_widget.start_stop_button.setText(
+                                "Stop LIDAR" if is_active else "Start LIDAR"
+                            )
+                            
+                logging.info(f"LIDAR Status Update - {data.get('status', 'Unknown')}, Rate: {data.get('collection_rate_hz', 0)} Hz")
+                
+            except Exception as e:
+                logging.error(f"Failed to process LIDAR status update: {e}")
+
+        @sio.on("lidar_command_response")
+        def on_lidar_command_response(data):
+            """Handle LIDAR command responses from server"""
+            try:
+                success = data.get("success", False)
+                message = data.get("message", "No message")
+                
+                if success:
+                    logging.info(f"LIDAR Command Success: {message}")
+                else:
+                    logging.error(f"LIDAR Command Failed: {message}")
+                    
+            except Exception as e:
+                logging.error(f"Failed to process LIDAR command response: {e}")
+
         @sio.on("lidar_status")
         def on_lidar_status(data):
-            """Handle LIDAR status updates from server"""
+            """Handle legacy LIDAR status updates from server (deprecated)"""
             try:
                 status = data.get('status', 'unknown')
                 streaming = data.get('streaming', False)
-                logging.info(f"LIDAR Status: {status}, Streaming: {streaming}")
+                logging.info(f"Legacy LIDAR Status: {status}, Streaming: {streaming}")
                 
                 # Update LIDAR widget streaming state if needed
                 if hasattr(self.lidar_widget, 'is_streaming'):
@@ -1236,7 +1320,7 @@ class MainWindow(QWidget):
 
         @sio.on("payload_broadcast")
         def on_payload_data(data):
-            """Handle payload subsystem data updates"""
+            """Handle payload subsystem status updates"""
             try:
                 if hasattr(self, 'payload_labels'):
                     if "camera_status" in data:
@@ -1289,16 +1373,6 @@ class MainWindow(QWidget):
                 logging.warning("Frame decode failed")
         except Exception as e:
             logging.error(f"Frame processing error: {e}")
-
-    def update_sensor_display(self, data):
-        """Update sensor information display"""
-        try:
-            temp = data.get("temperature", 0)
-            cpu = data.get("cpu_percent", 0)
-            self.info_labels["temp"].setText(f"Temp: {temp:.1f} °C")
-            self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
-        except Exception as e:
-            logging.error(f"Sensor update error: {e}")
 
     def update_camera_status(self, data):
         """Update camera status display"""
@@ -1760,8 +1834,7 @@ class MainWindow(QWidget):
 
     def measure_speed(self):
         """Measure internet speed for performance monitoring"""
-        self.info_labels["speed"].setText("Upload: Testing...")
-        self.info_labels["max_frame"].setText("Max Frame: ...")
+        self.comms_upload_speed_label.setText("Upload: Testing...")
 
         def run_speedtest():
             try:
@@ -1781,11 +1854,9 @@ class MainWindow(QWidget):
     def update_speed_labels(self, upload_mbps, max_frame_size_kb):
         """Update speed test results in UI"""
         if upload_mbps < 0:
-            self.info_labels["speed"].setText("Upload: Error")
-            self.info_labels["max_frame"].setText("Max Frame: -- KB")
+            self.comms_upload_speed_label.setText("Upload: Error")
         else:
-            self.info_labels["speed"].setText(f"Upload: {upload_mbps:.2f} Mbps")
-            self.info_labels["max_frame"].setText(f"Max Frame: {max_frame_size_kb:.1f} KB")
+            self.comms_upload_speed_label.setText(f"Upload: {upload_mbps:.2f} Mbps")
 
     def timerEvent(self, event):
         """Handle timer events for FPS calculation"""
@@ -1797,10 +1868,8 @@ class MainWindow(QWidget):
         self.current_display_fps   = self.display_frame_counter
         self.display_frame_counter = 0
 
-        # update labels
-        self.info_labels["fps"].setText(f"Live FPS: {self.current_fps}")
-        self.info_labels["disp_fps"].setText(f"Display FPS: {self.current_display_fps}")
-        self.info_labels["frame_size"].setText(f"Frame Size: {self.current_frame_size/1024:.1f} KB")
+        # FPS and frame size are now handled by camera_info socket event
+        # No need to update labels here since they're updated by server data
     #=========================================================================
     #                          UTILITY METHODS                              
     #=========================================================================

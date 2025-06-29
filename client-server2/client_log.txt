@@ -1307,3 +1307,19 @@ ValueError: Client is not in a disconnected state
 2025-06-28 23:06:56,400 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
 2025-06-28 23:06:56,405 - INFO - [INFO] Successfully connected to server
 2025-06-28 23:36:34,465 - INFO - Disconnected from server: client disconnect
+2025-06-29 16:53:14,346 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 16:53:14,994 - INFO - Connected to server
+2025-06-29 16:53:14,996 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 16:53:15,003 - INFO - [INFO] Successfully connected to server
+2025-06-29 16:53:39,407 - INFO - Disconnected from server: client disconnect
+2025-06-29 16:53:39,427 - INFO - Attempting to reconnect to http://192.168.128.89:5000...
+2025-06-29 16:53:39,776 - INFO - Connected to server
+2025-06-29 16:53:39,778 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 16:53:40,281 - INFO - Restarting stream after reconnect...
+2025-06-29 16:53:50,195 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-29 16:53:50,697 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-29 16:53:50,704 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-29 16:54:10,130 - INFO - Disconnected from server: client disconnect
+2025-06-29 17:05:33,897 - INFO - [INFO] Attempting to connect to http://192.168.128.89:5000
+2025-06-29 17:05:38,904 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.128.89', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751213133.8985438 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001BE6CA96900>, 'Connection to 192.168.128.89 timed out. (connect timeout=5)'))
+2025-06-29 17:06:40,132 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.

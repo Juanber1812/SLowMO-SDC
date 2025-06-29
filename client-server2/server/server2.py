@@ -210,8 +210,11 @@ def handle_capture_image(data):
 
 @socketio.on("lidar_data")
 def handle_lidar_data(data):
+    """Handle LIDAR distance data and broadcast to clients"""
     try:
-        emit("lidar_broadcast", data, broadcast=True)
+        # Only broadcast if we have valid data
+        if "distance_cm" in data and data["distance_cm"] is not None:
+            emit("lidar_broadcast", data, broadcast=True)
     except Exception as e:
         print(f"[ERROR] lidar_data: {e}")
 
@@ -273,6 +276,40 @@ def handle_download_image(data):
             "success": False,
             "error": str(e)
         })
+
+@socketio.on("start_lidar")
+def handle_start_lidar():
+    """Handle client request to start LIDAR data collection"""
+    try:
+        # Send command to LIDAR module to start collection
+        lidar.sio.emit("start_lidar_collection")
+        print("🟢 LIDAR collection start requested")
+        emit("lidar_command_response", {"success": True, "message": "LIDAR collection started"})
+    except Exception as e:
+        print(f"[ERROR] start_lidar: {e}")
+        emit("lidar_command_response", {"success": False, "message": str(e)})
+
+@socketio.on("stop_lidar")
+def handle_stop_lidar():
+    """Handle client request to stop LIDAR data collection"""
+    try:
+        # Send command to LIDAR module to stop collection
+        lidar.sio.emit("stop_lidar_collection")
+        print("🔴 LIDAR collection stop requested")
+        emit("lidar_command_response", {"success": True, "message": "LIDAR collection stopped"})
+    except Exception as e:
+        print(f"[ERROR] stop_lidar: {e}")
+        emit("lidar_command_response", {"success": False, "message": str(e)})
+
+@socketio.on("lidar_status")
+def handle_lidar_status(data):
+    """Handle comprehensive LIDAR status updates and broadcast to clients"""
+    try:
+        # Broadcast enhanced status to all clients
+        emit("lidar_status_broadcast", data, broadcast=True)
+        print(f"📊 LIDAR Status - {data.get('status', 'Unknown')}, Rate: {data.get('collection_rate_hz', 0)} Hz")
+    except Exception as e:
+        print(f"[ERROR] lidar_status: {e}")
 
 def set_camera_state(new_state):
     global camera_state
