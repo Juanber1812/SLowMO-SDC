@@ -15,7 +15,7 @@ last_fps_value = None
 def print_status_line(status, resolution, jpeg_quality, fps, fps_value):
     global last_status, last_fps_value
     msg = f"[CAMERA] {status} | Res:{resolution} | Q:{jpeg_quality} | FPS:{fps} | {fps_value}fps"
-    # Only print a new line if status (Idle/Streaming) changes
+    # Only print a new line if status (Connected/Streaming) changes
     if last_status != status:
         print()  # Move to a new line if status changes (optional, can remove for always-in-place)
         last_status = status
@@ -40,7 +40,7 @@ class CameraStreamer:
         try:
             sio.connect(SERVER_URL)
             self.connected = True
-            sio.emit("camera_status", {"status": "Idle"})
+            sio.emit("camera_status", {"status": "Connected"})
             # Send initial camera info
             sio.emit("camera_info", {
                 "fps": 0,
@@ -255,7 +255,7 @@ def on_start_camera(_):
 @sio.on("stop_camera")
 def on_stop_camera(_):
     streamer.streaming = False
-    sio.emit("camera_status", {"status": "Idle"})
+    sio.emit("camera_status", {"status": "Connected"})
     # Send camera info on stop
     sio.emit("camera_info", {
         "fps": 0,
@@ -280,13 +280,13 @@ def on_camera_config(data):
 
 @sio.on("get_camera_status")
 def on_get_camera_status(_):
-    status = "Streaming" if streamer.streaming else "Idle"
+    status = "Streaming" if streamer.streaming else "Connected"
     sio.emit("camera_status", {"status": status})
 
 @sio.on("set_camera_idle")
 def on_set_camera_idle(_):
     streamer.streaming = False
-    sio.emit("camera_status", {"status": "Idle"})
+    sio.emit("camera_status", {"status": "Connected"})
 
 @sio.on("camera_update")
 def on_camera_update(_):
@@ -298,7 +298,7 @@ def on_camera_update(_):
                 camera_status = "Streaming"
                 fps = streamer.config.get("fps", 0)
             else:
-                camera_status = "Idle"
+                camera_status = "Connected"
                 fps = 0
             
             # Send current camera info

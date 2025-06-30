@@ -942,26 +942,16 @@ class MainWindow(QWidget):
                 self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.comms_status_label)
             elif name == "Payload Subsystem":
-                # Create payload subsystem labels as specified
-                self.payload_camera_label = QLabel("Camera: Pending...")
+                # Create payload subsystem labels with combined format
+                self.payload_camera_label = QLabel("Camera: Checking...")
                 self.payload_camera_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_camera_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_camera_label)
                 
-                self.payload_fps_label = QLabel("FPS: --")
-                self.payload_fps_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.payload_fps_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.payload_fps_label)
-                
-                self.payload_lidar_label = QLabel("Lidar: Pending...")
+                self.payload_lidar_label = QLabel("Lidar: Checking...")
                 self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_lidar_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_lidar_label)
-                
-                self.payload_frequency_label = QLabel("Frequency: --")
-                self.payload_frequency_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.payload_frequency_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.payload_frequency_label)
                 
                 self.payload_status_label = QLabel("Status: Not Ready")
                 self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
@@ -1113,15 +1103,12 @@ class MainWindow(QWidget):
                 # Store the OK/Error status for overall status computation
                 self.camera_payload_status = data.get("status", "Error")
                 
-                # Update payload subsystem labels
+                # Update payload subsystem labels with combined format
                 if hasattr(self, "payload_camera_label"):
-                    self.payload_camera_label.setText(f"Camera: {camera_status}")
-                
-                if hasattr(self, "payload_fps_label"):
-                    if fps > 0:
-                        self.payload_fps_label.setText(f"FPS: {fps:.1f}")
+                    if camera_status.lower() == "streaming" and fps > 0:
+                        self.payload_camera_label.setText(f"Camera: {camera_status} - {fps:.1f} FPS")
                     else:
-                        self.payload_fps_label.setText("FPS: --")
+                        self.payload_camera_label.setText(f"Camera: {camera_status}")
                 
                 # Update overall payload status based on camera status
                 self.update_payload_overall_status()
@@ -1187,15 +1174,12 @@ class MainWindow(QWidget):
                 # Store the OK/Error status for overall status computation
                 self.lidar_payload_status = data.get("status", "Error")
                 
-                # Update payload subsystem labels
+                # Update payload subsystem labels with combined format
                 if hasattr(self, "payload_lidar_label"):
-                    self.payload_lidar_label.setText(f"Lidar: {lidar_status}")
-                
-                if hasattr(self, "payload_frequency_label"):
-                    if collection_rate_hz > 0:
-                        self.payload_frequency_label.setText(f"Frequency: {collection_rate_hz:.1f} Hz")
+                    if lidar_status.lower() == "active" and collection_rate_hz > 0:
+                        self.payload_lidar_label.setText(f"Lidar: {lidar_status} - {collection_rate_hz:.1f} Hz")
                     else:
-                        self.payload_frequency_label.setText("Frequency: --")
+                        self.payload_lidar_label.setText(f"Lidar: {lidar_status}")
                 
                 # Update overall payload status based on lidar status
                 self.update_payload_overall_status()

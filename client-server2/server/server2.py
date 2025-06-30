@@ -109,7 +109,7 @@ def on_camera_info(data):
         elif data.get("fps", 0) > 0:  # If we're getting frames, we're streaming
             display_status = "Streaming"
         else:
-            display_status = "Idle"  # Connected but not streaming
+            display_status = "Connected"  # Connected but not streaming
             
         payload_data = {
             "camera_status": display_status,
