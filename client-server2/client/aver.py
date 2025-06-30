@@ -6,9 +6,6 @@
 import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os
 import pandas as pd
 import traceback
-import subprocess
-import re
-import platform
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea,
@@ -31,16 +28,9 @@ logging.getLogger('socketio').setLevel(logging.ERROR)
 class SafeStreamHandler(logging.StreamHandler):
     def flush(self):
         try:
-            if self.stream and not self.stream.closed:
-                super().flush()
-        except (OSError, ValueError):
-            pass  # Ignore Windows flush errors and closed stream errors
-    
-    def close(self):
-        try:
-            super().close()
-        except (OSError, ValueError):
-            pass  # Ignore errors during close
+            super().flush()
+        except OSError:
+            pass  # Ignore Windows flush errors
 
 # Configure logging properly at the module level
 logging.basicConfig(
@@ -53,7 +43,7 @@ logging.basicConfig(
 )
 
 
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer, QMutexLocker
+from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
 from PyQt6.QtGui import QPixmap, QImage, QFont, QPainter, QPen
 
 
@@ -117,6 +107,8 @@ class QtLogHandler(logging.Handler, QObject):
     def emit(self, record):
         if record:
             msg = self.format(record)
+            print(f"[DEBUG QtLogHandler.emit] Emitting: {msg}") # <<< ADD THIS DEBUG PRINT
+
             self.new_log_message.emit(msg)
 
 class Bridge(QObject):
@@ -335,6 +327,8 @@ class MainWindow(QWidget):
 
     def append_log_message(self, message: str):
         """Appends a message to the log display widget and auto-scrolls."""
+        print(f"[DEBUG MainWindow.append_log_message] Received for GUI: {message}") 
+
         self.log_display_widget.append(message)
         scrollbar = self.log_display_widget.verticalScrollBar()
         if scrollbar: # Check if scrollbar exists
@@ -375,151 +369,11 @@ class MainWindow(QWidget):
             
 
     def setup_timers(self):
-        """Set up various timers for UI updates and tasks"""
-        # Frame rate calculation timer
-        self.fps_timer = QTimer(self)
-        self.fps_timer.timeout.connect(self.update_fps_counters)
-        self.fps_timer.start(1000)
-
-        # Wi-Fi signal strength timer
-        self.signal_timer = QTimer(self)
-        self.signal_timer.timeout.connect(self.measure_client_signal_strength)
-        self.signal_timer.start(5000)  # Update every 5 seconds
-        
-        # Get initial signal reading immediately
-        QTimer.singleShot(1000, self.measure_client_signal_strength)  # Wait 1 second for UI to initialize
-
-    def measure_client_signal_strength(self):
-        """Measure client's Wi-Fi signal strength (Windows XPS laptop)"""
-        try:
-            # Check if the label exists first
-            if not hasattr(self, 'comms_client_signal_label') or not self.comms_client_signal_label:
-                return  # Silent return - don't spam logs
-            
-            # Use netsh command to get Wi-Fi signal strength - improved for Windows
-            result = subprocess.run(
-                ["netsh", "wlan", "show", "interfaces"],
-                capture_output=True,
-                text=True,
-                timeout=5,  # Reduced timeout
-                creationflags=subprocess.CREATE_NO_WINDOW
-            )
-            
-            # Check if command succeeded
-            if result.returncode != 0:
-                # Command failed - maintain last known value or show error
-                if not hasattr(self, '_last_signal_text'):
-                    self.comms_client_signal_label.setText("Client signal: -- dBm".ljust(30))
-                    self.comms_client_signal_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                return
-            
-            output = result.stdout
-            
-            # More robust connection check - look for any connected interface
-            interfaces_connected = []
-            current_interface = None
-            
-            # Parse each interface section
-            for line in output.split('\n'):
-                line = line.strip()
-                if line.startswith('Name'):
-                    current_interface = line
-                elif line.startswith('State') and current_interface:
-                    if 'connected' in line.lower():
-                        interfaces_connected.append(current_interface)
-            
-            # Check if any WiFi interface is connected
-            is_connected = len(interfaces_connected) > 0
-            
-            if is_connected:
-                # Try to find signal strength in different formats
-                signal_dbm = None
-                signal_percent = None
-                
-                # Look for signal strength in percentage format (most common)
-                signal_match = re.search(r"Signal\s*:\s*(\d+)%", output, re.IGNORECASE)
-                if signal_match:
-                    signal_percent = int(signal_match.group(1))
-                    # Improved conversion formula for Windows WiFi signal
-                    signal_dbm = -100 + (signal_percent * 0.7)
-                
-                # Alternative: Look for direct RSSI in dBm (some adapters)
-                rssi_match = re.search(r"RSSI\s*:\s*(-?\d+)\s*dBm", output, re.IGNORECASE)
-                if rssi_match:
-                    signal_dbm = int(rssi_match.group(1))
-                
-                # Alternative: Look for "Signal Quality" or other signal indicators
-                if not signal_dbm:
-                    quality_match = re.search(r"Signal\s*Quality\s*:\s*(\d+)%", output, re.IGNORECASE)
-                    if quality_match:
-                        signal_percent = int(quality_match.group(1))
-                        signal_dbm = -100 + (signal_percent * 0.7)
-                
-                if signal_dbm is not None:
-                    # Create signal text
-                    signal_text = f"Client signal: {signal_dbm:.0f} dBm".ljust(30)
-                    
-                    # Only update if text actually changed (avoid flicker)
-                    if not hasattr(self, '_last_signal_text') or self._last_signal_text != signal_text:
-                        self.comms_client_signal_label.setText(signal_text)
-                        self._last_signal_text = signal_text
-                        
-                        # Set color based on signal strength in dBm (matching server logic)
-                        if signal_dbm >= -50:  # Excellent signal
-                            color = "#4CAF50"  # Green
-                        elif signal_dbm >= -60:  # Good signal  
-                            color = "#8BC34A"  # Light green
-                        elif signal_dbm >= -70:  # Fair signal
-                            color = "#FFC107"  # Amber/Yellow
-                        else:  # Poor signal (below -70 dBm)
-                            color = "#F44336"  # Red
-                        
-                        self.comms_client_signal_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                        
-                        # Log only significant changes
-                        if not hasattr(self, '_last_client_signal') or abs(self._last_client_signal - signal_dbm) > 3:
-                            logging.info(f"Client WiFi signal: {signal_dbm:.0f} dBm" + (f" ({signal_percent}%)" if signal_percent else ""))
-                            self._last_client_signal = signal_dbm
-                else:
-                    # Connected but no signal info - only update if changed
-                    signal_text = "Client signal: -- dBm".ljust(30)
-                    if not hasattr(self, '_last_signal_text') or self._last_signal_text != signal_text:
-                        self.comms_client_signal_label.setText(signal_text)
-                        self.comms_client_signal_label.setStyleSheet(f"QLabel {{ color: #FFC107; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                        self._last_signal_text = signal_text
-            else:
-                # Not connected to WiFi - only update if changed
-                signal_text = "Client signal: Not connected".ljust(30)
-                if not hasattr(self, '_last_signal_text') or self._last_signal_text != signal_text:
-                    self.comms_client_signal_label.setText(signal_text)
-                    self.comms_client_signal_label.setStyleSheet(f"QLabel {{ color: #9E9E9E; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                    self._last_signal_text = signal_text
-
-        except subprocess.TimeoutExpired:
-            # Command timed out - maintain last value, don't spam logs
-            if not hasattr(self, '_timeout_logged'):
-                logging.warning("WiFi signal measurement timed out")
-                self._timeout_logged = True
-        except (subprocess.CalledProcessError, FileNotFoundError, OSError):
-            # Command failed - maintain last value or show error once
-            if not hasattr(self, '_cmd_error_logged'):
-                logging.warning("WiFi signal measurement command not available")
-                self._cmd_error_logged = True
-        except Exception as e:
-            # Other errors - log once and maintain last value
-            if not hasattr(self, '_other_error_logged'):
-                logging.error(f"Error measuring Wi-Fi signal: {e}")
-                self._other_error_logged = True
-
-    def update_fps_counters(self):
-        """Update FPS counters periodically."""
-        # This method is called by a QTimer, so it receives no arguments.
-        # The original timerEvent is a QObject method that expects an event argument.
-        self.current_fps = self.frame_counter
-        self.frame_counter = 0
-
-        self.current_display_fps = self.display_frame_counter
-        self.display_frame_counter = 0
+        """Initialize performance timers"""
+        self.fps_timer = self.startTimer(1000)
+        self.speed_timer = QTimer()
+        self.speed_timer.timeout.connect(self.measure_speed)
+        self.speed_timer.start(5000)
 
     #=========================================================================
     #                          UI SETUP METHODS                             
@@ -830,6 +684,9 @@ class MainWindow(QWidget):
         info_layout.setContentsMargins(2, 2, 2, 2)
         info_container.setStyleSheet(f"background-color: {self.COLOR_BOX_BG_RIGHT};")
 
+        # System performance info
+        self.setup_system_performance_group(info_layout)
+        
         # Subsystem status groups
         self.setup_subsystem_status_groups(info_layout)
         
@@ -883,7 +740,11 @@ class MainWindow(QWidget):
         try:
             lines = []
 
-            # Export each subsystem status group
+            # 1) system performance labels
+            for key, lbl in self.info_labels.items():
+                lines.append(lbl.text())
+
+            # 2) each subsystem status group
             if hasattr(self, 'info_container'):
                 groups = self.info_container.findChildren(QGroupBox)
                 for grp in groups:
@@ -915,6 +776,47 @@ class MainWindow(QWidget):
             )
             logging(f"[ERROR] Health report export failed: {e}")
 
+    def setup_system_performance_group(self, parent_layout):
+        """Setup system performance monitoring group"""
+        info_group = QGroupBox("System Info")
+        info_layout_inner = QVBoxLayout()
+        # ── patch ──
+        # add fps_server label
+        self.info_labels = {
+            "temp":      QLabel("Temp: -- °C"),
+            "cpu":       QLabel("CPU: --%"),
+            "speed":     QLabel("Upload: -- Mbps"),
+            "max_frame": QLabel("Max Frame: -- KB"),
+            "fps":       QLabel("Live FPS: --"),
+            "frame_size":QLabel("Frame Size: -- KB"),
+            "disp_fps" : QLabel("Display FPS: --")
+            }
+    
+
+        # Corrected stylesheet application
+        info_label_style = f"""
+            QLabel {{
+                color: {TEXT_COLOR};
+                font-size: {FONT_SIZE_NORMAL}pt;
+                font-family: {FONT_FAMILY};
+                margin: 2px 0px; 
+                padding: 2px 0px;
+            }}
+        """
+        for lbl in self.info_labels.values():
+            lbl.setStyleSheet(info_label_style)
+            info_layout_inner.addWidget(lbl)
+            
+        info_group.setLayout(info_layout_inner)
+        self.apply_groupbox_style(
+            info_group, 
+            self.COLOR_BOX_BORDER_RIGHT, 
+            self.COLOR_BOX_BG_RIGHT, 
+            self.COLOR_BOX_TITLE_RIGHT,
+            is_part_of_right_column=True # Explicitly flag as right column item
+        )
+        parent_layout.addWidget(info_group)
+
     def setup_subsystem_status_groups(self, parent_layout):
         """Setup all subsystem status monitoring groups"""
         # Initialize label dictionaries for live data updates
@@ -922,22 +824,18 @@ class MainWindow(QWidget):
         self.thermal_labels = {}
         self.adcs_labels = {}
         self.cdh_labels = {}
-        self.payload_labels = {}
         self.error_labels = {}
         self.overall_labels = {}
         
-        # Track if we've received real power data
-        self.received_real_power_data = False
-        
         subsystems = [
-            ("Power Subsystem", ["Current: -- a", "Voltage: -- v", "Power: -- w", "Energy: -- wh", "Temperature: --°c", "Battery: --%", "Status: not connected"]),
-            ("Thermal Subsystem", ["Pi: 55.2°c", "Power pcb: 32.1°c", "Battery: 25.8°c", "Status: normal"]),
-            ("Communication Subsystem", []),  # Will be handled specially with dynamic labels
-            ("ADCS Subsystem", ["Gyro: 0.02°/s", "Orientation: [0.1, -0.3, 89.7]°", "Lux1: 125 lx","Lux2: 90 lx","Lux3: 11 lx", "Rpm: 0", "Status: stable"]),
-            ("Payload Subsystem", []),  # Special handling for payload - no dummy data
-            ("Command & Data Handling Subsystem", ["Memory usage: 45.2%", "Last command: camera config", "Uptime: 4m", "Status: active"]),
-            ("Error Log", ["No critical errors detected"]),
-            ("Overall Status", ["System nominal", "Recommended actions: none"])
+            ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Temperature: Pending...", "Status: Pending..."]),
+            ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
+            ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Signal Strength: Pending...", "Data Rate: Pending..."]),
+            ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Lux1: Pending...","Lux2: Pending...","Lux3: Pending...", "RPM: Pending...", "Status: Pending..."]),
+            ("Payload Subsystem", []),  # Special handling for payload
+            ("Command & Data Handling Subsystem", ["Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
+            ("Error Log", ["No Critical Errors Detected: Pending..."]),
+            ("Overall Status", ["No Anomalies Detected: Pending...", "Recommended Actions: Pending..."])
         ]
 
         for name, items in subsystems:
@@ -970,8 +868,6 @@ class MainWindow(QWidget):
                         self.power_labels["energy"] = lbl
                     elif "Temperature:" in text:
                         self.power_labels["temperature"] = lbl
-                    elif "Battery:" in text:
-                        self.power_labels["battery"] = lbl
                     elif "Status:" in text:
                         self.power_labels["status"] = lbl
                         
@@ -985,7 +881,7 @@ class MainWindow(QWidget):
                     # Store label references for your new thermal labels
                     if "Pi:" in text:
                         self.thermal_labels["pi_temp"] = lbl
-                    elif "Power pcb:" in text:
+                    elif "Power PCB:" in text:
                         self.thermal_labels["power_pcb_temp"] = lbl
                     elif "Battery:" in text:
                         self.thermal_labels["battery_temp"] = lbl
@@ -1010,7 +906,7 @@ class MainWindow(QWidget):
                         self.adcs_labels["lux2"] = lbl
                     elif "Lux3:" in text:
                         self.adcs_labels["lux3"] = lbl
-                    elif "Rpm:" in text:
+                    elif "RPM:" in text:
                         self.adcs_labels["rpm"] = lbl
                     elif "Status:" in text:
                         self.adcs_labels["status"] = lbl
@@ -1023,9 +919,9 @@ class MainWindow(QWidget):
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references
-                    if "Memory usage" in text:
+                    if "Memory Usage" in text:
                         self.cdh_labels["memory"] = lbl
-                    elif "Last command" in text:
+                    elif "Last Command" in text:
                         self.cdh_labels["last_cmd"] = lbl
                     elif "Uptime" in text:
                         self.cdh_labels["uptime"] = lbl
@@ -1033,120 +929,28 @@ class MainWindow(QWidget):
                         self.cdh_labels["status"] = lbl
                         
             elif name == "Communication Subsystem":
-                # No dummy data - create all labels with placeholders
-                
-                # WiFi speed label (actual internet speed test)
-                self.comms_wifi_speed_label = QLabel("Wifi speed: -- mbps".ljust(30))
-                self.comms_wifi_speed_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_wifi_speed_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_wifi_speed_label.setMinimumWidth(220)
-                self.comms_wifi_speed_label.setMaximumWidth(220)
-                layout.addWidget(self.comms_wifi_speed_label)
-                
-                # Upload speed label (actual data upload from camera/sensors)
-                self.comms_upload_speed_label = QLabel("Upload speed: -- kb/s".ljust(30))
-                self.comms_upload_speed_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_upload_speed_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_upload_speed_label.setMinimumWidth(220)
-                self.comms_upload_speed_label.setMaximumWidth(220)
-                layout.addWidget(self.comms_upload_speed_label)
-                
-                # Server signal strength label
-                self.comms_server_signal_label = QLabel("Server signal: -- dbm".ljust(30))
-                self.comms_server_signal_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_server_signal_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_server_signal_label.setMinimumWidth(220)
-                self.comms_server_signal_label.setMaximumWidth(220)
-                layout.addWidget(self.comms_server_signal_label)
-                
-                # Client signal strength label (WiFi signal strength in dBm)
-                self.comms_client_signal_label = QLabel("Client signal: -- dBm".ljust(30))
-                self.comms_client_signal_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_client_signal_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_client_signal_label.setMinimumWidth(220)
-                self.comms_client_signal_label.setMaximumWidth(220)
-                layout.addWidget(self.comms_client_signal_label)
-                
-                # Data transmission rate label
-                self.comms_transmission_rate_label = QLabel("Data rate: -- kb/s".ljust(30))
-                self.comms_transmission_rate_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_transmission_rate_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_transmission_rate_label.setMinimumWidth(220)
-                self.comms_transmission_rate_label.setMaximumWidth(220)
-                layout.addWidget(self.comms_transmission_rate_label)
-                
-                # WiFi frequency label
-                self.comms_frequency_label = QLabel("Frequency: -- GHz".ljust(30))
-                self.comms_frequency_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_frequency_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_frequency_label.setMinimumWidth(220)
-                self.comms_frequency_label.setMaximumWidth(220)
-                layout.addWidget(self.comms_frequency_label)
-                
-                # Network latency label
-                self.comms_latency_label = QLabel("Latency: -- ms".ljust(30))
-                self.comms_latency_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_latency_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_latency_label.setMinimumWidth(220)
-                self.comms_latency_label.setMaximumWidth(220)
-                layout.addWidget(self.comms_latency_label)
-                
-                # Connection quality label
-                self.comms_quality_label = QLabel("Quality: Unknown".ljust(30))
-                self.comms_quality_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_quality_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_quality_label.setMinimumWidth(220)
-                self.comms_quality_label.setMaximumWidth(220)
-                layout.addWidget(self.comms_quality_label)
-                
-                # Status label
-                self.comms_status_label = QLabel("Status: not connected".ljust(30))
+                # Add standard comm items
+                for text in items:
+                    lbl = QLabel(text)
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    layout.addWidget(lbl)
+                # Add special status label
+                self.comms_status_label = QLabel("Status: Disconnected")
                 self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.comms_status_label.setMinimumWidth(220)
-                self.comms_status_label.setMaximumWidth(220)
                 layout.addWidget(self.comms_status_label)
             elif name == "Payload Subsystem":
-                # Camera status label with FPS integrated - fixed width
-                self.camera_status_label = QLabel("Camera: disconnected".ljust(30))
+                # Special payload status labels
+                self.camera_status_label = QLabel("Camera: Pending...")
                 self.camera_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.camera_status_label.setMinimumWidth(220)  # Increased minimum width
-                self.camera_status_label.setMaximumWidth(220)  # Also set maximum width to prevent expansion
-                self.camera_status_label.setFixedHeight(20)    # Fixed height
                 layout.addWidget(self.camera_status_label)
                 
-                self.camera_frame_size_label = QLabel("Frame size: -- kb".ljust(30))
-                self.camera_frame_size_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.camera_frame_size_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.camera_frame_size_label.setMinimumWidth(220)  # Increased minimum width
-                self.camera_frame_size_label.setMaximumWidth(220)  # Also set maximum width
-                self.camera_frame_size_label.setFixedHeight(20)    # Fixed height
-                layout.addWidget(self.camera_frame_size_label)
-                
-                # LIDAR status label with collection rate integrated - fixed width
-                self.lidar_status_label = QLabel("Lidar: disconnected".ljust(30))
-                self.lidar_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.lidar_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.lidar_status_label.setMinimumWidth(220)  # Increased minimum width
-                self.lidar_status_label.setMaximumWidth(220)  # Also set maximum width
-                self.lidar_status_label.setFixedHeight(20)    # Fixed height
-                layout.addWidget(self.lidar_status_label)
-                
-                # Overall payload subsystem status - fixed width
-                self.payload_status_label = QLabel("Status: unknown".ljust(30))
-                self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                self.payload_status_label.setMinimumWidth(220)  # Increased minimum width
-                self.payload_status_label.setMaximumWidth(220)  # Also set maximum width
-                self.payload_status_label.setFixedHeight(20)    # Fixed height
-                layout.addWidget(self.payload_status_label)
-                
-                # Store references for live updates
-                self.payload_labels["camera"] = self.camera_status_label
-                self.payload_labels["frame_size"] = self.camera_frame_size_label
-                self.payload_labels["lidar_status"] = self.lidar_status_label
-                self.payload_labels["payload_status"] = self.payload_status_label
+                self.camera_ready_label = QLabel("Status: Not Ready")
+                self.camera_ready_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.camera_ready_label)
             else:
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
@@ -1178,7 +982,7 @@ class MainWindow(QWidget):
 #'########################################################################################
 
     def update_image(self, frame):
-        """Update the image display with a new frame"""
+        """Update video display with new frame"""
         try:
             # Only display raw frames if detector is NOT active
             if self.detector_active:
@@ -1241,7 +1045,7 @@ class MainWindow(QWidget):
         @sio.event
         def connect():
             logging.info("Connected to server")
-            self.comms_status_label.setText("Status: Connected".ljust(30))
+            self.comms_status_label.setText("Status: Connected")
             self.camera_controls.toggle_btn.setEnabled(True)
             self.detector_controls.detector_btn.setEnabled(True)
             # self.camera_controls.crop_btn.setEnabled(True) # DELETED
@@ -1251,15 +1055,13 @@ class MainWindow(QWidget):
             self.print_report_btn.setEnabled(True)
             # ── end patch
 
-            # Send current camera configuration to server automatically
-            logging.info("Sending current camera configuration to server...")
             self.apply_config()
             QTimer.singleShot(100, self.delayed_server_setup)
 
         @sio.event
         def disconnect(reason=None):
             logging.info(f"Disconnected from server: {reason}")
-            self.comms_status_label.setText("Status: Disconnected".ljust(30))
+            self.comms_status_label.setText("Status: Disconnected")
             self.camera_controls.toggle_btn.setEnabled(False)
             self.detector_controls.detector_btn.setEnabled(False)
             # self.camera_controls.crop_btn.setEnabled(False) # DELETED
@@ -1271,153 +1073,19 @@ class MainWindow(QWidget):
 
         @sio.on("sensor_broadcast")
         def on_sensor_data(data):
-            # Distribute sensor data to appropriate subsystems
-            try:
-                # Temperature to Thermal Subsystem
-                if "temperature" in data and hasattr(self, 'thermal_labels'):
-                    temp = data["temperature"]
-                    self.thermal_labels["pi_temp"].setText(f"Pi: {temp:.1f}°C")
-                
-                # CPU usage to CDH Subsystem
-                if "cpu_percent" in data and hasattr(self, 'cdh_labels'):
-                    cpu = data["cpu_percent"]
-                    self.cdh_labels["memory"].setText(f"CPU Usage: {cpu:.1f}%")
-            except Exception as e:
-                # Check if error is due to Qt object cleanup during shutdown
-                if "wrapped C/C++ object" in str(e) or "has been deleted" in str(e):
-                    # Widget was deleted during shutdown - silently ignore
-                    pass
-                else:
-                    logging.error(f"Failed to distribute sensor data: {e}")
+            # update temps/CPU
+            self.update_sensor_display(data)
+            # server already computes FPS in camera.py and sends it
+            if "fps" in data:
+                # format with one decimal place
+                self.info_labels["fps_server"].setText(
+                    f"Server FPS: {data['fps']:.1f}"
+                )
 
         @sio.on("camera_status")
         def on_camera_status(data):
             self.update_camera_status(data)
 
-        @sio.on("camera_info")
-        def on_camera_info(data):
-            """Handle camera performance data - only updates non-status labels"""
-            try:
-                # Check if widgets still exist and we have the labels dictionary
-                if hasattr(self, 'payload_labels') and self.payload_labels:
-                    # Update frame size - only if changed
-                    if "frame_size" in data:
-                        frame_size_label = self.payload_labels.get("frame_size")
-                        if frame_size_label and hasattr(frame_size_label, 'setText'):
-                            frame_size_text = f"Frame size: {data['frame_size']} kb".ljust(30)
-                            # Only update if text actually changed
-                            if not hasattr(self, '_last_frame_size_text') or self._last_frame_size_text != frame_size_text:
-                                frame_size_label.setText(frame_size_text)
-                                self._last_frame_size_text = frame_size_text
-                    
-                    # Update upload speed if available - only if changed
-                    if "upload_speed" in data:
-                        upload_speed_label = self.payload_labels.get("upload_speed")
-                        if upload_speed_label and hasattr(upload_speed_label, 'setText'):
-                            upload_speed_text = f"Upload speed: {data['upload_speed']} kb/s".ljust(30)
-                            # Only update if text actually changed
-                            if not hasattr(self, '_last_upload_speed_text') or self._last_upload_speed_text != upload_speed_text:
-                                upload_speed_label.setText(upload_speed_text)
-                                self._last_upload_speed_text = upload_speed_text
-                            
-            except Exception as e:
-                # Check if error is due to Qt object cleanup during shutdown
-                if "wrapped C/C++ object" in str(e) or "has been deleted" in str(e):
-                    # Widget was deleted during shutdown - silently ignore
-                    pass
-                else:
-                    logging.error(f"Failed to update camera info: {e}")
-
-        @sio.on("communication_broadcast")
-        def on_communication_broadcast(data):
-            """Update communication subsystem labels from server broadcast"""
-            try:
-                # WiFi speed (Mbps)
-                if hasattr(self, 'comms_wifi_speed_label'):
-                    wifi_download = data.get('wifi_download_speed', 0)
-                    wifi_upload = data.get('wifi_upload_speed', 0)
-                    if wifi_download > 0 or wifi_upload > 0:
-                        wifi_speed = f"{wifi_download:.1f}↓/{wifi_upload:.1f}↑"
-                    else:
-                        wifi_speed = '--'
-                    self.comms_wifi_speed_label.setText(f"Wifi speed: {wifi_speed} mbps".ljust(30))
-                
-                # Upload speed (KB/s) - actual data upload
-                if hasattr(self, 'comms_upload_speed_label'):
-                    upload_speed = data.get('data_upload_speed', 0)
-                    upload_text = f"{upload_speed:.1f}" if upload_speed > 0 else '--'
-                    self.comms_upload_speed_label.setText(f"Upload speed: {upload_text} kb/s".ljust(30))
-                
-                # Data transmission rate (KB/s) - current real-time rate
-                if hasattr(self, 'comms_transmission_rate_label'):
-                    transmission_rate = data.get('data_transmission_rate', 0)
-                    transmission_text = f"{transmission_rate:.1f}" if transmission_rate > 0 else '--'
-                    self.comms_transmission_rate_label.setText(f"Data rate: {transmission_text} kb/s".ljust(30))
-                
-                # WiFi frequency (GHz)
-                if hasattr(self, 'comms_frequency_label'):
-                    uplink_freq = data.get('uplink_frequency', 0)
-                    downlink_freq = data.get('downlink_frequency', 0)
-                    if uplink_freq > 0 and downlink_freq > 0:
-                        if uplink_freq == downlink_freq:
-                            freq_text = f"{uplink_freq:.1f}"
-                        else:
-                            freq_text = f"{uplink_freq:.1f}↑/{downlink_freq:.1f}↓"
-                    else:
-                        freq_text = '--'
-                    self.comms_frequency_label.setText(f"Frequency: {freq_text} GHz".ljust(30))
-                
-                # Network latency (ms)
-                if hasattr(self, 'comms_latency_label'):
-                    latency = data.get('network_latency', 0)
-                    latency_text = f"{latency:.1f}" if latency > 0 else '--'
-                    self.comms_latency_label.setText(f"Latency: {latency_text} ms".ljust(30))
-                
-                # Connection quality
-                if hasattr(self, 'comms_quality_label'):
-                    quality = data.get('connection_quality', 'Unknown')
-                    # Color code the quality
-                    if quality == 'Excellent':
-                        color = '#00ff00'  # Green
-                    elif quality == 'Good':
-                        color = '#90ee90'  # Light Green
-                    elif quality == 'Fair':
-                        color = '#ffff00'  # Yellow
-                    elif quality == 'Poor':
-                        color = '#ff6666'  # Light Red
-                    else:
-                        color = '#bbb'     # Default gray
-                    
-                    self.comms_quality_label.setText(f"Quality: {quality}".ljust(30))
-                    self.comms_quality_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-                # Server signal strength (dBm)
-                if hasattr(self, 'comms_server_signal_label'):
-                    server_signal = data.get('server_signal_strength', 0)
-                    signal_text = f"{server_signal}" if server_signal != 0 else '--'
-                    self.comms_server_signal_label.setText(f"Server signal: {signal_text} dbm".ljust(30))
-                
-                # Client signal strength (dBm)
-                if hasattr(self, 'comms_client_signal_label'):
-                    client_signal = data.get('client_signal_strength', 0)
-                    signal_text = f"{client_signal}" if client_signal != 0 else '--'
-                    self.comms_client_signal_label.setText(f"Client signal: {signal_text} dbm".ljust(30))
-                
-                # Status
-                if hasattr(self, 'comms_status_label'):
-                    status = data.get('status', 'Disconnected')
-                    # Color code the status
-                    status_color = '#00ff00' if status == 'Connected' else '#ff6666'
-                    self.comms_status_label.setText(f"Status: {status}".ljust(30))
-                    self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {status_color}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                    
-            except Exception as e:
-                # Check if error is due to Qt object cleanup during shutdown
-                if "wrapped C/C++ object" in str(e) or "has been deleted" in str(e):
-                    # Qt object was deleted during shutdown - silently ignore
-                    pass
-                else:
-                    logging.error(f"Failed to update communication subsystem: {e}")
 
         @sio.on("image_captured")
         def on_image_captured(data):
@@ -1465,59 +1133,22 @@ class MainWindow(QWidget):
                 import traceback
                 traceback.print_exc()
 
-        @sio.on("lidar_status_broadcast")
-        def on_lidar_status_broadcast(data):
-            """Handle comprehensive LIDAR status updates from server - only updates widget state"""
-            try:
-                # Update LIDAR widget streaming state if present
-                if hasattr(self, 'lidar_widget') and self.lidar_widget:
-                    is_active = data.get("is_active", False)
-                    # Sync widget state with server state
-                    if hasattr(self.lidar_widget, 'is_streaming'):
-                        # Only update if there's a mismatch to avoid unnecessary changes
-                        if is_active != self.lidar_widget.is_streaming:
-                            from PyQt6.QtCore import QMutexLocker
-                            with QMutexLocker(self.lidar_widget.data_mutex):
-                                self.lidar_widget.is_streaming = is_active
-                            logging.info(f"LIDAR widget streaming state updated to: {is_active}")
-                
-                # Only log significant status changes, not frequent rate updates
-                if data.get("status") in ["connected", "disconnected"] or data.get("collection_rate_hz", 0) == 0:
-                    logging.info(f"LIDAR Status Update - {data.get('status', 'Unknown')}, Rate: {data.get('collection_rate_hz', 0)} Hz")
-                
-            except Exception as e:
-                logging.error(f"Failed to process LIDAR status update: {e}")
-
-        @sio.on("lidar_command_response")
-        def on_lidar_command_response(data):
-            """Handle LIDAR command responses from server"""
-            try:
-                success = data.get("success", False)
-                message = data.get("message", "No message")
-                
-                if success:
-                    logging.info(f"LIDAR Command Success: {message}")
-                else:
-                    logging.error(f"LIDAR Command Failed: {message}")
-                    
-            except Exception as e:
-                logging.error(f"Failed to process LIDAR command response: {e}")
-
         @sio.on("lidar_status")
         def on_lidar_status(data):
-            """Handle legacy LIDAR status updates from server (deprecated)"""
+            """Handle LIDAR status updates from server"""
             try:
                 status = data.get('status', 'unknown')
                 streaming = data.get('streaming', False)
-                logging.info(f"Legacy LIDAR Status: {status}, Streaming: {streaming}")
+                logging.info(f"LIDAR Status: {status}, Streaming: {streaming}")
                 
-                # Update LIDAR widget streaming state if needed (legacy support)
-                if hasattr(self, 'lidar_widget') and self.lidar_widget:
-                    if hasattr(self.lidar_widget, 'is_streaming'):
-                        if streaming != self.lidar_widget.is_streaming:
-                            with QMutexLocker(self.lidar_widget.data_mutex):
-                                self.lidar_widget.is_streaming = streaming
-                            logging.info(f"LIDAR widget streaming state updated (legacy): {streaming}")
+                # Update LIDAR widget streaming state if needed
+                if hasattr(self.lidar_widget, 'is_streaming'):
+                    if streaming != self.lidar_widget.is_streaming:
+                        # Sync widget state with server state
+                        self.lidar_widget.is_streaming = streaming
+                        self.lidar_widget.start_stop_button.setText(
+                            "Stop LIDAR" if streaming else "Start LIDAR"
+                        )
             except Exception as e:
                 logging.error(f"Failed to process LIDAR status: {e}")
 
@@ -1548,54 +1179,20 @@ class MainWindow(QWidget):
         def on_power_data(data):
             """Handle power subsystem data updates"""
             try:
-                # Check if widgets still exist and we have the labels dictionary
-                if not hasattr(self, 'power_labels') or not self.power_labels:
-                    return
-                
-                # Mark that we've received real power data from server
-                self.received_real_power_data = True
-                
-                # Update power labels to match the server2.py power data format
-                if "current" in data:
-                    current_label = self.power_labels.get("current")
-                    if current_label and hasattr(current_label, 'setText'):
-                        current_label.setText(f"Current: {data['current']} A")
-                        
-                if "voltage" in data:
-                    voltage_label = self.power_labels.get("voltage")
-                    if voltage_label and hasattr(voltage_label, 'setText'):
-                        voltage_label.setText(f"Voltage: {data['voltage']} V")
-                        
-                if "power" in data:
-                    power_label = self.power_labels.get("power")
-                    if power_label and hasattr(power_label, 'setText'):
-                        power_label.setText(f"Power: {data['power']} W")
-                        
-                if "energy" in data:
-                    energy_label = self.power_labels.get("energy")
-                    if energy_label and hasattr(energy_label, 'setText'):
-                        energy_label.setText(f"Energy: {data['energy']} Wh")
-                        
-                if "temperature" in data:
-                    temp_label = self.power_labels.get("temperature")
-                    if temp_label and hasattr(temp_label, 'setText'):
-                        temp_label.setText(f"Temperature: {data['temperature']}°C")
-                        
-                if "battery_percentage" in data:
-                    battery_label = self.power_labels.get("battery")
-                    if battery_label and hasattr(battery_label, 'setText'):
-                        battery_label.setText(f"Battery: {data['battery_percentage']}%")
-                        
-                if "status" in data:
-                    status_label = self.power_labels.get("status")
-                    if status_label and hasattr(status_label, 'setText'):
-                        # Add indicator if this is real data vs disconnected
-                        status_text = data['status']
-                        if status_text == "Disconnected":
-                            status_label.setText(f"Status: {status_text} (No Hardware)")
-                        else:
-                            status_label.setText(f"Status: {status_text} (Live Data)")
-                        
+                if hasattr(self, 'power_labels'):
+                    # Update power labels to match your power.py data structure
+                    if "current" in data:
+                        self.power_labels["current"].setText(f"Current: {data['current']:.2f} mA")
+                    if "voltage" in data:
+                        self.power_labels["voltage"].setText(f"Voltage: {data['voltage']:.2f} V")
+                    if "power" in data:
+                        self.power_labels["power"].setText(f"Power: {data['power']:.2f} mW")
+                    if "energy" in data:
+                        self.power_labels["energy"].setText(f"Energy: {data['energy']:.2f} J")
+                    if "temperature" in data:
+                        self.power_labels["temperature"].setText(f"Temperature: {data['temperature']:.1f}°C")
+                    if "status" in data:
+                        self.power_labels["status"].setText(f"Status: {data['status']}")
             except Exception as e:
                 logging.error(f"Failed to update power data: {e}")
 
@@ -1631,167 +1228,12 @@ class MainWindow(QWidget):
                         self.cdh_labels["status"].setText(f"Status: {data['status']}")
             except Exception as e:
                 logging.error(f"Failed to update CDH data: {e}")
-
-        @sio.on("payload_broadcast")
-        def on_payload_data(data):
-            """Handle comprehensive payload subsystem status updates from server"""
-            try:
-                # Check if widgets still exist and we have the labels dictionary
-                if not hasattr(self, 'payload_labels') or not self.payload_labels:
-                    return
-                
-                # Update camera status with comprehensive data
-                if "camera_status" in data:
-                    camera_label = self.payload_labels.get("camera")
-                    if camera_label and hasattr(camera_label, 'setText'):
-                        status = data['camera_status']
-                        camera_connected = data.get('camera_connected', False)
-                        camera_streaming = data.get('camera_streaming', False)
-                        
-                        # Determine display text and color based on status
-                        if status.lower() == "streaming":
-                            camera_text = f"Camera: Streaming".ljust(30)
-                            color = "#4CAF50"  # Green
-                        elif status.lower() == "connected" or camera_connected:
-                            camera_text = f"Camera: Connected".ljust(30)
-                            color = "#2196F3"  # Blue
-                        elif status.lower() == "idle":
-                            camera_text = f"Camera: Idle".ljust(30)
-                            color = "#FFC107"  # Yellow
-                        elif status.lower() in ["disconnected", "error"]:
-                            camera_text = f"Camera: Disconnected".ljust(30)
-                            color = "#F44336"  # Red
-                        else:
-                            camera_text = f"Camera: {status.capitalize()}".ljust(30)
-                            color = "#bbb"  # Gray
-                        
-                        # Only update if text actually changed
-                        current_text = camera_label.text() if hasattr(camera_label, 'text') else ""
-                        if current_text != camera_text:
-                            camera_label.setText(camera_text)
-                            camera_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-                # Update LIDAR status with comprehensive data
-                if "lidar_status" in data:
-                    lidar_label = self.payload_labels.get("lidar_status")
-                    if lidar_label and hasattr(lidar_label, 'setText'):
-                        status = data['lidar_status']
-                        lidar_connected = data.get('lidar_connected', False)
-                        lidar_collecting = data.get('lidar_collecting', False)
-                        
-                        # Determine display text and color based on status
-                        if status.lower() in ["active", "streaming"] or lidar_collecting:
-                            lidar_text = f"Lidar: Active".ljust(30)
-                            color = "#4CAF50"  # Green
-                        elif status.lower() == "connected" or lidar_connected:
-                            lidar_text = f"Lidar: Connected".ljust(30)
-                            color = "#2196F3"  # Blue
-                        elif status.lower() == "idle":
-                            lidar_text = f"Lidar: Idle".ljust(30)
-                            color = "#FFC107"  # Yellow
-                        elif status.lower() in ["disconnected", "error"]:
-                            lidar_text = f"Lidar: Disconnected".ljust(30)
-                            color = "#F44336"  # Red
-                        else:
-                            lidar_text = f"Lidar: {status.capitalize()}".ljust(30)
-                            color = "#bbb"  # Gray
-                        
-                        # Only update if text actually changed
-                        current_text = lidar_label.text() if hasattr(lidar_label, 'text') else ""
-                        if current_text != lidar_text:
-                            lidar_label.setText(lidar_text)
-                            lidar_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-                # Update overall payload status
-                if "overall_status" in data:
-                    status_label = self.payload_labels.get("payload_status")
-                    if status_label and hasattr(status_label, 'setText'):
-                        status = data['overall_status']
-                        
-                        # Determine display text and color
-                        if status.upper() in ["OK", "OPERATIONAL", "NORMAL"]:
-                            status_text = f"Status: OK".ljust(30)
-                            color = "#4CAF50"  # Green
-                        elif status.upper() in ["WARNING", "DEGRADED"]:
-                            status_text = f"Status: Warning".ljust(30)
-                            color = "#FFC107"  # Yellow
-                        elif status.upper() in ["ERROR", "CRITICAL"]:
-                            status_text = f"Status: Error".ljust(30)
-                            color = "#F44336"  # Red
-                        else:
-                            status_text = f"Status: {status.capitalize()}".ljust(30)
-                            color = "#bbb"  # Gray
-                        
-                        # Only update if text actually changed
-                        current_text = status_label.text() if hasattr(status_label, 'text') else ""
-                        if current_text != status_text:
-                            status_label.setText(status_text)
-                            status_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-                # Update frame size if available (from camera_info data)
-                if "frame_size" in data:
-                    frame_size_label = self.payload_labels.get("frame_size")
-                    if frame_size_label and hasattr(frame_size_label, 'setText'):
-                        frame_size_text = f"Frame size: {data['frame_size']} kb".ljust(30)
-                        current_text = frame_size_label.text() if hasattr(frame_size_label, 'text') else ""
-                        if current_text != frame_size_text:
-                            frame_size_label.setText(frame_size_text)
-                
-                # Update upload speed if available (from camera_info data)
-                if "upload_speed" in data:
-                    upload_speed_label = self.payload_labels.get("upload_speed")
-                    if upload_speed_label and hasattr(upload_speed_label, 'setText'):
-                        upload_speed_text = f"Upload speed: {data['upload_speed']} kb/s".ljust(30)
-                        current_text = upload_speed_label.text() if hasattr(upload_speed_label, 'text') else ""
-                        if current_text != upload_speed_text:
-                            upload_speed_label.setText(upload_speed_text)
-                
-                # Update camera FPS if available (from camera_info data)
-                if "fps" in data:
-                    camera_label = self.payload_labels.get("camera")
-                    if camera_label and hasattr(camera_label, 'setText'):
-                        fps = data['fps']
-                        status = data.get('camera_status', 'Streaming')
-                        
-                        if fps > 0:
-                            camera_text = f"Camera: {status} ({fps} fps)".ljust(30)
-                            color = "#4CAF50"  # Green
-                        else:
-                            camera_text = f"Camera: {status} (0 fps)".ljust(30)
-                            color = "#FFC107"  # Yellow
-                        
-                        current_text = camera_label.text() if hasattr(camera_label, 'text') else ""
-                        if current_text != camera_text:
-                            camera_label.setText(camera_text)
-                            camera_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-                # Update LIDAR collection rate if available (from lidar_status_broadcast data)
-                if "collection_rate_hz" in data:
-                    lidar_label = self.payload_labels.get("lidar_status")
-                    if lidar_label and hasattr(lidar_label, 'setText'):
-                        rate = data['collection_rate_hz']
-                        status = data.get('lidar_status', 'Active')
-                        
-                        if rate > 0:
-                            lidar_text = f"Lidar: {status} - {rate:.1f}Hz".ljust(30) 
-                            color = "#4CAF50"  # Green
-                        else:
-                            lidar_text = f"Lidar: {status}".ljust(30)
-                            color = "#FFC107"  # Yellow
-                        
-                        current_text = lidar_label.text() if hasattr(lidar_label, 'text') else ""
-                        if current_text != lidar_text:
-                            lidar_label.setText(lidar_text)
-                            lidar_label.setStyleSheet(f"QLabel {{ color: {color}; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                
-            except Exception as e:
-                logging.error(f"Failed to update payload data: {e}")
                 
     def handle_adcs_command(self, mode_name, command_name, value):
         data = {
-            "mode": mode_name,
+            "mode":    mode_name,
             "command": command_name,
-            "value": value
+            "value":   value
         }
         sio.emit("adcs_command", data)
         print(f"[CLIENT] ADCS command sent: {data}")
@@ -1831,13 +1273,30 @@ class MainWindow(QWidget):
         except Exception as e:
             logging.error(f"Frame processing error: {e}")
 
-    def update_camera_status(self, data):
-        """Update camera status display - deprecated, status updates now handled by payload_broadcast"""
+    def update_sensor_display(self, data):
+        """Update sensor information display"""
         try:
-            # This method is kept for backward compatibility but payload status updates
-            # are now exclusively handled by the payload_broadcast handler
-            status = data.get("status", "unknown").lower()
-            logging.info(f"Camera status update received (legacy): {status}")
+            temp = data.get("temperature", 0)
+            cpu = data.get("cpu_percent", 0)
+            self.info_labels["temp"].setText(f"Temp: {temp:.1f} °C")
+            self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
+        except Exception as e:
+            logging.error(f"Sensor update error: {e}")
+
+    def update_camera_status(self, data):
+        """Update camera status display"""
+        try:
+            status = data.get("status", "Unknown")
+            self.camera_status_label.setText(f"Camera: {status}")
+            
+            if status.lower() in ("streaming", "idle", "ready"):
+                self.camera_status_label.setStyleSheet("color: white;")
+                self.camera_ready_label.setText("Status: Ready")
+                self.camera_ready_label.setStyleSheet("color: #0f0;")
+            else:
+                self.camera_status_label.setStyleSheet("color: #bbb;")
+                self.camera_ready_label.setText("Status: Not Ready")
+                self.camera_ready_label.setStyleSheet("color: #f00;")
                 
         except Exception as e:
             logging.error(f"Camera status update error: {e}")
@@ -1969,10 +1428,10 @@ class MainWindow(QWidget):
         self.detector_active = not self.detector_active
 
         if self.detector_active:
-            logging.info("[INFO] Starting detector...")
+            logging.info("[INFO] 🚀 Starting detector...")
             threading.Thread(target=self.run_detector, daemon=True).start()
         else:
-            logging.info("[INFO] Stopping detector...")
+            logging.info("[INFO] 🛑 Stopping detector...")
             self.clear_queue()
 
     def show_full_image(self):
@@ -2159,7 +1618,6 @@ class MainWindow(QWidget):
                             # 2b) update the big "detail" label for the active graph WITH UNITS
                             detail = getattr(self.graph_section, "current_detail_label", None)
                             mode   = getattr(self.graph_section, "current_graph_mode", None)
-                           
                             if detail and mode:
                                 if mode == "SPIN MODE":
                                     metrics = self.spin_plotter.get_spin_metrics()
@@ -2259,7 +1717,7 @@ class MainWindow(QWidget):
         
         try:
             sio.emit("capture_image", {})
-            logging.info("[INFO] Image capture requested")
+            logging.info("[INFO] 📸 Image capture requested")
         except Exception as e:
             logging.info(f"[ERROR] Failed to request image capture: {e}")
 
@@ -2285,7 +1743,8 @@ class MainWindow(QWidget):
 
     def measure_speed(self):
         """Measure internet speed for performance monitoring"""
-        self.comms_upload_speed_label.setText("Upload Speed: Testing...".ljust(30))
+        self.info_labels["speed"].setText("Upload: Testing...")
+        self.info_labels["max_frame"].setText("Max Frame: ...")
 
         def run_speedtest():
             try:
@@ -2305,9 +1764,11 @@ class MainWindow(QWidget):
     def update_speed_labels(self, upload_mbps, max_frame_size_kb):
         """Update speed test results in UI"""
         if upload_mbps < 0:
-            self.comms_upload_speed_label.setText("Upload Speed: Error".ljust(30))
+            self.info_labels["speed"].setText("Upload: Error")
+            self.info_labels["max_frame"].setText("Max Frame: -- KB")
         else:
-            self.comms_upload_speed_label.setText(f"Upload Speed: {upload_mbps:.2f} Mbps".ljust(30))
+            self.info_labels["speed"].setText(f"Upload: {upload_mbps:.2f} Mbps")
+            self.info_labels["max_frame"].setText(f"Max Frame: {max_frame_size_kb:.1f} KB")
 
     def timerEvent(self, event):
         """Handle timer events for FPS calculation"""
@@ -2319,9 +1780,10 @@ class MainWindow(QWidget):
         self.current_display_fps   = self.display_frame_counter
         self.display_frame_counter = 0
 
-        # FPS and frame size are now handled by camera_info socket event
-        # No need to update labels here since they're updated by server data
-
+        # update labels
+        self.info_labels["fps"].setText(f"Live FPS: {self.current_fps}")
+        self.info_labels["disp_fps"].setText(f"Display FPS: {self.current_display_fps}")
+        self.info_labels["frame_size"].setText(f"Frame Size: {self.current_frame_size/1024:.1f} KB")
     #=========================================================================
     #                          UTILITY METHODS                              
     #=========================================================================
@@ -2373,7 +1835,7 @@ class MainWindow(QWidget):
 
     def _restart_stream_after_reconnect(self):
         """Helper to restart stream after a delay, ensuring it's still desired."""
-        if self.streaming == False and hasattr(self, 'camera_controls'): # Check if it wasn't restarted by another process and if UI is available
+        if self.streaming == False and hasattr(self, 'camera_controls'): # Check if it wasn't already restarted and if UI is available
             # Check if the original intent was to stream (was_streaming was true)
             # This requires was_streaming to be accessible, e.g. by making it an instance var if needed,
             # or by always attempting to restart if self.streaming is false here.
@@ -2439,83 +1901,47 @@ class MainWindow(QWidget):
         sio.emit("camera_config", config)
         time.sleep(0.2) # Keep delay if necessary for server to process
 
-    def update_payload_status(self):
-        """DEPRECATED: Payload status is now updated exclusively by payload_broadcast handler"""
-        # This method is kept for backward compatibility but no longer performs any UI updates
-        # All payload subsystem status updates are now handled by the server-driven payload_broadcast handler
-        logging.debug("update_payload_status called - now deprecated, payload status handled by server broadcast")
-        pass
-
     #=========================================================================
     #                           EVENT HANDLERS                              
     #=========================================================================
 
     def closeEvent(self, event):
-        """Handle application closure - properly stop all components"""
+        """Handle application close event"""
         try:
-            logging.info("[INFO] Closing application...")
+            logging.info("[INFO] 🛑 Closing application...")
             
-            # Stop detector first
+            # Remove QtLogHandler from logging FIRST to prevent RuntimeError at exit
+            if hasattr(self, 'qt_log_handler') and self.qt_log_handler is not None:
+                logging.getLogger().removeHandler(self.qt_log_handler)
+                self.qt_log_handler.close() # Good practice, though base Handler.close() is no-op
+                self.qt_log_handler = None # Clear reference
+            
             if self.detector_active:
-                logging.info("Stopping detector...")
+               
                 self.detector_active = False
-                self.clear_queue()  # Clear frame queue
-            
-            # Stop streaming
+    
+            self.reset_camera_to_default() # This might log
+            time.sleep(0.5)
+    
             if self.streaming:
-                logging.info("Stopping camera stream...")
-                if sio.connected:
-                    sio.emit("stop_camera")
+                sio.emit("stop_camera") # This might log
                 self.streaming = False
-                if hasattr(self, 'camera_controls'):
+                if hasattr(self, 'camera_controls'): # Check if camera_controls exists
                     self.camera_controls.toggle_btn.setText("Start Stream")
-            
-            # Stop LIDAR
-            if hasattr(self, 'lidar_widget') and self.lidar_widget:
-                logging.info("Stopping LIDAR...")
-                if sio.connected:
-                    sio.emit("stop_lidar")
-            
-            # Stop any recording
-            if hasattr(self, 'graph_section') and self.graph_section:
-                if getattr(self.graph_section, 'is_recording', False):
-                    logging.info("Stopping recording...")
-                    self.graph_section.toggle_recording()
-            
-            # Send final cleanup signals to server
+                time.sleep(0.5)
+    
+            sio.emit("set_camera_idle") # This might log
+            time.sleep(0.5)
+    
             if sio.connected:
-                logging.info("Sending cleanup signals to server...")
-                sio.emit("stop_camera")
-                sio.emit("stop_lidar")
-                QTimer.singleShot(200, lambda: sio.disconnect())
-            
-            # Remove log handler to prevent runtime errors
-            try:
-                if hasattr(self, 'qt_log_handler') and self.qt_log_handler is not None:
-                    logging.getLogger().removeHandler(self.qt_log_handler)
-                    if hasattr(self.qt_log_handler, 'close'):
-                        self.qt_log_handler.close()
-                    self.qt_log_handler = None
-                
-                # Also clean up all logging handlers to prevent shutdown errors
-                logger = logging.getLogger()
-                for handler in logger.handlers[:]:  # Make a copy of the list
-                    try:
-                        logger.removeHandler(handler)
-                        if hasattr(handler, 'close'):
-                            handler.close()
-                    except:
-                        pass  # Ignore any errors during cleanup
-                        
-            except Exception as e:
-                pass  # Ignore any logging cleanup errors
-            
-            # Call parent closeEvent
-            super().closeEvent(event)
+                sio.disconnect() # This might log
+                time.sleep(0.2)
             
         except Exception as e:
-            logging.error(f"Error during client closure: {e}")
-            super().closeEvent(event)
+            logging.info(f"[DEBUG] Cleanup error during closeEvent: {e}")
+            traceback.print_exc() # Add traceback for more details on cleanup errors
+
+        event.accept()
 
     def keyPressEvent(self, event):
         """Handle keyboard events"""
