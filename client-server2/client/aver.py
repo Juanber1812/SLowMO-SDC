@@ -1451,7 +1451,7 @@ class MainWindow(QWidget):
             if self.streaming: # Double check, as state might change
                 sio.emit("stop_camera")
                 self.streaming = False
-                self.camera_controls.toggle_btn.setText("Start Stream")
+                # Removed: self.camera_controls.toggle_btn.setText("Start Stream")
                 logging.info("Stream paused for config application.")
 
 
@@ -1485,7 +1485,7 @@ class MainWindow(QWidget):
                 if not self.streaming: # Check if it wasn't restarted by another process
                     sio.emit("start_camera")
                     self.streaming = True
-                    self.camera_controls.toggle_btn.setText("Stop Stream")
+                    # Removed: self.camera_controls.toggle_btn.setText("Stop Stream")
                     logging.info("Stream restart scheduled (if it was on before apply_config).")
 
             threading.Timer(0.2, restart_stream_if_needed).start()
@@ -1903,7 +1903,7 @@ class MainWindow(QWidget):
         try:
             if was_streaming: # if it was streaming, stop it first
                 self.streaming = False
-                self.camera_controls.toggle_btn.setText("Start Stream")
+                # Removed: self.camera_controls.toggle_btn.setText("Start Stream")
                 sio.emit("stop_camera")
                 time.sleep(0.5) # give server time to process
             sio.disconnect()
@@ -1939,7 +1939,7 @@ class MainWindow(QWidget):
             logging.info("Restarting stream after reconnect...")
             sio.emit("start_camera")
             self.streaming = True # Update state
-            self.camera_controls.toggle_btn.setText("Stop Stream")
+            # Removed: self.camera_controls.toggle_btn.setText("Stop Stream")
         elif self.streaming:
             logging.info("Stream already running after reconnect or restart not needed.")
 
@@ -2022,8 +2022,7 @@ class MainWindow(QWidget):
             if self.streaming:
                 sio.emit("stop_camera") # This might log
                 self.streaming = False
-                if hasattr(self, 'camera_controls'): # Check if camera_controls exists
-                    self.camera_controls.toggle_btn.setText("Start Stream")
+                # Removed: if hasattr(self, 'camera_controls'): self.camera_controls.toggle_btn.setText("Start Stream")
                 time.sleep(0.5)
     
             sio.emit("set_camera_idle") # This might log

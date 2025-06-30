@@ -1,4 +1,3 @@
-
 # server2.py
 
 from gevent import monkey; monkey.patch_all()
@@ -249,7 +248,12 @@ def start_background_tasks():
 def handle_connect():
     print(f"[INFO] Client connected: {request.sid}")
     connected_clients.add(request.sid)
-    # No longer send initial payload status; handled by camera_info/lidar_info events
+    
+    # Request current status from camera and lidar subsystems
+    emit('camera_update', {}, broadcast=True)
+    emit('lidar_update', {}, broadcast=True)
+    print("[INFO] Status update requests sent to camera and lidar subsystems")
+    
     # Start communication monitoring if not already running
     if communication_monitor and not communication_monitor.is_monitoring:
         communication_monitor.set_update_callback(communication_data_callback)
@@ -450,6 +454,24 @@ def handle_power_data(data):
         logging.error(f"Error handling power data: {e}")
 
 # ===================== END OTHER LIVE DATA UPDATES SECTION =====================
+
+@socketio.on('request_camera_update')
+def handle_request_camera_update():
+    """Manual request for camera status update"""
+    try:
+        emit('camera_update', {}, broadcast=True)
+        print("[INFO] Camera status update requested manually")
+    except Exception as e:
+        print(f"[ERROR] request_camera_update: {e}")
+
+@socketio.on('request_lidar_update')
+def handle_request_lidar_update():
+    """Manual request for lidar status update"""
+    try:
+        emit('lidar_update', {}, broadcast=True)
+        print("[INFO] Lidar status update requested manually")
+    except Exception as e:
+        print(f"[ERROR] request_lidar_update: {e}")
 
 if __name__ == "__main__":
     print("🚀 Server starting at http://0.0.0.0:5000")

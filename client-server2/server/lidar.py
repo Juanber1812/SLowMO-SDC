@@ -30,6 +30,16 @@ def disconnect():
         lidar_controller.connected = False
         # Note: Can't send status update here since we're disconnected
 
+@sio.on("lidar_update")
+def on_lidar_update(_):
+    """Handle request for lidar status update"""
+    try:
+        if 'lidar_controller' in globals():
+            lidar_controller._send_status_update()
+            print("[INFO] Lidar status update sent")
+    except Exception as e:
+        print(f"[ERROR] lidar_update handler: {e}")
+
 def read_distance(bus):
     try:
         bus.write_byte_data(LIDAR_ADDR, ACQ_COMMAND, MEASURE)
@@ -106,7 +116,7 @@ class LidarController:
                         self._send_status_update()
                         self.last_status_time = current_time
                     
-                    time.sleep(0.05)  # 20 Hz collection rate
+
                     
         except Exception as e:
             print(f"❌ LIDAR collection error: {e}")

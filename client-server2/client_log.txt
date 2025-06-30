@@ -161,3 +161,33 @@
 2025-06-30 22:17:38,803 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
 2025-06-30 22:17:38,804 - INFO - Stream paused for config application.
 2025-06-30 22:17:48,445 - INFO - Disconnected from server: client disconnect
+2025-06-30 22:41:20,650 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-30 22:41:20,837 - INFO - Connected to server
+2025-06-30 22:41:20,839 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 22:41:20,840 - INFO - [INFO] Successfully connected to server
+2025-06-30 22:41:30,140 - INFO - Requesting LIDAR streaming start
+2025-06-30 22:41:33,018 - INFO - Requesting LIDAR streaming stop
+2025-06-30 22:41:33,023 - INFO - Back button clicked in LidarWidget
+2025-06-30 22:41:34,002 - INFO - Requesting LIDAR streaming start
+2025-06-30 22:41:34,797 - INFO - Requesting LIDAR streaming stop
+2025-06-30 22:41:34,805 - INFO - Back button clicked in LidarWidget
+2025-06-30 22:41:44,585 - INFO - Requesting LIDAR streaming start
+2025-06-30 22:41:45,467 - INFO - Requesting LIDAR streaming stop
+2025-06-30 22:41:45,472 - INFO - Back button clicked in LidarWidget
+2025-06-30 22:41:49,511 - INFO - Disconnected from server: client disconnect
+2025-06-30 22:57:18,731 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-30 22:57:18,882 - INFO - Connected to server
+2025-06-30 22:57:18,885 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 22:57:18,886 - INFO - [INFO] Successfully connected to server
+2025-06-30 22:57:34,560 - INFO - Requesting LIDAR streaming start
+2025-06-30 22:57:37,347 - INFO - Requesting LIDAR streaming stop
+2025-06-30 22:57:37,356 - INFO - Back button clicked in LidarWidget
+2025-06-30 22:57:38,211 - INFO - Requesting LIDAR streaming start
+2025-06-30 22:57:38,734 - INFO - Requesting LIDAR streaming stop
+2025-06-30 22:57:38,738 - INFO - Back button clicked in LidarWidget
+2025-06-30 22:57:45,164 - INFO - Disconnected from server: client disconnect
+2025-06-30 22:57:53,213 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-30 22:57:53,385 - INFO - Connected to server
+2025-06-30 22:57:53,387 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 22:57:53,392 - INFO - [INFO] Successfully connected to server
+2025-06-30 22:58:02,597 - INFO - Disconnected from server: client disconnect

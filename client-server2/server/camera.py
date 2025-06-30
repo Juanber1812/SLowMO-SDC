@@ -288,6 +288,39 @@ def on_set_camera_idle(_):
     streamer.streaming = False
     sio.emit("camera_status", {"status": "Idle"})
 
+@sio.on("camera_update")
+def on_camera_update(_):
+    """Handle request for camera status update"""
+    try:
+        # Determine current status
+        if streamer.connected:
+            if streamer.streaming:
+                camera_status = "Streaming"
+                fps = streamer.config.get("fps", 0)
+            else:
+                camera_status = "Idle"
+                fps = 0
+            
+            # Send current camera info
+            sio.emit("camera_info", {
+                "fps": fps,
+                "frame_size": 0,  # Could be calculated if needed
+                "camera_status": camera_status.lower(),
+                "status": "OK"
+            })
+            print(f"[INFO] Camera status update sent: {camera_status}")
+        else:
+            # Camera disconnected
+            sio.emit("camera_info", {
+                "fps": 0,
+                "frame_size": 0,
+                "camera_status": "disconnected",
+                "status": "Error"
+            })
+            print("[INFO] Camera status update sent: Disconnected")
+    except Exception as e:
+        print(f"[ERROR] camera_update handler: {e}")
+
 def start_stream():
     streamer.connect_socket()
     streamer.apply_config()
