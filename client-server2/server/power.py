@@ -262,8 +262,12 @@ class PowerMonitor:
 
     def determine_power_status(self, current_ma, voltage_v, power_mw, battery_pct, temperature_c=None):
         """Determine overall power system status based on readings"""
-        # Check for no readings or all zeros (Error condition)
-        if current_ma == 0 and voltage_v == 0 and power_mw == 0:
+        # Check for zero readings (Error condition) - current and power can be zero together (idle), others cannot
+        if voltage_v == 0 or battery_pct == 0:
+            return "Error"
+        
+        # If power is zero but current is not zero, that's an error (should be P = V × I)
+        if power_mw == 0 and current_ma != 0:
             return "Error"
         
         # Check for abnormally low voltage (could indicate sensor issues)
