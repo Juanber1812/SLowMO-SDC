@@ -32,8 +32,8 @@ except ImportError as e:
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-camera_state = "Disconnected"  # Default camera state
-camera_connected = False  # Track camera connection status
+# Camera state is now managed entirely by camera.py via camera_info events
+# No need for server-side state tracking
 
 # Initialize power monitor
 power_monitor = None
@@ -69,27 +69,19 @@ def handle_frame(data):
 
 @socketio.on('start_camera')
 def handle_start_camera():
-    global camera_state, camera_connected
     try:
+        # Simply relay the command to camera.py
         emit('start_camera', {}, broadcast=True)
-        if camera_connected:
-            camera_state = "Streaming"
-        else:
-            camera_state = "Disconnected"
-        # send_payload_status_update() removed; handled by camera_info event
+        print("[INFO] Start camera command relayed to camera.py")
     except Exception as e:
         print(f"[ERROR] start_camera: {e}")
 
 @socketio.on('stop_camera')
 def handle_stop_camera():
-    global camera_state, camera_connected
     try:
+        # Simply relay the command to camera.py  
         emit('stop_camera', {}, broadcast=True)
-        if camera_connected:
-            camera_state = "Idle"
-        else:
-            camera_state = "Disconnected"
-        # send_payload_status_update() removed; handled by camera_info event
+        print("[INFO] Stop camera command relayed to camera.py")
     except Exception as e:
         print(f"[ERROR] stop_camera: {e}")
 
@@ -106,14 +98,27 @@ def handle_camera_config(data):
 def on_camera_info(data):
     """Handle camera-only payload: status, fps, frame size"""
     try:
-        global camera_connected
-        camera_connected = True  # If we're receiving camera_info, camera is connected
+        # Camera.py is now the single source of truth for all camera state
+        # We simply forward the information from camera.py to clients
+        
+        camera_status_from_info = data.get("status", "Error")
+        camera_connected = camera_status_from_info == "OK"
+        
+        # Determine display status based on actual camera state from camera.py
+        if not camera_connected:
+            display_status = "Disconnected"
+        elif data.get("fps", 0) > 0:  # If we're getting frames, we're streaming
+            display_status = "Streaming"
+        else:
+            display_status = "Idle"  # Connected but not streaming
+            
         payload_data = {
-            "camera_status": camera_state,
+            "camera_status": display_status,
             "camera_connected": camera_connected,
-            "camera_streaming": camera_state == "Streaming",
+            "camera_streaming": display_status == "Streaming",
             "fps": data.get("fps", 0),
-            "frame_size": data.get("frame_size", 0)
+            "frame_size": data.get("frame_size", 0),
+            "status": camera_status_from_info  # Include the OK/Error status
         }
         emit("camera_payload_broadcast", payload_data, broadcast=True)
     except Exception as e:
@@ -124,22 +129,22 @@ def on_camera_info(data):
 def on_lidar_info(data):
     """Handle lidar-only payload: status and frequency"""
     try:
-        lidar_status = "Disconnected"
-        lidar_collecting = False
-        if hasattr(lidar, 'lidar_controller'):
-            if lidar.lidar_controller.connected:
-                if lidar.lidar_controller.is_collecting:
-                    lidar_status = "Active"
-                    lidar_collecting = True
-                else:
-                    lidar_status = "Connected"
-            else:
-                lidar_status = "Disconnected"
+        # Lidar.py is now the single source of truth for all lidar state
+        # We simply forward the information from lidar.py to clients
+        
+        lidar_status_from_info = data.get("status", "Error")
+        lidar_connected = lidar_status_from_info == "OK"
+        
+        # Use the lidar_status directly from lidar.py
+        display_status = data.get("lidar_status", "disconnected")
+        lidar_collecting = display_status == "active"
+        
         payload_data = {
-            "lidar_status": lidar_status,
-            "lidar_connected": lidar_status != "Disconnected",
+            "lidar_status": display_status.title(),  # Convert to title case for display
+            "lidar_connected": lidar_connected,
             "lidar_collecting": lidar_collecting,
-            "collection_rate_hz": data.get("collection_rate_hz", 0)
+            "collection_rate_hz": data.get("collection_rate_hz", 0),
+            "status": lidar_status_from_info  # Include the OK/Error status
         }
         emit("lidar_payload_broadcast", payload_data, broadcast=True)
     except Exception as e:
@@ -147,14 +152,10 @@ def on_lidar_info(data):
 
 @socketio.on('set_camera_idle')
 def handle_set_camera_idle():
-    global camera_state, camera_connected
     try:
-        if camera_connected:
-            camera_state = "Idle"
-        else:
-            camera_state = "Disconnected"
-        # Do not send payload_status_update; camera status will be sent only via camera_info
-        print("[INFO] Camera set to idle by client request.")
+        # Simply relay the command to camera.py
+        emit('set_camera_idle', {}, broadcast=True)
+        print("[INFO] Set camera idle command relayed to camera.py")
     except Exception as e:
         print(f"[ERROR] set_camera_idle: {e}")
 
@@ -246,17 +247,8 @@ def start_background_tasks():
 
 @socketio.on('connect')
 def handle_connect():
-    global camera_state, camera_connected
     print(f"[INFO] Client connected: {request.sid}")
     connected_clients.add(request.sid)
-    
-    # Check if this is camera.py connecting (we can detect this by checking for camera-specific events)
-    # For now, assume any connection could be camera.py and set to Connected
-    if not camera_connected:
-        camera_connected = True
-        camera_state = "Connected"
-        print("[INFO] Camera module connected")
-    
     # No longer send initial payload status; handled by camera_info/lidar_info events
     # Start communication monitoring if not already running
     if communication_monitor and not communication_monitor.is_monitoring:
@@ -268,17 +260,8 @@ def handle_connect():
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    global camera_state, camera_connected
     print(f"[INFO] Client disconnected: {request.sid}")
     connected_clients.discard(request.sid)
-    
-    # If this was the camera module disconnecting, update status
-    # Note: This is a simplified approach - in production you'd want to track which specific client is the camera
-    if len(connected_clients) == 0:
-        camera_connected = False
-        camera_state = "Disconnected"
-        print("[INFO] Camera module disconnected")
-    
     # Stop communication monitoring if no clients remain
     if communication_monitor and len(connected_clients) == 0:
         communication_monitor.stop_monitoring()

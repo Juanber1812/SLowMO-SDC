@@ -45,7 +45,6 @@ class LidarController:
         self.is_collecting = False
         self.collection_thread = None
         self.data_count = 0
-        self.error_count = 0
         self.start_time = None
         self.last_status_time = time.time()
         self.connected = False
@@ -71,7 +70,6 @@ class LidarController:
             
         self.is_collecting = True
         self.data_count = 0
-        self.error_count = 0
         self.start_time = time.time()
         self.collection_thread = threading.Thread(target=self._collection_loop, daemon=True)
         self.collection_thread.start()
@@ -101,8 +99,6 @@ class LidarController:
                     if distance is not None:
                         sio.emit("lidar_data", {"distance_cm": distance})
                         self.data_count += 1
-                    else:
-                        self.error_count += 1
                     
                     # Send status update every second
                     current_time = time.time()
@@ -114,7 +110,6 @@ class LidarController:
                     
         except Exception as e:
             print(f"❌ LIDAR collection error: {e}")
-            self.error_count += 1
             self.is_collecting = False
             self.connected = False  # Assume disconnection on error
             
@@ -126,26 +121,25 @@ class LidarController:
         elapsed_time = time.time() - self.start_time if self.start_time else 0
         collection_rate = self.data_count / elapsed_time if elapsed_time > 0 and self.start_time else 0
         
-        # Determine status based on connection and collection state
+        # Determine lidar status based on connection and collection state
         if not self.connected:
-            status = "disconnected"
+            lidar_status = "disconnected"
         elif self.is_collecting:
-            status = "active"
+            lidar_status = "active"
         else:
-            status = "connected"
+            lidar_status = "connected"
+        
+        # Determine overall status (OK if lidar is connected/active, Error if disconnected)
+        status = "OK" if self.connected else "Error"
         
         status_data = {
-            "status": status,
-            "is_collecting": self.is_collecting,
-            "is_active": self.is_collecting,  # For compatibility with client
             "collection_rate_hz": round(collection_rate, 2),
-            "error_count": self.error_count,
-            "uptime_seconds": round(elapsed_time, 1),
-            "timestamp": datetime.now().strftime("%H:%M:%S")
+            "lidar_status": lidar_status,
+            "status": status
         }
         
         try:
-            sio.emit("lidar_status", status_data)
+            sio.emit("lidar_info", status_data)
         except Exception as e:
             # Silently handle status update failures to avoid log spam
             pass

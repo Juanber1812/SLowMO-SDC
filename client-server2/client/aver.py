@@ -967,6 +967,10 @@ class MainWindow(QWidget):
                 self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_status_label)
+                
+                # Initialize payload status tracking variables
+                self.camera_payload_status = "Error"  # Default to Error until we get actual status
+                self.lidar_payload_status = "Error"   # Default to Error until we get actual status
             else:
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
@@ -1102,9 +1106,12 @@ class MainWindow(QWidget):
         def on_camera_payload_broadcast(data):
             """Handle camera payload status updates from server"""
             try:
-                # Server sends: {"camera_status": "Streaming", "camera_connected": true, "camera_streaming": true, "fps": 30, "frame_size": 1024}
+                # Server sends: {"camera_status": "Streaming", "camera_connected": true, "camera_streaming": true, "fps": 30, "frame_size": 1024, "status": "OK"}
                 camera_status = data.get("camera_status", "Unknown")
                 fps = data.get("fps", 0)
+                
+                # Store the OK/Error status for overall status computation
+                self.camera_payload_status = data.get("status", "Error")
                 
                 # Update payload subsystem labels
                 if hasattr(self, "payload_camera_label"):
@@ -1173,9 +1180,12 @@ class MainWindow(QWidget):
         def on_lidar_payload_broadcast(data):
             """Handle lidar payload status updates from server"""
             try:
-                # Server sends: {"lidar_status": "Active", "lidar_connected": true, "lidar_collecting": true, "collection_rate_hz": 10}
+                # Server sends: {"lidar_status": "Active", "lidar_connected": true, "lidar_collecting": true, "collection_rate_hz": 10, "status": "OK"}
                 lidar_status = data.get("lidar_status", "Unknown")
                 collection_rate_hz = data.get("collection_rate_hz", 0)
+                
+                # Store the OK/Error status for overall status computation
+                self.lidar_payload_status = data.get("status", "Error")
                 
                 # Update payload subsystem labels
                 if hasattr(self, "payload_lidar_label"):
@@ -1362,32 +1372,20 @@ class MainWindow(QWidget):
             logging.error(f"Sensor update error: {e}")
 
     def update_payload_overall_status(self):
-        """Update the overall payload subsystem status based on camera and lidar states"""
+        """Update the overall payload subsystem status based on camera and lidar OK/Error states"""
         try:
             if not hasattr(self, "payload_status_label"):
                 return
                 
-            # Get current camera and lidar status
-            camera_text = getattr(self, "payload_camera_label", None)
-            lidar_text = getattr(self, "payload_lidar_label", None)
+            # Get camera and lidar status from the stored OK/Error status values
+            camera_status = getattr(self, "camera_payload_status", "Error")
+            lidar_status = getattr(self, "lidar_payload_status", "Error")
             
-            camera_status = "Unknown"
-            lidar_status = "Unknown"
-            
-            if camera_text:
-                camera_status = camera_text.text().replace("Camera: ", "")
-            if lidar_text:
-                lidar_status = lidar_text.text().replace("Lidar: ", "")
-            
-            # Determine overall status
-            if camera_status == "Streaming" and lidar_status == "Active":
-                overall_status = "Ready"
-            elif camera_status == "Streaming" or lidar_status == "Active":
-                overall_status = "Partial"
-            elif camera_status == "Pending..." or lidar_status == "Pending...":
-                overall_status = "Initializing"
+            # Determine overall status: OK only if both are OK, otherwise Error
+            if camera_status == "OK" and lidar_status == "OK":
+                overall_status = "OK"
             else:
-                overall_status = "Not Ready"
+                overall_status = "Error"
             
             self.payload_status_label.setText(f"Status: {overall_status}")
             
