@@ -1,0 +1,32 @@
+2025-06-30 21:20:32,462 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-30 21:20:33,999 - INFO - Connected to server
+2025-06-30 21:20:34,000 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:20:34,007 - INFO - [INFO] Successfully connected to server
+2025-06-30 21:20:34,013 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:36,197 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:37,961 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:39,889 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:41,895 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:43,910 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:44,435 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:20:44,938 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-30 21:20:44,943 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:20:45,910 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:46,642 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:20:46,644 - INFO - Stream paused for config application.
+2025-06-30 21:20:47,147 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:20:47,151 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:20:47,355 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:20:47,918 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:49,918 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:20:49,922 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:50,424 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-30 21:20:50,428 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:20:51,926 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:52,049 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:20:52,553 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-06-30 21:20:52,558 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:20:53,938 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:55,942 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:57,946 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:20:58,348 - INFO - Disconnected from server: client disconnect
