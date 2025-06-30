@@ -116,6 +116,8 @@ class LidarController:
                         self._send_status_update()
                         self.last_status_time = current_time
                     
+                    # Simple 20Hz frequency control
+                    time.sleep(0.05)  # 1/20 = 0.05 seconds
 
                     
         except Exception as e:

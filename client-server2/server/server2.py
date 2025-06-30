@@ -352,7 +352,7 @@ def handle_stop_lidar():
 
 def power_data_callback(power_data):
     try:
-        if power_data.get('status') in ['Disconnected', 'Error - Disconnected']:
+        if power_data.get('status') in ['Disconnected', 'Error - Disconnected', 'Error']:
             formatted_data = {
                 "current": "0.000",
                 "voltage": "0.0", 
@@ -363,6 +363,21 @@ def power_data_callback(power_data):
                 "status": "Disconnected"
             }
         else:
+            # Map power.py status to client-friendly status
+            status_mapping = {
+                "OK": "Nominal",
+                "Battery Low": "Battery Low", 
+                "Battery Critical": "Battery Critical",
+                "High Current": "High Current",
+                "Current Critical": "Current Critical", 
+                "High Power": "High Power",
+                "High Temperature": "High Temperature",
+                "Overheating": "Overheating",
+                "Operational": "Nominal"  # Legacy fallback
+            }
+            
+            client_status = status_mapping.get(power_data['status'], power_data['status'])
+            
             formatted_data = {
                 "current": f"{power_data['current_ma'] / 1000:.3f}",
                 "voltage": f"{power_data['voltage_v']:.1f}",
@@ -370,7 +385,7 @@ def power_data_callback(power_data):
                 "energy": f"{power_data['energy_j'] / 3600:.2f}",
                 "temperature": f"{power_data['temperature_c']:.1f}",
                 "battery_percentage": power_data['battery_percentage'],
-                "status": "Nominal" if power_data['status'] == "Operational" else power_data['status']
+                "status": client_status
             }
         socketio.emit("power_broadcast", formatted_data)
         import time

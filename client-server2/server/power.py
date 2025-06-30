@@ -103,6 +103,9 @@ class PowerMonitor:
             temperature_c = getattr(self.ina228, 'die_temperature', 25.0)  # Fallback temp
             battery_pct = self.get_battery_percentage(voltage_v)
             
+            # Determine intelligent status based on readings
+            power_status = self.determine_power_status(current_ma, voltage_v, power_mw, battery_pct, temperature_c)
+            
             return {
                 "current_ma": current_ma,
                 "voltage_v": voltage_v,
@@ -110,7 +113,7 @@ class PowerMonitor:
                 "energy_j": energy_j,
                 "temperature_c": temperature_c,
                 "battery_percentage": battery_pct,
-                "status": "Operational"
+                "status": power_status  # Now uses intelligent status determination
             }
             
         except Exception as e:
@@ -257,6 +260,46 @@ class PowerMonitor:
             "last_update": datetime.now().isoformat() if self.last_data else None
         }
 
+    def determine_power_status(self, current_ma, voltage_v, power_mw, battery_pct, temperature_c=None):
+        """Determine overall power system status based on readings"""
+        # Check for no readings or all zeros (Error condition)
+        if current_ma == 0 and voltage_v == 0 and power_mw == 0:
+            return "Error"
+        
+        # Check for abnormally low voltage (could indicate sensor issues)
+        if voltage_v < 3.0:
+            return "Error"
+        
+        # Check for overheating (more than 60°C) - highest priority after Error
+        if temperature_c and temperature_c > 60.0:
+            return "Overheating"
+        
+        # Check for very high current draw (more than 2A = 2000mA) - critical
+        if current_ma > 2000:
+            return "Current Critical"
+        
+        # Check for critically low battery (less than 15%)
+        if battery_pct < 15:
+            return "Battery Critical"
+        
+        # Check for high temperature (more than 50°C) but not critical
+        if temperature_c and temperature_c > 50.0:
+            return "High Temperature"
+        
+        # Check for high current draw (more than 1A = 1000mA)
+        if current_ma > 1000:
+            return "High Current"
+        
+        # Check for low battery (less than 25%)
+        if battery_pct < 25:
+            return "Battery Low"
+        
+        # Check for high power consumption (more than 10W = 10000mW)
+        if power_mw > 10000:
+            return "High Power"
+        
+        # If all checks pass, system is OK
+        return "OK"
 
 # Standalone testing functions
 def init_sensor():

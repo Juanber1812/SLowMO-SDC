@@ -829,7 +829,7 @@ class MainWindow(QWidget):
         self.overall_labels = {}
         
         subsystems = [
-            ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Temperature: Pending...", "Status: Pending..."]),
+            ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Battery: Pending...", "Temperature: Pending...", "Status: Pending..."]),
             ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
             ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Signal Strength: Pending...", "Data Rate: Pending..."]),
             ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Lux1: Pending...","Lux2: Pending...","Lux3: Pending...", "RPM: Pending...", "Status: Pending..."]),
@@ -867,6 +867,8 @@ class MainWindow(QWidget):
                         self.power_labels["power"] = lbl
                     elif "Energy:" in text:
                         self.power_labels["energy"] = lbl
+                    elif "Battery:" in text:
+                        self.power_labels["battery"] = lbl
                     elif "Temperature:" in text:
                         self.power_labels["temperature"] = lbl
                     elif "Status:" in text:
@@ -1212,10 +1214,29 @@ class MainWindow(QWidget):
 
         @sio.on("power_broadcast")
         def on_power_data(data):
-            """Handle power subsystem data updates"""
+            """Handle power subsystem data updates with smart status"""
             try:
                 if hasattr(self, 'power_labels'):
-                    # Server sends strings like: {"current": "0.123", "voltage": "5.0", "power": "0.62", "energy": "0.01", "temperature": "25.5", "status": "Nominal"}
+                    # Server sends formatted data like: 
+                    # {"current": "0.123", "voltage": "5.0", "power": "0.62", "energy": "0.01", 
+                    #  "temperature": "25.5", "battery_percentage": 75, "status": "Nominal"}
+                    
+                    # Handle disconnected state
+                    if data.get("status") == "Disconnected":
+                        self.power_labels["current"].setText("Current: -- A")
+                        self.power_labels["voltage"].setText("Voltage: -- V") 
+                        self.power_labels["power"].setText("Power: -- W")
+                        self.power_labels["energy"].setText("Energy: -- Wh")
+                        self.power_labels["battery"].setText("Battery: --%")
+                        self.power_labels["temperature"].setText("Temperature: -- °C")
+                        self.power_labels["status"].setText("Status: Disconnected")
+                        self.power_labels["status"].setStyleSheet(
+                            f"QLabel {{ color: #666666; margin: 2px 0px; padding: 2px 0px; "
+                            f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                        )
+                        return
+                    
+                    # Handle normal data updates
                     if "current" in data:
                         self.power_labels["current"].setText(f"Current: {data['current']} A")
                     if "voltage" in data:
@@ -1224,10 +1245,30 @@ class MainWindow(QWidget):
                         self.power_labels["power"].setText(f"Power: {data['power']} W")
                     if "energy" in data:
                         self.power_labels["energy"].setText(f"Energy: {data['energy']} Wh")
+                    if "battery_percentage" in data:
+                        battery_pct = data['battery_percentage']
+                        self.power_labels["battery"].setText(f"Battery: {battery_pct}%")
                     if "temperature" in data:
                         self.power_labels["temperature"].setText(f"Temperature: {data['temperature']}°C")
+                    
+                    # Update status with appropriate color coding
                     if "status" in data:
-                        self.power_labels["status"].setText(f"Status: {data['status']}")
+                        status = data['status']
+                        # Apply color coding based on status
+                        if status in ["Battery Critical", "Current Critical", "Overheating"]:
+                            status_color = "#ff4444"  # Red for critical
+                        elif status in ["Battery Low", "High Current", "High Power", "High Temperature"]:
+                            status_color = "#ffaa00"  # Orange for warnings
+                        elif status == "Disconnected":
+                            status_color = "#666666"  # Gray for disconnected
+                        else:  # Nominal, OK
+                            status_color = "#00ff00"  # Green for normal
+                        
+                        self.power_labels["status"].setText(f"Status: {status}")
+                        self.power_labels["status"].setStyleSheet(
+                            f"QLabel {{ color: {status_color}; margin: 2px 0px; padding: 2px 0px; "
+                            f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                        )
             except Exception as e:
                 logging.error(f"Failed to update power data: {e}")
 
