@@ -823,6 +823,7 @@ class MainWindow(QWidget):
         # Initialize label dictionaries for live data updates
         self.power_labels = {}
         self.thermal_labels = {}
+        self.comms_labels = {}
         self.adcs_labels = {}
         self.cdh_labels = {}
         self.error_labels = {}
@@ -831,7 +832,7 @@ class MainWindow(QWidget):
         subsystems = [
             ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Battery: Pending...", "Temperature: Pending...", "Status: Pending..."]),
             ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
-            ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Signal Strength: Pending...", "Data Rate: Pending..."]),
+            ("Communication Subsystem", ["Downlink Frequency: Pending...", "WiFi Download: Pending...", "WiFi Upload: Pending...", "Signal Strength: Pending...", "Data Rate: Pending...", "Status: Pending..."]),
             ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Lux1: Pending...","Lux2: Pending...","Lux3: Pending...", "RPM: Pending...", "Status: Pending..."]),
             ("Payload Subsystem", []),  # Special handling for payload
             ("Command & Data Handling Subsystem", ["Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
@@ -932,12 +933,25 @@ class MainWindow(QWidget):
                         self.cdh_labels["status"] = lbl
                         
             elif name == "Communication Subsystem":
-                # Add standard comm items
-                for text in items:
+                # Store references to communication labels for live updates
+                for i, text in enumerate(items):
                     lbl = QLabel(text)
                     lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
+                    # Store label references for the new communication labels
+                    if "Downlink Frequency:" in text:
+                        self.comms_labels["downlink_frequency"] = lbl
+                    elif "WiFi Download:" in text:
+                        self.comms_labels["wifi_download_speed"] = lbl
+                    elif "WiFi Upload:" in text:
+                        self.comms_labels["wifi_upload_speed"] = lbl
+                    elif "Signal Strength:" in text:
+                        self.comms_labels["server_signal_strength"] = lbl
+                    elif "Data Rate:" in text:
+                        self.comms_labels["data_transmission_rate"] = lbl
+                    elif "Status:" in text:
+                        self.comms_labels["status"] = lbl
                 # Add special status label
                 self.comms_status_label = QLabel("Status: Disconnected")
                 self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
@@ -1293,26 +1307,76 @@ class MainWindow(QWidget):
         def on_communication_data(data):
             """Handle communication subsystem data updates"""
             try:
-                # Server sends: {"wifi_download_speed": 0.0, "wifi_upload_speed": 0.0, "data_upload_speed": 0.0, 
-                # "data_transmission_rate": 0.0, "uplink_frequency": 0.0, "downlink_frequency": 0.0, 
-                # "server_signal_strength": 0, "connection_quality": "Unknown", "network_latency": 0.0, "status": "Disconnected"}
+                # Server sends: {"downlink_frequency": 0.0, "wifi_download_speed": 0.0, "wifi_upload_speed": 0.0, 
+                # "data_transmission_rate": 0.0, "server_signal_strength": 0, "status": "Disconnected"}
                 
-                # Update the comms status label that already exists
-                if hasattr(self, 'comms_status_label'):
-                    status = data.get('status', 'Unknown')
-                    signal_strength = data.get('server_signal_strength', 0)
-                    wifi_down = data.get('wifi_download_speed', 0)
-                    wifi_up = data.get('wifi_upload_speed', 0)
+                # Update communication labels
+                if hasattr(self, 'comms_labels'):
+                    # Update downlink frequency
+                    if 'downlink_frequency' in self.comms_labels:
+                        freq = data.get('downlink_frequency', 0.0)
+                        self.comms_labels['downlink_frequency'].setText(f"Downlink Frequency: {freq:.3f} GHz")
                     
-                    # Create a summary status
-                    if status == "Disconnected":
-                        status_text = "Status: Disconnected"
-                    else:
-                        status_text = f"Status: {status} | WiFi: {wifi_down:.1f}↓/{wifi_up:.1f}↑ Mbps | Signal: {signal_strength} dBm"
+                    # Update WiFi speeds
+                    if 'wifi_download_speed' in self.comms_labels:
+                        speed = data.get('wifi_download_speed', 0.0)
+                        self.comms_labels['wifi_download_speed'].setText(f"WiFi Download: {speed:.1f} Mbps")
                     
-                    self.comms_status_label.setText(status_text)
+                    if 'wifi_upload_speed' in self.comms_labels:
+                        speed = data.get('wifi_upload_speed', 0.0)
+                        self.comms_labels['wifi_upload_speed'].setText(f"WiFi Upload: {speed:.1f} Mbps")
+                    
+                    # Update signal strength
+                    if 'server_signal_strength' in self.comms_labels:
+                        signal = data.get('server_signal_strength', 0)
+                        self.comms_labels['server_signal_strength'].setText(f"Signal Strength: {signal} dBm")
+                    
+                    # Update data transmission rate
+                    if 'data_transmission_rate' in self.comms_labels:
+                        rate = data.get('data_transmission_rate', 0.0)
+                        self.comms_labels['data_transmission_rate'].setText(f"Data Rate: {rate:.1f} KB/s")
+                    
+                    # Update status with color coding
+                    if 'status' in self.comms_labels:
+                        status = data.get('status', 'Unknown')
+                        # Apply color coding based on status
+                        if status == "Disconnected":
+                            status_color = "#666666"  # Gray for disconnected
+                        elif status == "Poor Connection":
+                            status_color = "#ff4444"  # Red for poor
+                        elif status == "Fair Connection":
+                            status_color = "#ffaa00"  # Orange for fair
+                        elif status == "Excellent":
+                            status_color = "#00ff00"  # Green for excellent
+                        else:  # Good
+                            status_color = "#88ff88"  # Light green for good
+                        
+                        self.comms_labels['status'].setText(f"Status: {status}")
+                        self.comms_labels['status'].setStyleSheet(
+                            f"QLabel {{ color: {status_color}; margin: 2px 0px; padding: 2px 0px; "
+                            f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                        )
+                        
             except Exception as e:
                 logging.error(f"Failed to update communication data: {e}")
+
+        @sio.on("throughput_test")
+        def on_throughput_test(data):
+            """Handle throughput test request from server and echo data back"""
+            try:
+                # Extract test data from server
+                test_data = data.get('test_data', b'')
+                test_size = data.get('size', 0)
+                
+                # Echo the data back to server immediately
+                sio.emit('throughput_response', {
+                    'response_data': test_data,
+                    'size': test_size,
+                    'timestamp': time.time()
+                })
+                
+            except Exception as e:
+                logging.error(f"Failed to handle throughput test: {e}")
 
         @sio.on("tachometer_broadcast")
         def on_tachometer_data(data):

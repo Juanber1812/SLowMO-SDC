@@ -55,14 +55,8 @@ connected_clients = set()
 def handle_frame(data):
     try:
         emit('frame', data, broadcast=True)
-        # Track upload data for communication monitoring
-        if communication_monitor and isinstance(data, (bytes, bytearray)):
-            communication_monitor.record_upload_data(len(data))
-            communication_monitor.record_data_transmission(len(data))
-        elif communication_monitor and isinstance(data, str):
-            data_bytes = len(data.encode('utf-8'))
-            communication_monitor.record_upload_data(data_bytes)
-            communication_monitor.record_data_transmission(data_bytes)
+        # Note: Frame data no longer tracked for communication monitoring
+        # as true channel throughput is now measured via dedicated tests
     except Exception as e:
         print(f"[ERROR] frame broadcast: {e}")
 
@@ -257,6 +251,7 @@ def handle_connect():
     # Start communication monitoring if not already running
     if communication_monitor and not communication_monitor.is_monitoring:
         communication_monitor.set_update_callback(communication_data_callback)
+        communication_monitor.set_throughput_test_callback(throughput_test_callback)
         if communication_monitor.start_monitoring():
             logging.info("Communication monitoring started (on client connect)")
         else:
@@ -399,43 +394,62 @@ def power_data_callback(power_data):
         logging.error(f"Error in power data callback: {e}")
 
 def communication_data_callback(comm_data):
+    """Handle communication data updates and broadcast to clients"""
     try:
+        # Format data to match the simplified structure
         formatted_data = {
-            "wifi_download_speed": comm_data.get('wifi_download_speed', 0.0),
-            "wifi_upload_speed": comm_data.get('wifi_upload_speed', 0.0),
-            "data_upload_speed": comm_data.get('data_upload_speed', 0.0),
-            "data_transmission_rate": comm_data.get('data_transmission_rate', 0.0),
-            "uplink_frequency": comm_data.get('uplink_frequency', 0.0),
             "downlink_frequency": comm_data.get('downlink_frequency', 0.0),
+            "wifi_download_speed": comm_data.get('wifi_download_speed', 0.0), 
+            "wifi_upload_speed": comm_data.get('wifi_upload_speed', 0.0),
+            "data_transmission_rate": comm_data.get('data_transmission_rate', 0.0),
             "server_signal_strength": comm_data.get('server_signal_strength', 0),
-            "connection_quality": comm_data.get('connection_quality', 'Unknown'),
-            "network_latency": comm_data.get('network_latency', 0.0),
             "status": comm_data.get('status', 'Disconnected')
         }
+        
         socketio.emit("communication_broadcast", formatted_data)
+        
+        # Log communication status periodically (every 30 seconds)
         if not hasattr(communication_data_callback, 'last_log') or time.time() - communication_data_callback.last_log > 30:
             print(f"\n[COMM] WiFi: {formatted_data['wifi_download_speed']:.1f}↓/{formatted_data['wifi_upload_speed']:.1f}↑ Mbps, "
-                  f"Upload: {formatted_data['data_upload_speed']:.1f} KB/s, "
                   f"Data Rate: {formatted_data['data_transmission_rate']:.1f} KB/s, "
-                  f"Freq: {formatted_data['uplink_frequency']:.1f} GHz, "
+                  f"Freq: {formatted_data['downlink_frequency']:.3f} GHz, "
                   f"Signal: {formatted_data['server_signal_strength']} dBm, "
-                  f"Latency: {formatted_data['network_latency']:.1f} ms, "
-                  f"Quality: {formatted_data['connection_quality']}, "
                   f"Status: {formatted_data['status']}")
             communication_data_callback.last_log = time.time()
+            
     except Exception as e:
         logging.error(f"Error in communication data callback: {e}")
+        # Send error state to clients
         socketio.emit("communication_broadcast", {
-            "wifi_speed": "0.0",
-            "upload_speed": "0.0",
-            "transmission_rate": "0.0",
-            "uplink_frequency": "0.0",
-            "downlink_frequency": "0.0",
+            "downlink_frequency": 0.0,
+            "wifi_download_speed": 0.0,
+            "wifi_upload_speed": 0.0,
+            "data_transmission_rate": 0.0,
             "server_signal_strength": 0,
-            "connection_quality": "Error",
-            "network_latency": "0.0",
             "status": "Error"
         })
+
+def throughput_test_callback(event_type, data):
+    """Handle throughput test requests from communication monitor"""
+    try:
+        if event_type == 'throughput_test':
+            # Send throughput test to all connected clients
+            socketio.emit('throughput_test', data)
+            logging.info(f"Throughput test initiated: {data['size']} bytes")
+    except Exception as e:
+        logging.error(f"Error in throughput test callback: {e}")
+
+@socketio.on('throughput_response')
+def handle_throughput_response(data):
+    """Handle throughput test response from client"""
+    try:
+        if communication_monitor:
+            response_data = data.get('response_data', b'')
+            response_size = data.get('size', 0)
+            communication_monitor.handle_throughput_response(response_data, response_size)
+            logging.info(f"Throughput response received: {response_size} bytes")
+    except Exception as e:
+        logging.error(f"Error handling throughput response: {e}")
 
 @socketio.on("get_power_status")
 def handle_get_power_status():
