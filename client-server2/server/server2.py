@@ -32,7 +32,8 @@ except ImportError as e:
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-camera_state = "Idle"  # Default camera state
+camera_state = "Disconnected"  # Default camera state
+camera_connected = False  # Track camera connection status
 
 # Initialize power monitor
 power_monitor = None
@@ -68,20 +69,26 @@ def handle_frame(data):
 
 @socketio.on('start_camera')
 def handle_start_camera():
-    global camera_state
+    global camera_state, camera_connected
     try:
         emit('start_camera', {}, broadcast=True)
-        camera_state = "Streaming"
+        if camera_connected:
+            camera_state = "Streaming"
+        else:
+            camera_state = "Disconnected"
         # send_payload_status_update() removed; handled by camera_info event
     except Exception as e:
         print(f"[ERROR] start_camera: {e}")
 
 @socketio.on('stop_camera')
 def handle_stop_camera():
-    global camera_state
+    global camera_state, camera_connected
     try:
         emit('stop_camera', {}, broadcast=True)
-        camera_state = "Idle"
+        if camera_connected:
+            camera_state = "Idle"
+        else:
+            camera_state = "Disconnected"
         # send_payload_status_update() removed; handled by camera_info event
     except Exception as e:
         print(f"[ERROR] stop_camera: {e}")
@@ -99,12 +106,12 @@ def handle_camera_config(data):
 def on_camera_info(data):
     """Handle camera-only payload: status, fps, frame size"""
     try:
-        camera_connected = True  # Assume connected if server is running
-        camera_streaming = camera_state == "Streaming"
+        global camera_connected
+        camera_connected = True  # If we're receiving camera_info, camera is connected
         payload_data = {
             "camera_status": camera_state,
             "camera_connected": camera_connected,
-            "camera_streaming": camera_streaming,
+            "camera_streaming": camera_state == "Streaming",
             "fps": data.get("fps", 0),
             "frame_size": data.get("frame_size", 0)
         }
@@ -140,9 +147,12 @@ def on_lidar_info(data):
 
 @socketio.on('set_camera_idle')
 def handle_set_camera_idle():
-    global camera_state
+    global camera_state, camera_connected
     try:
-        camera_state = "Idle"
+        if camera_connected:
+            camera_state = "Idle"
+        else:
+            camera_state = "Disconnected"
         # Do not send payload_status_update; camera status will be sent only via camera_info
         print("[INFO] Camera set to idle by client request.")
     except Exception as e:
@@ -236,8 +246,17 @@ def start_background_tasks():
 
 @socketio.on('connect')
 def handle_connect():
+    global camera_state, camera_connected
     print(f"[INFO] Client connected: {request.sid}")
     connected_clients.add(request.sid)
+    
+    # Check if this is camera.py connecting (we can detect this by checking for camera-specific events)
+    # For now, assume any connection could be camera.py and set to Connected
+    if not camera_connected:
+        camera_connected = True
+        camera_state = "Connected"
+        print("[INFO] Camera module connected")
+    
     # No longer send initial payload status; handled by camera_info/lidar_info events
     # Start communication monitoring if not already running
     if communication_monitor and not communication_monitor.is_monitoring:
@@ -249,8 +268,17 @@ def handle_connect():
 
 @socketio.on('disconnect')
 def handle_disconnect():
+    global camera_state, camera_connected
     print(f"[INFO] Client disconnected: {request.sid}")
     connected_clients.discard(request.sid)
+    
+    # If this was the camera module disconnecting, update status
+    # Note: This is a simplified approach - in production you'd want to track which specific client is the camera
+    if len(connected_clients) == 0:
+        camera_connected = False
+        camera_state = "Disconnected"
+        print("[INFO] Camera module disconnected")
+    
     # Stop communication monitoring if no clients remain
     if communication_monitor and len(connected_clients) == 0:
         communication_monitor.stop_monitoring()

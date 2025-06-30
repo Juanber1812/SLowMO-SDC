@@ -30,3 +30,125 @@
 2025-06-30 21:20:55,942 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
 2025-06-30 21:20:57,946 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
 2025-06-30 21:20:58,348 - INFO - Disconnected from server: client disconnect
+2025-06-30 21:42:13,942 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-30 21:42:15,681 - INFO - Connected to server
+2025-06-30 21:42:15,682 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:42:15,686 - INFO - [INFO] Successfully connected to server
+2025-06-30 21:42:17,333 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:19,329 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:21,338 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:22,205 - INFO - Disconnected from server: transport error
+2025-06-30 21:42:23,333 - INFO - Connected to server
+2025-06-30 21:42:23,336 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:42:23,340 - INFO - Stream paused for config application.
+2025-06-30 21:42:23,640 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:23,722 - INFO - Disconnected from server: transport error
+2025-06-30 21:42:25,285 - INFO - Connected to server
+2025-06-30 21:42:25,286 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:42:25,344 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:27,356 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:29,375 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:31,379 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:33,386 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:35,387 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:37,398 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:39,404 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:41,407 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:43,409 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:44,094 - INFO - Requesting LIDAR streaming start
+2025-06-30 21:42:45,454 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:45,731 - INFO - Requesting LIDAR streaming stop
+2025-06-30 21:42:45,735 - INFO - Back button clicked in LidarWidget
+2025-06-30 21:42:46,906 - INFO - Requesting LIDAR streaming start
+2025-06-30 21:42:47,134 - INFO - Requesting LIDAR streaming stop
+2025-06-30 21:42:47,138 - INFO - Back button clicked in LidarWidget
+2025-06-30 21:42:47,418 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:49,467 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:51,433 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:53,448 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:42:53,605 - INFO - Disconnected from server: client disconnect
+2025-06-30 21:46:01,540 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-30 21:46:01,697 - INFO - Connected to server
+2025-06-30 21:46:01,698 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:46:01,700 - INFO - [INFO] Successfully connected to server
+2025-06-30 21:46:02,045 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:46:02,384 - INFO - Requesting LIDAR streaming start
+2025-06-30 21:46:03,677 - INFO - Requesting LIDAR streaming stop
+2025-06-30 21:46:03,685 - INFO - Back button clicked in LidarWidget
+2025-06-30 21:46:03,939 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:46:05,957 - ERROR - Failed to update power data: Unknown format code 'f' for object of type 'str'
+2025-06-30 21:46:06,450 - INFO - Disconnected from server: client disconnect
+2025-06-30 21:54:32,737 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-30 21:54:32,895 - INFO - Connected to server
+2025-06-30 21:54:32,896 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:54:32,898 - INFO - [INFO] Successfully connected to server
+2025-06-30 21:54:49,284 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:54:49,288 - INFO - Stream paused for config application.
+2025-06-30 21:54:49,790 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:54:49,796 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:54:50,003 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:54:52,271 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:54:52,273 - INFO - Stream paused for config application.
+2025-06-30 21:54:52,776 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:54:52,781 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:54:52,985 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:54:55,692 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:54:55,695 - INFO - Stream paused for config application.
+2025-06-30 21:54:56,198 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:54:56,202 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:54:56,407 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:54:59,367 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:54:59,369 - INFO - Stream paused for config application.
+2025-06-30 21:54:59,873 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:54:59,876 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:55:00,078 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:55:04,695 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:55:04,696 - INFO - Stream paused for config application.
+2025-06-30 21:55:05,198 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:55:05,204 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:55:05,408 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:55:06,932 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:55:06,934 - INFO - Stream paused for config application.
+2025-06-30 21:55:07,437 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:55:07,441 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:55:07,644 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:55:08,564 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:55:08,628 - INFO - Stream paused for config application.
+2025-06-30 21:55:09,150 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:55:09,155 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:55:09,361 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:55:12,152 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:55:12,155 - INFO - Stream paused for config application.
+2025-06-30 21:55:12,659 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:55:12,663 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:55:12,867 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:55:16,629 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:55:16,632 - INFO - Stream paused for config application.
+2025-06-30 21:55:17,136 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:55:17,141 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:55:17,345 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:55:20,838 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 21:55:20,842 - INFO - Stream paused for config application.
+2025-06-30 21:55:21,346 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 21:55:21,351 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 21:55:21,555 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 21:55:54,565 - INFO - Requesting LIDAR streaming start
+2025-06-30 21:55:57,054 - INFO - Requesting LIDAR streaming stop
+2025-06-30 21:55:57,058 - INFO - Back button clicked in LidarWidget
+2025-06-30 21:56:01,664 - INFO - Disconnected from server: client disconnect
+2025-06-30 22:02:45,454 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-06-30 22:02:45,616 - INFO - Connected to server
+2025-06-30 22:02:45,618 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 22:02:45,619 - INFO - [INFO] Successfully connected to server
+2025-06-30 22:02:55,807 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-06-30 22:02:55,809 - INFO - Stream paused for config application.
+2025-06-30 22:02:56,312 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-06-30 22:02:56,316 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-06-30 22:02:56,523 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-06-30 22:03:04,286 - INFO - Requesting LIDAR streaming start
+2025-06-30 22:03:07,309 - INFO - Requesting LIDAR streaming stop
+2025-06-30 22:03:07,315 - INFO - Back button clicked in LidarWidget
+2025-06-30 22:03:08,275 - INFO - Requesting LIDAR streaming start
+2025-06-30 22:03:08,954 - INFO - Requesting LIDAR streaming stop
+2025-06-30 22:03:08,958 - INFO - Back button clicked in LidarWidget
+2025-06-30 22:03:19,212 - INFO - Disconnected from server: client disconnect

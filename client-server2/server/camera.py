@@ -40,10 +40,8 @@ class CameraStreamer:
         try:
             sio.connect(SERVER_URL)
             self.connected = True
-            sio.emit("camera_status", {"status": "Idle"})
         except Exception as e:
             print("[ERROR] Socket connection failed:", e)
-            sio.emit("camera_status", {"status": "Error"})
 
     def apply_config(self):
         try:
@@ -78,7 +76,6 @@ class CameraStreamer:
             self.picam.start()
         except Exception as e:
             print("[ERROR] Failed to configure camera:", e)
-            sio.emit("camera_status", {"status": "Error"})
 
     def stream_loop(self):
         frame_count = 0
@@ -105,7 +102,7 @@ class CameraStreamer:
                         frame_size = len(frame_bytes) // 1024  # KB
                         upload_speed = (bytes_sent - last_bytes_sent) // 1024  # KB/s
 
-                        # EMIT CAMERA INFO EVENT
+                        # EMIT CAMERA INFO EVENT FOR SERVER2.PY
                         sio.emit("camera_info", {
                             "fps": fps,
                             "frame_size": frame_size,
@@ -200,11 +197,6 @@ streamer = CameraStreamer()
 def connect():
     streamer.connected = True
     print("📡 Connected to server from camera.py")
-    # Send payload subsystem status
-    sio.emit("payload_data", {
-        "camera_status": "OPERATIONAL",
-        "status": "OK"
-    })
 
 @sio.event
 def disconnect():
@@ -213,55 +205,31 @@ def disconnect():
     if hasattr(streamer, "picam") and getattr(streamer.picam, "started", False):
         streamer.picam.stop()
     print("🔌 Camera disconnected")
-    # Send payload subsystem status
-    sio.emit("payload_data", {
-        "camera_status": "DISCONNECTED", 
-        "status": "ERROR"
-    })
 
 @sio.on("start_camera")
 def on_start_camera(_):
     streamer.streaming = True
     if not streamer.picam.started:
-        streamer.picam.start()
-    sio.emit("camera_status", {"status": "Streaming"})
-    # Send payload subsystem status
-    sio.emit("payload_data", {
-        "camera_status": "STREAMING",
-        "status": "OK"
-    })
+        streamer.apply_config()
 
 @sio.on("stop_camera")
 def on_stop_camera(_):
     streamer.streaming = False
-    sio.emit("camera_status", {"status": "Idle"})
-    # Send payload subsystem status
-    sio.emit("payload_data", {
-        "camera_status": "IDLE",
-        "status": "OK"
-    })
 
 @sio.on("camera_config")
 def on_camera_config(data):
     streamer.config.update(data)
     if not streamer.streaming:
         streamer.apply_config()
-        sio.emit("camera_status", {"status": "Ready"})
-        # Send payload subsystem status
-        sio.emit("payload_data", {
-            "camera_status": "OPERATIONAL",
-            "status": "OK"
-        })
 
 @sio.on("get_camera_status")
 def on_get_camera_status(_):
-    status = "Streaming" if streamer.streaming else "Idle"
-    sio.emit("camera_status", {"status": status})
+    # Server2.py will handle status reporting
+    pass
 
 @sio.on("set_camera_idle")
 def on_set_camera_idle(_):
     streamer.streaming = False
-    sio.emit("camera_status", {"status": "Idle"})
 
 def start_stream():
     streamer.connect_socket()

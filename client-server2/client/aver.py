@@ -788,6 +788,7 @@ class MainWindow(QWidget):
             "speed":     QLabel("Upload: -- Mbps"),
             "max_frame": QLabel("Max Frame: -- KB"),
             "fps":       QLabel("Live FPS: --"),
+            "fps_server": QLabel("Server FPS: --"),
             "frame_size":QLabel("Frame Size: -- KB"),
             "disp_fps" : QLabel("Display FPS: --")
             }
@@ -941,16 +942,31 @@ class MainWindow(QWidget):
                 self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.comms_status_label)
             elif name == "Payload Subsystem":
-                # Special payload status labels
-                self.camera_status_label = QLabel("Camera: Pending...")
-                self.camera_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.camera_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.camera_status_label)
+                # Create payload subsystem labels as specified
+                self.payload_camera_label = QLabel("Camera: Pending...")
+                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_camera_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.payload_camera_label)
                 
-                self.camera_ready_label = QLabel("Status: Not Ready")
-                self.camera_ready_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.camera_ready_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.camera_ready_label)
+                self.payload_fps_label = QLabel("FPS: --")
+                self.payload_fps_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_fps_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.payload_fps_label)
+                
+                self.payload_lidar_label = QLabel("Lidar: Pending...")
+                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_lidar_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.payload_lidar_label)
+                
+                self.payload_frequency_label = QLabel("Frequency: --")
+                self.payload_frequency_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_frequency_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.payload_frequency_label)
+                
+                self.payload_status_label = QLabel("Status: Not Ready")
+                self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                layout.addWidget(self.payload_status_label)
             else:
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
@@ -1082,9 +1098,29 @@ class MainWindow(QWidget):
                     f"Server FPS: {data['fps']:.1f}"
                 )
 
-        @sio.on("camera_status")
-        def on_camera_status(data):
-            self.update_camera_status(data)
+        @sio.on("camera_payload_broadcast")
+        def on_camera_payload_broadcast(data):
+            """Handle camera payload status updates from server"""
+            try:
+                # Server sends: {"camera_status": "Streaming", "camera_connected": true, "camera_streaming": true, "fps": 30, "frame_size": 1024}
+                camera_status = data.get("camera_status", "Unknown")
+                fps = data.get("fps", 0)
+                
+                # Update payload subsystem labels
+                if hasattr(self, "payload_camera_label"):
+                    self.payload_camera_label.setText(f"Camera: {camera_status}")
+                
+                if hasattr(self, "payload_fps_label"):
+                    if fps > 0:
+                        self.payload_fps_label.setText(f"FPS: {fps:.1f}")
+                    else:
+                        self.payload_fps_label.setText("FPS: --")
+                
+                # Update overall payload status based on camera status
+                self.update_payload_overall_status()
+                
+            except Exception as e:
+                logging.error(f"Failed to process camera_payload_broadcast: {e}")
 
 
         @sio.on("image_captured")
@@ -1133,24 +1169,29 @@ class MainWindow(QWidget):
                 import traceback
                 traceback.print_exc()
 
-        @sio.on("lidar_status")
-        def on_lidar_status(data):
-            """Handle LIDAR status updates from server"""
+        @sio.on("lidar_payload_broadcast")
+        def on_lidar_payload_broadcast(data):
+            """Handle lidar payload status updates from server"""
             try:
-                status = data.get('status', 'unknown')
-                streaming = data.get('streaming', False)
-                logging.info(f"LIDAR Status: {status}, Streaming: {streaming}")
+                # Server sends: {"lidar_status": "Active", "lidar_connected": true, "lidar_collecting": true, "collection_rate_hz": 10}
+                lidar_status = data.get("lidar_status", "Unknown")
+                collection_rate_hz = data.get("collection_rate_hz", 0)
                 
-                # Update LIDAR widget streaming state if needed
-                if hasattr(self.lidar_widget, 'is_streaming'):
-                    if streaming != self.lidar_widget.is_streaming:
-                        # Sync widget state with server state
-                        self.lidar_widget.is_streaming = streaming
-                        self.lidar_widget.start_stop_button.setText(
-                            "Stop LIDAR" if streaming else "Start LIDAR"
-                        )
+                # Update payload subsystem labels
+                if hasattr(self, "payload_lidar_label"):
+                    self.payload_lidar_label.setText(f"Lidar: {lidar_status}")
+                
+                if hasattr(self, "payload_frequency_label"):
+                    if collection_rate_hz > 0:
+                        self.payload_frequency_label.setText(f"Frequency: {collection_rate_hz:.1f} Hz")
+                    else:
+                        self.payload_frequency_label.setText("Frequency: --")
+                
+                # Update overall payload status based on lidar status
+                self.update_payload_overall_status()
+                
             except Exception as e:
-                logging.error(f"Failed to process LIDAR status: {e}")
+                logging.error(f"Failed to process lidar_payload_broadcast: {e}")
 
         @sio.on("adcs_broadcast")
         def on_adcs_data(data):
@@ -1180,17 +1221,17 @@ class MainWindow(QWidget):
             """Handle power subsystem data updates"""
             try:
                 if hasattr(self, 'power_labels'):
-                    # Update power labels to match your power.py data structure
+                    # Server sends strings like: {"current": "0.123", "voltage": "5.0", "power": "0.62", "energy": "0.01", "temperature": "25.5", "status": "Nominal"}
                     if "current" in data:
-                        self.power_labels["current"].setText(f"Current: {data['current']:.2f} mA")
+                        self.power_labels["current"].setText(f"Current: {data['current']} A")
                     if "voltage" in data:
-                        self.power_labels["voltage"].setText(f"Voltage: {data['voltage']:.2f} V")
+                        self.power_labels["voltage"].setText(f"Voltage: {data['voltage']} V")
                     if "power" in data:
-                        self.power_labels["power"].setText(f"Power: {data['power']:.2f} mW")
+                        self.power_labels["power"].setText(f"Power: {data['power']} W")
                     if "energy" in data:
-                        self.power_labels["energy"].setText(f"Energy: {data['energy']:.2f} J")
+                        self.power_labels["energy"].setText(f"Energy: {data['energy']} Wh")
                     if "temperature" in data:
-                        self.power_labels["temperature"].setText(f"Temperature: {data['temperature']:.1f}°C")
+                        self.power_labels["temperature"].setText(f"Temperature: {data['temperature']}°C")
                     if "status" in data:
                         self.power_labels["status"].setText(f"Status: {data['status']}")
             except Exception as e:
@@ -1212,6 +1253,42 @@ class MainWindow(QWidget):
                         self.thermal_labels["status"].setText(f"Status: {data['status']}")
             except Exception as e:
                 logging.error(f"Failed to update thermal data: {e}")
+
+        @sio.on("communication_broadcast")
+        def on_communication_data(data):
+            """Handle communication subsystem data updates"""
+            try:
+                # Server sends: {"wifi_download_speed": 0.0, "wifi_upload_speed": 0.0, "data_upload_speed": 0.0, 
+                # "data_transmission_rate": 0.0, "uplink_frequency": 0.0, "downlink_frequency": 0.0, 
+                # "server_signal_strength": 0, "connection_quality": "Unknown", "network_latency": 0.0, "status": "Disconnected"}
+                
+                # Update the comms status label that already exists
+                if hasattr(self, 'comms_status_label'):
+                    status = data.get('status', 'Unknown')
+                    signal_strength = data.get('server_signal_strength', 0)
+                    wifi_down = data.get('wifi_download_speed', 0)
+                    wifi_up = data.get('wifi_upload_speed', 0)
+                    
+                    # Create a summary status
+                    if status == "Disconnected":
+                        status_text = "Status: Disconnected"
+                    else:
+                        status_text = f"Status: {status} | WiFi: {wifi_down:.1f}↓/{wifi_up:.1f}↑ Mbps | Signal: {signal_strength} dBm"
+                    
+                    self.comms_status_label.setText(status_text)
+            except Exception as e:
+                logging.error(f"Failed to update communication data: {e}")
+
+        @sio.on("tachometer_broadcast")
+        def on_tachometer_data(data):
+            """Handle tachometer data updates"""
+            try:
+                # Update RPM in ADCS subsystem if available
+                if hasattr(self, 'adcs_labels') and "rpm" in self.adcs_labels:
+                    rpm = data.get('rpm', 0)
+                    self.adcs_labels["rpm"].setText(f"RPM: {rpm:.1f}")
+            except Exception as e:
+                logging.error(f"Failed to update tachometer data: {e}")
 
         @sio.on("cdh_broadcast")
         def on_cdh_data(data):
@@ -1256,7 +1333,8 @@ class MainWindow(QWidget):
 
     def delayed_server_setup(self):
         """Called shortly after connect—override if needed."""
-        pass
+        # Initialize payload status on startup
+        self.update_payload_overall_status()
 
     def handle_frame_data(self, data):
         """Process incoming frame data"""
@@ -1282,6 +1360,39 @@ class MainWindow(QWidget):
             self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
         except Exception as e:
             logging.error(f"Sensor update error: {e}")
+
+    def update_payload_overall_status(self):
+        """Update the overall payload subsystem status based on camera and lidar states"""
+        try:
+            if not hasattr(self, "payload_status_label"):
+                return
+                
+            # Get current camera and lidar status
+            camera_text = getattr(self, "payload_camera_label", None)
+            lidar_text = getattr(self, "payload_lidar_label", None)
+            
+            camera_status = "Unknown"
+            lidar_status = "Unknown"
+            
+            if camera_text:
+                camera_status = camera_text.text().replace("Camera: ", "")
+            if lidar_text:
+                lidar_status = lidar_text.text().replace("Lidar: ", "")
+            
+            # Determine overall status
+            if camera_status == "Streaming" and lidar_status == "Active":
+                overall_status = "Ready"
+            elif camera_status == "Streaming" or lidar_status == "Active":
+                overall_status = "Partial"
+            elif camera_status == "Pending..." or lidar_status == "Pending...":
+                overall_status = "Initializing"
+            else:
+                overall_status = "Not Ready"
+            
+            self.payload_status_label.setText(f"Status: {overall_status}")
+            
+        except Exception as e:
+            logging.error(f"Payload status update error: {e}")
 
     # Removed update_camera_status and all legacy payload status update logic
                 
