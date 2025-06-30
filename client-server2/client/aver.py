@@ -1283,20 +1283,7 @@ class MainWindow(QWidget):
         except Exception as e:
             logging.error(f"Sensor update error: {e}")
 
-    def update_camera_status(self, data):
-        """Update camera status display"""
-        try:
-            status = data.get("status", "Unknown")
-            self.camera_status_label.setText(f"Camera: {status}")
-            
-            if status.lower() in ("streaming", "idle", "ready"):
-                self.camera_status_label.setStyleSheet("color: white;")
-                self.camera_ready_label.setText("Status: Ready")
-                self.camera_ready_label.setStyleSheet("color: #0f0;")
-            else:
-                self.camera_status_label.setStyleSheet("color: #bbb;")
-                self.camera_ready_label.setText("Status: Not Ready")
-                self.camera_ready_label.setStyleSheet("color: #f00;")
+    # Removed update_camera_status and all legacy payload status update logic
                 
         except Exception as e:
             logging.error(f"Camera status update error: {e}")
