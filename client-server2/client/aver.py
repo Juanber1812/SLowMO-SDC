@@ -6,6 +6,8 @@
 import sys, base64, socketio, cv2, numpy as np, logging, threading, time, queue, os
 import pandas as pd
 import traceback
+import platform
+import subprocess
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QFrame, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QComboBox, QSlider, QGroupBox, QGridLayout, QMessageBox, QSizePolicy, QScrollArea,
@@ -246,6 +248,10 @@ class MainWindow(QWidget):
         self.frame_counter = 0
         self.current_fps = 0
         self.current_frame_size = 0
+        
+        # Client-side communication metrics
+        self.client_uplink_frequency = 0.0
+        self.client_signal_strength = 0
 
 
         # display‐FPS counters
@@ -338,7 +344,6 @@ class MainWindow(QWidget):
         """Connect internal signals"""
         bridge.frame_received.connect(self.update_image)
         bridge.analysed_frame.connect(self.update_analysed_image)
-        self.speedtest_result.connect(self.update_speed_labels)
         self.latencyUpdated.connect(self.detector_settings.set_latency)
 
         # ── now it's safe to connect the frequency-spinbox signal ──
@@ -374,6 +379,11 @@ class MainWindow(QWidget):
         self.speed_timer = QTimer()
         self.speed_timer.timeout.connect(self.measure_speed)
         self.speed_timer.start(5000)
+        
+        # Add client communication metrics timer (every 5 seconds)
+        self.client_comm_timer = QTimer()
+        self.client_comm_timer.timeout.connect(self.update_client_communication_metrics)
+        self.client_comm_timer.start(5000)
 
     #=========================================================================
     #                          UI SETUP METHODS                             
@@ -684,9 +694,6 @@ class MainWindow(QWidget):
         info_layout.setContentsMargins(2, 2, 2, 2)
         info_container.setStyleSheet(f"background-color: {self.COLOR_BOX_BG_RIGHT};")
 
-        # System performance info
-        self.setup_system_performance_group(info_layout)
-        
         # Subsystem status groups
         self.setup_subsystem_status_groups(info_layout)
         
@@ -776,48 +783,6 @@ class MainWindow(QWidget):
             )
             logging(f"[ERROR] Health report export failed: {e}")
 
-    def setup_system_performance_group(self, parent_layout):
-        """Setup system performance monitoring group"""
-        info_group = QGroupBox("System Info")
-        info_layout_inner = QVBoxLayout()
-        # ── patch ──
-        # add fps_server label
-        self.info_labels = {
-            "temp":      QLabel("Temp: -- °C"),
-            "cpu":       QLabel("CPU: --%"),
-            "speed":     QLabel("Upload: -- Mbps"),
-            "max_frame": QLabel("Max Frame: -- KB"),
-            "fps":       QLabel("Live FPS: --"),
-            "fps_server": QLabel("Server FPS: --"),
-            "frame_size":QLabel("Frame Size: -- KB"),
-            "disp_fps" : QLabel("Display FPS: --")
-            }
-    
-
-        # Corrected stylesheet application
-        info_label_style = f"""
-            QLabel {{
-                color: {TEXT_COLOR};
-                font-size: {FONT_SIZE_NORMAL}pt;
-                font-family: {FONT_FAMILY};
-                margin: 2px 0px; 
-                padding: 2px 0px;
-            }}
-        """
-        for lbl in self.info_labels.values():
-            lbl.setStyleSheet(info_label_style)
-            info_layout_inner.addWidget(lbl)
-            
-        info_group.setLayout(info_layout_inner)
-        self.apply_groupbox_style(
-            info_group, 
-            self.COLOR_BOX_BORDER_RIGHT, 
-            self.COLOR_BOX_BG_RIGHT, 
-            self.COLOR_BOX_TITLE_RIGHT,
-            is_part_of_right_column=True # Explicitly flag as right column item
-        )
-        parent_layout.addWidget(info_group)
-
     def setup_subsystem_status_groups(self, parent_layout):
         """Setup all subsystem status monitoring groups"""
         # Initialize label dictionaries for live data updates
@@ -829,13 +794,22 @@ class MainWindow(QWidget):
         self.error_labels = {}
         self.overall_labels = {}
         
+        # Initialize remaining info labels (no longer in system info box)
+        self.info_labels = {
+            "speed":     None,  # Will be set by speed test
+            "max_frame": None,  # Will be set by speed test  
+            "fps":       None,  # Will be created as needed
+            "fps_server": None, # Will be created as needed
+            "frame_size": None, # Will be created as needed
+        }
+        
         subsystems = [
             ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Battery: Pending...", "Temperature: Pending...", "Status: Pending..."]),
             ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
-            ("Communication Subsystem", ["Downlink Frequency: Pending...", "WiFi Download: Pending...", "WiFi Upload: Pending...", "Signal Strength: Pending...", "Data Rate: Pending...", "Status: Pending..."]),
+            ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "WiFi Download: Pending...", "WiFi Upload: Pending...", "Server Signal: Pending...", "Client Signal: Pending...", "Data Rate: Pending...", "Latency: Pending...", "Status: Pending..."]),
             ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Lux1: Pending...","Lux2: Pending...","Lux3: Pending...", "RPM: Pending...", "Status: Pending..."]),
             ("Payload Subsystem", []),  # Special handling for payload
-            ("Command & Data Handling Subsystem", ["Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
+            ("Command & Data Handling Subsystem", ["CPU Usage: Pending...", "Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
             ("Error Log", ["No Critical Errors Detected: Pending..."]),
             ("Overall Status", ["No Anomalies Detected: Pending...", "Recommended Actions: Pending..."])
         ]
@@ -923,7 +897,9 @@ class MainWindow(QWidget):
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references
-                    if "Memory Usage" in text:
+                    if "CPU Usage" in text:
+                        self.cdh_labels["cpu_usage"] = lbl
+                    elif "Memory Usage" in text:
                         self.cdh_labels["memory"] = lbl
                     elif "Last Command" in text:
                         self.cdh_labels["last_cmd"] = lbl
@@ -942,14 +918,20 @@ class MainWindow(QWidget):
                     # Store label references for the new communication labels
                     if "Downlink Frequency:" in text:
                         self.comms_labels["downlink_frequency"] = lbl
+                    elif "Uplink Frequency:" in text:
+                        self.comms_labels["uplink_frequency"] = lbl
                     elif "WiFi Download:" in text:
                         self.comms_labels["wifi_download_speed"] = lbl
                     elif "WiFi Upload:" in text:
                         self.comms_labels["wifi_upload_speed"] = lbl
-                    elif "Signal Strength:" in text:
+                    elif "Server Signal:" in text:
                         self.comms_labels["server_signal_strength"] = lbl
+                    elif "Client Signal:" in text:
+                        self.comms_labels["client_signal_strength"] = lbl
                     elif "Data Rate:" in text:
                         self.comms_labels["data_transmission_rate"] = lbl
+                    elif "Latency:" in text:
+                        self.comms_labels["latency"] = lbl
                     elif "Status:" in text:
                         self.comms_labels["status"] = lbl
                 # Add special status label
@@ -1101,13 +1083,9 @@ class MainWindow(QWidget):
         def on_sensor_data(data):
             # update temps/CPU
             self.update_sensor_display(data)
-            # server already computes FPS in camera.py and sends it
-            if "fps" in data:
-                # format with one decimal place
-                self.info_labels["fps_server"].setText(
-                    f"Server FPS: {data['fps']:.1f}"
-                )
-
+            # If you want to display server FPS, move it to a subsystem or widget
+            # (removed info_labels["fps_server"])
+        # ...existing code...
         @sio.on("camera_payload_broadcast")
         def on_camera_payload_broadcast(data):
             """Handle camera payload status updates from server"""
@@ -1326,15 +1304,20 @@ class MainWindow(QWidget):
                         speed = data.get('wifi_upload_speed', 0.0)
                         self.comms_labels['wifi_upload_speed'].setText(f"WiFi Upload: {speed:.1f} Mbps")
                     
-                    # Update signal strength
+                    # Update server signal strength (from server data)
                     if 'server_signal_strength' in self.comms_labels:
                         signal = data.get('server_signal_strength', 0)
-                        self.comms_labels['server_signal_strength'].setText(f"Signal Strength: {signal} dBm")
+                        self.comms_labels['server_signal_strength'].setText(f"Server Signal: {signal} dBm")
                     
                     # Update data transmission rate
                     if 'data_transmission_rate' in self.comms_labels:
                         rate = data.get('data_transmission_rate', 0.0)
                         self.comms_labels['data_transmission_rate'].setText(f"Data Rate: {rate:.1f} KB/s")
+                    
+                    # Update latency
+                    if 'latency' in self.comms_labels:
+                        latency = data.get('latency', 0.0)
+                        self.comms_labels['latency'].setText(f"Latency: {latency:.1f} ms")
                     
                     # Update status with color coding
                     if 'status' in self.comms_labels:
@@ -1364,11 +1347,19 @@ class MainWindow(QWidget):
         def on_throughput_test(data):
             """Handle throughput test request from server and echo data back"""
             try:
+                # Record when client received the data
+                client_receive_time = time.time()
+                
                 # Extract test data from server
                 test_data = data.get('test_data', b'')
                 test_size = data.get('size', 0)
                 
-                # Echo the data back to server immediately
+                # Send latency measurement first
+                sio.emit('latency_response', {
+                    'client_receive_time': client_receive_time
+                })
+                
+                # Then echo the data back to server for throughput measurement
                 sio.emit('throughput_response', {
                     'response_data': test_data,
                     'size': test_size,
@@ -1455,10 +1446,106 @@ class MainWindow(QWidget):
         try:
             temp = data.get("temperature", 0)
             cpu = data.get("cpu_percent", 0)
-            self.info_labels["temp"].setText(f"Temp: {temp:.1f} °C")
-            self.info_labels["cpu"].setText(f"CPU: {cpu:.1f} %")
+            
+            # Update Pi temperature in thermal subsystem
+            if hasattr(self, 'thermal_labels') and 'pi_temp' in self.thermal_labels:
+                self.thermal_labels["pi_temp"].setText(f"Pi: {temp:.1f} °C")
+            
+            # Update CPU usage in CDH subsystem
+            if hasattr(self, 'cdh_labels') and 'cpu_usage' in self.cdh_labels:
+                self.cdh_labels["cpu_usage"].setText(f"CPU Usage: {cpu:.1f}%")
+                
         except Exception as e:
             logging.error(f"Sensor update error: {e}")
+
+    def update_client_communication_metrics(self):
+        """Update client-side communication metrics (uplink frequency and signal strength)"""
+        try:
+            # Update uplink frequency and client signal strength
+            if platform.system() == "Windows":
+                # For Windows - use netsh wlan show interfaces
+                try:
+                    result = subprocess.run(
+                        ['netsh', 'wlan', 'show', 'interfaces'],
+                        capture_output=True, text=True, timeout=5
+                    )
+                    if result.returncode == 0:
+                        output = result.stdout
+                        for line in output.split('\n'):
+                            line = line.strip()
+                            # Extract signal strength (e.g., "Signal: 85%")
+                            if 'Signal' in line and '%' in line:
+                                try:
+                                    signal_percent = int(line.split(':')[1].strip().rstrip('%'))
+                                    # Convert percentage to dBm approximation (-30 to -90 dBm range)
+                                    self.client_signal_strength = -30 - (100 - signal_percent) * 0.6
+                                except (ValueError, IndexError):
+                                    self.client_signal_strength = 0
+                            # Extract frequency/channel info
+                            elif 'Channel' in line:
+                                try:
+                                    channel_info = line.split(':')[1].strip()
+                                    # Extract channel number if available
+                                    if any(char.isdigit() for char in channel_info):
+                                        channel_num = int(''.join(filter(str.isdigit, channel_info.split()[0])))
+                                        # Convert channel to frequency (rough approximation)
+                                        if channel_num <= 14:  # 2.4 GHz channels
+                                            self.client_uplink_frequency = 2.4 + (channel_num - 1) * 0.005
+                                        else:  # 5 GHz channels
+                                            self.client_uplink_frequency = 5.0 + (channel_num - 36) * 0.005
+                                except (ValueError, IndexError):
+                                    self.client_uplink_frequency = 2.4  # Default to 2.4 GHz
+                except subprocess.TimeoutExpired:
+                    logging.warning("Client communication metrics timeout on Windows")
+                except Exception as e:
+                    logging.error(f"Windows client metrics error: {e}")
+                    
+            elif platform.system() == "Linux":
+                # For Linux - use iwconfig
+                try:
+                    result = subprocess.run(['iwconfig'], capture_output=True, text=True, timeout=5)
+                    if result.returncode == 0:
+                        output = result.stdout
+                        for line in output.split('\n'):
+                            # Extract signal strength (e.g., "Signal level=-45 dBm")
+                            if 'Signal level' in line:
+                                try:
+                                    parts = line.split('Signal level=')
+                                    if len(parts) > 1:
+                                        signal_str = parts[1].split()[0]
+                                        self.client_signal_strength = int(signal_str)
+                                except (ValueError, IndexError):
+                                    self.client_signal_strength = 0
+                            # Extract frequency (e.g., "Frequency:2.437 GHz")
+                            elif 'Frequency:' in line:
+                                try:
+                                    parts = line.split('Frequency:')
+                                    if len(parts) > 1:
+                                        freq_str = parts[1].split()[0]
+                                        self.client_uplink_frequency = float(freq_str)
+                                except (ValueError, IndexError):
+                                    self.client_uplink_frequency = 0.0
+                except subprocess.TimeoutExpired:
+                    logging.warning("Client communication metrics timeout on Linux")
+                except Exception as e:
+                    logging.error(f"Linux client metrics error: {e}")
+            else:
+                # Default values for other systems
+                self.client_uplink_frequency = 2.4
+                self.client_signal_strength = -50
+                
+            # Update UI labels if they exist
+            if hasattr(self, 'comms_labels'):
+                if 'uplink_frequency' in self.comms_labels:
+                    self.comms_labels['uplink_frequency'].setText(f"Uplink Frequency: {self.client_uplink_frequency:.3f} GHz")
+                if 'client_signal_strength' in self.comms_labels:
+                    self.comms_labels['client_signal_strength'].setText(f"Client Signal: {self.client_signal_strength:.0f} dBm")
+                    
+        except Exception as e:
+            logging.error(f"Client communication metrics update error: {e}")
+            # Set default values on error
+            self.client_uplink_frequency = 0.0
+            self.client_signal_strength = 0
 
     def update_payload_overall_status(self):
         """Update the overall payload subsystem status based on camera and lidar OK/Error states"""
@@ -1633,6 +1720,7 @@ class MainWindow(QWidget):
             # Load and scale image
             image_path = r"C:\Users\juanb\OneDrive\Imágenes\Camera Roll\WIN_20250221_12_17_13_Pro.jpg"
             
+
             if os.path.exists(image_path):
                 pix = QPixmap(image_path)
                 if not pix.isNull():
@@ -1965,10 +2053,10 @@ class MainWindow(QWidget):
         self.current_display_fps   = self.display_frame_counter
         self.display_frame_counter = 0
 
-        # update labels
-        self.info_labels["fps"].setText(f"Live FPS: {self.current_fps}")
-        self.info_labels["disp_fps"].setText(f"Display FPS: {self.current_display_fps}")
-        self.info_labels["frame_size"].setText(f"Frame Size: {self.current_frame_size/1024:.1f} KB")
+        # Update display FPS in detector widget
+        if hasattr(self, 'detector_settings') and self.detector_settings:
+            self.detector_settings.set_display_fps(self.current_display_fps)
+            
     #=========================================================================
     #                          UTILITY METHODS                              
     #=========================================================================

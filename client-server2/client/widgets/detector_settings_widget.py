@@ -109,9 +109,12 @@ class DetectorSettingsWidget(QGroupBox):
         add_row("Decode Sharpening:", self.decode_slider, self.decode_label)
         layout.addLayout(tag_size_layout)
 
-        # ── 3) Latency display ───────────────────────────────────────
+        # ── 3) Latency and Display FPS display ──────────────────────
         self.latency_label = QLabel("Latency: 0.0 ms")
         layout.addWidget(self.latency_label)
+        
+        self.display_fps_label = QLabel("Display FPS: --")
+        layout.addWidget(self.display_fps_label)
 
         self.setLayout(layout)
         self._emit_settings()
@@ -131,6 +134,10 @@ class DetectorSettingsWidget(QGroupBox):
     def set_latency(self, ms: float):
         """Update the latency display (in milliseconds)."""
         self.latency_label.setText(f"Latency: {ms:.1f} ms")
+
+    def set_display_fps(self, fps: float):
+        """Update the display FPS."""
+        self.display_fps_label.setText(f"Display FPS: {fps:.1f}")
 
     def get_settings(self) -> dict:
         return {

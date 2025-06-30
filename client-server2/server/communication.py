@@ -30,6 +30,7 @@ class CommunicationMonitor:
             'wifi_upload_speed': 0.0,    # Internet upload speed in Mbps
             'data_transmission_rate': 0.0,  # True channel throughput in KB/s
             'server_signal_strength': 0,  # WiFi signal strength in dBm
+            'latency': 0.0,              # One-way latency in ms (server to client)
             'status': 'Disconnected'      # Overall connection status
         }
         
@@ -37,6 +38,9 @@ class CommunicationMonitor:
         self.throughput_test_data = None
         self.throughput_test_start = None
         self.throughput_results = []
+        
+        # Latency tracking
+        self.latency_results = []
         
         # Lock for thread-safe operations
         self.lock = threading.Lock()
@@ -113,6 +117,28 @@ class CommunicationMonitor:
         except Exception as e:
             self.logger.error(f"Error handling throughput response: {e}")
     
+    def handle_latency_response(self, client_receive_time):
+        """Handle latency measurement from client."""
+        try:
+            if self.throughput_test_start:
+                # Calculate one-way latency (server to client)
+                latency_seconds = client_receive_time - self.throughput_test_start
+                latency_ms = latency_seconds * 1000  # Convert to milliseconds
+                
+                # Store latency result
+                self.latency_results.append(latency_ms)
+                
+                # Keep only last 5 results for averaging
+                if len(self.latency_results) > 5:
+                    self.latency_results = self.latency_results[-5:]
+                
+                # Update current latency (average of recent tests)
+                with self.lock:
+                    self.current_data['latency'] = round(sum(self.latency_results) / len(self.latency_results), 1)
+                    
+        except Exception as e:
+            self.logger.error(f"Error handling latency response: {e}")
+    
     def start_monitoring(self) -> bool:
         """Start communication monitoring."""
         if self.is_monitoring:
@@ -138,7 +164,7 @@ class CommunicationMonitor:
     
     def _monitoring_loop(self):
         """Main monitoring loop - simplified to focus on required metrics only."""
-        throughput_test_interval = 30  # Test throughput every 30 seconds
+        throughput_test_interval = 2  # Test throughput every 2 seconds
         last_throughput_test = 0
         
         while self.is_monitoring:

@@ -403,6 +403,7 @@ def communication_data_callback(comm_data):
             "wifi_upload_speed": comm_data.get('wifi_upload_speed', 0.0),
             "data_transmission_rate": comm_data.get('data_transmission_rate', 0.0),
             "server_signal_strength": comm_data.get('server_signal_strength', 0),
+            "latency": comm_data.get('latency', 0.0),
             "status": comm_data.get('status', 'Disconnected')
         }
         
@@ -412,6 +413,7 @@ def communication_data_callback(comm_data):
         if not hasattr(communication_data_callback, 'last_log') or time.time() - communication_data_callback.last_log > 30:
             print(f"\n[COMM] WiFi: {formatted_data['wifi_download_speed']:.1f}↓/{formatted_data['wifi_upload_speed']:.1f}↑ Mbps, "
                   f"Data Rate: {formatted_data['data_transmission_rate']:.1f} KB/s, "
+                  f"Latency: {formatted_data['latency']:.1f} ms, "
                   f"Freq: {formatted_data['downlink_frequency']:.3f} GHz, "
                   f"Signal: {formatted_data['server_signal_strength']} dBm, "
                   f"Status: {formatted_data['status']}")
@@ -426,6 +428,7 @@ def communication_data_callback(comm_data):
             "wifi_upload_speed": 0.0,
             "data_transmission_rate": 0.0,
             "server_signal_strength": 0,
+            "latency": 0.0,
             "status": "Error"
         })
 
@@ -438,6 +441,17 @@ def throughput_test_callback(event_type, data):
             logging.info(f"Throughput test initiated: {data['size']} bytes")
     except Exception as e:
         logging.error(f"Error in throughput test callback: {e}")
+
+@socketio.on('latency_response')
+def handle_latency_response(data):
+    """Handle latency measurement response from client"""
+    try:
+        if communication_monitor:
+            client_receive_time = data.get('client_receive_time', 0.0)
+            communication_monitor.handle_latency_response(client_receive_time)
+            logging.info(f"Latency measurement received")
+    except Exception as e:
+        logging.error(f"Error handling latency response: {e}")
 
 @socketio.on('throughput_response')
 def handle_throughput_response(data):

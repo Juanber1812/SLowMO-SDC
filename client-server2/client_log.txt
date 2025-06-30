@@ -231,3 +231,18 @@
 2025-06-30 23:57:12,328 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
 2025-06-30 23:57:12,330 - INFO - [INFO] Successfully connected to server
 2025-06-30 23:57:23,934 - INFO - Disconnected from server: client disconnect
+2025-07-01 00:21:26,888 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 00:21:27,073 - INFO - Connected to server
+2025-07-01 00:21:27,075 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 00:21:27,077 - INFO - [INFO] Successfully connected to server
+2025-07-01 00:26:57,050 - ERROR - packet queue is empty, aborting
+2025-07-01 00:27:29,284 - INFO - Disconnected from server: transport error
+2025-07-01 00:51:17,204 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 00:51:22,218 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751327477.2056522 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001E1C0E62A50>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-01 00:52:43,148 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 00:56:25,689 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 00:56:30,699 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751327785.6922204 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001BB7FC62A50>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-01 00:56:32,124 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 00:57:05,584 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 00:57:10,599 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751327825.5861535 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001ABA1762900>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-01 00:57:19,759 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
