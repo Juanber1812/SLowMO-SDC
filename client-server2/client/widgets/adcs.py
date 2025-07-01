@@ -318,6 +318,30 @@ class ADCSSection(QGroupBox):
         self.kd_input.setPlaceholderText("Enter Kd")
         self.kd_input.setFixedHeight(25)  # Fixed input height
         pd_tuning_layout.addWidget(self.kd_input)
+
+        # Add min_pulse_time
+        min_pulse_label = QLabel("Min Pulse:")
+        min_pulse_label.setStyleSheet(ADCS_LABEL_STYLE)
+        min_pulse_label.setFixedWidth(60)
+        pd_tuning_layout.addWidget(min_pulse_label)
+
+        self.min_pulse_input = QLineEdit()
+        self.min_pulse_input.setPlaceholderText("s")
+        self.min_pulse_input.setFixedHeight(25)
+        self.min_pulse_input.setFixedWidth(50)
+        pd_tuning_layout.addWidget(self.min_pulse_input)
+
+        # Add deadband
+        deadband_label = QLabel("Deadband:")
+        deadband_label.setStyleSheet(ADCS_LABEL_STYLE)
+        deadband_label.setFixedWidth(60)
+        pd_tuning_layout.addWidget(deadband_label)
+
+        self.deadband_input = QLineEdit()
+        self.deadband_input.setPlaceholderText("deg")
+        self.deadband_input.setFixedHeight(25)
+        self.deadband_input.setFixedWidth(50)
+        pd_tuning_layout.addWidget(self.deadband_input)
         
         self.set_pd_btn = QPushButton("Set PD")
         self.set_pd_btn.setStyleSheet(ADCS_BUTTON_STYLE)
@@ -326,7 +350,7 @@ class ADCSSection(QGroupBox):
         pd_tuning_layout.addWidget(self.set_pd_btn)
         
         # Current PD values display
-        self.current_pd_label = QLabel("Current: Kp=0.0, Kd=0.0")
+        self.current_pd_label = QLabel("Current: Kp=0.0, Kd=0.0, MinPulse=0.0, Deadband=0.0")
         self.current_pd_label.setStyleSheet(f"{ADCS_LABEL_STYLE} font-size: 8pt; color: #aaa;")
         self.current_pd_label.setFixedHeight(25)
         self.current_pd_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -481,19 +505,25 @@ class ADCSSection(QGroupBox):
             try:
                 kp_value = float(self.kp_input.text() or 0)
                 kd_value = float(self.kd_input.text() or 0)
-                pd_values = {"kp": kp_value, "kd": kd_value}
+                min_pulse = float(self.min_pulse_input.text() or 0)
+                deadband = float(self.deadband_input.text() or 0)
+                pd_values = {"kp": kp_value, "kd": kd_value, "min_pulse_time": min_pulse, "deadband": deadband}
                 self._handle_action_clicked(self.current_auto_mode, "set_pd_values", pd_values)
                 
                 # Update current PD display
-                self.current_pd_label.setText(f"Current: Kp={kp_value:.2f}, Kd={kd_value:.2f}")
+                self.current_pd_label.setText(f"Current: Kp={kp_value:.2f}, Kd={kd_value:.2f}, MinPulse={min_pulse:.2f}, Deadband={deadband:.2f}")
                 
                 self.kp_input.clear()
                 self.kd_input.clear()
+                self.min_pulse_input.clear()
+                self.deadband_input.clear()
             except ValueError:
-                logging.warning(f"[ADCSSection] Invalid PD values: Kp={self.kp_input.text()}, Kd={self.kd_input.text()}")
+                logging.warning(f"[ADCSSection] Invalid PD values: Kp={self.kp_input.text()}, Kd={self.kd_input.text()}, MinPulse={self.min_pulse_input.text()}, Deadband={self.deadband_input.text()}")
                 # Select all text in both inputs for easy correction
                 self.kp_input.selectAll()
                 self.kd_input.selectAll()
+                self.min_pulse_input.selectAll()
+                self.deadband_input.selectAll()
 
     def _handle_pd_tuning_clicked(self):
         """Handle PD tuning button click."""
@@ -529,21 +559,23 @@ class ADCSSection(QGroupBox):
         """Update sensor data display (for integration with main window)."""
         # This method can be used to update any sensor displays if needed
         # Also update current values if they come from server
-        if 'current_kp' in data or 'current_kd' in data:
+        if 'current_kp' in data or 'current_kd' in data or 'current_min_pulse_time' in data or 'current_deadband' in data:
             kp = data.get('current_kp', 0.0)
             kd = data.get('current_kd', 0.0)
+            min_pulse = data.get('current_min_pulse_time', 0.0)
+            deadband = data.get('current_deadband', 0.0)
             if hasattr(self, 'current_pd_label'):
-                self.current_pd_label.setText(f"Current: Kp={kp:.2f}, Kd={kd:.2f}")
+                self.current_pd_label.setText(f"Current: Kp={kp:.2f}, Kd={kd:.2f}, MinPulse={min_pulse:.2f}, Deadband={deadband:.2f}")
         
         if 'current_target' in data:
             target = data.get('current_target', 0.0)
             if hasattr(self, 'current_target_label'):
                 self.current_target_label.setText(f"Current: {target:.1f}°")
 
-    def update_current_pd_values(self, kp, kd):
+    def update_current_pd_values(self, kp, kd, min_pulse=0.0, deadband=0.0):
         """Update the current PD values display."""
         if hasattr(self, 'current_pd_label'):
-            self.current_pd_label.setText(f"Current: Kp={kp:.2f}, Kd={kd:.2f}")
+            self.current_pd_label.setText(f"Current: Kp={kp:.2f}, Kd={kd:.2f}, MinPulse={min_pulse:.2f}, Deadband={deadband:.2f}")
 
     def update_current_target_value(self, target):
         """Update the current target value display."""

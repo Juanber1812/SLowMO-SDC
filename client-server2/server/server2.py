@@ -355,7 +355,6 @@ def handle_sensor_data(data):
             uptime = enhanced_data.get("uptime", "N/A")
             status = enhanced_data.get("status", "N/A")
             
-            print(f"\n[SENSORS] Temp: {temp}°C, CPU: {cpu}%, Memory: {memory_percent}%, Uptime: {uptime}, Status: {status}")
             handle_sensor_data.last_log = time.time()
             
     except Exception as e:
@@ -474,11 +473,6 @@ def communication_data_callback(comm_data):
         
         # Log communication status periodically (every 30 seconds)
         if not hasattr(communication_data_callback, 'last_log') or time.time() - communication_data_callback.last_log > 30:
-            print(f"\n[COMM] Data Rate: {formatted_data['data_transmission_rate']:.1f} KB/s, "
-                  f"Latency: {formatted_data['latency']:.1f} ms, "
-                  f"Freq: {formatted_data['downlink_frequency']:.3f} GHz, "
-                  f"Signal: {formatted_data['server_signal_strength']} dBm, "
-                  f"Status: {formatted_data['status']}")
             communication_data_callback.last_log = time.time()
             
     except Exception as e:
@@ -519,7 +513,6 @@ def adcs_data_broadcast():
             temp = adcs_data.get('temperature', '0.0°C')
             status = adcs_data.get('status', 'Unknown')
             
-            print(f"\n[ADCS] Yaw: {yaw}°, Roll: {roll}°, Pitch: {pitch}°, Temp: {temp}, Status: {status}")
             adcs_data_broadcast.last_log = time.time()
             
     except Exception as e:

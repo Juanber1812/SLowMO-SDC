@@ -51,49 +51,6 @@ IN1_PIN = 13    # Clockwise control
 IN2_PIN = 19    # Counterclockwise control  
 SLEEP_PIN = 26  # Motor driver enable
 
-# ── MOTOR CONTROL FUNCTIONS ────────────────────────────────────────────
-def setup_motor_control():
-    """Setup GPIO pins for motor control"""
-    if not GPIO_AVAILABLE:
-        return False
-    try:
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-        GPIO.setup([IN1_PIN, IN2_PIN, SLEEP_PIN], GPIO.OUT, initial=GPIO.LOW)
-        GPIO.output(SLEEP_PIN, GPIO.HIGH)  # Enable motor driver
-        print("✓ Motor control GPIO initialized")
-        return True
-    except Exception as e:
-        print(f"✗ Motor control GPIO initialization failed: {e}")
-        return False
-
-def rotate_clockwise():
-    """Rotate motor clockwise (full power) with I2C protection"""
-    if GPIO_AVAILABLE:
-        GPIO.output(IN1_PIN, GPIO.HIGH)
-        GPIO.output(IN2_PIN, GPIO.LOW)
-        time.sleep(0.001)  # Brief delay to avoid I2C interference
-
-def rotate_counterclockwise():
-    """Rotate motor counterclockwise (full power) with I2C protection"""
-    if GPIO_AVAILABLE:
-        GPIO.output(IN1_PIN, GPIO.LOW)
-        GPIO.output(IN2_PIN, GPIO.HIGH)
-        time.sleep(0.001)  # Brief delay to avoid I2C interference
-
-def stop_motor():
-    """Stop motor (no power) with I2C protection"""
-    if GPIO_AVAILABLE:
-        GPIO.output(IN1_PIN, GPIO.LOW)
-        GPIO.output(IN2_PIN, GPIO.LOW)
-        time.sleep(0.001)  # Brief delay to avoid I2C interference
-
-def cleanup_motor_control():
-    """Cleanup GPIO pins"""
-    if GPIO_AVAILABLE:
-        stop_motor()
-        GPIO.cleanup()
-
 class MPU6050Sensor:
     """Dedicated MPU6050 sensor class for ADCS"""
     
@@ -210,18 +167,6 @@ class MPU6050Sensor:
             gyro_raw[1] - self.gyro_y_cal, 
             gyro_raw[2] - self.gyro_z_cal
         ]
-    
-    def read_accelerometer(self):
-        """Read accelerometer data"""
-        if not self.sensor_ready:
-            return [0.0, 0.0, 0.0]
-        try:
-            ax = self.read_raw_data(0x3B) / 16384.0  # Convert to g
-            ay = self.read_raw_data(0x3D) / 16384.0
-            az = self.read_raw_data(0x3F) / 16384.0
-            return [ax, ay, az]
-        except:
-            return [0.0, 0.0, 0.0]
     
     def read_temperature(self):
         """Read MPU6050 temperature"""
@@ -359,12 +304,13 @@ class ADCSController:
     def __init__(self):
         print("🛰️ Initializing UNIFIED ADCS Controller...")
         
+
+        self.motor_available = False
+        if GPIO_AVAILABLE:
+            self.motor_available = self.setup_motor_control()
         # Initialize sensor components
         self.mpu_sensor = MPU6050Sensor()
         self.lux_manager = LuxSensorManager()
-        
-        # Initialize motor control
-        self.motor_available = setup_motor_control()
         
         # Initialize PD controller
         self.pd_controller = PDBangBangController(
@@ -408,6 +354,78 @@ class ADCSController:
         
         print("✓ ADCS Controller initialization complete")
     
+    # ── MOTOR CONTROL FUNCTIONS ────────────────────────────────────────────
+    def setup_motor_control(self):
+        """Setup GPIO pins for motor control"""
+        if GPIO_AVAILABLE:
+            try:
+                GPIO.setmode(GPIO.BCM)
+                GPIO.setup(IN1_PIN, GPIO.OUT)
+                GPIO.setup(IN2_PIN, GPIO.OUT)
+                GPIO.setup(SLEEP_PIN, GPIO.OUT)
+                GPIO.output(SLEEP_PIN, GPIO.LOW)  # Start with motor driver disabled
+                print("Motor control setup complete")
+                return True
+            except Exception as e:
+                print(f"Error setting up motor control: {e}")
+                return False
+        else:
+            return False
+
+    def enable_motor_driver(self):
+        """Enable the motor driver (set SLEEP_PIN high)"""
+        try:
+            if GPIO_AVAILABLE:
+                GPIO.output(SLEEP_PIN, GPIO.HIGH)
+                print("Motor driver enabled (SLEEP_PIN high)")
+                return {"status": "success", "message": "Motor driver enabled"}
+            else:
+                return {"status": "error", "message": "GPIO not available"}
+        except Exception as e:
+            return {"status": "error", "message": f"Enable motor error: {e}"}
+
+    def disable_motor_driver(self):
+        """Disable the motor driver (set SLEEP_PIN low)"""
+        try:
+            if GPIO_AVAILABLE:
+                GPIO.output(SLEEP_PIN, GPIO.LOW)
+                print("Motor driver disabled (SLEEP_PIN low)")
+                return {"status": "success", "message": "Motor driver disabled"}
+            else:
+                return {"status": "error", "message": "GPIO not available"}
+        except Exception as e:
+            return {"status": "error", "message": f"Disable motor error: {e}"}
+
+    def rotate_clockwise(self):
+        """Rotate motor clockwise (full power) with I2C protection"""
+        if self.motor_available:
+            GPIO.output(IN1_PIN, GPIO.HIGH)
+            GPIO.output(IN2_PIN, GPIO.LOW)
+            time.sleep(0.001)
+            return {"status": "success", "message": "Motor rotating clockwise"}
+        else:
+            return {"status": "error", "message": "Motor not available"}
+
+    def rotate_counterclockwise(self):
+        """Rotate motor counterclockwise (full power) with I2C protection"""
+        if self.motor_available:
+            GPIO.output(IN1_PIN, GPIO.LOW)
+            GPIO.output(IN2_PIN, GPIO.HIGH)
+            time.sleep(0.001)
+            return {"status": "success", "message": "Motor rotating counterclockwise"}
+        else:
+            return {"status": "error", "message": "Motor not available"}
+
+    def stop_motor(self):
+        """Stop motor (no power) with I2C protection"""
+        if self.motor_available:
+            GPIO.output(IN1_PIN, GPIO.LOW)
+            GPIO.output(IN2_PIN, GPIO.LOW)
+            time.sleep(0.001)
+            return {"status": "success", "message": "Motor stopped"}
+        else:
+            return {"status": "success", "message": "Motor not available (simulated stop)"}
+        
     def start_data_thread(self):
         """Start high-speed data acquisition thread"""
         self.stop_data_thread = False
@@ -415,6 +433,15 @@ class ADCSController:
         self.data_thread.start()
         print(f"🚀 Data acquisition started at {LOG_FREQUENCY}Hz")
     
+    def cleanup_motor_control(self):
+        """Cleanup GPIO pins for motor control"""
+        if GPIO_AVAILABLE:
+            try:
+                GPIO.cleanup()
+                print("Motor control GPIO cleaned up")
+            except Exception as e:
+                print(f"Error cleaning up motor control: {e}")
+
     def _data_thread_worker(self):
         """High-speed sensor data acquisition worker"""
         interval = 1.0 / LOG_FREQUENCY
@@ -475,13 +502,13 @@ class ADCSController:
                     # Execute motor command if motor is available
                     if self.motor_available and self.pd_controller.controller_enabled:
                         if motor_cmd == "CW":
-                            rotate_clockwise()
+                            self.rotate_clockwise()
                         elif motor_cmd == "CCW":
-                            rotate_counterclockwise()
+                            self.rotate_counterclockwise()
                         else:
-                            stop_motor()
+                            self.stop_motor()
                     else:
-                        stop_motor()  # Ensure motor is stopped when controller is disabled
+                        self.stop_motor()  # Ensure motor is stopped when controller is disabled
                     
                     # Update shared data
                     with self.data_lock:
@@ -517,7 +544,6 @@ class ADCSController:
             try:
                 yaw_angle = self.mpu_sensor.get_yaw_angle()
                 gyro = self.mpu_sensor.read_gyroscope()
-                accel = self.mpu_sensor.read_accelerometer()
                 temp = self.mpu_sensor.read_temperature()
                 
                 # Position angles (integrated from gyro)
@@ -601,13 +627,13 @@ class ADCSController:
 
             if mode == "Manual":
                 if command == "manual_clockwise_start":
-                    return self.start_manual_control("CW")
+                    return self.rotate_clockwise()
                 elif command == "manual_clockwise_stop":
-                    return self.stop_manual_control()
+                    return self.stop_motor()
                 elif command == "manual_anticlockwise_start":
-                    return self.start_manual_control("CCW")
+                    return self.rotate_counterclockwise()
                 elif command == "manual_anticlockwise_stop":
-                    return self.stop_manual_control()
+                    return self.stop_motor()
                 elif command == "enable_motor":
                     if value is True:
                         return self.enable_motor_driver()
@@ -624,49 +650,91 @@ class ADCSController:
                 if command == "set_zero":
                     return self.zero_yaw_position()
                 elif command == "set_value":
-                    return self.set_target_yaw(value)
+                    return self.set_target(value)
                 elif command == "start":
-                    return self.start_auto_control(mode)
+                    return self.start_controller(mode)
                 elif command == "stop":
-                    return self.stop_auto_control()
+                    return self.stop_controller()
                 elif command == "set_pd_values":
-                    # Expects value as dict with kp, kd
-                    if isinstance(value, dict) and "kp" in value and "kd" in value:
-                        self.pd_controller.set_gains(float(value["kp"]), float(value["kd"]))
-                        return {"status": "success", "message": f"PD gains set: kp={value['kp']}, kd={value['kd']}"}
+                    # Handle all PD parameters (not just kp and kd)
+                    if isinstance(value, dict):
+                        try:
+                            # Extract and validate parameters
+                            updates = {}
+                            message_parts = []
+                            
+                            if "kp" in value:
+                                updates["kp"] = float(value["kp"])
+                                message_parts.append(f"kp={updates['kp']}")
+                            
+                            if "kd" in value:
+                                updates["kd"] = float(value["kd"])
+                                message_parts.append(f"kd={updates['kd']}")
+                            
+                            if "deadband" in value:
+                                updates["deadband"] = float(value["deadband"])
+                                message_parts.append(f"deadband={updates['deadband']}°")
+                            
+                            if "min_pulse_time" in value:
+                                updates["min_pulse_time"] = float(value["min_pulse_time"])
+                                message_parts.append(f"min_pulse={updates['min_pulse_time']}s")
+                            
+                            # Update the controller (you need to add this method to PDBangBangController)
+                            if updates:  # Only update if there are valid parameters
+                                for param, val in updates.items():
+                                    if param == "kp":
+                                        self.pd_controller.kp = val
+                                    elif param == "kd":
+                                        self.pd_controller.kd = val
+                                    elif param == "deadband":
+                                        self.pd_controller.deadband = val
+                                    elif param == "min_pulse_time":
+                                        self.pd_controller.min_pulse_time = val
+                                
+                                return {
+                                    "status": "success", 
+                                    "message": f"PD parameters updated: {', '.join(message_parts)}"
+                                }
+                            else:
+                                return {"status": "error", "message": "No valid parameters provided"}
+                            
+                        except ValueError as e:
+                            return {"status": "error", "message": f"Invalid parameter values: {e}"}
+                        except Exception as e:
+                            return {"status": "error", "message": f"Error updating parameters: {e}"}
                     else:
-                        return {"status": "error", "message": "set_pd_values requires dict with 'kp' and 'kd'"}
-                else:
-                    return {"status": "error", "message": f"Unknown {mode} command: {command}"}
-
-            # PD Controller specific commands (legacy)
-            elif mode == "PD_Control":
-                if command == "start_controller":
-                    return self.start_pd_controller()
-                elif command == "stop_controller":
-                    return self.stop_pd_controller()
-                elif command == "set_target":
-                    return self.set_target_yaw(value)
-                elif command == "set_gains":
-                    # Expects value as dict with kp, kd, deadband, min_pulse_time
-                    return self.set_controller_gains(value)
-                else:
-                    return {"status": "error", "message": f"Unknown PD_Control command: {command}"}
-
-            elif mode == "Calibration":
-                if command == "start_calibration":
-                    return self.calibrate_sensors()
-                else:
-                    return {"status": "error", "message": f"Unknown Calibration command: {command}"}
-
-            else:
-                return {"status": "error", "message": f"Unknown mode: {mode}"}
-
+                        return {"status": "error", "message": "set_pd_values requires dict with parameter values"}
         except Exception as e:
             error_msg = f"ADCS command error: {e}"
             print(f"❌ {error_msg}")
             return {"status": "error", "message": error_msg}
     
+    def set_target(self, target_value):
+        """Set target yaw angle"""
+        try:
+            self.pd_controller.set_target(float(target_value))
+            return {"status": "success", "message": f"Target set to {target_value}°"}
+        except Exception as e:
+            return {"status": "error", "message": f"Failed to set target: {e}"}
+
+    def start_controller(self, mode):
+        """Start the PD controller"""
+        try:
+            self.pd_controller.start_controller()
+            return {"status": "success", "message": f"Controller started in {mode} mode"}
+        except Exception as e:
+            return {"status": "error", "message": f"Failed to start controller: {e}"}
+
+    def stop_controller(self):
+        """Stop the PD controller"""
+        try:
+            self.pd_controller.stop_controller()
+            # Also stop the motor directly
+            self.stop_motor()
+            return {"status": "success", "message": "Controller stopped"}
+        except Exception as e:
+            return {"status": "error", "message": f"Failed to stop controller: {e}"}
+
     def zero_yaw_position(self):
         """Zero the yaw position"""
         try:
@@ -721,30 +789,6 @@ class ADCSController:
         status = f"{mpu_info} | {gyro_info} | {temp_info} | {ctrl_info} | {lux_info} | Status: {data['status']}"
         print(f"\r{status}", end="", flush=True)
     
-    def enable_motor_driver(self):
-        """Enable the motor driver (set SLEEP_PIN high)"""
-        try:
-            if GPIO_AVAILABLE:
-                GPIO.output(SLEEP_PIN, GPIO.HIGH)
-                print("Motor driver enabled (SLEEP_PIN high)")
-                return {"status": "success", "message": "Motor driver enabled"}
-            else:
-                return {"status": "error", "message": "GPIO not available"}
-        except Exception as e:
-            return {"status": "error", "message": f"Enable motor error: {e}"}
-
-    def disable_motor_driver(self):
-        """Disable the motor driver (set SLEEP_PIN low)"""
-        try:
-            if GPIO_AVAILABLE:
-                GPIO.output(SLEEP_PIN, GPIO.LOW)
-                print("Motor driver disabled (SLEEP_PIN low)")
-                return {"status": "success", "message": "Motor driver disabled"}
-            else:
-                return {"status": "error", "message": "GPIO not available"}
-        except Exception as e:
-            return {"status": "error", "message": f"Disable motor error: {e}"}
-
     def shutdown(self):
         """Shutdown the ADCS controller"""
         print("\n🛰️ ADCS Controller shutdown...")
@@ -762,7 +806,7 @@ class ADCSController:
             self.control_thread.join(timeout=1.0)
         
         # Cleanup motor control
-        cleanup_motor_control()
+        self.cleanup_motor_control()
         print("✓ ADCS Controller shutdown complete")
 
 # ── PD BANG-BANG CONTROLLER ────────────────────────────────────────────
@@ -789,6 +833,7 @@ class PDBangBangController:
         self.motor_state = "STOP"  # "CW", "CCW", "STOP"
         self.pulse_start_time = 0.0
         
+
         # Controller enable/disable
         self.controller_enabled = False  # Controller starts disabled
         self.input_mode = False  # Flag to indicate when user is typing
@@ -807,9 +852,48 @@ class PDBangBangController:
         """Stop the PD controller and motor"""
         self.controller_enabled = False
         self.motor_state = "STOP"
-        stop_motor()  # Immediately stop motor
         print("Controller STOPPED - Motor disabled")
     
+    def set_gains(self, kp, kd):
+        """Set PD controller gains"""
+        self.kp = kp
+        self.kd = kd
+        print(f"Controller gains updated - Kp: {kp}, Kd: {kd}")
+
+    def set_deadband(self, deadband):
+        """Set controller deadband"""
+        self.deadband = deadband
+        print(f"Controller deadband updated - Deadband: {deadband}°")
+    
+    def set_min_pulse_time(self, min_pulse_time):
+        """Set minimum pulse time"""
+        self.min_pulse_time = min_pulse_time
+        print(f"Controller minimum pulse time updated - Min pulse: {min_pulse_time}s")
+    
+    def update_parameters(self, kp=None, kd=None, deadband=None, min_pulse_time=None):
+        """Update multiple controller parameters at once"""
+        if kp is not None:
+            self.kp = kp
+        if kd is not None:
+            self.kd = kd
+        if deadband is not None:
+            self.deadband = deadband
+        if min_pulse_time is not None:
+            self.min_pulse_time = min_pulse_time
+        
+        print(f"Controller parameters updated - Kp: {self.kp}, Kd: {self.kd}, Deadband: {self.deadband}°, Min pulse: {self.min_pulse_time}s")
+    
+    def get_parameters(self):
+        """Get current controller parameters"""
+        return {
+            'kp': self.kp,
+            'kd': self.kd,
+            'deadband': self.deadband,
+            'min_pulse_time': self.min_pulse_time,
+            'target_yaw': self.target_yaw,
+            'controller_enabled': self.controller_enabled
+        }
+
     def update(self, current_yaw, gyro_rate, dt):
         """
         Update PD controller and return motor command
@@ -869,8 +953,3 @@ class PDBangBangController:
         
         return motor_command, error, pd_output
     
-    def set_gains(self, kp, kd):
-        """Set PD controller gains"""
-        self.kp = kp
-        self.kd = kd
-        print(f"Controller gains updated - Kp: {kp}, Kd: {kd}")
