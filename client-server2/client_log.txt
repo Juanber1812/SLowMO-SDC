@@ -1291,3 +1291,46 @@
 2025-07-01 21:18:13,777 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 0.0
 2025-07-01 21:21:03,128 - INFO - [INFO] Closing application...
 2025-07-01 21:21:04,333 - INFO - Disconnected from server: client disconnect
+2025-07-01 21:33:44,580 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 21:33:45,132 - INFO - Connected to server
+2025-07-01 21:33:45,135 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 21:33:45,142 - INFO - [INFO] Successfully connected to server
+2025-07-01 21:33:46,903 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:33:47,182 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:33:47,667 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:33:47,957 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:33:48,211 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:33:48,407 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:33:48,541 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:33:48,707 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:33:49,547 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:33:49,763 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:33:49,970 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:33:50,094 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:33:50,193 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:33:50,315 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:33:50,430 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:33:50,581 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:33:50,674 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:33:51,318 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:33:51,554 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:33:51,678 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:33:51,764 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:33:51,891 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:33:52,599 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 21:33:53,414 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 21:33:54,879 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 21:33:55,167 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 21:33:55,766 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 21:34:02,167 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 21:34:51,313 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_zero', Value: None
+2025-07-01 21:34:59,430 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 21:35:05,803 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 10.0
+2025-07-01 21:35:56,208 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 21:35:57,568 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 21:35:58,546 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 21:35:59,809 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 21:36:01,128 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 21:36:02,993 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 21:36:06,346 - INFO - [INFO] Closing application...
+2025-07-01 21:36:07,550 - INFO - Disconnected from server: client disconnect

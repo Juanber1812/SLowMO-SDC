@@ -366,7 +366,9 @@ class ADCSController:
         
         # Initialize motor control
         self.motor_available = setup_motor_control()
-        
+        self.running = True
+        self.manual_control_active = False # Add this line
+        self.status = "Initializing"
         # Initialize PD controller
         self.pd_controller = PDBangBangController(
             kp=2.0,           # Proportional gain
@@ -449,7 +451,7 @@ class ADCSController:
         self.control_thread = threading.Thread(target=self._control_thread_worker, daemon=True)
         self.control_thread.start()
         print(f"🎮 Control thread started at 50Hz")
-    
+
     def _control_thread_worker(self):
         """High-speed control worker thread"""
         interval = 1.0 / 50  # 50Hz control loop
@@ -457,6 +459,11 @@ class ADCSController:
         last_time = time.time()
         
         while not self.stop_control_thread:
+            # If in manual mode, skip the automatic control logic
+            if self.manual_control_active:
+                time.sleep(0.05) # Sleep briefly to prevent busy-waiting
+                continue
+
             current_time = time.time()
             
             if current_time >= next_control_time:
@@ -698,7 +705,8 @@ class ADCSController:
             
             # Stop PD controller first
             self.pd_controller.stop_controller()
-            
+            self.manual_control_active = True # Ad
+
             if direction == "CW":
                 rotate_clockwise()
                 print("🔄 Manual clockwise started")
@@ -716,6 +724,7 @@ class ADCSController:
     def stop_manual_control(self):
         """Stop manual motor control"""
         try:
+            self.manual_control_active = False # Add this line
             stop_motor()
             print("⏹️ Manual control stopped")
             return {"status": "success", "message": "Manual control stopped"}
