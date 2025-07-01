@@ -1771,3 +1771,5 @@
 2025-07-01 23:16:52,552 - INFO - Sending ADCS command: Mode='adcs', Command='set_pd_values', Value={'kp': 0.5, 'kd': 0.1, 'deadband': 1.0, 'min_pulse': 0.1}
 2025-07-01 23:16:56,664 - INFO - Sending ADCS command: Mode='adcs', Command='set_pd_values', Value={'kp': 0.5, 'kd': 0.1, 'deadband': 1.0, 'min_pulse': 0.1}
 2025-07-01 23:25:03,468 - INFO - Disconnected from server: transport error
+2025-07-01 23:30:34,587 - INFO - [INFO] Closing application...
+2025-07-01 23:30:34,590 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
