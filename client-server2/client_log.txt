@@ -846,3 +846,229 @@
 2025-07-01 14:45:13,452 - INFO - [ADCSSection] Navigating to page 0
 2025-07-01 14:45:15,736 - INFO - [INFO] Closing application...
 2025-07-01 14:45:16,941 - INFO - Disconnected from server: client disconnect
+2025-07-01 14:53:59,972 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 14:54:01,165 - INFO - Connected to server
+2025-07-01 14:54:01,168 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 14:54:01,171 - INFO - [INFO] Successfully connected to server
+2025-07-01 14:54:35,298 - INFO - [ADCSSection] Navigating to page 6
+2025-07-01 14:54:37,527 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 14:55:02,367 - INFO - [INFO] Closing application...
+2025-07-01 14:55:03,571 - INFO - Disconnected from server: client disconnect
+2025-07-01 14:59:41,258 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 14:59:41,669 - INFO - Connected to server
+2025-07-01 14:59:41,672 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 14:59:41,679 - INFO - [INFO] Successfully connected to server
+2025-07-01 14:59:59,152 - INFO - [INFO] Closing application...
+2025-07-01 15:00:00,357 - INFO - Disconnected from server: client disconnect
+2025-07-01 15:09:05,141 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 15:09:07,589 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751378945.1443229 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000236AB2F6900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 15:09:08,189 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 15:09:08,332 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 15:09:09,678 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 15:09:09,978 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 15:09:13,515 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 15:09:13,651 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 15:09:14,248 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 15:09:14,503 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 15:09:15,018 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 15:09:15,075 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 15:09:15,512 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 15:09:15,760 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 15:09:16,524 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 15:09:16,680 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 15:09:17,247 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 15:09:17,366 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 15:09:18,351 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: None
+2025-07-01 15:09:20,582 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: None
+2025-07-01 15:09:22,300 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 15:09:23,749 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 15:09:25,283 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:09:26,919 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 15:09:27,614 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 15:09:30,914 - INFO - [ADCSSection] Action for mode 'Raw': Command 'pd_tuning', Value: None
+2025-07-01 15:09:32,433 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:09:33,185 - INFO - [ADCSSection] Switched to AprilTag control page
+2025-07-01 15:09:33,885 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:09:35,836 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:09:40,140 - INFO - [INFO] Closing application...
+2025-07-01 15:09:40,142 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 15:13:33,539 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 15:13:35,622 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751379213.5426342 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019B1FA5EA50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 15:13:35,835 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:13:37,118 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:13:38,797 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:13:39,150 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:13:39,890 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 15:13:40,891 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 15:13:41,619 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:13:42,294 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 15:13:43,632 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 15:13:45,514 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 15:13:47,451 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 15:13:54,949 - INFO - [INFO] Closing application...
+2025-07-01 15:13:54,953 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 15:18:23,638 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 15:18:26,090 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751379503.6395984 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002198B662900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 15:18:28,035 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:18:30,165 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 15:18:31,858 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 15:18:34,021 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:18:36,153 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:18:38,269 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 15:18:39,536 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 15:20:16,119 - INFO - [INFO] Closing application...
+2025-07-01 15:20:16,122 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 15:21:57,118 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 15:21:59,597 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751379717.120146 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000027093762900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 15:22:00,975 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:22:02,940 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:22:05,136 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:22:14,281 - WARNING - [ADCSSection] Invalid value: a
+2025-07-01 15:22:20,868 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 1.0
+2025-07-01 15:22:30,037 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:22:33,778 - INFO - [INFO] Closing application...
+2025-07-01 15:22:33,781 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 15:28:18,548 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 15:28:20,617 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751380098.5507247 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000171B176EA50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 15:28:20,863 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:28:22,451 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:28:23,418 - INFO - [ADCSSection] Switched to Environmental control page
+2025-07-01 15:28:24,687 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:28:25,631 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 15:28:25,752 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 15:28:29,639 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:28:31,540 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:28:31,825 - INFO - [ADCSSection] Switched to AprilTag control page
+2025-07-01 15:28:32,685 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:34:13,734 - INFO - [INFO] Closing application...
+2025-07-01 15:34:13,736 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 15:34:21,347 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 15:34:23,533 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751380461.3503592 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000021126522A50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 15:34:23,743 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:34:25,109 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:34:25,692 - INFO - [ADCSSection] Switched to AprilTag control page
+2025-07-01 15:34:26,903 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:34:27,852 - INFO - [ADCSSection] Switched to Environmental control page
+2025-07-01 15:34:29,164 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:34:30,198 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:34:32,284 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_pd_values', Value: {'kp': 0.0, 'kd': 0.0}
+2025-07-01 15:34:32,814 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_pd_values', Value: {'kp': 0.0, 'kd': 0.0}
+2025-07-01 15:34:34,263 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 0.0
+2025-07-01 15:34:34,650 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 0.0
+2025-07-01 15:34:35,793 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 15:34:35,912 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 15:34:36,422 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 15:34:36,535 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 15:34:45,820 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:34:47,466 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:34:48,306 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:34:50,037 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:34:51,213 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:34:52,108 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:34:52,865 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 15:39:58,086 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 15:40:00,179 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751380798.0875576 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001A793B62A50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 15:40:01,850 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:40:04,680 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 15:40:05,480 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 15:40:06,748 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:40:07,183 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:40:07,750 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:40:08,157 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:40:10,749 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:40:13,089 - INFO - [INFO] Closing application...
+2025-07-01 15:40:13,093 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 15:45:02,064 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 15:45:03,901 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:45:04,410 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751381102.0678144 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002D970C72900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 15:45:05,264 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:45:06,449 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:45:07,465 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:45:09,299 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 15:45:11,612 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 15:45:12,475 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 15:45:14,189 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 15:45:15,102 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 15:45:19,949 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_zero', Value: None
+2025-07-01 15:45:26,905 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:45:28,223 - INFO - [ADCSSection] Switched to Environmental control page
+2025-07-01 15:45:30,852 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 15:46:35,353 - INFO - [INFO] Closing application...
+2025-07-01 15:46:35,356 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 16:09:40,214 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 16:09:42,611 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 16:09:42,689 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751382580.2166376 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001D67AEC27B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 16:09:45,755 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 16:09:46,730 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 16:09:48,549 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 16:09:49,393 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 16:09:51,315 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 16:09:56,235 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 16:10:02,212 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 0.0
+2025-07-01 16:10:07,746 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_pd_values', Value: {'kp': 0.0, 'kd': 0.0}
+2025-07-01 16:10:11,020 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_zero', Value: None
+2025-07-01 16:10:13,157 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 16:10:14,648 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 16:10:16,031 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 16:10:16,713 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 16:10:18,920 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 16:10:21,717 - INFO - [INFO] Closing application...
+2025-07-01 16:10:21,721 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 16:22:39,817 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 16:22:40,017 - INFO - Connected to server
+2025-07-01 16:22:40,018 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 16:22:40,020 - INFO - [INFO] Successfully connected to server
+2025-07-01 16:22:45,987 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 16:22:51,433 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 16:22:52,541 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 16:22:53,858 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 16:22:53,960 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 16:22:54,935 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 16:22:55,041 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 16:23:15,663 - INFO - [INFO] Closing application...
+2025-07-01 16:23:16,868 - INFO - Disconnected from server: client disconnect
+2025-07-01 16:28:23,005 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 16:28:25,112 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751383703.0075443 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002155126F0E0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 16:28:33,960 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 16:28:34,124 - INFO - Connected to server
+2025-07-01 16:28:34,126 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 16:28:49,826 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 16:28:54,098 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 10.0
+2025-07-01 16:29:46,408 - INFO - [INFO] Closing application...
+2025-07-01 16:29:47,622 - INFO - Disconnected from server: client disconnect
+2025-07-01 16:37:01,957 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 16:37:04,217 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751384221.9611578 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000027A8039F0E0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 16:37:10,984 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 16:37:13,062 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751384230.9868789 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000027A9FE09590>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 16:37:25,649 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 16:37:27,750 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751384245.6512861 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000027A9FE09A90>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 16:37:30,595 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 16:37:30,790 - INFO - Connected to server
+2025-07-01 16:37:30,792 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 16:38:20,980 - INFO - [INFO] Closing application...
+2025-07-01 16:38:22,184 - INFO - Disconnected from server: client disconnect
+2025-07-01 16:38:41,295 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 16:38:41,473 - INFO - Connected to server
+2025-07-01 16:38:41,475 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 16:38:41,477 - INFO - [INFO] Successfully connected to server
+2025-07-01 16:40:44,240 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 16:40:44,246 - INFO - Stream paused for config application.
+2025-07-01 16:40:44,758 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-01 16:40:44,765 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-01 16:40:44,969 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-01 16:41:01,438 - INFO - Disconnected from server: transport error
+2025-07-01 16:41:02,586 - INFO - Connected to server
+2025-07-01 16:41:02,589 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 16:41:02,592 - INFO - Stream paused for config application.
+2025-07-01 16:41:11,366 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 16:41:23,593 - INFO - Requesting LIDAR streaming start
+2025-07-01 16:41:26,665 - INFO - Requesting LIDAR streaming stop
+2025-07-01 16:41:26,668 - INFO - Back button clicked in LidarWidget
+2025-07-01 16:42:04,894 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 16:42:05,185 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 16:42:06,335 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 16:42:06,580 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 16:42:07,834 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 16:42:08,202 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 16:42:22,623 - INFO - [INFO] Closing application...
+2025-07-01 16:42:24,330 - INFO - Disconnected from server: client disconnect

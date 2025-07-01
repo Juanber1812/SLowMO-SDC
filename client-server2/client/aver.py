@@ -65,6 +65,7 @@ from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
 from widgets.detector_control import DetectorControlWidget
 from widgets.adcs import ADCSSection
+from widgets.adcs_graph import ADCSGraphWidget
 from widgets.detector_settings_widget import DetectorSettingsWidget
 from payload.detector4 import detector_instance
 from data_analysis import DataAnalysisTab
@@ -679,12 +680,15 @@ class MainWindow(QWidget):
         self.adcs_control_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
 
         self.adcs_control_widget.adcs_command_sent.connect(self.handle_adcs_command)
-        row3.addWidget(self.adcs_control_widget, 1)  # stretch factor 1 for half space
+        row3.addWidget(self.adcs_control_widget, 1)  # stretch factor 1 for ADCS controls
         
-        # Add a spacer to fill the remaining half of the space
-        from PyQt6.QtWidgets import QSpacerItem
-        spacer = QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        row3.addItem(spacer)
+        # ADCS graph widget - same row as ADCS controls
+        self.adcs_graph_widget = ADCSGraphWidget()
+        self.adcs_graph_widget.setFixedSize(600, 250)  # Compact size for row 3 layout
+        self.apply_groupbox_style(self.adcs_graph_widget, self.COLOR_BOX_BORDER_GRAPH)
+        self.adcs_graph_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        
+        row3.addWidget(self.adcs_graph_widget, 1)  # stretch factor 1 for graph
         
         parent_layout.addLayout(row3)
 
@@ -801,9 +805,15 @@ class MainWindow(QWidget):
             ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
             ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Server Signal: Pending...", "Client Signal: Pending...", "Data Transmission Rate: Pending...", "Latency: Pending...", "Status: Pending..."]),
             ("ADCS Subsystem", [
-                "Gyroscope: X:-- °/s, Y:-- °/s, Z:-- °/s", 
-                "Orientation: X:-- °, Y:-- °, Z:-- °", 
-                "Sun Sensors: Lux1:-- lux, Lux2:-- lux, Lux3:-- lux",
+                "Gyro X: -- °/s", 
+                "Gyro Y: -- °/s", 
+                "Gyro Z: -- °/s",
+                "Angle X: -- °", 
+                "Angle Y: -- °", 
+                "Angle Z: -- °",
+                "Lux1: -- lux", 
+                "Lux2: -- lux", 
+                "Lux3: -- lux",
                 "Status: Pending..."
             ]),
             ("Payload Subsystem", []),  # Special handling for payload
@@ -871,13 +881,25 @@ class MainWindow(QWidget):
                     lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
-                    # Store label references for the 4 main ADCS lines
-                    if "Gyroscope:" in text:
-                        self.adcs_labels["gyroscope"] = lbl
-                    elif "Orientation:" in text:
-                        self.adcs_labels["orientation"] = lbl
-                    elif "Sun Sensors:" in text:
-                        self.adcs_labels["sun_sensors"] = lbl
+                    # Store label references for the individual ADCS components
+                    if "Gyro X:" in text:
+                        self.adcs_labels["gyro_x"] = lbl
+                    elif "Gyro Y:" in text:
+                        self.adcs_labels["gyro_y"] = lbl
+                    elif "Gyro Z:" in text:
+                        self.adcs_labels["gyro_z"] = lbl
+                    elif "Angle X:" in text:
+                        self.adcs_labels["angle_x"] = lbl
+                    elif "Angle Y:" in text:
+                        self.adcs_labels["angle_y"] = lbl
+                    elif "Angle Z:" in text:
+                        self.adcs_labels["angle_z"] = lbl
+                    elif "Lux1:" in text:
+                        self.adcs_labels["lux1"] = lbl
+                    elif "Lux2:" in text:
+                        self.adcs_labels["lux2"] = lbl
+                    elif "Lux3:" in text:
+                        self.adcs_labels["lux3"] = lbl
                     elif "Status:" in text:
                         self.adcs_labels["status"] = lbl
                         
@@ -1167,30 +1189,40 @@ class MainWindow(QWidget):
             """Handle ADCS subsystem data updates"""
             try:
                 if hasattr(self, 'adcs_labels'):
-                    # Update the 4 main ADCS display lines
-                    
-                    # Line 1: Gyroscope rates (X, Y, Z in °/s)
-                    if "gyroscope" in self.adcs_labels:
+                    # Update individual gyroscope rates (X, Y, Z in °/s)
+                    if "gyro_x" in self.adcs_labels:
                         gyro_x = data.get('gyro_rate_x', '--')
+                        self.adcs_labels["gyro_x"].setText(f"Gyro X: {gyro_x} °/s")
+                    if "gyro_y" in self.adcs_labels:
                         gyro_y = data.get('gyro_rate_y', '--')
+                        self.adcs_labels["gyro_y"].setText(f"Gyro Y: {gyro_y} °/s")
+                    if "gyro_z" in self.adcs_labels:
                         gyro_z = data.get('gyro_rate_z', '--')
-                        self.adcs_labels["gyroscope"].setText(f"Gyroscope: X:{gyro_x} °/s, Y:{gyro_y} °/s, Z:{gyro_z} °/s")
+                        self.adcs_labels["gyro_z"].setText(f"Gyro Z: {gyro_z} °/s")
                     
-                    # Line 2: Orientation angles (X, Y, Z in degrees)
-                    if "orientation" in self.adcs_labels:
+                    # Update individual orientation angles (X, Y, Z in degrees)
+                    if "angle_x" in self.adcs_labels:
                         angle_x = data.get('angle_x', '--')
+                        self.adcs_labels["angle_x"].setText(f"Angle X: {angle_x} °")
+                    if "angle_y" in self.adcs_labels:
                         angle_y = data.get('angle_y', '--')
+                        self.adcs_labels["angle_y"].setText(f"Angle Y: {angle_y} °")
+                    if "angle_z" in self.adcs_labels:
                         angle_z = data.get('angle_z', '--')
-                        self.adcs_labels["orientation"].setText(f"Orientation: X:{angle_x} °, Y:{angle_y} °, Z:{angle_z} °")
+                        self.adcs_labels["angle_z"].setText(f"Angle Z: {angle_z} °")
                     
-                    # Line 3: Sun sensors (Lux1, Lux2, Lux3 in lux)
-                    if "sun_sensors" in self.adcs_labels:
+                    # Update individual sun sensors (Lux1, Lux2, Lux3 in lux)
+                    if "lux1" in self.adcs_labels:
                         lux1 = data.get('lux1', '--')
+                        self.adcs_labels["lux1"].setText(f"Lux1: {lux1} lux")
+                    if "lux2" in self.adcs_labels:
                         lux2 = data.get('lux2', '--')
+                        self.adcs_labels["lux2"].setText(f"Lux2: {lux2} lux")
+                    if "lux3" in self.adcs_labels:
                         lux3 = data.get('lux3', '--')
-                        self.adcs_labels["sun_sensors"].setText(f"Sun Sensors: Lux1:{lux1} lux, Lux2:{lux2} lux, Lux3:{lux3} lux")
+                        self.adcs_labels["lux3"].setText(f"Lux3: {lux3} lux")
                     
-                    # Line 4: Status
+                    # Update status
                     if "status" in self.adcs_labels:
                         status = data.get('status', 'Unknown')
                         self.adcs_labels["status"].setText(f"Status: {status}")
@@ -1229,6 +1261,10 @@ class MainWindow(QWidget):
                     # Update ADCS widget with detailed sensor data
                     if hasattr(self.adcs_control_widget, 'update_sensor_data'):
                         self.adcs_control_widget.update_sensor_data(adcs_detailed_data)
+                
+                # Update ADCS graph widget with live data
+                if hasattr(self, 'adcs_graph_widget') and self.adcs_graph_widget:
+                    self.adcs_graph_widget.update_from_adcs_data(data)
                     
             except Exception as e:
                 logging.error(f"Failed to update ADCS data: {e}")
@@ -1424,6 +1460,11 @@ class MainWindow(QWidget):
         }
         sio.emit("adcs_command", data)
         print(f"[CLIENT] ADCS command sent: {data}")
+        
+        # Update ADCS graph widget when target value is set
+        if hasattr(self, 'adcs_graph_widget') and self.adcs_graph_widget:
+            if command_name == "set_value" and isinstance(value, (int, float)):
+                self.adcs_graph_widget.update_target_angle(value)
 
     def start_lidar_streaming(self):
         """Start LIDAR data streaming from server"""

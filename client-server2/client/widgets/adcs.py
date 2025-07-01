@@ -9,6 +9,14 @@ ADCS_BUTTON_STYLE = """
         background-color: #444444; color: white; border: 1px solid #555555; border-radius: 3px; padding: 5px;
     }
     QPushButton:hover { background-color: #555555; }
+    QPushButton:checked {
+        background-color: #00ff88;
+        color: black;
+    }
+    QPushButton:checked:hover {
+        background-color: #00dd77;
+        color: black;
+    }
     QPushButton:disabled { 
         background-color: #444444; /* Fallback normal background for disabled */
         color: white; /* Fallback normal text for disabled */
@@ -52,6 +60,14 @@ try:
             background-color: {BUTTON_HOVER};
             color: {BUTTON_TEXT};
         }}
+        QPushButton:checked {{
+            background-color: #00ff88;
+            color: black;
+        }}
+        QPushButton:checked:hover {{
+            background-color: #00dd77;
+            color: black;
+        }}
         QPushButton:disabled {{
             background-color: {BUTTON_COLOR}; /* Use normal button background */
             color: {BUTTON_TEXT}; /* Use normal button text color */
@@ -88,45 +104,43 @@ class ADCSSection(QGroupBox):
     adcs_command_sent = pyqtSignal(str, str, object)  # Emits mode_name, command_name, value (can be None)
 
     def __init__(self, parent=None):
-        super().__init__("ADCS", parent)
+        super().__init__(parent)  # Removed "ADCS" title
         self.setObjectName("ADCSSection")
+        
+        # Set fixed size for the widget
+        self.setFixedSize(650, 220)  # Width x Height
 
-        self._main_layout = QVBoxLayout(self)
-        self._main_layout.setSpacing(0)  # Remove spacing to fill completely
-        self._main_layout.setContentsMargins(0, 0, 0, 0)  # Remove margins to fill completely
+        self._main_layout = QHBoxLayout(self)  # Changed to horizontal layout
+        self._main_layout.setSpacing(4)  # Reduced spacing between columns
+        self._main_layout.setContentsMargins(2, 2, 2, 2)  # Reduced padding around the widget
 
-        self.stacked_widget = QStackedWidget()
-
-        # Page 0: Main mode selection (Manual/Auto + Calibrate)
-        main_page = self._create_main_page()
-        self.stacked_widget.addWidget(main_page)
-
-        # Page 1: Manual orientation page (Clockwise/Anticlockwise + Back)
-        manual_page = self._create_manual_page()
-        self.stacked_widget.addWidget(manual_page)
-
-        # Page 2: Auto mode selection (Raw/Env/AprilTag)
+        # Left column: Automatic controls with stacked widget
+        self.auto_stacked_widget = QStackedWidget()
+        
+        # Page 0: Auto mode selection (Raw/Env/AprilTag)
         auto_selection_page = self._create_auto_selection_page()
-        self.stacked_widget.addWidget(auto_selection_page)
-
-        # Page 3: Raw control page
-        raw_page = self._create_raw_page()
-        self.stacked_widget.addWidget(raw_page)
-
-        # Page 4: Env control page
-        env_page = self._create_env_page()
-        self.stacked_widget.addWidget(env_page)
-
-        # Page 5: AprilTag control page
-        apriltag_page = self._create_apriltag_page()
-        self.stacked_widget.addWidget(apriltag_page)
-
-        # Page 6: Calibration page
-        calibration_page = self._create_calibration_page()
-        self.stacked_widget.addWidget(calibration_page)
-
-        self._main_layout.addWidget(self.stacked_widget)
-        self.stacked_widget.setCurrentIndex(0)
+        self.auto_stacked_widget.addWidget(auto_selection_page)
+        
+        # Page 1: Control page for Raw/Env/AprilTag (shared layout)
+        control_page = self._create_control_page()
+        self.auto_stacked_widget.addWidget(control_page)
+        
+        self.auto_stacked_widget.setCurrentIndex(0)
+        
+        # Right column: Manual controls (fixed)
+        manual_column = self._create_manual_column()
+        
+        # Add columns to main layout
+        self._main_layout.addWidget(self.auto_stacked_widget, 3)  # Auto column takes more space (3/4)
+        self._main_layout.addWidget(manual_column, 1)  # Manual column takes less space (1/4)
+        
+        # Track current auto mode for control page
+        self.current_auto_mode = None
+        
+        # Initialize current values (will be updated when server sends actual values)
+        self.current_kp = 0.0
+        self.current_kd = 0.0
+        self.current_target = 0.0
 
     def _create_main_page(self):
         """Creates the main page with Manual/Auto buttons and Calibrate button."""
@@ -220,328 +234,333 @@ class ADCSSection(QGroupBox):
         """Creates the auto selection page with Raw/Env/AprilTag buttons."""
         page = QWidget()
         page_layout = QVBoxLayout(page)
-        page_layout.setSpacing(0)  # Remove spacing to fill completely
-        page_layout.setContentsMargins(0, 0, 0, 0)
+        page_layout.setSpacing(2)  # Reduced spacing between buttons
+        page_layout.setContentsMargins(2, 2, 2, 2)  # Reduced padding inside the page
 
-        # Three rows of buttons
+        # Three buttons stacked vertically with increased height to fill space
         self.raw_btn = QPushButton("Raw")
         self.raw_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.raw_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.raw_btn.clicked.connect(lambda: self._go_to_page(3))
+        self.raw_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.raw_btn.clicked.connect(lambda: self._show_control_page("Raw"))
         page_layout.addWidget(self.raw_btn)
 
-        self.env_btn = QPushButton("Env")
+        self.env_btn = QPushButton("Environmental")
         self.env_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.env_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.env_btn.clicked.connect(lambda: self._go_to_page(4))
+        self.env_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.env_btn.clicked.connect(lambda: self._show_control_page("Environmental"))
         page_layout.addWidget(self.env_btn)
 
         self.apriltag_btn = QPushButton("AprilTag")
         self.apriltag_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.apriltag_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.apriltag_btn.clicked.connect(lambda: self._go_to_page(5))
+        self.apriltag_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.apriltag_btn.clicked.connect(lambda: self._show_control_page("AprilTag"))
         page_layout.addWidget(self.apriltag_btn)
-
-        # Back button
-        self.auto_back_btn = QPushButton("← Back")
-        self.auto_back_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.auto_back_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.auto_back_btn.clicked.connect(lambda: self._go_to_page(0))
-        page_layout.addWidget(self.auto_back_btn)
         
         return page
 
-    def _create_raw_page(self):
-        """Creates the raw control page with Set Zero, Set Value, Start, Stop buttons."""
+    def _create_control_page(self):
+        """Creates the shared control page for Raw/Env/AprilTag modes."""
         page = QWidget()
         page_layout = QVBoxLayout(page)
-        page_layout.setSpacing(0)  # Remove spacing to fill completely
-        page_layout.setContentsMargins(0, 0, 0, 0)
+        page_layout.setSpacing(1)  # Reduced spacing between controls
+        page_layout.setContentsMargins(2, 2, 2, 2)  # Reduced padding inside the page
 
-        # Set Zero button
-        self.raw_set_zero_btn = QPushButton("Set Zero")
-        self.raw_set_zero_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.raw_set_zero_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.raw_set_zero_btn.clicked.connect(
-            lambda: self._handle_action_clicked("Raw", "set_zero", None)
-        )
-        page_layout.addWidget(self.raw_set_zero_btn)
+        # Title label to show current mode
+        self.control_title_label = QLabel("Control Mode")
+        self.control_title_label.setStyleSheet(ADCS_LABEL_STYLE)
+        self.control_title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.control_title_label.setFixedHeight(25)  # Reduced label height to occupy less vertical space
+        page_layout.addWidget(self.control_title_label)
 
-        # Set Value input and send button
-        value_row = QWidget()
-        value_layout = QHBoxLayout(value_row)
-        value_layout.setSpacing(0)  # Remove spacing to fill completely
-        value_layout.setContentsMargins(0, 0, 0, 0)
+        # Run Controller and Set Zero buttons row
+        controller_row = QWidget()
+        controller_layout = QHBoxLayout(controller_row)
+        controller_layout.setSpacing(2)  # Reduced spacing
+        controller_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.raw_value_input = QLineEdit()
-        self.raw_value_input.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.raw_value_input.setPlaceholderText("Enter value")
-        value_layout.addWidget(self.raw_value_input)
+        self.run_controller_btn = QPushButton("Run Controller")  # Always show "Run Controller"
+        self.run_controller_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.run_controller_btn.setFixedHeight(30)  # Same height as Set Value button
+        self.run_controller_btn.setCheckable(True)  # Make it a toggle button
+        self.run_controller_btn.clicked.connect(self._handle_run_controller_clicked)
+        controller_layout.addWidget(self.run_controller_btn)
 
-        self.raw_set_value_btn = QPushButton("Set Value")
-        self.raw_set_value_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.raw_set_value_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.raw_set_value_btn.clicked.connect(self._send_raw_value)
-        value_layout.addWidget(self.raw_set_value_btn)
+        self.set_zero_btn = QPushButton("Set Zero")
+        self.set_zero_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.set_zero_btn.setFixedHeight(30)  # Fixed button height
+        self.set_zero_btn.clicked.connect(self._handle_set_zero_clicked)
+        controller_layout.addWidget(self.set_zero_btn)
 
-        page_layout.addWidget(value_row)
+        page_layout.addWidget(controller_row)
 
-        # Start and Stop buttons
-        control_row = QWidget()
-        control_layout = QHBoxLayout(control_row)
-        control_layout.setSpacing(0)  # Remove spacing to fill completely
-        control_layout.setContentsMargins(0, 0, 0, 0)
+        # PD Tuning controls - all in one row
+        pd_tuning_row = QWidget()
+        pd_tuning_layout = QHBoxLayout(pd_tuning_row)
+        pd_tuning_layout.setSpacing(2)  # Reduced spacing
+        pd_tuning_layout.setContentsMargins(0, 0, 0, 0)
+        
+        kp_label = QLabel("Kp:")
+        kp_label.setStyleSheet(ADCS_LABEL_STYLE)
+        kp_label.setFixedWidth(25)  # Fixed label width
+        pd_tuning_layout.addWidget(kp_label)
+        
+        self.kp_input = QLineEdit()
+        self.kp_input.setPlaceholderText("Enter Kp")
+        self.kp_input.setFixedHeight(25)  # Fixed input height
+        pd_tuning_layout.addWidget(self.kp_input)
+        
+        kd_label = QLabel("Kd:")
+        kd_label.setStyleSheet(ADCS_LABEL_STYLE)
+        kd_label.setFixedWidth(25)  # Fixed label width
+        pd_tuning_layout.addWidget(kd_label)
+        
+        self.kd_input = QLineEdit()
+        self.kd_input.setPlaceholderText("Enter Kd")
+        self.kd_input.setFixedHeight(25)  # Fixed input height
+        pd_tuning_layout.addWidget(self.kd_input)
+        
+        self.set_pd_btn = QPushButton("Set PD")
+        self.set_pd_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.set_pd_btn.setFixedHeight(25)  # Fixed button height
+        self.set_pd_btn.clicked.connect(self._handle_set_pd_clicked)
+        pd_tuning_layout.addWidget(self.set_pd_btn)
+        
+        # Current PD values display
+        self.current_pd_label = QLabel("Current: Kp=0.0, Kd=0.0")
+        self.current_pd_label.setStyleSheet(f"{ADCS_LABEL_STYLE} font-size: 8pt; color: #aaa;")
+        self.current_pd_label.setFixedHeight(25)
+        self.current_pd_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        pd_tuning_layout.addWidget(self.current_pd_label)
+        
+        page_layout.addWidget(pd_tuning_row)
 
-        self.raw_start_btn = QPushButton("Start")
-        self.raw_start_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.raw_start_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.raw_start_btn.clicked.connect(
-            lambda: self._handle_action_clicked("Raw", "start", None)
-        )
-        control_layout.addWidget(self.raw_start_btn)
+        # Set Value input and button row
+        set_value_row = QWidget()
+        set_value_layout = QHBoxLayout(set_value_row)
+        set_value_layout.setSpacing(2)  # Reduced spacing between input and button
+        set_value_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.raw_stop_btn = QPushButton("Stop")
-        self.raw_stop_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.raw_stop_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.raw_stop_btn.clicked.connect(
-            lambda: self._handle_action_clicked("Raw", "stop", None)
-        )
-        control_layout.addWidget(self.raw_stop_btn)
+        self.value_input = QLineEdit()
+        self.value_input.setPlaceholderText("Enter value")
+        self.value_input.setFixedHeight(25)  # Fixed input height
+        set_value_layout.addWidget(self.value_input)
 
-        page_layout.addWidget(control_row)
+        self.set_value_btn = QPushButton("Set Target")
+        self.set_value_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.set_value_btn.setFixedHeight(25)  # Fixed button height
+        self.set_value_btn.clicked.connect(self._handle_set_value_clicked)
+        set_value_layout.addWidget(self.set_value_btn)
+        
+        # Current target value display
+        self.current_target_label = QLabel("Current: 0.0°")
+        self.current_target_label.setStyleSheet(f"{ADCS_LABEL_STYLE} font-size: 8pt; color: #aaa;")
+        self.current_target_label.setFixedHeight(25)
+        self.current_target_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        set_value_layout.addWidget(self.current_target_label)
+
+        page_layout.addWidget(set_value_row)
 
         # Back button
-        self.raw_back_btn = QPushButton("← Back")
-        self.raw_back_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.raw_back_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.raw_back_btn.clicked.connect(lambda: self._go_to_page(2))
-        page_layout.addWidget(self.raw_back_btn)
+        self.control_back_btn = QPushButton("← Back")
+        self.control_back_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.control_back_btn.setFixedHeight(30)  # Fixed button height
+        self.control_back_btn.clicked.connect(self._show_auto_selection)
+        page_layout.addWidget(self.control_back_btn)
         
         return page
 
-    def _create_env_page(self):
-        """Creates the env control page with Set Zero, Set Value, Start, Stop buttons."""
-        page = QWidget()
-        page_layout = QVBoxLayout(page)
-        page_layout.setSpacing(6)
-        page_layout.setContentsMargins(0, 0, 0, 0)
+    def _create_manual_column(self):
+        """Creates the manual control column with 4 fixed buttons."""
+        column = QWidget()
+        column.setMaximumWidth(120)  # Limit the width of the manual column
+        column_layout = QVBoxLayout(column)
+        column_layout.setSpacing(2)  # Reduced spacing between buttons
+        column_layout.setContentsMargins(3, 3, 3, 3)  # Reduced padding inside the column
 
-        # Set Zero button
-        self.env_set_zero_btn = QPushButton("Set Zero")
-        self.env_set_zero_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.env_set_zero_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.env_set_zero_btn.clicked.connect(
-            lambda: self._handle_action_clicked("Env", "set_zero", None)
+        # Clockwise button
+        self.manual_cw_btn = QPushButton("CW")  # Shortened text
+        self.manual_cw_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.manual_cw_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.manual_cw_btn.setMaximumWidth(100)  # Limit button width
+        self.manual_cw_btn.pressed.connect(
+            lambda: self._handle_action_clicked("Manual", "manual_clockwise_start", None)
         )
-        page_layout.addWidget(self.env_set_zero_btn)
-
-        # Set Value input and send button
-        value_row = QWidget()
-        value_layout = QHBoxLayout(value_row)
-        value_layout.setSpacing(6)
-        value_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.env_value_input = QLineEdit()
-        self.env_value_input.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.env_value_input.setPlaceholderText("Enter value")
-        value_layout.addWidget(self.env_value_input)
-
-        self.env_set_value_btn = QPushButton("Set Value")
-        self.env_set_value_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.env_set_value_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.env_set_value_btn.clicked.connect(self._send_env_value)
-        value_layout.addWidget(self.env_set_value_btn)
-
-        page_layout.addWidget(value_row)
-
-        # Start and Stop buttons
-        control_row = QWidget()
-        control_layout = QHBoxLayout(control_row)
-        control_layout.setSpacing(6)
-        control_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.env_start_btn = QPushButton("Start")
-        self.env_start_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.env_start_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.env_start_btn.clicked.connect(
-            lambda: self._handle_action_clicked("Env", "start", None)
+        self.manual_cw_btn.released.connect(
+            lambda: self._handle_action_clicked("Manual", "manual_clockwise_stop", None)
         )
-        control_layout.addWidget(self.env_start_btn)
+        column_layout.addWidget(self.manual_cw_btn)
 
-        self.env_stop_btn = QPushButton("Stop")
-        self.env_stop_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.env_stop_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.env_stop_btn.clicked.connect(
-            lambda: self._handle_action_clicked("Env", "stop", None)
+        # Anticlockwise button
+        self.manual_ccw_btn = QPushButton("CCW")  # Shortened text
+        self.manual_ccw_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.manual_ccw_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.manual_ccw_btn.setMaximumWidth(100)  # Limit button width
+        self.manual_ccw_btn.pressed.connect(
+            lambda: self._handle_action_clicked("Manual", "manual_anticlockwise_start", None)
         )
-        control_layout.addWidget(self.env_stop_btn)
-
-        page_layout.addWidget(control_row)
-
-        # Back button
-        self.env_back_btn = QPushButton("← Back")
-        self.env_back_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.env_back_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.env_back_btn.clicked.connect(lambda: self._go_to_page(2))
-        page_layout.addWidget(self.env_back_btn)
-        
-        return page
-
-    def _create_apriltag_page(self):
-        """Creates the AprilTag control page with Set Zero, Set Value, Start, Stop buttons."""
-        page = QWidget()
-        page_layout = QVBoxLayout(page)
-        page_layout.setSpacing(6)
-        page_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Set Zero button
-        self.apriltag_set_zero_btn = QPushButton("Set Zero")
-        self.apriltag_set_zero_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.apriltag_set_zero_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.apriltag_set_zero_btn.clicked.connect(
-            lambda: self._handle_action_clicked("AprilTag", "set_zero", None)
+        self.manual_ccw_btn.released.connect(
+            lambda: self._handle_action_clicked("Manual", "manual_anticlockwise_stop", None)
         )
-        page_layout.addWidget(self.apriltag_set_zero_btn)
+        column_layout.addWidget(self.manual_ccw_btn)
 
-        # Set Value input and send button
-        value_row = QWidget()
-        value_layout = QHBoxLayout(value_row)
-        value_layout.setSpacing(6)
-        value_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.apriltag_value_input = QLineEdit()
-        self.apriltag_value_input.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.apriltag_value_input.setPlaceholderText("Enter value")
-        value_layout.addWidget(self.apriltag_value_input)
-
-        self.apriltag_set_value_btn = QPushButton("Set Value")
-        self.apriltag_set_value_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.apriltag_set_value_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.apriltag_set_value_btn.clicked.connect(self._send_apriltag_value)
-        value_layout.addWidget(self.apriltag_set_value_btn)
-
-        page_layout.addWidget(value_row)
-
-        # Start and Stop buttons
-        control_row = QWidget()
-        control_layout = QHBoxLayout(control_row)
-        control_layout.setSpacing(6)
-        control_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.apriltag_start_btn = QPushButton("Start")
-        self.apriltag_start_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.apriltag_start_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.apriltag_start_btn.clicked.connect(
-            lambda: self._handle_action_clicked("AprilTag", "start", None)
-        )
-        control_layout.addWidget(self.apriltag_start_btn)
-
-        self.apriltag_stop_btn = QPushButton("Stop")
-        self.apriltag_stop_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.apriltag_stop_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.apriltag_stop_btn.clicked.connect(
-            lambda: self._handle_action_clicked("AprilTag", "stop", None)
-        )
-        control_layout.addWidget(self.apriltag_stop_btn)
-
-        page_layout.addWidget(control_row)
-
-        # Back button
-        self.apriltag_back_btn = QPushButton("← Back")
-        self.apriltag_back_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.apriltag_back_btn.setFixedHeight(ADCS_BUTTON_HEIGHT)
-        self.apriltag_back_btn.clicked.connect(lambda: self._go_to_page(2))
-        page_layout.addWidget(self.apriltag_back_btn)
-        
-        return page
-
-    def _create_calibration_page(self):
-        """Creates the calibration page with live text display and calibrate button."""
-        page = QWidget()
-        page_layout = QVBoxLayout(page)
-        page_layout.setSpacing(0)  # Remove spacing to fill completely
-        page_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Live text display
-        self.calibration_status_label = QLabel("Calibration Status: Ready")
-        self.calibration_status_label.setStyleSheet(ADCS_LABEL_STYLE)
-        self.calibration_status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.calibration_status_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        page_layout.addWidget(self.calibration_status_label)
+        # Enable Motor toggle button
+        self.enable_motor_btn = QPushButton("Enable")  # Always show "Enable"
+        self.enable_motor_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.enable_motor_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.enable_motor_btn.setMaximumWidth(100)  # Limit button width
+        self.enable_motor_btn.setCheckable(True)  # Make it a toggle button
+        self.enable_motor_btn.clicked.connect(self._handle_enable_motor_clicked)
+        column_layout.addWidget(self.enable_motor_btn)
 
         # Calibrate button
-        self.calibrate_again_btn = QPushButton("Start Calibration")
-        self.calibrate_again_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.calibrate_again_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.calibrate_again_btn.clicked.connect(
-            lambda: self._handle_action_clicked("Calibration", "start_calibration", None)
+        self.calibrate_btn = QPushButton("Cal")  # Shortened text
+        self.calibrate_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.calibrate_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.calibrate_btn.setMaximumWidth(100)  # Limit button width
+        self.calibrate_btn.clicked.connect(
+            lambda: self._handle_action_clicked("Manual", "calibrate", None)
         )
-        page_layout.addWidget(self.calibrate_again_btn)
-
-        # Back button
-        self.calibration_back_btn = QPushButton("← Back")
-        self.calibration_back_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.calibration_back_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  # Fill available space
-        self.calibration_back_btn.clicked.connect(lambda: self._go_to_page(0))
-        page_layout.addWidget(self.calibration_back_btn)
+        column_layout.addWidget(self.calibrate_btn)
         
-        return page
+        return column
 
-    def _go_to_page(self, page_index):
-        """Navigate to a specific page."""
-        logging.info(f"[ADCSSection] Navigating to page {page_index}")
-        self.stacked_widget.setCurrentIndex(page_index)
+    def _show_control_page(self, mode_name):
+        """Show the control page for the specified mode."""
+        self.current_auto_mode = mode_name
+        self.control_title_label.setText(f"{mode_name} Control")
+        
+        # Reset the run controller button state when switching modes
+        self.run_controller_btn.setChecked(False)
+        # Button text remains "Run Controller" - visual state is shown by checked/unchecked appearance
+        
+        self.auto_stacked_widget.setCurrentIndex(1)
+        logging.info(f"[ADCSSection] Switched to {mode_name} control page")
 
-    def _send_raw_value(self):
-        """Send raw value from input field."""
-        try:
-            value = int(self.raw_value_input.text() or 0)
-            self._handle_action_clicked("Raw", "set_value", value)
-            self.raw_value_input.clear()
-        except ValueError:
-            logging.warning(f"[ADCSSection] Invalid raw value: {self.raw_value_input.text()}")
-            self.raw_value_input.selectAll()
+    def _show_auto_selection(self):
+        """Show the auto mode selection page."""
+        self.auto_stacked_widget.setCurrentIndex(0)
+        self.current_auto_mode = None
+        logging.info("[ADCSSection] Switched to auto selection page")
 
-    def _send_env_value(self):
-        """Send env value from input field."""
-        try:
-            value = int(self.env_value_input.text() or 0)
-            self._handle_action_clicked("Env", "set_value", value)
-            self.env_value_input.clear()
-        except ValueError:
-            logging.warning(f"[ADCSSection] Invalid env value: {self.env_value_input.text()}")
-            self.env_value_input.selectAll()
+    def _handle_run_controller_clicked(self):
+        """Handle run controller toggle button click."""
+        if self.current_auto_mode:
+            if self.run_controller_btn.isChecked():
+                # Button is now pressed/checked - start the controller
+                # Text stays "Run Controller" - visual state is shown by checked appearance
+                self._handle_action_clicked(self.current_auto_mode, "start", None)
+            else:
+                # Button is now unpressed/unchecked - stop the controller
+                # Text stays "Run Controller" - visual state is shown by unchecked appearance
+                self._handle_action_clicked(self.current_auto_mode, "stop", None)
 
-    def _send_apriltag_value(self):
-        """Send AprilTag value from input field."""
-        try:
-            value = int(self.apriltag_value_input.text() or 0)
-            self._handle_action_clicked("AprilTag", "set_value", value)
-            self.apriltag_value_input.clear()
-        except ValueError:
-            logging.warning(f"[ADCSSection] Invalid AprilTag value: {self.apriltag_value_input.text()}")
-            self.apriltag_value_input.selectAll()
+    def _handle_enable_motor_clicked(self):
+        """Handle enable motor toggle button click."""
+        if self.enable_motor_btn.isChecked():
+            # Button is now pressed/checked - enable motor
+            # Text stays "Enable" - visual state is shown by checked appearance
+            self._handle_action_clicked("Manual", "enable_motor", True)
+        else:
+            # Button is now unpressed/unchecked - disable motor
+            # Text stays "Enable" - visual state is shown by unchecked appearance
+            self._handle_action_clicked("Manual", "enable_motor", False)
+
+    def _handle_start_clicked(self):
+        """Handle start button click."""
+        if self.current_auto_mode:
+            self._handle_action_clicked(self.current_auto_mode, "start", None)
+
+    def _handle_stop_clicked(self):
+        """Handle stop button click."""
+        if self.current_auto_mode:
+            self._handle_action_clicked(self.current_auto_mode, "stop", None)
+
+    def _handle_set_pd_clicked(self):
+        """Handle set PD values button click."""
+        if self.current_auto_mode:
+            try:
+                kp_value = float(self.kp_input.text() or 0)
+                kd_value = float(self.kd_input.text() or 0)
+                pd_values = {"kp": kp_value, "kd": kd_value}
+                self._handle_action_clicked(self.current_auto_mode, "set_pd_values", pd_values)
+                
+                # Update current PD display
+                self.current_pd_label.setText(f"Current: Kp={kp_value:.2f}, Kd={kd_value:.2f}")
+                
+                self.kp_input.clear()
+                self.kd_input.clear()
+            except ValueError:
+                logging.warning(f"[ADCSSection] Invalid PD values: Kp={self.kp_input.text()}, Kd={self.kd_input.text()}")
+                # Select all text in both inputs for easy correction
+                self.kp_input.selectAll()
+                self.kd_input.selectAll()
+
+    def _handle_pd_tuning_clicked(self):
+        """Handle PD tuning button click."""
+        if self.current_auto_mode:
+            self._handle_action_clicked(self.current_auto_mode, "pd_tuning", None)
+
+    def _handle_set_value_clicked(self):
+        """Handle set value button click."""
+        if self.current_auto_mode:
+            try:
+                value = float(self.value_input.text() or 0)
+                self._handle_action_clicked(self.current_auto_mode, "set_value", value)
+                
+                # Update current target display
+                self.current_target_label.setText(f"Current: {value:.1f}°")
+                
+                self.value_input.clear()
+            except ValueError:
+                logging.warning(f"[ADCSSection] Invalid value: {self.value_input.text()}")
+                self.value_input.selectAll()
+
+    def _handle_set_zero_clicked(self):
+        """Handle set zero button click."""
+        if self.current_auto_mode:
+            self._handle_action_clicked(self.current_auto_mode, "set_zero", None)
 
     def _handle_action_clicked(self, mode_name, command_name, value=None):
         """Handle action button clicks and emit signals."""
         logging.info(f"[ADCSSection] Action for mode '{mode_name}': Command '{command_name}', Value: {value}")
         self.adcs_command_sent.emit(mode_name, command_name, value)
 
-    def update_calibration_status(self, status_text):
-        """Update the calibration status text (can be called from main application)."""
-        if hasattr(self, 'calibration_status_label'):
-            self.calibration_status_label.setText(f"Calibration Status: {status_text}")
+    def update_sensor_data(self, data):
+        """Update sensor data display (for integration with main window)."""
+        # This method can be used to update any sensor displays if needed
+        # Also update current values if they come from server
+        if 'current_kp' in data or 'current_kd' in data:
+            kp = data.get('current_kp', 0.0)
+            kd = data.get('current_kd', 0.0)
+            if hasattr(self, 'current_pd_label'):
+                self.current_pd_label.setText(f"Current: Kp={kp:.2f}, Kd={kd:.2f}")
+        
+        if 'current_target' in data:
+            target = data.get('current_target', 0.0)
+            if hasattr(self, 'current_target_label'):
+                self.current_target_label.setText(f"Current: {target:.1f}°")
 
-    # Deprecated methods - keeping for backward compatibility but they now redirect to main page
+    def update_current_pd_values(self, kp, kd):
+        """Update the current PD values display."""
+        if hasattr(self, 'current_pd_label'):
+            self.current_pd_label.setText(f"Current: Kp={kp:.2f}, Kd={kd:.2f}")
+
+    def update_current_target_value(self, target):
+        """Update the current target value display."""
+        if hasattr(self, 'current_target_label'):
+            self.current_target_label.setText(f"Current: {target:.1f}°")
+
+    # Deprecated methods - keeping for backward compatibility
     def switch_to_mode_selection_view(self):
-        """Deprecated: Switches back to main page for backward compatibility."""
-        logging.info("[ADCSSection] Returning to main page (deprecated method).")
-        self._go_to_page(0)
+        """Deprecated: Switches back to auto selection for backward compatibility."""
+        logging.info("[ADCSSection] Returning to auto selection (deprecated method).")
+        self._show_auto_selection()
 
     def switch_to_detail_view(self, mode_name):
         """Deprecated: For backward compatibility only."""
         logging.warning(f"[ADCSSection] Deprecated method called: switch_to_detail_view({mode_name})")
-        self._go_to_page(0)
+        self._show_auto_selection()
+
 
 # Example of how to use it (if run standalone, for testing)
 if __name__ == '__main__':
@@ -571,7 +590,6 @@ if __name__ == '__main__':
     """
     ADCS_BUTTON_HEIGHT = int(BUTTON_HEIGHT)
     ADCS_LABEL_STYLE = f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;"
-
 
     app = QApplication(sys.argv)
     main_window = QMainWindow()

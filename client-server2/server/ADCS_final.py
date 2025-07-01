@@ -80,8 +80,8 @@ class MPU6050Sensor:
             print("✓ MPU6050 initialized successfully")
             time.sleep(0.1)
             
-            # Perform initial calibration
-            self.calibrate_gyro()
+            # Skip automatic calibration - use raw values until calibration command is sent
+            print("ℹ️ MPU6050 ready - using raw values (calibration available on command)")
             self.sensor_ready = True
             
         except Exception as e:

@@ -9,7 +9,7 @@ Temperature: -- °C
 Status: Disconnected
 
 === Thermal Subsystem ===
-Pi: 44.3°C
+Pi: 47.2°C
 Power PCB: Pending...
 Battery: Pending...
 Status: Pending...
@@ -17,20 +17,23 @@ Status: Pending...
 === Communication Subsystem ===
 Downlink Frequency: 5.180 GHz
 Uplink Frequency: 5.000 GHz
-Server Signal: -61 dBm
-Client Signal: -39 dBm
-Data Transmission Rate: 151.7 KB/s
-Latency: -468.6 ms
+Server Signal: -67 dBm
+Client Signal: -41 dBm
+Data Transmission Rate: 848.0 KB/s
+Latency: -1024.1 ms
 Status: Good
 
 === ADCS Subsystem ===
-Gyro: Pending...
-Orientation: Pending...
-Lux1: Pending...
-Lux2: Pending...
-Lux3: Pending...
-RPM: Pending...
-Status: Pending...
+Gyro X: -3.92 °/s
+Gyro Y: -0.73 °/s
+Gyro Z: -1.61 °/s
+Angle X: -64.5 °
+Angle Y: -14.0 °
+Angle Z: -24.2 °
+Lux1: 450.5 lux
+Lux2: 323.1 lux
+Lux3: 724.7 lux
+Status: Active
 
 === Payload Subsystem ===
 Camera: Connected
@@ -38,10 +41,10 @@ Lidar: Connected
 Status: OK
 
 === Command & Data Handling Subsystem ===
-CPU Usage: 10.4%
-Memory Usage: 27.6%
+CPU Usage: 5.2%
+Memory Usage: 28.1%
 Last Command: Pending...
-Uptime: 1m 30s
+Uptime: 0m 14s
 Status: Optimal
 
 === Error Log ===
