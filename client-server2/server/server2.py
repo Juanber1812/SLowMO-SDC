@@ -437,11 +437,9 @@ def power_data_callback(power_data):
 def communication_data_callback(comm_data):
     """Handle communication data updates and broadcast to clients"""
     try:
-        # Format data to match the simplified structure
+        # Format data to match the simplified structure (no WiFi speeds)
         formatted_data = {
             "downlink_frequency": comm_data.get('downlink_frequency', 0.0),
-            "wifi_download_speed": comm_data.get('wifi_download_speed', 0.0), 
-            "wifi_upload_speed": comm_data.get('wifi_upload_speed', 0.0),
             "data_transmission_rate": comm_data.get('data_transmission_rate', 0.0),
             "server_signal_strength": comm_data.get('server_signal_strength', 0),
             "latency": comm_data.get('latency', 0.0),
@@ -452,8 +450,7 @@ def communication_data_callback(comm_data):
         
         # Log communication status periodically (every 30 seconds)
         if not hasattr(communication_data_callback, 'last_log') or time.time() - communication_data_callback.last_log > 30:
-            print(f"\n[COMM] WiFi: {formatted_data['wifi_download_speed']:.1f}↓/{formatted_data['wifi_upload_speed']:.1f}↑ Mbps, "
-                  f"Data Rate: {formatted_data['data_transmission_rate']:.1f} KB/s, "
+            print(f"\n[COMM] Data Rate: {formatted_data['data_transmission_rate']:.1f} KB/s, "
                   f"Latency: {formatted_data['latency']:.1f} ms, "
                   f"Freq: {formatted_data['downlink_frequency']:.3f} GHz, "
                   f"Signal: {formatted_data['server_signal_strength']} dBm, "
@@ -465,8 +462,6 @@ def communication_data_callback(comm_data):
         # Send error state to clients
         socketio.emit("communication_broadcast", {
             "downlink_frequency": 0.0,
-            "wifi_download_speed": 0.0,
-            "wifi_upload_speed": 0.0,
             "data_transmission_rate": 0.0,
             "server_signal_strength": 0,
             "latency": 0.0,

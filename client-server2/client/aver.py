@@ -789,7 +789,7 @@ class MainWindow(QWidget):
         subsystems = [
             ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Battery: Pending...", "Temperature: Pending...", "Status: Pending..."]),
             ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
-            ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "WiFi Download: Pending...", "WiFi Upload: Pending...", "Server Signal: Pending...", "Client Signal: Pending...", "Data Rate: Pending...", "Latency: Pending...", "Status: Pending..."]),
+            ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Server Signal: Pending...", "Client Signal: Pending...", "Data Transmission Rate: Pending...", "Latency: Pending...", "Status: Pending..."]),
             ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Lux1: Pending...","Lux2: Pending...","Lux3: Pending...", "RPM: Pending...", "Status: Pending..."]),
             ("Payload Subsystem", []),  # Special handling for payload
             ("Command & Data Handling Subsystem", ["CPU Usage: Pending...", "Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
@@ -903,15 +903,11 @@ class MainWindow(QWidget):
                         self.comms_labels["downlink_frequency"] = lbl
                     elif "Uplink Frequency:" in text:
                         self.comms_labels["uplink_frequency"] = lbl
-                    elif "WiFi Download:" in text:
-                        self.comms_labels["wifi_download_speed"] = lbl
-                    elif "WiFi Upload:" in text:
-                        self.comms_labels["wifi_upload_speed"] = lbl
                     elif "Server Signal:" in text:
                         self.comms_labels["server_signal_strength"] = lbl
                     elif "Client Signal:" in text:
                         self.comms_labels["client_signal_strength"] = lbl
-                    elif "Data Rate:" in text:
+                    elif "Data Transmission Rate:" in text:
                         self.comms_labels["data_transmission_rate"] = lbl
                     elif "Latency:" in text:
                         self.comms_labels["latency"] = lbl
@@ -1261,8 +1257,8 @@ class MainWindow(QWidget):
         def on_communication_data(data):
             """Handle communication subsystem data updates"""
             try:
-                # Server sends: {"downlink_frequency": 0.0, "wifi_download_speed": 0.0, "wifi_upload_speed": 0.0, 
-                # "data_transmission_rate": 0.0, "server_signal_strength": 0, "status": "Disconnected"}
+                # Server sends: {"downlink_frequency": 0.0, "data_transmission_rate": 0.0, 
+                # "server_signal_strength": 0, "latency": 0.0, "status": "Disconnected"}
                 
                 # Update communication labels
                 if hasattr(self, 'comms_labels'):
@@ -1270,15 +1266,6 @@ class MainWindow(QWidget):
                     if 'downlink_frequency' in self.comms_labels:
                         freq = data.get('downlink_frequency', 0.0)
                         self.comms_labels['downlink_frequency'].setText(f"Downlink Frequency: {freq:.3f} GHz")
-                    
-                    # Update WiFi speeds
-                    if 'wifi_download_speed' in self.comms_labels:
-                        speed = data.get('wifi_download_speed', 0.0)
-                        self.comms_labels['wifi_download_speed'].setText(f"WiFi Download: {speed:.1f} Mbps")
-                    
-                    if 'wifi_upload_speed' in self.comms_labels:
-                        speed = data.get('wifi_upload_speed', 0.0)
-                        self.comms_labels['wifi_upload_speed'].setText(f"WiFi Upload: {speed:.1f} Mbps")
                     
                     # Update server signal strength (from server data)
                     if 'server_signal_strength' in self.comms_labels:
@@ -1288,7 +1275,7 @@ class MainWindow(QWidget):
                     # Update data transmission rate
                     if 'data_transmission_rate' in self.comms_labels:
                         rate = data.get('data_transmission_rate', 0.0)
-                        self.comms_labels['data_transmission_rate'].setText(f"Data Rate: {rate:.1f} KB/s")
+                        self.comms_labels['data_transmission_rate'].setText(f"Data Transmission Rate: {rate:.1f} KB/s")
                     
                     # Update latency
                     if 'latency' in self.comms_labels:

@@ -1,7 +1,7 @@
 """
 Communication monitoring module for SLowMO system.
-Simplified to monitor: downlink frequency, WiFi speed, server signal strength, 
-data transmission rate (via throughput tests), and overall status.
+Monitors: downlink frequency, server signal strength, 
+data transmission rate (via throughput tests), latency, and overall status.
 """
 
 import threading
@@ -9,13 +9,12 @@ import time
 import subprocess
 import json
 import logging
-import speedtest
 import psutil
 import platform
 from typing import Dict, Any, Optional, Callable
 
 class CommunicationMonitor:
-    """Monitor communication metrics including WiFi speed, upload speed, and signal strength."""
+    """Monitor communication metrics including signal strength and data transmission rate."""
     
     def __init__(self):
         self.is_monitoring = False
@@ -23,11 +22,9 @@ class CommunicationMonitor:
         self.throughput_test_callback = None
         self.thread = None
         
-        # Current metrics - simplified to only required ones
+        # Current metrics - focused on local network performance
         self.current_data = {
             'downlink_frequency': 0.0,  # WiFi downlink frequency in GHz
-            'wifi_download_speed': 0.0,  # Internet download speed in Mbps
-            'wifi_upload_speed': 0.0,    # Internet upload speed in Mbps
             'data_transmission_rate': 0.0,  # True channel throughput in KB/s
             'server_signal_strength': 0,  # WiFi signal strength in dBm
             'latency': 0.0,              # One-way latency in ms (server to client)
@@ -44,13 +41,6 @@ class CommunicationMonitor:
         
         # Lock for thread-safe operations
         self.lock = threading.Lock()
-        
-        # Speed test instance (created when needed)
-        self.speed_test = None
-        
-        # WiFi speed test interval (seconds)
-        self.wifi_test_interval = 300  # 5 minutes
-        self.last_wifi_test = 0
         
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
@@ -181,11 +171,6 @@ class CommunicationMonitor:
                     # Update overall status based on metrics
                     self._update_status()
                     
-                    # Check if we need to run WiFi speed test (every 5 minutes)
-                    if current_time - self.last_wifi_test > self.wifi_test_interval:
-                        self._update_wifi_speed()
-                        self.last_wifi_test = current_time
-                    
                     # Initiate throughput test periodically
                     if current_time - last_throughput_test > throughput_test_interval:
                         if self.initiate_throughput_test():
@@ -268,45 +253,21 @@ class CommunicationMonitor:
             self.logger.error(f"Error updating WiFi frequency: {e}")
             self.current_data['downlink_frequency'] = 0.0
     
-    def _update_wifi_speed(self):
-        """Update WiFi speed using speedtest."""
-        try:
-            if not self.speed_test:
-                self.speed_test = speedtest.Speedtest()
-            
-            # Get best server
-            self.speed_test.get_best_server()
-            
-            # Test download speed
-            download_speed = self.speed_test.download() / 1_000_000  # Convert to Mbps
-            self.current_data['wifi_download_speed'] = round(download_speed, 2)
-            
-            # Test upload speed
-            upload_speed = self.speed_test.upload() / 1_000_000  # Convert to Mbps
-            self.current_data['wifi_upload_speed'] = round(upload_speed, 2)
-            
-            self.logger.info(f"WiFi speed test completed: {download_speed:.2f} Mbps down, {upload_speed:.2f} Mbps up")
-            
-        except Exception as e:
-            self.logger.error(f"Error running WiFi speed test: {e}")
-            self.current_data['wifi_download_speed'] = 0.0
-            self.current_data['wifi_upload_speed'] = 0.0
-    
     def _update_status(self):
         """Update overall status based on available metrics."""
         try:
             signal = self.current_data['server_signal_strength']
-            wifi_down = self.current_data['wifi_download_speed']
             throughput = self.current_data['data_transmission_rate']
+            latency = self.current_data['latency']
             
-            # Determine status based on metrics
+            # Determine status based on local network metrics only
             if not self._is_connected():
                 self.current_data['status'] = 'Disconnected'
-            elif signal < -80 or (wifi_down > 0 and wifi_down < 1):
+            elif signal < -80 or throughput < 50:  # Very poor signal or low throughput
                 self.current_data['status'] = 'Poor Connection'
-            elif signal < -70 or (wifi_down > 0 and wifi_down < 5):
+            elif signal < -70 or throughput < 200 or latency > 100:  # Fair conditions
                 self.current_data['status'] = 'Fair Connection'
-            elif signal >= -50 and wifi_down >= 10:
+            elif signal >= -50 and throughput >= 500 and latency <= 20:  # Excellent conditions
                 self.current_data['status'] = 'Excellent'
             else:
                 self.current_data['status'] = 'Good'
