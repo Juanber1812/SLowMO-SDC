@@ -293,8 +293,7 @@ class ADCSSection(QGroupBox):
     adcs_command_sent = pyqtSignal(str, str, object)
 
     def __init__(self, parent=None):
-        super().__init__("ADCS Control", parent)
-        self.setObjectName("ADCSSection")
+        super().__init__(parent)
         self.setFixedSize(700, 220)
         self.current_auto_mode = "adcs" # Default auto mode
         self._setup_ui()

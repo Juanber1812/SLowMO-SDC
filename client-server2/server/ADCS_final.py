@@ -162,7 +162,7 @@ class MPU6050Sensor:
                 
                 # Progress indicator
                 if i % 400 == 0:
-                    print(f"Calibration progress: {(i/samples)*100:.1f}%")
+                    logging(f"Calibration progress: {(i/samples)*100:.1f}%")
                 
                 time.sleep(0.004)  # 250Hz sampling for thorough calibration
             except:
@@ -172,8 +172,8 @@ class MPU6050Sensor:
         self.gyro_y_cal = gyro_sum[1] / samples  
         self.gyro_z_cal = gyro_sum[2] / samples
         
-        print(f"✓ MPU6050 calibration complete!")
-        print(f"  Offsets - X: {self.gyro_x_cal:.3f}, Y: {self.gyro_y_cal:.3f}, Z: {self.gyro_z_cal:.3f}")
+        logging(f"✓ MPU6050 calibration complete!")
+        logging(f"  Offsets - X: {self.gyro_x_cal:.3f}, Y: {self.gyro_y_cal:.3f}, Z: {self.gyro_z_cal:.3f}")
     
     def read_raw_data(self, addr):
         """Read raw 16-bit data from sensor"""
