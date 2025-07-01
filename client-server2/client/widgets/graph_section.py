@@ -70,20 +70,6 @@ class GraphSection(QGroupBox):
         # center everything
         self.placeholder_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # add a header label
-        header = QLabel("Select Payload Mode")
-        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        header.setStyleSheet(f"""
-            QLabel {{
-                color: {BOX_TITLE_COLOR};
-                font-size: {FONT_SIZE_TITLE}pt;
-                font-family: {FONT_FAMILY};
-                font-weight: bold;
-                padding: 8px 0;
-            }}
-        """)
-        self.placeholder_layout.addWidget(header)
-
         self.graph_modes = ["DISTANCE MEASURING MODE", "SCANNING MODE", "SPIN MODE"]
         self.select_buttons = {}
 
@@ -121,6 +107,7 @@ class GraphSection(QGroupBox):
             # live‐value label, boxed in button‐color border + matching text
             lbl = QLabel("0.0")
             lbl.setFixedWidth(60)
+            lbl.setFixedHeight(int(BUTTON_HEIGHT * 1.8))  # Match button height
             lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             lbl.setStyleSheet(f"""
                 background-color: {BOX_BACKGROUND};
@@ -175,7 +162,7 @@ class GraphSection(QGroupBox):
 
         self.shared_start_time = time.time()
         self.graph_widget.start_time = self.shared_start_time
-        self.graph_widget.setFixedSize(500, 300)  # Larger graph size
+        self.graph_widget.setFixedSize(520, 265)  # Larger graph size
 
         # ── hook the frequency‐spinbox to this plotter’s redraw rate ───────────
         self.graph_update_frequency_changed.connect(self.graph_widget.set_redraw_rate)
@@ -197,8 +184,8 @@ class GraphSection(QGroupBox):
         # ── Detail live‐value label for the selected mode ───────────────
         color = GRAPH_MODE_COLORS[mode]
         detail_label = QLabel("0.0")
-        detail_label.setFixedWidth(120)  # Increased from 60 to accommodate more text
-        detail_label.setFixedHeight(160)  # Increased height for multiple lines
+        detail_label.setFixedWidth(80)  # Increased from 60 to accommodate more text
+        detail_label.setFixedHeight(80)  # Increased height for multiple lines
         detail_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         detail_label.setWordWrap(True)   # Enable word wrapping for multi-line text
         detail_label.setStyleSheet(f"""
@@ -272,12 +259,12 @@ class GraphSection(QGroupBox):
         self.record_btn.setText("Record")
         self.is_recording = False
         self.record_btn.setFixedHeight(int(BUTTON_HEIGHT))
-        self.record_btn.setFixedWidth(120)  # Increased from default
+        self.record_btn.setFixedWidth(80)  # Increased from default
         self.record_btn.setStyleSheet(button_style)
         btn_layout.addWidget(self.record_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.duration_dropdown.setFixedHeight(int(BUTTON_HEIGHT))
-        self.duration_dropdown.setFixedWidth(120)  # Increased from default
+        self.duration_dropdown.setFixedWidth(80)  # Increased from default
         # self.duration_dropdown.setStyleSheet(button_style) # Apply similar style if visible
         btn_layout.addWidget(self.duration_dropdown, alignment=Qt.AlignmentFlag.AlignLeft)
 
@@ -339,7 +326,7 @@ class GraphSection(QGroupBox):
 
         # Increased width for frequency spinbox
         self.freq_spinbox.setFixedHeight(int(BUTTON_HEIGHT))
-        self.freq_spinbox.setFixedWidth(120)  # Increased from 72
+        self.freq_spinbox.setFixedWidth(80)  # Increased from 72
         self.freq_spinbox.valueChanged.connect(self.on_frequency_changed)
         btn_layout.addWidget(self.freq_spinbox, alignment=Qt.AlignmentFlag.AlignLeft)
 
@@ -348,7 +335,7 @@ class GraphSection(QGroupBox):
 
         self.exit_graph_btn = QPushButton("← Back")
         self.exit_graph_btn.setFixedHeight(int(BUTTON_HEIGHT))
-        self.exit_graph_btn.setFixedWidth(120)  # Increased from default
+        self.exit_graph_btn.setFixedWidth(80)  # Increased from default
         self.exit_graph_btn.setStyleSheet(button_style)
         self.exit_graph_btn.clicked.connect(self.exit_graph)
         btn_layout.addWidget(self.exit_graph_btn, alignment=Qt.AlignmentFlag.AlignLeft)

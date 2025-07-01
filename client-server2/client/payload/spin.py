@@ -127,7 +127,7 @@ class AngularPositionPlotter(QFrame):
         self.plot_widget.getViewBox().setMouseEnabled(x=True, y=False)
         # Set tick spacing if desired
         self.plot_widget.getAxis('left').setTickSpacing(major=45, minor=15)
-        self.plot_widget.getAxis('bottom').setTickSpacing(major=1.0, minor=0.5)
+        self.plot_widget.getAxis('bottom').setTickSpacing(major=1.0, minor=1.0)
 
     def showEvent(self, event):
         super().showEvent(event)

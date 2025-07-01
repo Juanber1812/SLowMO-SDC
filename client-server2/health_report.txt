@@ -1,0 +1,52 @@
+
+=== Power Subsystem ===
+Current: -- A
+Voltage: -- V
+Power: -- W
+Energy: -- Wh
+Battery: --%
+Temperature: -- °C
+Status: Disconnected
+
+=== Thermal Subsystem ===
+Pi: 44.3°C
+Power PCB: Pending...
+Battery: Pending...
+Status: Pending...
+
+=== Communication Subsystem ===
+Downlink Frequency: 5.180 GHz
+Uplink Frequency: 5.000 GHz
+Server Signal: -61 dBm
+Client Signal: -39 dBm
+Data Transmission Rate: 151.7 KB/s
+Latency: -468.6 ms
+Status: Good
+
+=== ADCS Subsystem ===
+Gyro: Pending...
+Orientation: Pending...
+Lux1: Pending...
+Lux2: Pending...
+Lux3: Pending...
+RPM: Pending...
+Status: Pending...
+
+=== Payload Subsystem ===
+Camera: Connected
+Lidar: Connected
+Status: OK
+
+=== Command & Data Handling Subsystem ===
+CPU Usage: 10.4%
+Memory Usage: 27.6%
+Last Command: Pending...
+Uptime: 1m 30s
+Status: Optimal
+
+=== Error Log ===
+No Critical Errors Detected: Pending...
+
+=== Overall Status ===
+No Anomalies Detected: Pending...
+Recommended Actions: Pending...

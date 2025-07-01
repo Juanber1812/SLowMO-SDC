@@ -61,8 +61,8 @@ class LidarWidget(QWidget):
     def init_ui(self):
         """Build the widget UI with layout and style matching other graphs"""
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(PADDING_NORMAL, PADDING_NORMAL, PADDING_NORMAL, PADDING_NORMAL)
-        main_layout.setSpacing(PADDING_NORMAL)
+        main_layout.setContentsMargins(2, 2, 2, 2)  # Reduced from PADDING_NORMAL to minimal margins
+        main_layout.setSpacing(2)  # Reduced from PADDING_NORMAL to minimal spacing
         
         self.stacked_widget = QStackedWidget()
         self.stacked_widget.setStyleSheet(f"background-color: {BACKGROUND};")
@@ -71,10 +71,10 @@ class LidarWidget(QWidget):
         self.button_page = QWidget()
         button_layout = QVBoxLayout(self.button_page)
         button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.big_lidar_button = QPushButton("LIDAR\nMetrics Monitor")
+        self.big_lidar_button = QPushButton("LiDAR")
         self.big_lidar_button.setObjectName("big_lidar_button")
         self.big_lidar_button.clicked.connect(self.show_lidar_interface)
-        self.big_lidar_button.setMinimumSize(180, 250) 
+        self.big_lidar_button.setMinimumSize(80, 200) 
 
         accent_color_big_button = BUTTON_COLOR 
         
@@ -106,46 +106,55 @@ class LidarWidget(QWidget):
         # Page 2: LIDAR Interface (Metrics Display)
         self.lidar_page = QWidget()
         main_lidar_layout = QVBoxLayout(self.lidar_page)
-        main_lidar_layout.setSpacing(PADDING_NORMAL)
-        main_lidar_layout.setContentsMargins(PADDING_NORMAL, PADDING_NORMAL, PADDING_NORMAL, PADDING_NORMAL)
+        main_lidar_layout.setSpacing(0)
+        main_lidar_layout.setContentsMargins(0, 0, 0, 0)
         main_lidar_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         metrics_panel = QWidget()
         metrics_layout = QVBoxLayout(metrics_panel)
-        metrics_layout.setSpacing(PADDING_NORMAL + 5) 
-        metrics_layout.setContentsMargins(PADDING_LARGE, PADDING_LARGE, PADDING_LARGE, PADDING_LARGE) 
+        metrics_layout.setSpacing(3)  # Reduced from 5 to tighten spacing between labels
+        metrics_layout.setContentsMargins(6, 6, 6, 6)  # Reduced from 10 to save space
+        metrics_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         metrics_panel.setStyleSheet(f"""
             QWidget {{
-                background-color: {BACKGROUND}; 
-                border: {BORDER_WIDTH}px solid {BORDER_COLOR};
-                border-radius: {BORDER_RADIUS}px;
+                background-color: {BOX_BACKGROUND}; 
+                border: 2px solid {BUTTON_COLOR};
+                border-radius: 2px;
             }}
         """)
-        metrics_panel.setMinimumWidth(200) 
-        metrics_panel.setMaximumWidth(200) 
+        metrics_panel.setFixedSize(80, 200)  # Same size as big button
 
         metric_label_style = f"""
             QLabel {{
                 color: {TEXT_COLOR};
                 font-family: {FONT_FAMILY};
-                font-size: {FONT_SIZE_TITLE - 2}pt; 
-                padding: 5px;
+                font-size: {FONT_SIZE_NORMAL}pt; 
+                padding: 2px;
                 background-color: transparent; 
                 border: none; 
             }}
         """
 
-        self.live_distance_label = QLabel("Live Distance: -- cm")
+        # Create individual labels as specified
+        live_label = QLabel("Live")
+        live_label.setStyleSheet(metric_label_style)
+        live_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.live_distance_label = QLabel("-- m")
         self.live_distance_label.setStyleSheet(metric_label_style)
         self.live_distance_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.average_distance_label = QLabel("5s Average: -- cm")
+        avg_label = QLabel("5s Avg:")
+        avg_label.setStyleSheet(metric_label_style)
+        avg_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.average_distance_label = QLabel("-- m")
         self.average_distance_label.setStyleSheet(metric_label_style)
         self.average_distance_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         self.back_button = QPushButton("Back")
         self.back_button.clicked.connect(self.show_button_interface)
-        self.back_button.setFixedHeight(BUTTON_HEIGHT+10) 
+        self.back_button.setFixedHeight(25) 
 
         accent_color_back_button = ERROR_COLOR 
 
@@ -153,26 +162,27 @@ class LidarWidget(QWidget):
             QPushButton {{
                 background-color: {BOX_BACKGROUND};
                 color: {TEXT_COLOR};
-                border: 2px solid {accent_color_back_button}; /* Accent color for border */
+                border: 1px solid {accent_color_back_button}; 
                 border-radius: 2px; 
-                padding: 8px 14px; 
+                padding: 2px 4px; 
                 font-family: {FONT_FAMILY};
-                font-size: {FONT_SIZE_NORMAL}pt; 
-                margin-top: {PADDING_NORMAL}px; 
+                font-size: {FONT_SIZE_NORMAL - 2}pt; 
             }}
             QPushButton:hover, QPushButton:pressed {{
-                background-color: {BUTTON_HOVER}; /* Or a hover color related to ERROR_COLOR if desired */
-                color: black; /* Text color for hover/pressed */
-                border: 2px solid {BUTTON_HOVER}; /* Optional: change border on hover too */
+                background-color: {BUTTON_HOVER};
+                color: black; 
+                border: 1px solid {BUTTON_HOVER}; 
             }}
             QPushButton:disabled {{
                 background-color: {BUTTON_DISABLED};
-                color: #777; /* Disabled text color from CameraControlsWidget */
-                border: 2px solid #555; /* Disabled border color from CameraControlsWidget */
+                color: #777; 
+                border: 1px solid #555; 
             }}
         """)
         
+        metrics_layout.addWidget(live_label)
         metrics_layout.addWidget(self.live_distance_label)
+        metrics_layout.addWidget(avg_label)
         metrics_layout.addWidget(self.average_distance_label)
         metrics_layout.addStretch()
         metrics_layout.addWidget(self.back_button, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -189,8 +199,8 @@ class LidarWidget(QWidget):
         self.stacked_widget.setCurrentWidget(self.lidar_page)
         if not self.is_streaming:
             # Reset labels when showing interface before streaming starts
-            self.live_distance_label.setText("Live Distance: -- cm")
-            self.average_distance_label.setText("5s Average: -- cm")
+            self.live_distance_label.setText("-- m")
+            self.average_distance_label.setText("-- m")
             self.toggle_lidar_streaming() # Start streaming when interface is shown
 
     def show_button_interface(self):
@@ -231,11 +241,11 @@ class LidarWidget(QWidget):
         current_displayed_average = None
 
         if live_distance is not None:
-            self.live_distance_label.setText(f"Live Distance: {live_distance:.4f} m")
+            self.live_distance_label.setText(f"{live_distance:.2f} m")
             with QMutexLocker(self.data_mutex):
                 self.live_distance_history.append(live_distance)
         else:
-            self.live_distance_label.setText("Live Distance: N/A")
+            self.live_distance_label.setText("N/A")
 
         if server_avg_distance is not None:
             current_displayed_average = server_avg_distance
@@ -245,9 +255,9 @@ class LidarWidget(QWidget):
                     current_displayed_average = sum(self.live_distance_history) / len(self.live_distance_history)
 
         if current_displayed_average is not None:
-            self.average_distance_label.setText(f"5s Average: {current_displayed_average:.4f} m")
+            self.average_distance_label.setText(f"{current_displayed_average:.2f} m")
         else:
-            self.average_distance_label.setText("5s Average: N/A")
+            self.average_distance_label.setText("N/A")
 
         if self.is_recording and live_distance is not None:
             with QMutexLocker(self.data_mutex):
@@ -316,6 +326,6 @@ class LidarWidget(QWidget):
             self.live_distance_history.clear() # Clear the client-side history
             if hasattr(self, 'recorded_data'): 
                  self.recorded_data = []
-        self.live_distance_label.setText("Live Distance: -- cm")
-        self.average_distance_label.setText("5s Average: -- cm")
+        self.live_distance_label.setText("-- m")
+        self.average_distance_label.setText("-- m")
         logging.info("LIDAR metrics display and history cleared.")

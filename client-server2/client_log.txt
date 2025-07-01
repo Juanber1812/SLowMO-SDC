@@ -353,3 +353,486 @@
 2025-07-01 12:18:06,284 - INFO - Back button clicked in LidarWidget
 2025-07-01 12:18:07,012 - INFO - [INFO] Closing application...
 2025-07-01 12:18:07,017 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 12:24:00,940 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:24:01,105 - INFO - Connected to server
+2025-07-01 12:24:01,108 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 12:24:01,110 - INFO - [INFO] Successfully connected to server
+2025-07-01 12:25:47,086 - INFO - [INFO] Closing application...
+2025-07-01 12:25:48,292 - INFO - Disconnected from server: client disconnect
+2025-07-01 12:32:20,053 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:32:22,441 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751369540.0561216 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000177D325AA50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 12:32:30,967 - INFO - [INFO] Closing application...
+2025-07-01 12:32:30,971 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 12:33:36,240 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:33:38,636 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751369616.2415266 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001F99C60AA50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 12:33:49,947 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:34:01,470 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 12:34:02,710 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 12:34:02,717 - INFO - Back button clicked in LidarWidget
+2025-07-01 12:34:09,604 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 12:34:21,951 - INFO - [INFO] Closing application...
+2025-07-01 12:34:21,956 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 12:34:32,195 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:34:34,536 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751369672.1975048 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001F30175AA50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 12:36:17,849 - INFO - [INFO] Closing application...
+2025-07-01 12:36:17,852 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 12:36:41,635 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:36:43,759 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751369801.6378427 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000023409D1AA50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 12:36:55,286 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:37:00,433 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:37:03,084 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:37:04,375 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:37:05,631 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:37:07,009 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:37:09,049 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:37:10,027 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:37:14,337 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 12:37:15,569 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 12:37:15,573 - INFO - Back button clicked in LidarWidget
+2025-07-01 12:37:19,253 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:37:24,135 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 12:37:26,141 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 12:37:26,145 - INFO - Back button clicked in LidarWidget
+2025-07-01 12:37:26,857 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 12:37:32,410 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 12:37:32,415 - INFO - Back button clicked in LidarWidget
+2025-07-01 12:38:00,646 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:38:06,604 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 12:38:08,844 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 12:38:08,849 - INFO - Back button clicked in LidarWidget
+2025-07-01 12:38:12,252 - INFO - [INFO] Closing application...
+2025-07-01 12:38:12,255 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 12:51:28,441 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:51:30,637 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751370688.4430273 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FF3673A7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 12:51:31,691 - INFO - [ADCSSection] Navigating to page 1
+2025-07-01 12:51:33,476 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_start', Value: None
+2025-07-01 12:51:33,688 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_stop', Value: None
+2025-07-01 12:51:34,392 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_start', Value: None
+2025-07-01 12:51:34,666 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_stop', Value: None
+2025-07-01 12:51:35,470 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_start', Value: None
+2025-07-01 12:51:35,720 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_stop', Value: None
+2025-07-01 12:51:36,557 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:51:36,812 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:51:37,181 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:51:37,378 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:51:38,394 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:51:38,621 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:51:40,498 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 12:51:41,942 - INFO - [ADCSSection] Navigating to page 2
+2025-07-01 12:51:43,912 - INFO - [ADCSSection] Navigating to page 3
+2025-07-01 12:51:47,104 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 12:51:49,998 - INFO - [ADCSSection] Navigating to page 2
+2025-07-01 12:51:51,245 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 12:51:53,770 - INFO - [ADCSSection] Navigating to page 1
+2025-07-01 12:51:54,997 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 12:51:56,084 - INFO - [ADCSSection] Navigating to page 6
+2025-07-01 12:51:58,542 - INFO - [ADCSSection] Action for mode 'Calibration': Command 'start_calibration', Value: None
+2025-07-01 12:52:05,109 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 12:52:05,916 - INFO - [ADCSSection] Navigating to page 2
+2025-07-01 12:52:07,290 - INFO - [ADCSSection] Navigating to page 5
+2025-07-01 12:52:08,044 - INFO - [ADCSSection] Navigating to page 2
+2025-07-01 12:52:08,477 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 12:52:13,000 - INFO - [ADCSSection] Navigating to page 1
+2025-07-01 12:52:14,314 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 12:52:15,053 - INFO - [ADCSSection] Navigating to page 1
+2025-07-01 12:52:15,605 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_start', Value: None
+2025-07-01 12:52:15,685 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_stop', Value: None
+2025-07-01 12:52:18,454 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_start', Value: None
+2025-07-01 12:52:18,719 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_stop', Value: None
+2025-07-01 12:52:19,503 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:19,817 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:19,976 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:20,073 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:20,170 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:20,262 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:20,328 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:20,435 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:20,570 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:20,653 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:21,083 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:21,199 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:21,294 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:21,362 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:21,623 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:21,685 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:24,167 - INFO - [INFO] Closing application...
+2025-07-01 12:52:24,170 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 12:52:42,702 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:52:42,871 - INFO - Connected to server
+2025-07-01 12:52:42,872 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 12:52:42,873 - INFO - [INFO] Successfully connected to server
+2025-07-01 12:52:44,404 - INFO - [ADCSSection] Navigating to page 1
+2025-07-01 12:52:46,188 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_start', Value: None
+2025-07-01 12:52:46,564 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_stop', Value: None
+2025-07-01 12:52:47,561 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_start', Value: None
+2025-07-01 12:52:48,052 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_stop', Value: None
+2025-07-01 12:52:50,089 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:50,405 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:50,735 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:51,090 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:51,493 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:51,761 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:56,882 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:57,012 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:52:57,090 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:52:57,200 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:53:02,710 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_start', Value: None
+2025-07-01 12:53:03,190 - INFO - [ADCSSection] Action for mode 'Manual': Command 'anticlockwise_stop', Value: None
+2025-07-01 12:53:43,855 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:53:44,287 - INFO - Connected to server
+2025-07-01 12:53:44,290 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 12:53:44,292 - INFO - [INFO] Successfully connected to server
+2025-07-01 12:53:44,780 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-07-01 12:53:46,169 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 12:53:46,498 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 12:53:49,072 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 12:53:49,420 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 12:54:15,348 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:54:15,517 - INFO - Connected to server
+2025-07-01 12:54:15,519 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 12:54:15,520 - INFO - [INFO] Successfully connected to server
+2025-07-01 12:54:16,552 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-07-01 12:54:17,427 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 12:54:17,662 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 12:54:18,185 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 12:54:18,415 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 12:54:19,439 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 12:54:19,749 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 12:54:20,190 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 12:54:20,384 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 12:54:21,325 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 12:54:22,751 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 12:54:24,517 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 12:54:26,352 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 12:54:28,477 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-07-01 12:54:34,234 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:54:46,026 - INFO - Manual orientation crosshairs enabled
+2025-07-01 12:54:46,648 - INFO - Manual orientation crosshairs disabled
+2025-07-01 12:54:48,005 - INFO - [INFO] Closing application...
+2025-07-01 12:54:49,710 - INFO - Disconnected from server: client disconnect
+2025-07-01 12:55:11,155 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:55:12,449 - INFO - [ADCSSection] Navigating to page 1
+2025-07-01 12:55:13,244 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751370911.1570058 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DA1A21A7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 12:55:13,555 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_start', Value: None
+2025-07-01 12:55:13,858 - INFO - [ADCSSection] Action for mode 'Manual': Command 'clockwise_stop', Value: None
+2025-07-01 12:55:18,080 - INFO - [INFO] Closing application...
+2025-07-01 12:55:18,088 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 12:56:42,472 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:56:43,999 - INFO - [ADCSSection] Navigating to page 1
+2025-07-01 12:56:44,590 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371002.4744642 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FEE65DA7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 12:56:45,108 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 12:56:45,418 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 12:56:46,290 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 12:56:46,593 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 12:56:47,658 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 12:56:47,833 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 12:56:58,176 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 12:56:58,982 - INFO - Connected to server
+2025-07-01 12:56:58,985 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 12:57:01,711 - INFO - Disconnected from server: client disconnect
+2025-07-01 12:57:01,881 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 12:57:02,631 - INFO - Connected to server
+2025-07-01 12:57:02,633 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 12:57:03,392 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 12:57:03,685 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 12:57:04,142 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 12:57:04,379 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 12:57:09,080 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 12:57:09,493 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 12:57:10,076 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 12:57:10,322 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 12:57:10,701 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 12:57:10,836 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 12:57:11,333 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 12:57:12,100 - INFO - [INFO] Closing application...
+2025-07-01 12:57:13,305 - INFO - Disconnected from server: client disconnect
+2025-07-01 12:59:00,368 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 12:59:02,451 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371140.3707626 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001803069A7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 12:59:30,296 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 12:59:48,675 - INFO - [INFO] Closing application...
+2025-07-01 12:59:48,680 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:01:34,540 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:01:36,828 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371294.5418985 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000139FE22A7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:01:37,618 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:01:39,451 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:01:39,455 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:01:50,304 - INFO - [INFO] Closing application...
+2025-07-01 13:01:50,309 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:02:55,552 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:02:57,964 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371375.5557923 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000021A26B8A7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:03:10,604 - INFO - [INFO] Closing application...
+2025-07-01 13:03:10,607 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:03:28,154 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:03:29,206 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:03:30,508 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371408.1567209 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000026639F467B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:03:30,783 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:03:32,345 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:03:34,582 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:03:35,267 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:03:35,274 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:03:36,994 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:03:38,995 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:03:39,002 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:03:51,069 - INFO - [INFO] Closing application...
+2025-07-01 13:03:51,072 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:05:05,673 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:05:07,572 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:05:07,811 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371505.675501 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002A6D7A1A900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:05:09,059 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:05:09,066 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:05:10,153 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:05:12,496 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:05:18,457 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:05:19,439 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:05:19,444 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:05:22,748 - INFO - [INFO] Closing application...
+2025-07-01 13:05:22,753 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:05:38,204 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:05:38,893 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:05:40,360 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371538.2061841 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000230CA91A900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:05:41,602 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:05:41,607 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:05:42,168 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:05:45,869 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:05:45,876 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:05:47,199 - INFO - [INFO] Closing application...
+2025-07-01 13:05:47,202 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:06:06,835 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:06:09,342 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371566.837068 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000022D05A6A7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:06:09,525 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:06:10,360 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:06:10,366 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:06:14,505 - INFO - [INFO] Closing application...
+2025-07-01 13:06:14,510 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:06:24,522 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:06:26,427 - INFO - [INFO] Closing application...
+2025-07-01 13:06:26,430 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:07:13,995 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:07:15,088 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:07:16,212 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371633.9969256 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002E3F9546A50>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:07:18,825 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:07:18,829 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:07:19,358 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:07:19,731 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:07:19,738 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:07:22,095 - INFO - [INFO] Closing application...
+2025-07-01 13:07:22,101 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:10:50,827 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:10:51,795 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:10:53,095 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751371850.8291109 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C3E1C8A900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:10:54,800 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:10:54,805 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:10:56,076 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:10:58,113 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:10:58,123 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:10:59,139 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:11:00,764 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:11:00,769 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:11:01,383 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:11:07,775 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:11:07,783 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:11:08,193 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:11:25,268 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:11:25,273 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:11:25,708 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:11:26,465 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:11:26,471 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:11:27,365 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:11:29,719 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 13:11:29,883 - INFO - Connected to server
+2025-07-01 13:11:29,884 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 13:11:33,416 - INFO - Requesting LIDAR streaming stop
+2025-07-01 13:11:33,424 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:11:33,834 - INFO - Requesting LIDAR streaming start
+2025-07-01 13:11:44,586 - INFO - [INFO] Closing application...
+2025-07-01 13:11:45,791 - INFO - Disconnected from server: client disconnect
+2025-07-01 13:12:38,842 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:12:38,995 - INFO - Connected to server
+2025-07-01 13:12:38,998 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 13:12:39,000 - INFO - [INFO] Successfully connected to server
+2025-07-01 13:12:40,427 - INFO - Requesting LIDAR streaming start
+2025-07-01 13:12:41,433 - INFO - Requesting LIDAR streaming stop
+2025-07-01 13:12:41,437 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:12:41,865 - INFO - Requesting LIDAR streaming start
+2025-07-01 13:12:42,945 - INFO - Requesting LIDAR streaming stop
+2025-07-01 13:12:42,952 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:12:43,692 - INFO - Requesting LIDAR streaming start
+2025-07-01 13:12:44,176 - INFO - Requesting LIDAR streaming stop
+2025-07-01 13:12:44,183 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:12:44,893 - INFO - Requesting LIDAR streaming start
+2025-07-01 13:12:45,459 - INFO - Requesting LIDAR streaming stop
+2025-07-01 13:12:45,465 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:12:45,895 - INFO - Requesting LIDAR streaming start
+2025-07-01 13:12:46,749 - INFO - Requesting LIDAR streaming stop
+2025-07-01 13:12:46,757 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:12:47,157 - INFO - Requesting LIDAR streaming start
+2025-07-01 13:12:51,001 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:12:56,540 - INFO - [INFO] Closing application...
+2025-07-01 13:12:57,746 - INFO - Disconnected from server: client disconnect
+2025-07-01 13:16:55,758 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:16:56,198 - INFO - Connected to server
+2025-07-01 13:16:56,203 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 13:16:56,205 - INFO - [INFO] Successfully connected to server
+2025-07-01 13:16:57,588 - INFO - Requesting LIDAR streaming start
+2025-07-01 13:17:04,021 - INFO - Requesting LIDAR streaming stop
+2025-07-01 13:17:04,026 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:17:04,707 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:17:08,084 - INFO - Requesting LIDAR streaming start
+2025-07-01 13:17:18,460 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:17:21,472 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:17:22,723 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:17:25,276 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:17:31,015 - INFO - [INFO] Closing application...
+2025-07-01 13:17:32,220 - INFO - Disconnected from server: client disconnect
+2025-07-01 13:27:20,058 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:27:21,151 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:27:22,349 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751372840.0603006 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000025DD04467B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:27:29,380 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:27:31,494 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:27:51,006 - INFO - [INFO] Closing application...
+2025-07-01 13:27:51,009 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:27:57,774 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:27:58,785 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:28:00,030 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751372877.776112 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001C65D1FA7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:28:04,506 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:28:18,223 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:28:20,201 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:28:23,873 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:28:46,944 - INFO - [INFO] Closing application...
+2025-07-01 13:28:46,948 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:28:53,862 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:28:54,625 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:28:56,392 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751372933.8650177 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000206A7F2A7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:28:56,712 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:28:58,071 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:28:59,766 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:29:01,247 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:29:02,757 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:29:05,412 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:29:12,481 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:29:13,692 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:31:01,086 - INFO - [INFO] Closing application...
+2025-07-01 13:31:01,089 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:31:08,953 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:31:09,813 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:31:11,114 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373068.9551146 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019E59F767B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:31:11,355 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:31:12,332 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:31:15,123 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:31:17,062 - INFO - [INFO] Closing application...
+2025-07-01 13:31:17,066 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:31:52,682 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:31:54,403 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:31:54,757 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373112.6864693 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000029155D067B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:31:57,745 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:31:59,450 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:32:01,096 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:32:02,435 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:32:04,357 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:32:10,138 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:32:11,633 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:32:13,935 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:32:22,148 - INFO - [INFO] Closing application...
+2025-07-01 13:32:22,151 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:33:02,373 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:33:03,144 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:04,477 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373182.3759744 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000208DE54A7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:33:06,635 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:08,963 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:10,480 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:11,780 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:13,109 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:17,653 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:20,048 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:22,445 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:23,478 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:33:33,447 - INFO - [INFO] Closing application...
+2025-07-01 13:33:33,450 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:34:45,987 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:34:48,100 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373285.9891129 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000213B8FF67B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:34:50,668 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:34:53,144 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:34:54,980 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:34:56,470 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:35:47,335 - INFO - [INFO] Closing application...
+2025-07-01 13:35:47,340 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:35:54,823 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:35:56,904 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:35:57,200 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373354.8247128 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DE831667B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:36:00,576 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:36:01,819 - INFO - [GraphSection] Update frequency set to: 29.0 Hz via spinbox
+2025-07-01 13:36:03,862 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:36:05,934 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:36:07,688 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:36:23,797 - INFO - [INFO] Closing application...
+2025-07-01 13:36:23,801 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:38:29,218 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:38:30,451 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:38:31,334 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373509.2208204 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020D61296900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:38:32,597 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:38:32,601 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:38:36,723 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:38:41,581 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:38:41,589 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:38:48,538 - INFO - [INFO] Closing application...
+2025-07-01 13:38:48,541 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:40:01,142 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:40:03,595 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373601.1452544 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000023BCA9367B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:40:05,365 - INFO - [INFO] Closing application...
+2025-07-01 13:40:05,369 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:40:13,451 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:40:15,420 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:40:15,935 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373613.457956 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002899CFF67B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:40:16,086 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:40:16,091 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:40:18,509 - INFO - [INFO] Closing application...
+2025-07-01 13:40:18,511 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:41:35,161 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:41:37,564 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373695.164928 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001F325C667B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:41:38,357 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-01 13:41:39,590 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-01 13:41:39,595 - INFO - Back button clicked in LidarWidget
+2025-07-01 13:41:40,366 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:41:41,749 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:41:42,844 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:41:43,832 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:41:45,038 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:41:46,325 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:41:47,548 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:41:50,869 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:41:52,071 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:41:58,705 - INFO - [INFO] Closing application...
+2025-07-01 13:41:58,708 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:44:17,427 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:44:19,800 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751373857.4293501 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000267E8946900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:44:21,402 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:44:23,227 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:44:24,393 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:44:27,411 - INFO - [INFO] Closing application...
+2025-07-01 13:44:27,415 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:49:22,572 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:49:24,647 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751374162.5746932 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000027045F567B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:49:26,122 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:49:27,178 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:49:28,000 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:49:30,403 - INFO - [INFO] Closing application...
+2025-07-01 13:49:30,405 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:51:19,414 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:51:21,756 - INFO - [INFO] Closing application...
+2025-07-01 13:51:21,758 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:51:21,896 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751374279.4170258 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000155A1F267B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:52:04,621 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:52:06,016 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 13:52:07,081 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751374324.6230776 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020D1E0267B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:52:07,936 - INFO - [INFO] Closing application...
+2025-07-01 13:52:07,940 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 13:58:26,864 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 13:58:28,966 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751374706.8685887 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000156385667B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 13:58:29,192 - INFO - [ADCSSection] Navigating to page 1
+2025-07-01 13:58:33,693 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 13:58:34,448 - INFO - [ADCSSection] Navigating to page 2
+2025-07-01 13:58:37,675 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 13:58:38,460 - INFO - [ADCSSection] Navigating to page 6
+2025-07-01 13:58:40,799 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 13:58:42,834 - INFO - [INFO] Closing application...
+2025-07-01 13:58:42,837 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.

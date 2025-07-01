@@ -182,7 +182,7 @@ class RelativeDistancePlotter(QFrame):
         # Set tick spacing
         self.plot_widget.getAxis('left').setTickSpacing(major=0.5, minor=0.1)
         self.plot_widget.getAxis('right').setTickSpacing(major=2.0, minor=0.5)
-        self.plot_widget.getAxis('bottom').setTickSpacing(major=1.0, minor=0.5)
+        self.plot_widget.getAxis('bottom').setTickSpacing(major=1.0, minor=1)
 
         # Show right axis
         self.plot_widget.showAxis('right')

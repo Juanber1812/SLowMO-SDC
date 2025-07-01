@@ -496,9 +496,9 @@ class MainWindow(QWidget):
         left_col.setContentsMargins(2, 2, 2, 2)
         left_col.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-        # Setup control rows
-        self.setup_video_controls_row(left_col)
+        # Setup control rows - swapped order to make video stream row in the middle
         self.setup_graph_display_row(left_col)
+        self.setup_video_controls_row(left_col)
         self.setup_subsystem_controls_row(left_col)
 
         # Right column with system information
@@ -555,11 +555,7 @@ class MainWindow(QWidget):
         self.camera_settings.apply_btn.setFixedHeight(BUTTON_HEIGHT)
         self.camera_settings.apply_btn.clicked.connect(self.apply_config)
 
-        row1.addWidget(video_group)
-        row1.addWidget(self.camera_controls)
-        row1.addWidget(self.camera_settings)
-
-        # ── Detector settings to the RIGHT of camera settings ────────────────
+        # Detector settings (fixed size to match video height)
         self.detector_settings = DetectorSettingsWidget()
         self.detector_settings.setMaximumWidth(280)
         self.detector_settings.setFixedHeight(video_group.height())
@@ -571,6 +567,10 @@ class MainWindow(QWidget):
         self.detector_settings.tagSizeUpdated.connect(
             lambda size: detector4.update_tag_size(size)
         )
+
+        row1.addWidget(self.camera_controls)
+        row1.addWidget(video_group)
+        row1.addWidget(self.camera_settings)
         row1.addWidget(self.detector_settings)
         # ─────────────────────────────────────────────────────────────────────
 
@@ -579,7 +579,7 @@ class MainWindow(QWidget):
     def setup_graph_display_row(self, parent_layout):
         """Setup graph display section and LIDAR section"""
         row2 = QHBoxLayout()
-        row2.setSpacing(2) # Keep spacing consistent, adjust if needed
+        row2.setSpacing(0) # No spacing between widgets to make LiDAR as close as possible to graph
         row2.setContentsMargins(2, 2, 2, 2)
         row2.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop) # Align top for differing heights
 
@@ -589,7 +589,7 @@ class MainWindow(QWidget):
         self.duration_dropdown.setVisible(False)
 
         self.graph_section = GraphSection(self.record_btn, self.duration_dropdown)
-        self.graph_section.setFixedSize(620, 280) 
+        self.graph_section.setFixedSize(620, 224)  # 4/5 of original (620*0.8, 280*0.8)
         self.graph_section.graph_display_layout.setSpacing(1)
         self.graph_section.graph_display_layout.setContentsMargins(1, 1, 1, 1)
         self.apply_groupbox_style(self.graph_section, self.COLOR_BOX_BORDER_GRAPH)
@@ -597,27 +597,29 @@ class MainWindow(QWidget):
         row2.addWidget(self.graph_section)
 
         self.lidar_widget = LidarWidget()
-        # lidar_layout.addWidget(self.lidar_widget) # Add directly to row2 later
-
         self.lidar_widget.back_button_clicked.connect(self.handle_lidar_back_button)
         if hasattr(self.lidar_widget, 'lidar_start_requested'):
             self.lidar_widget.lidar_start_requested.connect(self.start_lidar_streaming)
         if hasattr(self.lidar_widget, 'lidar_stop_requested'):
             self.lidar_widget.lidar_stop_requested.connect(self.stop_lidar_streaming)
          
-        # Apply sizing directly to self.lidar_widget
+        # Apply sizing directly to self.lidar_widget - make it narrower to move closer to graph
         self.lidar_widget.setFixedHeight(self.graph_section.height()) # Match graph height
-        self.lidar_widget.setFixedWidth(250) # Adjust as needed
+        self.lidar_widget.setFixedWidth(160) # Reduced from 200 to move closer to graph
 
-        row2.addWidget(self.lidar_widget) # Add LidarWidget directly to row2
+        # Add LiDAR widget with vertical centering alignment
+        row2.addWidget(self.lidar_widget, 0, Qt.AlignmentFlag.AlignVCenter)
         
-        # Console Log Display Section
+        # Console Log Display Section - expanded to use space freed from narrower LiDAR widget
         log_display_group = QGroupBox()
         log_display_layout = QVBoxLayout() 
-        log_display_layout.setContentsMargins(0, 0, 0, 0)
+        log_display_layout.setContentsMargins(2, 2, 2, 2)  # Add some padding
         log_display_layout.setSpacing(1)
         
         # self.log_display_widget was created in __init__
+        # Set minimum size to make it bigger and match graph section height
+        self.log_display_widget.setMinimumHeight(self.graph_section.height() - 10)  # Slightly smaller than graph for padding
+        self.log_display_widget.setMinimumWidth(300)  # Ensure reasonable minimum width
         log_display_layout.addWidget(self.log_display_widget)
         log_display_group.setLayout(log_display_layout)
 
@@ -633,7 +635,9 @@ class MainWindow(QWidget):
             log_group_title_color,
             is_part_of_right_column=False # Explicitly flag as right column item
         )
-        row2.addWidget(log_display_group)
+        
+        # Add stretch factor to expand log widget into freed space from narrower LiDAR
+        row2.addWidget(log_display_group, 1)  # stretch factor 1 to expand
         
         parent_layout.addLayout(row2)
 
@@ -666,16 +670,22 @@ class MainWindow(QWidget):
         row3.setContentsMargins(4, 4, 4, 4) # Standard margins
         row3.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
-        # ADCS section using the new ADCSSection widget
+        # ADCS section using the new ADCSSection widget - takes half width and full height
         self.adcs_control_widget = ADCSSection() # Instantiate your custom widget
                                                                             
         self.apply_groupbox_style(self.adcs_control_widget, self.COLOR_BOX_BORDER_ADCS)
 
-        # Adjust sizing as needed. For example, to make it expand:
-        self.adcs_control_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        # Set size policy to expand vertically and take half width
+        self.adcs_control_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
 
         self.adcs_control_widget.adcs_command_sent.connect(self.handle_adcs_command)
-        row3.addWidget(self.adcs_control_widget)
+        row3.addWidget(self.adcs_control_widget, 1)  # stretch factor 1 for half space
+        
+        # Add a spacer to fill the remaining half of the space
+        from PyQt6.QtWidgets import QSpacerItem
+        spacer = QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        row3.addItem(spacer)
+        
         parent_layout.addLayout(row3)
 
 ##########################################################################################
