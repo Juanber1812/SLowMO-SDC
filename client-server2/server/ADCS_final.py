@@ -772,6 +772,9 @@ class ADCSController:
                     self.pd_controller.kd = float(gains['kd'])
                 if 'deadband' in gains:
                     self.pd_controller.deadband = float(gains['deadband'])
+                if 'min_pulse' in gains:
+                    self.pd_controller.min_pulse_time = float(gains['min_pulse'])
+                
                 
                 print(f"Controller gains updated: Kp={self.pd_controller.kp}, Kd={self.pd_controller.kd}, Deadband={self.pd_controller.deadband}")
                 return {"status": "success", "message": "Controller gains updated"}
