@@ -14,6 +14,7 @@ SLEEP_PIN = 26  # Motor driver enable
 
 def setup_motor_control():
     """Initializes GPIO pins for motor control."""
+    GPIO.setmode(GPIO.BCM)
     if not GPIO_AVAILABLE:
         return False
     try:
