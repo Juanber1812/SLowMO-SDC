@@ -608,7 +608,7 @@ class ADCSController:
             print(f"🎛️ ADCS Command: Mode='{mode}', Command='{command}', Value='{value}'")
             
             # Handle calibration commands
-            if mode == "Calibration" or (mode == "Manual" and command == "calibrate"):
+            if mode == "Calibration" or (mode == "adcs" and command == "calibrate"):
                 if command == "start_calibration" or command == "calibrate":
                     return self.calibrate_sensors()
                     
