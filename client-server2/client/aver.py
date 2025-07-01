@@ -124,7 +124,6 @@ bridge = Bridge()
 ##############################################################################
 
 class MainWindow(QWidget):
-    speedtest_result = pyqtSignal(float, float)  # upload_mbps, max_frame_size_kb
     latencyUpdated = pyqtSignal(float)
 
     #=========================================================================
@@ -376,9 +375,6 @@ class MainWindow(QWidget):
     def setup_timers(self):
         """Initialize performance timers"""
         self.fps_timer = self.startTimer(1000)
-        self.speed_timer = QTimer()
-        self.speed_timer.timeout.connect(self.measure_speed)
-        self.speed_timer.start(5000)
         
         # Add client communication metrics timer (every 5 seconds)
         self.client_comm_timer = QTimer()
@@ -747,11 +743,7 @@ class MainWindow(QWidget):
         try:
             lines = []
 
-            # 1) system performance labels
-            for key, lbl in self.info_labels.items():
-                lines.append(lbl.text())
-
-            # 2) each subsystem status group
+            # Export each subsystem status group
             if hasattr(self, 'info_container'):
                 groups = self.info_container.findChildren(QGroupBox)
                 for grp in groups:
@@ -793,15 +785,6 @@ class MainWindow(QWidget):
         self.cdh_labels = {}
         self.error_labels = {}
         self.overall_labels = {}
-        
-        # Initialize remaining info labels (no longer in system info box)
-        self.info_labels = {
-            "speed":     None,  # Will be set by speed test
-            "max_frame": None,  # Will be set by speed test  
-            "fps":       None,  # Will be created as needed
-            "fps_server": None, # Will be created as needed
-            "frame_size": None, # Will be created as needed
-        }
         
         subsystems = [
             ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Battery: Pending...", "Temperature: Pending...", "Status: Pending..."]),
@@ -934,11 +917,6 @@ class MainWindow(QWidget):
                         self.comms_labels["latency"] = lbl
                     elif "Status:" in text:
                         self.comms_labels["status"] = lbl
-                # Add special status label
-                self.comms_status_label = QLabel("Status: Disconnected")
-                self.comms_status_label.setStyleSheet(f"QLabel {{ margin: 2px 0px; padding: 2px 0px; color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
-                self.comms_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                layout.addWidget(self.comms_status_label)
             elif name == "Payload Subsystem":
                 # Create payload subsystem labels with combined format
                 self.payload_camera_label = QLabel("Camera: Checking...")
@@ -1053,7 +1031,6 @@ class MainWindow(QWidget):
         @sio.event
         def connect():
             logging.info("Connected to server")
-            self.comms_status_label.setText("Status: Connected")
             self.camera_controls.toggle_btn.setEnabled(True)
             self.detector_controls.detector_btn.setEnabled(True)
             # self.camera_controls.crop_btn.setEnabled(True) # DELETED
@@ -1069,7 +1046,6 @@ class MainWindow(QWidget):
         @sio.event
         def disconnect(reason=None):
             logging.info(f"Disconnected from server: {reason}")
-            self.comms_status_label.setText("Status: Disconnected")
             self.camera_controls.toggle_btn.setEnabled(False)
             self.detector_controls.detector_btn.setEnabled(False)
             # self.camera_controls.crop_btn.setEnabled(False) # DELETED
@@ -1444,19 +1420,50 @@ class MainWindow(QWidget):
     def update_sensor_display(self, data):
         """Update sensor information display"""
         try:
-            temp = data.get("temperature", 0)
-            cpu = data.get("cpu_percent", 0)
-            
-            # Update Pi temperature in thermal subsystem
+            # Handle thermal subsystem data (Pi temperature)
             if hasattr(self, 'thermal_labels') and 'pi_temp' in self.thermal_labels:
-                self.thermal_labels["pi_temp"].setText(f"Pi: {temp:.1f} °C")
+                temp = data.get("temperature")
+                if temp is not None:
+                    self.thermal_labels["pi_temp"].setText(f"Pi: {temp:.1f}°C")
+                else:
+                    self.thermal_labels["pi_temp"].setText("Pi: N/A")
             
-            # Update CPU usage in CDH subsystem
-            if hasattr(self, 'cdh_labels') and 'cpu_usage' in self.cdh_labels:
-                self.cdh_labels["cpu_usage"].setText(f"CPU Usage: {cpu:.1f}%")
+            # Handle CDH subsystem data (CPU, memory, uptime, status)
+            if hasattr(self, 'cdh_labels'):
+                # CPU Usage
+                if 'cpu_usage' in self.cdh_labels:
+                    cpu = data.get("cpu_percent")
+                    if cpu is not None:
+                        self.cdh_labels["cpu_usage"].setText(f"CPU Usage: {cpu:.1f}%")
+                    else:
+                        self.cdh_labels["cpu_usage"].setText("CPU Usage: N/A")
+                
+                # Memory Usage (now just percentage)
+                if 'memory' in self.cdh_labels:
+                    memory_percent = data.get("memory_percent")
+                    if memory_percent is not None:
+                        self.cdh_labels["memory"].setText(f"Memory Usage: {memory_percent:.1f}%")
+                    else:
+                        self.cdh_labels["memory"].setText("Memory Usage: N/A")
+                
+                # Uptime
+                if 'uptime' in self.cdh_labels:
+                    uptime = data.get("uptime")
+                    if uptime:
+                        self.cdh_labels["uptime"].setText(f"Uptime: {uptime}")
+                    else:
+                        self.cdh_labels["uptime"].setText("Uptime: N/A")
+                
+                # System Status
+                if 'status' in self.cdh_labels:
+                    status = data.get("status")
+                    if status:
+                        self.cdh_labels["status"].setText(f"Status: {status}")
+                    else:
+                        self.cdh_labels["status"].setText("Status: Unknown")
                 
         except Exception as e:
-            logging.error(f"Sensor update error: {e}")
+            logging.error(f"Failed to update sensor display: {e}")
 
     def update_client_communication_metrics(self):
         """Update client-side communication metrics (uplink frequency and signal strength)"""
@@ -2014,35 +2021,6 @@ class MainWindow(QWidget):
     #                       PERFORMANCE MONITORING                          
     #=========================================================================
 
-    def measure_speed(self):
-        """Measure internet speed for performance monitoring"""
-        self.info_labels["speed"].setText("Upload: Testing...")
-        self.info_labels["max_frame"].setText("Max Frame: ...")
-
-        def run_speedtest():
-            try:
-                import speedtest
-                st = speedtest.Speedtest()
-                upload = st.upload()
-                upload_mbps = upload / 1_000_000
-                fps = self.camera_settings.fps_slider.value()
-                max_bytes_per_sec = upload / 8
-                max_frame_size = max_bytes_per_sec / fps
-                self.speedtest_result.emit(upload_mbps, max_frame_size / 1024)
-            except Exception:
-                self.speedtest_result.emit(-1, -1)
-
-        threading.Thread(target=run_speedtest, daemon=True).start()
-
-    def update_speed_labels(self, upload_mbps, max_frame_size_kb):
-        """Update speed test results in UI"""
-        if upload_mbps < 0:
-            self.info_labels["speed"].setText("Upload: Error")
-            self.info_labels["max_frame"].setText("Max Frame: -- KB")
-        else:
-            self.info_labels["speed"].setText(f"Upload: {upload_mbps:.2f} Mbps")
-            self.info_labels["max_frame"].setText(f"Max Frame: {max_frame_size_kb:.1f} KB")
-
     def timerEvent(self, event):
         """Handle timer events for FPS calculation"""
         # live FPS (incoming)
@@ -2181,7 +2159,7 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         """Handle application close event"""
         try:
-            logging.info("[INFO] 🛑 Closing application...")
+            logging.info("[INFO] Closing application...")
             
             # Remove QtLogHandler from logging FIRST to prevent RuntimeError at exit
             if hasattr(self, 'qt_log_handler') and self.qt_log_handler is not None:

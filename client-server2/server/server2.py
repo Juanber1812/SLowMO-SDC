@@ -300,9 +300,50 @@ def handle_adcs_command(data):
 @socketio.on("sensor_data")
 def handle_sensor_data(data):
     try:
-        emit("sensor_broadcast", data, broadcast=True)
+        # Enhanced sensor data now includes memory usage, uptime, and smart status
+        # Format: {
+        #   "temperature": 45.2,
+        #   "cpu_percent": 25.4,
+        #   "memory": {"percent": 68.5, "used_gb": 2.74, "total_gb": 4.0, "available_gb": 1.26},
+        #   "uptime": "2h 34m 12s",
+        #   "status": "Moderate Load"
+        # }
+        
+        # Prepare enhanced sensor data for broadcast
+        memory_info = data.get("memory", {})
+        memory_percent = memory_info.get("percent") if memory_info else None
+        
+        enhanced_data = {
+            "temperature": data.get("temperature"),
+            "cpu_percent": data.get("cpu_percent"),
+            "memory_percent": memory_percent,  # Only memory percentage
+            "uptime": data.get("uptime"),
+            "status": data.get("status")   # Smart system status
+        }
+        
+        emit("sensor_broadcast", enhanced_data, broadcast=True)
+        
+        # Log sensor data periodically (every 60 seconds)
+        if not hasattr(handle_sensor_data, 'last_log') or time.time() - handle_sensor_data.last_log > 60:
+            temp = enhanced_data.get("temperature", "N/A")
+            cpu = enhanced_data.get("cpu_percent", "N/A")
+            memory_percent = enhanced_data.get("memory_percent", "N/A")
+            uptime = enhanced_data.get("uptime", "N/A")
+            status = enhanced_data.get("status", "N/A")
+            
+            print(f"\n[SENSORS] Temp: {temp}°C, CPU: {cpu}%, Memory: {memory_percent}%, Uptime: {uptime}, Status: {status}")
+            handle_sensor_data.last_log = time.time()
+            
     except Exception as e:
         print(f"[ERROR] sensor_data: {e}")
+        # Send basic data on error to maintain connectivity
+        emit("sensor_broadcast", {
+            "temperature": data.get("temperature", 0),
+            "cpu_percent": data.get("cpu_percent", 0),
+            "memory_percent": None,
+            "uptime": "Error",
+            "status": "Unknown"
+        }, broadcast=True)
 
 @socketio.on("lidar_data")
 def handle_lidar_data(data):

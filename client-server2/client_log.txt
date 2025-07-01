@@ -246,3 +246,84 @@
 2025-07-01 00:57:05,584 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
 2025-07-01 00:57:10,599 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751327825.5861535 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001ABA1762900>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
 2025-07-01 00:57:19,759 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 11:22:51,059 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 11:22:51,789 - INFO - Connected to server
+2025-07-01 11:22:51,791 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 11:22:51,794 - INFO - [INFO] Successfully connected to server
+2025-07-01 11:23:45,993 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 11:23:45,995 - INFO - Stream paused for config application.
+2025-07-01 11:23:46,499 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-01 11:23:46,507 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-07-01 11:23:46,713 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-01 11:24:41,773 - INFO - Requesting LIDAR streaming start
+2025-07-01 11:24:46,714 - INFO - Requesting LIDAR streaming stop
+2025-07-01 11:24:46,722 - INFO - Back button clicked in LidarWidget
+2025-07-01 11:25:01,289 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 11:25:51,987 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 11:25:51,989 - INFO - Stream paused for config application.
+2025-07-01 11:25:52,491 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-01 11:25:52,496 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-07-01 11:25:52,701 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-01 11:26:15,638 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 11:26:15,640 - INFO - Stream paused for config application.
+2025-07-01 11:26:16,177 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-01 11:26:16,181 - INFO - Detector calibration updated: calibrations/calibration_1536x864.npz
+2025-07-01 11:26:16,384 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-01 11:27:15,116 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 11:27:15,118 - INFO - Stream paused for config application.
+2025-07-01 11:27:15,636 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-01 11:27:15,639 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-01 11:27:15,842 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-01 11:27:56,292 - INFO - [ADCSSection] Displaying details for: Manual Orientation
+2025-07-01 11:27:57,275 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 11:27:57,435 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 11:28:04,303 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 11:28:04,524 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 11:28:05,004 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 11:28:05,236 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 11:28:05,512 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 11:28:05,709 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 11:28:05,964 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 11:28:06,088 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 11:28:06,521 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 11:28:06,802 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 11:28:07,555 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 11:28:07,775 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 11:28:08,048 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 11:28:08,335 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 11:28:08,571 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 11:28:08,793 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 11:28:09,014 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 11:28:09,278 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 11:28:09,638 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 11:28:09,945 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 11:28:10,562 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_start', Value: None
+2025-07-01 11:28:11,102 - INFO - [ADCSSection] Action for mode 'Manual Orientation': Command 'manual_clockwise_stop', Value: None
+2025-07-01 11:28:17,889 - INFO - Manual orientation crosshairs enabled
+2025-07-01 11:28:18,385 - INFO - Manual orientation crosshairs disabled
+2025-07-01 11:28:18,933 - INFO - Manual orientation crosshairs enabled
+2025-07-01 11:28:23,762 - INFO - Manual orientation crosshairs disabled
+2025-07-01 11:28:40,491 - INFO - [ADCSSection] Returning to ADCS Mode Selection.
+2025-07-01 11:28:43,893 - INFO - Disconnected from server: client disconnect
+2025-07-01 11:29:58,744 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 11:29:58,921 - INFO - Connected to server
+2025-07-01 11:29:58,923 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 11:29:58,925 - INFO - [INFO] Successfully connected to server
+2025-07-01 11:31:44,844 - INFO - Disconnected from server: client disconnect
+2025-07-01 11:32:02,170 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 11:32:02,660 - INFO - Connected to server
+2025-07-01 11:32:02,663 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 11:32:02,667 - INFO - [INFO] Successfully connected to server
+2025-07-01 11:32:10,915 - INFO - Disconnected from server: client disconnect
+2025-07-01 11:44:03,187 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 11:44:03,545 - INFO - Connected to server
+2025-07-01 11:44:03,549 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 11:44:03,551 - INFO - [INFO] Successfully connected to server
+2025-07-01 11:44:38,545 - INFO - [INFO] Closing application...
+2025-07-01 11:44:39,752 - INFO - Disconnected from server: client disconnect
+2025-07-01 11:44:50,002 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 11:44:50,172 - INFO - Connected to server
+2025-07-01 11:44:50,174 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 11:44:50,176 - INFO - [INFO] Successfully connected to server
+2025-07-01 11:44:51,051 - INFO - [INFO] Closing application...
+2025-07-01 11:44:52,256 - INFO - Disconnected from server: client disconnect
