@@ -1225,3 +1225,49 @@
 2025-07-01 20:12:26,727 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_pd_values', Value: {'kp': 0.0, 'kd': 0.0, 'min_pulse_time': 0.0, 'deadband': 0.0}
 2025-07-01 20:12:44,212 - INFO - [INFO] Closing application...
 2025-07-01 20:12:44,216 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 20:14:39,237 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 20:14:39,417 - INFO - Connected to server
+2025-07-01 20:14:39,418 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 20:14:39,420 - INFO - [INFO] Successfully connected to server
+2025-07-01 20:14:45,176 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 20:15:05,696 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 20:15:06,589 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_zero', Value: None
+2025-07-01 20:15:16,663 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 20:15:16,913 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 20:15:18,499 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 20:15:18,778 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 20:15:23,356 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 20:15:24,630 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 20:15:24,872 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 20:15:25,344 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 20:15:25,587 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 20:15:26,667 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 20:15:27,018 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 20:15:27,310 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 20:15:27,614 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 20:15:27,824 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 20:15:28,043 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 20:15:29,482 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 20:15:29,708 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 20:15:29,919 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 20:15:30,037 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 20:15:35,728 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 20:15:35,967 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 20:15:36,298 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 20:15:36,414 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 20:15:36,813 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 20:15:36,900 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 20:15:37,023 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 20:15:37,118 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 20:15:39,510 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 20:15:40,690 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 20:15:52,737 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_pd_values', Value: {'kp': 1600.0, 'kd': 80.0, 'min_pulse_time': 0.001, 'deadband': 90.0}
+2025-07-01 20:15:56,886 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 0.0
+2025-07-01 20:15:59,099 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 20:16:15,494 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 20:16:17,632 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 20:16:32,918 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 20:16:36,135 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 20:16:39,211 - INFO - [ADCSSection] Switched to auto selection page
+2025-07-01 20:16:40,162 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 20:16:48,000 - INFO - Disconnected from server: transport error
