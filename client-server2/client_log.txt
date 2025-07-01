@@ -1072,3 +1072,33 @@
 2025-07-01 16:42:08,202 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
 2025-07-01 16:42:22,623 - INFO - [INFO] Closing application...
 2025-07-01 16:42:24,330 - INFO - Disconnected from server: client disconnect
+2025-07-01 16:51:23,468 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 16:51:23,683 - INFO - Connected to server
+2025-07-01 16:51:23,685 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 16:51:23,687 - INFO - [INFO] Successfully connected to server
+2025-07-01 16:52:04,003 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 16:52:08,456 - INFO - [INFO] Closing application...
+2025-07-01 16:52:09,662 - INFO - Disconnected from server: client disconnect
+2025-07-01 17:10:27,648 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 17:10:28,121 - INFO - Connected to server
+2025-07-01 17:10:28,123 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 17:10:28,127 - INFO - [INFO] Successfully connected to server
+2025-07-01 17:11:20,390 - INFO - [INFO] Closing application...
+2025-07-01 17:11:21,596 - INFO - Disconnected from server: client disconnect
+2025-07-01 17:13:15,588 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 17:13:15,791 - INFO - Connected to server
+2025-07-01 17:13:15,792 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 17:13:15,794 - INFO - [INFO] Successfully connected to server
+2025-07-01 17:13:34,735 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 17:14:03,162 - INFO - [INFO] Closing application...
+2025-07-01 17:14:04,370 - INFO - Disconnected from server: client disconnect
+2025-07-01 17:19:21,303 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 17:19:21,616 - INFO - Connected to server
+2025-07-01 17:19:21,618 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 17:19:21,620 - INFO - [INFO] Successfully connected to server
+2025-07-01 17:27:00,896 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 17:27:01,204 - INFO - Connected to server
+2025-07-01 17:27:01,206 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 17:27:01,211 - INFO - [INFO] Successfully connected to server
+2025-07-01 17:27:23,081 - INFO - [INFO] Closing application...
+2025-07-01 17:27:24,287 - INFO - Disconnected from server: client disconnect

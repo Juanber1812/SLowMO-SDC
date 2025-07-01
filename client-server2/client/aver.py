@@ -684,9 +684,9 @@ class MainWindow(QWidget):
         
         # ADCS graph widget - same row as ADCS controls
         self.adcs_graph_widget = ADCSGraphWidget()
-        self.adcs_graph_widget.setFixedSize(600, 250)  # Compact size for row 3 layout
+        self.adcs_graph_widget.setFixedSize(500, 180)  # Reduced size to prevent overlap
         self.apply_groupbox_style(self.adcs_graph_widget, self.COLOR_BOX_BORDER_GRAPH)
-        self.adcs_graph_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        self.adcs_graph_widget.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         
         row3.addWidget(self.adcs_graph_widget, 1)  # stretch factor 1 for graph
         
