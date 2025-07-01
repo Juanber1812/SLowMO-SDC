@@ -801,19 +801,9 @@ class MainWindow(QWidget):
             ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
             ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Server Signal: Pending...", "Client Signal: Pending...", "Data Transmission Rate: Pending...", "Latency: Pending...", "Status: Pending..."]),
             ("ADCS Subsystem", [
-                "Gyro: Pending...", 
-                "Orientation: Pending...", 
-                "Gyro Rate X: Pending...", 
-                "Gyro Rate Y: Pending...", 
-                "Gyro Rate Z: Pending...",
-                "Angle X: Pending...", 
-                "Angle Y: Pending...", 
-                "Angle Z: Pending...",
-                "Temperature: Pending...",
-                "Lux1: Pending...",
-                "Lux2: Pending...",
-                "Lux3: Pending...", 
-                "RPM: Pending...", 
+                "Gyroscope: X:-- °/s, Y:-- °/s, Z:-- °/s", 
+                "Orientation: X:-- °, Y:-- °, Z:-- °", 
+                "Sun Sensors: Lux1:-- lux, Lux2:-- lux, Lux3:-- lux",
                 "Status: Pending..."
             ]),
             ("Payload Subsystem", []),  # Special handling for payload
@@ -881,33 +871,13 @@ class MainWindow(QWidget):
                     lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
-                    # Store label references for all ADCS data
-                    if "Gyro:" in text and "Gyro Rate" not in text:
-                        self.adcs_labels["gyro"] = lbl
+                    # Store label references for the 4 main ADCS lines
+                    if "Gyroscope:" in text:
+                        self.adcs_labels["gyroscope"] = lbl
                     elif "Orientation:" in text:
                         self.adcs_labels["orientation"] = lbl
-                    elif "Gyro Rate X:" in text:
-                        self.adcs_labels["gyro_rate_x"] = lbl
-                    elif "Gyro Rate Y:" in text:
-                        self.adcs_labels["gyro_rate_y"] = lbl
-                    elif "Gyro Rate Z:" in text:
-                        self.adcs_labels["gyro_rate_z"] = lbl
-                    elif "Angle X:" in text:
-                        self.adcs_labels["angle_x"] = lbl
-                    elif "Angle Y:" in text:
-                        self.adcs_labels["angle_y"] = lbl
-                    elif "Angle Z:" in text:
-                        self.adcs_labels["angle_z"] = lbl
-                    elif "Temperature:" in text:
-                        self.adcs_labels["temperature"] = lbl
-                    elif "Lux1:" in text:
-                        self.adcs_labels["lux1"] = lbl
-                    elif "Lux2:" in text:
-                        self.adcs_labels["lux2"] = lbl
-                    elif "Lux3:" in text:
-                        self.adcs_labels["lux3"] = lbl
-                    elif "RPM:" in text:
-                        self.adcs_labels["rpm"] = lbl
+                    elif "Sun Sensors:" in text:
+                        self.adcs_labels["sun_sensors"] = lbl
                     elif "Status:" in text:
                         self.adcs_labels["status"] = lbl
                         
@@ -1197,45 +1167,33 @@ class MainWindow(QWidget):
             """Handle ADCS subsystem data updates"""
             try:
                 if hasattr(self, 'adcs_labels'):
-                    # Update all ADCS labels in right column subsystem box
-                    if "gyro" in data:
-                        self.adcs_labels["gyro"].setText(f"Gyro: {data['gyro']}")
-                    if "orientation" in data:
-                        self.adcs_labels["orientation"].setText(f"Orientation: {data['orientation']}")
+                    # Update the 4 main ADCS display lines
                     
-                    # Update detailed MPU6050 gyro rates (deg/s)
-                    if "gyro_rate_x" in data:
-                        self.adcs_labels["gyro_rate_x"].setText(f"Gyro Rate X: {data['gyro_rate_x']}°/s")
-                    if "gyro_rate_y" in data:
-                        self.adcs_labels["gyro_rate_y"].setText(f"Gyro Rate Y: {data['gyro_rate_y']}°/s")
-                    if "gyro_rate_z" in data:
-                        self.adcs_labels["gyro_rate_z"].setText(f"Gyro Rate Z: {data['gyro_rate_z']}°/s")
+                    # Line 1: Gyroscope rates (X, Y, Z in °/s)
+                    if "gyroscope" in self.adcs_labels:
+                        gyro_x = data.get('gyro_rate_x', '--')
+                        gyro_y = data.get('gyro_rate_y', '--')
+                        gyro_z = data.get('gyro_rate_z', '--')
+                        self.adcs_labels["gyroscope"].setText(f"Gyroscope: X:{gyro_x} °/s, Y:{gyro_y} °/s, Z:{gyro_z} °/s")
                     
-                    # Update detailed MPU6050 angle positions (degrees)
-                    if "angle_x" in data:
-                        self.adcs_labels["angle_x"].setText(f"Angle X: {data['angle_x']}°")
-                    if "angle_y" in data:
-                        self.adcs_labels["angle_y"].setText(f"Angle Y: {data['angle_y']}°")
-                    if "angle_z" in data:
-                        self.adcs_labels["angle_z"].setText(f"Angle Z: {data['angle_z']}°")
+                    # Line 2: Orientation angles (X, Y, Z in degrees)
+                    if "orientation" in self.adcs_labels:
+                        angle_x = data.get('angle_x', '--')
+                        angle_y = data.get('angle_y', '--')
+                        angle_z = data.get('angle_z', '--')
+                        self.adcs_labels["orientation"].setText(f"Orientation: X:{angle_x} °, Y:{angle_y} °, Z:{angle_z} °")
                     
-                    # Update MPU6050 temperature
-                    if "temperature" in data:
-                        self.adcs_labels["temperature"].setText(f"Temperature: {data['temperature']}")
+                    # Line 3: Sun sensors (Lux1, Lux2, Lux3 in lux)
+                    if "sun_sensors" in self.adcs_labels:
+                        lux1 = data.get('lux1', '--')
+                        lux2 = data.get('lux2', '--')
+                        lux3 = data.get('lux3', '--')
+                        self.adcs_labels["sun_sensors"].setText(f"Sun Sensors: Lux1:{lux1} lux, Lux2:{lux2} lux, Lux3:{lux3} lux")
                     
-                    # Update VEML7700 lux sensor readings
-                    if "lux1" in data:
-                        self.adcs_labels["lux1"].setText(f"Lux1: {data['lux1']} lux")
-                    if "lux2" in data:
-                        self.adcs_labels["lux2"].setText(f"Lux2: {data['lux2']} lux")
-                    if "lux3" in data:
-                        self.adcs_labels["lux3"].setText(f"Lux3: {data['lux3']} lux")
-                    
-                    # Update motor and status
-                    if "rpm" in data:
-                        self.adcs_labels["rpm"].setText(f"RPM: {data['rpm']}")
-                    if "status" in data:
-                        self.adcs_labels["status"].setText(f"Status: {data['status']}")
+                    # Line 4: Status
+                    if "status" in self.adcs_labels:
+                        status = data.get('status', 'Unknown')
+                        self.adcs_labels["status"].setText(f"Status: {status}")
                 
                 # Forward complete ADCS data to ADCS widget for detailed display
                 if hasattr(self, 'adcs_control_widget') and self.adcs_control_widget:

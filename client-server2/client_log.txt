@@ -836,3 +836,13 @@
 2025-07-01 13:58:40,799 - INFO - [ADCSSection] Navigating to page 0
 2025-07-01 13:58:42,834 - INFO - [INFO] Closing application...
 2025-07-01 13:58:42,837 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 14:44:16,873 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 14:44:17,588 - INFO - Connected to server
+2025-07-01 14:44:17,589 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 14:44:17,591 - INFO - [INFO] Successfully connected to server
+2025-07-01 14:45:08,335 - INFO - [ADCSSection] Navigating to page 6
+2025-07-01 14:45:10,252 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 14:45:12,103 - INFO - [ADCSSection] Navigating to page 6
+2025-07-01 14:45:13,452 - INFO - [ADCSSection] Navigating to page 0
+2025-07-01 14:45:15,736 - INFO - [INFO] Closing application...
+2025-07-01 14:45:16,941 - INFO - Disconnected from server: client disconnect
