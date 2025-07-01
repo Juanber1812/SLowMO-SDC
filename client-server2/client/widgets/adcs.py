@@ -75,7 +75,7 @@ class ADCSSection(QGroupBox):
         main_layout.addLayout(right_column, 2)
 
     def _create_mode_selection_group(self):
-        group = QGroupBox("Mode")
+        group = QGroupBox()
         layout = QHBoxLayout()
         self.mode_button_group = QButtonGroup(self)
         self.mode_button_group.setExclusive(True)
@@ -103,7 +103,7 @@ class ADCSSection(QGroupBox):
         return group
 
     def _create_manual_controls_group(self):
-        group = QGroupBox("Manual Control")
+        group = QGroupBox()
         layout = QVBoxLayout()
         
         # CW/CCW Buttons
@@ -125,7 +125,7 @@ class ADCSSection(QGroupBox):
         return group
 
     def _create_auto_controls_group(self):
-        group = QGroupBox("Automatic Controller")
+        group = QGroupBox()
         layout = QGridLayout()
 
         # Target Input
@@ -173,24 +173,6 @@ class ADCSSection(QGroupBox):
         group.setLayout(layout)
         return group
 
-    def _connect_signals(self):
-        # Mode selection
-        self.raw_btn.clicked.connect(lambda: self._update_current_auto_mode("Raw"))
-        self.env_btn.clicked.connect(lambda: self._update_current_auto_mode("Environmental"))
-        self.apriltag_btn.clicked.connect(lambda: self._update_current_auto_mode("AprilTag"))
-
-        # Manual controls
-        self.manual_cw_btn.pressed.connect(lambda: self._handle_action_clicked("Manual", "manual_clockwise_start"))
-        self.manual_cw_btn.released.connect(lambda: self._handle_action_clicked("Manual", "manual_stop"))
-        self.manual_ccw_btn.pressed.connect(lambda: self._handle_action_clicked("Manual", "manual_counterclockwise_start"))
-        self.manual_ccw_btn.released.connect(lambda: self._handle_action_clicked("Manual", "manual_stop"))
-        self.calibrate_btn.clicked.connect(lambda: self._handle_action_clicked("Calibration", "calibrate"))
-
-        # Auto controls
-        self.run_controller_btn.clicked.connect(self._handle_run_controller_clicked)
-        self.set_zero_btn.clicked.connect(self._handle_set_zero_clicked)
-        self.set_value_btn.clicked.connect(self._handle_set_value_clicked)
-        self.set_pd_btn.clicked.connect(self._handle_set_pd_clicked)
 
     def _update_current_auto_mode(self, mode_name):
         self.current_auto_mode = mode_name
@@ -211,7 +193,8 @@ class ADCSSection(QGroupBox):
             pd_values = {
                 "kp": float(self.kp_input.text()),
                 "kd": float(self.kd_input.text()),
-                "deadband": float(self.deadband_input.text())
+                "deadband": float(self.deadband_input.text()),
+                "min_pulse": float(self.min_pulse_input.text())
             }
             self._handle_action_clicked(self.current_auto_mode, "set_pd_values", pd_values)
         except ValueError:
@@ -250,7 +233,7 @@ import logging
 # --- THEME AND STYLE CONFIGURATION (Copied from your existing file) ---
 ADCS_BUTTON_STYLE = """
     QPushButton {
-        background-color: #444444; color: white; border: 1px solid #555555; border-radius: 3px; padding: 5px;
+        background-color: #444444; color: white; border: 1px solid #555555; border-radius: 3px; padding: 0px;
     }
     QPushButton:hover { background-color: #555555; }
     QPushButton:checked {
@@ -294,7 +277,7 @@ class ADCSSection(QGroupBox):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedSize(700, 220)
+        self.setFixedSize(1200, 220)
         self.current_auto_mode = "adcs" # Default auto mode
         self._setup_ui()
         self._connect_signals()
@@ -316,7 +299,7 @@ class ADCSSection(QGroupBox):
         main_layout.addLayout(right_column, 2)
 
     def _create_mode_selection_group(self):
-        group = QGroupBox("Mode")
+        group = QGroupBox()
         layout = QHBoxLayout()
         self.mode_button_group = QButtonGroup(self)
         self.mode_button_group.setExclusive(True)
@@ -344,7 +327,7 @@ class ADCSSection(QGroupBox):
         return group
 
     def _create_manual_controls_group(self):
-        group = QGroupBox("Manual Control")
+        group = QGroupBox()
         layout = QVBoxLayout()
         
         # CW/CCW Buttons
@@ -366,7 +349,7 @@ class ADCSSection(QGroupBox):
         return group
 
     def _create_auto_controls_group(self):
-        group = QGroupBox("Automatic Controller")
+        group = QGroupBox()
         layout = QGridLayout()
 
         # Target Input
@@ -391,7 +374,7 @@ class ADCSSection(QGroupBox):
         return group
 
     def _create_pd_tuning_group(self):
-        group = QGroupBox("PD Tuning")
+        group = QGroupBox() # Title removed
         layout = QGridLayout()
 
         # Kp
@@ -406,10 +389,15 @@ class ADCSSection(QGroupBox):
         layout.addWidget(QLabel("Deadband:"), 1, 0)
         self.deadband_input = QLineEdit("1.0")
         layout.addWidget(self.deadband_input, 1, 1)
+        # Min Pulse Time
+        layout.addWidget(QLabel("Min Pulse:"), 1, 2)
+        self.min_pulse_input = QLineEdit("0.1")
+        layout.addWidget(self.min_pulse_input, 1, 3)
         # Set Button
         self.set_pd_btn = QPushButton("Set Gains")
         self.set_pd_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        layout.addWidget(self.set_pd_btn, 1, 2, 1, 2)
+        self.set_pd_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding) # Make button thicker
+        layout.addWidget(self.set_pd_btn, 2, 0, 1, 4) # Span across all columns
 
         group.setLayout(layout)
         return group
@@ -452,7 +440,8 @@ class ADCSSection(QGroupBox):
             pd_values = {
                 "kp": float(self.kp_input.text()),
                 "kd": float(self.kd_input.text()),
-                "deadband": float(self.deadband_input.text())
+                "deadband": float(self.deadband_input.text()),
+                "min_pulse": float(self.min_pulse_input.text()) # Add min_pulse
             }
             self._handle_action_clicked(self.current_auto_mode, "set_pd_values", pd_values)
         except ValueError:
@@ -480,3 +469,4 @@ class ADCSSection(QGroupBox):
             self.kd_input.setText(str(controller_data.get('kd', '')))
             self.deadband_input.setText(str(controller_data.get('deadband', '')))
             self.value_input.setText(str(controller_data.get('target_yaw', '')))
+            self.min_pulse_input.setText(str(controller_data.get('min_pulse', ''))) # Add min_pulse

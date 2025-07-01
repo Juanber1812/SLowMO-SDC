@@ -1596,3 +1596,89 @@
 2025-07-01 22:37:21,644 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
 2025-07-01 22:37:21,731 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
 2025-07-01 22:37:25,078 - INFO - Sending ADCS command: Mode='Calibration', Command='calibrate', Value=None
+2025-07-01 22:40:02,466 - INFO - Disconnected from server: transport error
+2025-07-01 22:40:09,527 - INFO - Connected to server
+2025-07-01 22:40:09,530 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 22:40:14,587 - INFO - Sending ADCS command: Mode='Calibration', Command='calibrate', Value=None
+2025-07-01 22:41:16,142 - INFO - Disconnected from server: transport error
+2025-07-01 22:42:30,472 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 22:42:30,658 - INFO - Connected to server
+2025-07-01 22:42:30,660 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 22:42:38,349 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 22:42:38,853 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-07-01 22:42:38,860 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-01 22:42:53,143 - INFO - Image captured: /home/slowmo/captures/image_20250701_224254.jpg (0.03 MB)
+2025-07-01 22:42:53,186 - INFO - Image saved: c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\captured_images\image_20250701_224254.jpg (33.9 KB)
+2025-07-01 22:43:04,945 - INFO - Manual orientation crosshairs enabled
+2025-07-01 22:43:05,847 - INFO - Manual orientation crosshairs disabled
+2025-07-01 22:43:13,715 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-01 22:43:13,842 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-01 22:43:14,138 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:43:14,252 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-01 22:43:16,911 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-01 22:43:17,051 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-01 22:43:17,391 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:43:17,509 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-01 22:43:18,051 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-01 22:43:35,360 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 22:43:38,152 - INFO - [INFO] Closing application...
+2025-07-01 22:43:39,357 - INFO - Disconnected from server: client disconnect
+2025-07-01 22:43:46,960 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 22:43:47,176 - INFO - Connected to server
+2025-07-01 22:43:47,178 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 22:43:47,180 - INFO - [INFO] Successfully connected to server
+2025-07-01 22:43:48,361 - INFO - [INFO] Closing application...
+2025-07-01 22:43:49,566 - INFO - Disconnected from server: client disconnect
+2025-07-01 22:47:26,756 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 22:47:26,938 - INFO - Connected to server
+2025-07-01 22:47:26,942 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 22:47:26,944 - INFO - [INFO] Successfully connected to server
+2025-07-01 22:47:34,216 - INFO - Sending ADCS command: Mode='Calibration', Command='calibrate', Value=None
+2025-07-01 22:48:57,878 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-01 22:49:05,856 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 22:49:11,821 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 22:49:11,824 - INFO - Stream paused for config application.
+2025-07-01 22:49:12,328 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-01 22:49:12,333 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-01 22:49:12,537 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-01 22:49:41,525 - INFO - [GraphSection] Update frequency set to: 1.0 Hz via spinbox
+2025-07-01 22:49:43,070 - INFO - [GraphSection] Update frequency set to: 2.0 Hz via spinbox
+2025-07-01 22:50:43,998 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-01 22:51:00,526 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-01 22:51:06,150 - INFO - Requesting LIDAR streaming start
+2025-07-01 22:51:59,765 - INFO - [INFO] Closing application...
+2025-07-01 22:52:01,469 - INFO - Disconnected from server: client disconnect
+2025-07-01 22:59:32,183 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 22:59:32,358 - INFO - Connected to server
+2025-07-01 22:59:32,359 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 22:59:32,362 - INFO - [INFO] Successfully connected to server
+2025-07-01 22:59:55,169 - INFO - [INFO] Closing application...
+2025-07-01 22:59:56,374 - INFO - Disconnected from server: client disconnect
+2025-07-01 23:00:57,085 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 23:00:57,710 - INFO - Connected to server
+2025-07-01 23:00:57,713 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 23:00:57,718 - INFO - [INFO] Successfully connected to server
+2025-07-01 23:01:01,044 - INFO - [INFO] Closing application...
+2025-07-01 23:01:02,251 - INFO - Disconnected from server: client disconnect
+2025-07-01 23:01:26,089 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 23:01:26,241 - INFO - Connected to server
+2025-07-01 23:01:26,243 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 23:01:26,247 - INFO - [INFO] Successfully connected to server
+2025-07-01 23:01:32,908 - INFO - [INFO] Closing application...
+2025-07-01 23:01:34,115 - INFO - Disconnected from server: client disconnect
+2025-07-01 23:09:25,975 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 23:09:26,283 - INFO - Connected to server
+2025-07-01 23:09:26,286 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 23:09:26,291 - INFO - [INFO] Successfully connected to server
+2025-07-01 23:09:29,149 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-01 23:09:29,328 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-01 23:09:30,026 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-01 23:09:30,228 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-01 23:09:31,069 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-01 23:09:31,230 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-01 23:09:32,125 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-01 23:09:32,263 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-01 23:09:33,404 - INFO - Sending ADCS command: Mode='Calibration', Command='calibrate', Value=None
+2025-07-01 23:09:57,902 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-01 23:09:59,405 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-01 23:10:07,629 - INFO - Disconnected from server: transport error

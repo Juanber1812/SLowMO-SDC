@@ -65,7 +65,6 @@ from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
 from widgets.detector_control import DetectorControlWidget
 from widgets.adcs import ADCSSection
-from widgets.adcs_graph import ADCSGraphWidget
 from widgets.detector_settings_widget import DetectorSettingsWidget
 from payload.detector4 import detector_instance
 from data_analysis import DataAnalysisTab
@@ -682,14 +681,6 @@ class MainWindow(QWidget):
         self.adcs_control_widget.adcs_command_sent.connect(self.handle_adcs_command)
         row3.addWidget(self.adcs_control_widget, 1)  # stretch factor 1 for ADCS controls
         
-        # ADCS graph widget - same row as ADCS controls
-        self.adcs_graph_widget = ADCSGraphWidget()
-        self.adcs_graph_widget.setFixedSize(500, 180)  # Reduced size to prevent overlap
-        self.apply_groupbox_style(self.adcs_graph_widget, self.COLOR_BOX_BORDER_GRAPH)
-        self.adcs_graph_widget.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        
-        row3.addWidget(self.adcs_graph_widget, 1)  # stretch factor 1 for graph
-        
         parent_layout.addLayout(row3)
 
 ##########################################################################################
@@ -1262,10 +1253,6 @@ class MainWindow(QWidget):
                     if hasattr(self.adcs_control_widget, 'update_sensor_data'):
                         self.adcs_control_widget.update_sensor_data(adcs_detailed_data)
                 
-                # Update ADCS graph widget with live data
-                if hasattr(self, 'adcs_graph_widget') and self.adcs_graph_widget:
-                    self.adcs_graph_widget.update_from_adcs_data(data)
-                    
             except Exception as e:
                 logging.error(f"Failed to update ADCS data: {e}")
 
@@ -1460,11 +1447,6 @@ class MainWindow(QWidget):
         }
         sio.emit("adcs_command", data)
         print(f"[CLIENT] ADCS command sent: {data}")
-        
-        # Update ADCS graph widget when target value is set
-        if hasattr(self, 'adcs_graph_widget') and self.adcs_graph_widget:
-            if command_name == "set_value" and isinstance(value, (int, float)):
-                self.adcs_graph_widget.update_target_angle(value)
 
     def start_lidar_streaming(self):
         """Start LIDAR data streaming from server"""
