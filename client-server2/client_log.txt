@@ -1212,3 +1212,16 @@
 2025-07-01 18:53:53,544 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
 2025-07-01 19:45:00,496 - INFO - [INFO] Closing application...
 2025-07-01 19:45:00,502 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 19:56:57,022 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 19:56:58,404 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 19:57:02,038 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751396217.026027 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000171666D6F90>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-01 19:57:02,128 - INFO - [INFO] Closing application...
+2025-07-01 19:57:02,130 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 20:11:36,297 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 20:11:41,309 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751397096.2995682 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001B3DA326E40>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-01 20:11:41,765 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 20:12:17,253 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_pd_values', Value: {'kp': 1600.0, 'kd': 80.0, 'min_pulse_time': 0.001, 'deadband': 90.0}
+2025-07-01 20:12:23,559 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 0.0
+2025-07-01 20:12:26,727 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_pd_values', Value: {'kp': 0.0, 'kd': 0.0, 'min_pulse_time': 0.0, 'deadband': 0.0}
+2025-07-01 20:12:44,212 - INFO - [INFO] Closing application...
+2025-07-01 20:12:44,216 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
