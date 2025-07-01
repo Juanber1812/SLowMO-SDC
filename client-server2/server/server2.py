@@ -28,6 +28,15 @@ except ImportError as e:
     CommunicationMonitor = None
     COMMUNICATION_AVAILABLE = False
 
+# Import ADCS controller
+try:
+    from ADCS_final import ADCSController
+    ADCS_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"ADCS controller not available: {e}")
+    ADCSController = None
+    ADCS_AVAILABLE = False
+
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -43,6 +52,11 @@ if POWER_AVAILABLE:
 communication_monitor = None
 if COMMUNICATION_AVAILABLE:
     communication_monitor = CommunicationMonitor()
+
+# Initialize ADCS controller
+adcs_controller = None
+if ADCS_AVAILABLE:
+    adcs_controller = ADCSController()
 
 def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
@@ -233,6 +247,12 @@ def start_background_tasks():
                 logging.info("Power monitoring started successfully")
             else:
                 logging.error("Failed to start power monitoring")
+        
+        # Start ADCS data broadcasting
+        if adcs_controller:
+            start_adcs_broadcast()
+            logging.info("ADCS controller initialized and broadcasting started")
+        
         # Do NOT start communication monitoring here; start on client connect
     # Start the delayed initialization in a separate thread
     threading.Thread(target=delayed_start, daemon=True).start()
@@ -270,32 +290,36 @@ def handle_disconnect():
 def handle_adcs_command(data):
     try:
         print(f"[SERVER] Received ADCS command: {data}")
-        command = data.get("command")
-        if command == "environmental":
-            from adcs_functions import environmental_calibration_mode
-            environmental_calibration_mode()
-        elif command == "manual_clockwise_start":
-            from motor_test import rotate_clockwise_dc
-            rotate_clockwise_dc()
-        elif command == "manual_clockwise_stop":
-            from motor_test import stop_motor_dc
-            stop_motor_dc()
-        elif command == "manual_anticlockwise_start":
-            from motor_test import rotate_counterclockwise_dc
-            rotate_counterclockwise_dc()
-        elif command == "manual_anticlockwise_stop":
-            from motor_test import stop_motor_dc
-            stop_motor_dc()
-        elif command == "set_target_orientation":
-            target = data.get("value")
-            print(f"[SERVER] Setting target orientation to: {target}")
-        elif command == "detumbling":
-            print("[SERVER] Running detumbling procedure")
-        else:
-            print("[SERVER] Unknown ADCS command received.")
-        emit("adcs_command_ack", {"status": "OK", "command": command}, broadcast=True)
+        
+        if not adcs_controller:
+            print("[ERROR] ADCS controller not available")
+            emit("adcs_command_ack", {"status": "ERROR", "message": "ADCS controller not available"}, broadcast=True)
+            return
+        
+        # Extract command parameters
+        mode = data.get("mode", "Unknown")
+        command = data.get("command", "unknown")
+        value = data.get("value")
+        
+        # Use the new ADCS controller command handler
+        result = adcs_controller.handle_adcs_command(mode, command, value)
+        
+        # Send response back to client
+        emit("adcs_command_ack", {
+            "status": result.get("status", "error").upper(),
+            "message": result.get("message", "Command processed"),
+            "mode": mode,
+            "command": command
+        }, broadcast=True)
+        
+        print(f"[SERVER] ADCS command result: {result}")
+        
     except Exception as e:
         print(f"[ERROR] ADCS command handling: {e}")
+        emit("adcs_command_ack", {
+            "status": "ERROR", 
+            "message": f"Command failed: {str(e)}"
+        }, broadcast=True)
 
 @socketio.on("sensor_data")
 def handle_sensor_data(data):
@@ -478,6 +502,57 @@ def throughput_test_callback(event_type, data):
     except Exception as e:
         logging.error(f"Error in throughput test callback: {e}")
 
+def adcs_data_broadcast():
+    """Broadcast ADCS data at 20Hz"""
+    if not adcs_controller:
+        return
+    
+    try:
+        adcs_data = adcs_controller.get_adcs_data_for_server()
+        socketio.emit("adcs_broadcast", adcs_data)
+        
+        # Log ADCS data periodically (every 10 seconds)
+        if not hasattr(adcs_data_broadcast, 'last_log') or time.time() - adcs_data_broadcast.last_log > 10:
+            yaw = adcs_data.get('angle_z', '0.0')
+            roll = adcs_data.get('angle_y', '0.0') 
+            pitch = adcs_data.get('angle_x', '0.0')
+            temp = adcs_data.get('temperature', '0.0°C')
+            status = adcs_data.get('status', 'Unknown')
+            
+            print(f"\n[ADCS] Yaw: {yaw}°, Roll: {roll}°, Pitch: {pitch}°, Temp: {temp}, Status: {status}")
+            adcs_data_broadcast.last_log = time.time()
+            
+    except Exception as e:
+        logging.error(f"Error in ADCS data broadcast: {e}")
+        # Send error state to clients
+        socketio.emit("adcs_broadcast", {
+            "gyro": "0.0°",
+            "orientation": "Y:0.0° R:0.0° P:0.0°",
+            "gyro_rate_x": "0.00", "gyro_rate_y": "0.00", "gyro_rate_z": "0.00",
+            "angle_x": "0.0", "angle_y": "0.0", "angle_z": "0.0",
+            "lux1": "0.0", "lux2": "0.0", "lux3": "0.0",
+            "temperature": "0.0°C",
+            "rpm": "0.0",
+            "status": "Error"
+        })
+
+def start_adcs_broadcast():
+    """Start ADCS data broadcasting at 20Hz"""
+    if not adcs_controller:
+        return
+    
+    def adcs_broadcast_loop():
+        while True:
+            try:
+                adcs_data_broadcast()
+                time.sleep(0.05)  # 20Hz = 50ms interval
+            except Exception as e:
+                logging.error(f"Error in ADCS broadcast loop: {e}")
+                time.sleep(1)  # Wait 1 second on error before retrying
+    
+    threading.Thread(target=adcs_broadcast_loop, daemon=True).start()
+    logging.info("ADCS data broadcasting started at 20Hz")
+
 @socketio.on('latency_response')
 def handle_latency_response(data):
     """Handle latency measurement response from client"""
@@ -580,5 +655,11 @@ if __name__ == "__main__":
                 print("[INFO] Power monitoring stopped.")
         except Exception as e:
             print(f"[WARN] Could not stop power monitoring: {e}")
+        try:
+            if adcs_controller:
+                adcs_controller.shutdown()
+                print("[INFO] ADCS controller stopped.")
+        except Exception as e:
+            print(f"[WARN] Could not stop ADCS controller: {e}")
         print("[INFO] Server exited cleanly.")
         exit(0)

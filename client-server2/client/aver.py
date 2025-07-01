@@ -800,7 +800,22 @@ class MainWindow(QWidget):
             ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Battery: Pending...", "Temperature: Pending...", "Status: Pending..."]),
             ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
             ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Server Signal: Pending...", "Client Signal: Pending...", "Data Transmission Rate: Pending...", "Latency: Pending...", "Status: Pending..."]),
-            ("ADCS Subsystem", ["Gyro: Pending...", "Orientation: Pending...", "Lux1: Pending...","Lux2: Pending...","Lux3: Pending...", "RPM: Pending...", "Status: Pending..."]),
+            ("ADCS Subsystem", [
+                "Gyro: Pending...", 
+                "Orientation: Pending...", 
+                "Gyro Rate X: Pending...", 
+                "Gyro Rate Y: Pending...", 
+                "Gyro Rate Z: Pending...",
+                "Angle X: Pending...", 
+                "Angle Y: Pending...", 
+                "Angle Z: Pending...",
+                "Temperature: Pending...",
+                "Lux1: Pending...",
+                "Lux2: Pending...",
+                "Lux3: Pending...", 
+                "RPM: Pending...", 
+                "Status: Pending..."
+            ]),
             ("Payload Subsystem", []),  # Special handling for payload
             ("Command & Data Handling Subsystem", ["CPU Usage: Pending...", "Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
             ("Error Log", ["No Critical Errors Detected: Pending..."]),
@@ -866,11 +881,25 @@ class MainWindow(QWidget):
                     lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
-                    # Store label references for your new ADCS labels
-                    if "Gyro:" in text:
+                    # Store label references for all ADCS data
+                    if "Gyro:" in text and "Gyro Rate" not in text:
                         self.adcs_labels["gyro"] = lbl
                     elif "Orientation:" in text:
                         self.adcs_labels["orientation"] = lbl
+                    elif "Gyro Rate X:" in text:
+                        self.adcs_labels["gyro_rate_x"] = lbl
+                    elif "Gyro Rate Y:" in text:
+                        self.adcs_labels["gyro_rate_y"] = lbl
+                    elif "Gyro Rate Z:" in text:
+                        self.adcs_labels["gyro_rate_z"] = lbl
+                    elif "Angle X:" in text:
+                        self.adcs_labels["angle_x"] = lbl
+                    elif "Angle Y:" in text:
+                        self.adcs_labels["angle_y"] = lbl
+                    elif "Angle Z:" in text:
+                        self.adcs_labels["angle_z"] = lbl
+                    elif "Temperature:" in text:
+                        self.adcs_labels["temperature"] = lbl
                     elif "Lux1:" in text:
                         self.adcs_labels["lux1"] = lbl
                     elif "Lux2:" in text:
@@ -1168,21 +1197,81 @@ class MainWindow(QWidget):
             """Handle ADCS subsystem data updates"""
             try:
                 if hasattr(self, 'adcs_labels'):
-                    # Update ADCS labels in right column with your new labels
+                    # Update all ADCS labels in right column subsystem box
                     if "gyro" in data:
                         self.adcs_labels["gyro"].setText(f"Gyro: {data['gyro']}")
                     if "orientation" in data:
                         self.adcs_labels["orientation"].setText(f"Orientation: {data['orientation']}")
+                    
+                    # Update detailed MPU6050 gyro rates (deg/s)
+                    if "gyro_rate_x" in data:
+                        self.adcs_labels["gyro_rate_x"].setText(f"Gyro Rate X: {data['gyro_rate_x']}°/s")
+                    if "gyro_rate_y" in data:
+                        self.adcs_labels["gyro_rate_y"].setText(f"Gyro Rate Y: {data['gyro_rate_y']}°/s")
+                    if "gyro_rate_z" in data:
+                        self.adcs_labels["gyro_rate_z"].setText(f"Gyro Rate Z: {data['gyro_rate_z']}°/s")
+                    
+                    # Update detailed MPU6050 angle positions (degrees)
+                    if "angle_x" in data:
+                        self.adcs_labels["angle_x"].setText(f"Angle X: {data['angle_x']}°")
+                    if "angle_y" in data:
+                        self.adcs_labels["angle_y"].setText(f"Angle Y: {data['angle_y']}°")
+                    if "angle_z" in data:
+                        self.adcs_labels["angle_z"].setText(f"Angle Z: {data['angle_z']}°")
+                    
+                    # Update MPU6050 temperature
+                    if "temperature" in data:
+                        self.adcs_labels["temperature"].setText(f"Temperature: {data['temperature']}")
+                    
+                    # Update VEML7700 lux sensor readings
                     if "lux1" in data:
-                        self.adcs_labels["lux1"].setText(f"Lux1: {data['lux1']}")
+                        self.adcs_labels["lux1"].setText(f"Lux1: {data['lux1']} lux")
                     if "lux2" in data:
-                        self.adcs_labels["lux2"].setText(f"Lux2: {data['lux2']}")
+                        self.adcs_labels["lux2"].setText(f"Lux2: {data['lux2']} lux")
                     if "lux3" in data:
-                        self.adcs_labels["lux3"].setText(f"Lux3: {data['lux3']}")
+                        self.adcs_labels["lux3"].setText(f"Lux3: {data['lux3']} lux")
+                    
+                    # Update motor and status
                     if "rpm" in data:
                         self.adcs_labels["rpm"].setText(f"RPM: {data['rpm']}")
                     if "status" in data:
                         self.adcs_labels["status"].setText(f"Status: {data['status']}")
+                
+                # Forward complete ADCS data to ADCS widget for detailed display
+                if hasattr(self, 'adcs_control_widget') and self.adcs_control_widget:
+                    # Pass all the detailed MPU and Lux sensor data
+                    adcs_detailed_data = {
+                        # MPU6050 gyro rates (deg/s)
+                        'gyro_rate_x': data.get('gyro_rate_x', '0.00'),
+                        'gyro_rate_y': data.get('gyro_rate_y', '0.00'), 
+                        'gyro_rate_z': data.get('gyro_rate_z', '0.00'),
+                        
+                        # MPU6050 angle positions (degrees)
+                        'angle_x': data.get('angle_x', '0.0'),
+                        'angle_y': data.get('angle_y', '0.0'),
+                        'angle_z': data.get('angle_z', '0.0'),
+                        
+                        # MPU6050 temperature
+                        'temperature': data.get('temperature', '0.0°C'),
+                        
+                        # VEML7700 lux sensors
+                        'lux1': data.get('lux1', '0.0'),
+                        'lux2': data.get('lux2', '0.0'),
+                        'lux3': data.get('lux3', '0.0'),
+                        
+                        # Motor/Control data
+                        'rpm': data.get('rpm', '0.0'),
+                        'status': data.get('status', 'Unknown'),
+                        
+                        # Legacy fields for backward compatibility
+                        'gyro': data.get('gyro', '0.0°'),
+                        'orientation': data.get('orientation', 'Y:0.0° R:0.0° P:0.0°')
+                    }
+                    
+                    # Update ADCS widget with detailed sensor data
+                    if hasattr(self.adcs_control_widget, 'update_sensor_data'):
+                        self.adcs_control_widget.update_sensor_data(adcs_detailed_data)
+                    
             except Exception as e:
                 logging.error(f"Failed to update ADCS data: {e}")
 
