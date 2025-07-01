@@ -110,9 +110,8 @@ class ADCSGraphWidget(QWidget):
         # Set fixed ranges - CHANGE THESE VALUES TO MODIFY PLOT RANGES
         self.plot_widget.setXRange(0, 10)  # Time: 0-10 seconds - MODIFY HERE
         self.plot_widget.setYRange(-180, 180)  # Angle: -180 to +180 degrees - MODIFY HERE
-        self.plot_widget.setMinimumHeight(120)  # Plot height: 120px minimum - MODIFY HERE
-        self.plot_widget.setMaximumHeight(150)  # Plot height: 150px maximum - MODIFY HERE
-        
+        self.plot_widget.setMinimumHeight(200)  # Plot height: 120px minimum - MODIFY HERE
+        self.plot_widget.setMinimumWidth(400)  # Plot width: 400px minimum - MODIFY HERE        
         # Disable auto-ranging to keep fixed ranges
         self.plot_widget.disableAutoRange()
         
@@ -338,38 +337,3 @@ class ADCSGraphWidget(QWidget):
         """Update the target angle value."""
         self.current_target = float(target_angle)
 
-
-# Example usage and testing
-if __name__ == '__main__':
-    import sys
-    from PyQt6.QtWidgets import QApplication, QMainWindow
-    import random
-    
-    app = QApplication(sys.argv)
-    
-    # Create main window
-    main_window = QMainWindow()
-    main_window.setWindowTitle("ADCS Graph Test")
-    main_window.setGeometry(100, 100, 1000, 600)
-    
-    # Create and set the graph widget
-    graph_widget = ADCSGraphWidget()
-    main_window.setCentralWidget(graph_widget)
-    
-    # Create a timer to simulate incoming data
-    test_timer = QTimer()
-    def add_test_data():
-        # Simulate some realistic ADCS data (angles only)
-        z_angle = 45 + 30 * np.sin(time.time() * 0.5) + random.uniform(-5, 5)  # -180 to 180 range
-        target = 45 + 20 * np.sin(time.time() * 0.2)
-        
-        graph_widget.add_data_point(
-            z_angle=z_angle,
-            target_angle=target
-        )
-    
-    test_timer.timeout.connect(add_test_data)
-    test_timer.start(200)  # Add test data every 200ms
-    
-    main_window.show()
-    sys.exit(app.exec())

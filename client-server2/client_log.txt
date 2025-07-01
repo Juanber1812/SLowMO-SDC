@@ -1334,3 +1334,110 @@
 2025-07-01 21:36:02,993 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
 2025-07-01 21:36:06,346 - INFO - [INFO] Closing application...
 2025-07-01 21:36:07,550 - INFO - Disconnected from server: client disconnect
+2025-07-01 21:42:21,276 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 21:42:21,814 - INFO - Connected to server
+2025-07-01 21:42:21,818 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 21:42:21,823 - INFO - [INFO] Successfully connected to server
+2025-07-01 21:42:22,130 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:42:22,348 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:42:22,664 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:42:22,972 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:42:23,450 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:42:23,779 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:42:24,011 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:42:24,586 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:42:25,076 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:42:25,783 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:42:26,402 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:42:26,658 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:42:27,025 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:42:27,172 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:42:32,167 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:42:32,265 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:42:32,745 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:42:32,868 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:42:33,359 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:42:33,445 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:42:33,878 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:42:33,991 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:42:47,403 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 21:42:50,100 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 21:42:51,444 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 21:43:08,030 - INFO - [INFO] Closing application...
+2025-07-01 21:43:09,234 - INFO - Disconnected from server: client disconnect
+2025-07-01 21:48:04,645 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 21:48:04,871 - INFO - Connected to server
+2025-07-01 21:48:04,873 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 21:48:04,876 - INFO - [INFO] Successfully connected to server
+2025-07-01 21:48:07,569 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 21:51:03,551 - INFO - Disconnected from server: transport error
+2025-07-01 21:51:24,561 - INFO - [INFO] Closing application...
+2025-07-01 21:51:24,565 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 21:52:41,829 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 21:52:43,935 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751403161.8331888 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000027C84722E40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 21:52:57,782 - INFO - [INFO] Closing application...
+2025-07-01 21:52:57,786 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 22:02:24,842 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 22:02:26,947 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751403744.8448896 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000023044242E40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-01 22:02:41,752 - INFO - Sending ADCS command: Mode='Manual', Command='manual_clockwise_start', Value=None
+2025-07-01 22:02:41,926 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:02:43,145 - INFO - Sending ADCS command: Mode='Manual', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:02:43,355 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:02:46,698 - INFO - Sending ADCS command: Mode='Manual', Command='manual_clockwise_start', Value=None
+2025-07-01 22:02:46,913 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:02:48,293 - INFO - Sending ADCS command: Mode='Manual', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:02:48,445 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:02:50,028 - INFO - Sending ADCS command: Mode='Manual', Command='zero_yaw', Value=None
+2025-07-01 22:03:04,766 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 22:03:04,963 - INFO - Connected to server
+2025-07-01 22:03:04,965 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 22:03:14,147 - INFO - Sending ADCS command: Mode='Manual', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:03:14,364 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:03:18,226 - INFO - Sending ADCS command: Mode='Manual', Command='manual_clockwise_start', Value=None
+2025-07-01 22:03:18,404 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:03:19,442 - INFO - Sending ADCS command: Mode='Manual', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:03:19,691 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:03:24,039 - WARNING - Ignoring manual command 'manual_counterclockwise_start' while in 'AprilTag' mode.
+2025-07-01 22:03:24,147 - WARNING - Ignoring manual command 'manual_stop' while in 'AprilTag' mode.
+2025-07-01 22:03:24,274 - WARNING - Ignoring manual command 'manual_counterclockwise_start' while in 'AprilTag' mode.
+2025-07-01 22:03:24,660 - WARNING - Ignoring manual command 'manual_stop' while in 'AprilTag' mode.
+2025-07-01 22:03:24,812 - WARNING - Ignoring manual command 'manual_counterclockwise_start' while in 'AprilTag' mode.
+2025-07-01 22:03:24,900 - WARNING - Ignoring manual command 'manual_stop' while in 'AprilTag' mode.
+2025-07-01 22:03:24,996 - WARNING - Ignoring manual command 'manual_counterclockwise_start' while in 'AprilTag' mode.
+2025-07-01 22:03:25,101 - WARNING - Ignoring manual command 'manual_stop' while in 'AprilTag' mode.
+2025-07-01 22:03:27,719 - INFO - Disconnected from server: transport error
+2025-07-01 22:04:22,531 - INFO - Sending ADCS command: Mode='Manual', Command='start', Value=None
+2025-07-01 22:04:23,767 - INFO - Sending ADCS command: Mode='Manual', Command='stop', Value=None
+2025-07-01 22:04:27,116 - INFO - Sending ADCS command: Mode='Manual', Command='start', Value=None
+2025-07-01 22:04:27,945 - INFO - Sending ADCS command: Mode='Manual', Command='set_value', Value=-33
+2025-07-01 22:04:28,660 - INFO - Sending ADCS command: Mode='Manual', Command='set_value', Value=-33
+2025-07-01 22:04:32,343 - INFO - Sending ADCS command: Mode='Manual', Command='set_pd_values', Value={'kp': 0.5, 'kd': 0.1, 'deadband': 1.0}
+2025-07-01 22:04:34,901 - INFO - [INFO] Closing application...
+2025-07-01 22:04:34,904 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 22:08:45,126 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 22:08:50,137 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751404125.1285357 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000025E7BA1AF90>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-01 22:09:31,479 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-01 22:09:31,644 - INFO - Connected to server
+2025-07-01 22:09:31,647 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 22:09:39,776 - INFO - Sending ADCS command: Mode='Calibration', Command='calibrate', Value=None
+2025-07-01 22:10:07,210 - INFO - Sending ADCS command: Mode='Manual', Command='manual_clockwise_start', Value=None
+2025-07-01 22:10:07,391 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:10:08,595 - INFO - Sending ADCS command: Mode='Manual', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:10:08,763 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:10:09,231 - INFO - Sending ADCS command: Mode='Manual', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:10:09,370 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:10:09,472 - INFO - Sending ADCS command: Mode='Manual', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:10:09,574 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:10:10,030 - INFO - Sending ADCS command: Mode='Manual', Command='manual_clockwise_start', Value=None
+2025-07-01 22:10:10,045 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:10:11,180 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-01 22:10:15,861 - INFO - Disconnected from server: transport error
+2025-07-01 22:12:05,352 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-01 22:12:06,031 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-01 22:12:06,521 - INFO - [ADCSSection] Auto mode set to: Raw
+2025-07-01 22:12:08,650 - INFO - Sending ADCS command: Mode='Manual', Command='manual_clockwise_start', Value=None
+2025-07-01 22:12:14,714 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:12:53,231 - INFO - Sending ADCS command: Mode='Manual', Command='manual_counterclockwise_start', Value=None
+2025-07-01 22:12:53,294 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None
+2025-07-01 22:12:54,857 - INFO - Sending ADCS command: Mode='Manual', Command='manual_clockwise_start', Value=None
+2025-07-01 22:12:55,051 - INFO - Sending ADCS command: Mode='Manual', Command='manual_stop', Value=None

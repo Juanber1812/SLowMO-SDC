@@ -618,12 +618,10 @@ class ADCSController:
                     return self.zero_yaw_position()
                 elif command == "manual_clockwise_start":
                     return self.start_manual_control("CW")
-                elif command == "manual_clockwise_stop":
+                elif command == "manual_stop":
                     return self.stop_manual_control()
                 elif command == "manual_anticlockwise_start":
                     return self.start_manual_control("CCW")
-                elif command == "manual_anticlockwise_stop":
-                    return self.stop_manual_control()
             
             # Handle automatic control modes
             elif mode in ["Raw", "Env", "AprilTag"]:
