@@ -30,7 +30,7 @@ except ImportError as e:
 
 # Import ADCS controller
 try:
-    from ADCS_final import ADCSController
+    from adcs.adcs_controller import ADCSController
     ADCS_AVAILABLE = True
 except ImportError as e:
     logging.warning(f"ADCS controller not available: {e}")
