@@ -600,11 +600,13 @@ class ADCSController:
         try:
             print(f"🎛️ ADCS Command: Mode='{mode}', Command='{command}', Value='{value}'")
             
-            if mode == "Calibration":
-                if command == "start_calibration":
+            # Handle calibration commands
+            if mode == "Calibration" or (mode == "Manual" and command == "calibrate"):
+                if command == "start_calibration" or command == "calibrate":
                     return self.calibrate_sensors()
                     
-            elif mode == "Manual Orientation":
+            # Handle manual control commands
+            elif mode == "Manual Orientation" or mode == "Manual":
                 if command == "zero_yaw":
                     return self.zero_yaw_position()
                 elif command == "manual_clockwise_start":
@@ -616,6 +618,7 @@ class ADCSController:
                 elif command == "manual_anticlockwise_stop":
                     return self.stop_manual_control()
             
+            # Handle automatic control modes
             elif mode in ["Raw", "Env", "AprilTag"]:
                 if command == "set_zero":
                     return self.zero_yaw_position()
@@ -625,29 +628,9 @@ class ADCSController:
                     return self.start_auto_control(mode)
                 elif command == "stop":
                     return self.stop_auto_control()
-            
-            # PD Controller specific commands
-            elif mode == "PD_Control":
-                if command == "start_controller":
-                    return self.start_pd_controller()
-                elif command == "stop_controller":
-                    return self.stop_pd_controller()
-                elif command == "set_target":
-                    return self.set_target_yaw(value)
-                elif command == "start_logging":
-                    return self.start_pd_logging()
-                elif command == "stop_logging":
-                    return self.stop_pd_logging()
-                elif command == "start_yaw_logging":
-                    return self.start_yaw_logging()
-                elif command == "stop_yaw_logging":
-                    return self.stop_yaw_logging()
-                elif command == "set_gains":
-                    # Expects value as dict with kp, kd, deadband, min_pulse_time
+                elif command == "set_pd_values":
                     return self.set_controller_gains(value)
-            
-            return {"status": "error", "message": f"Unknown command: {mode}.{command}"}
-            
+        
         except Exception as e:
             error_msg = f"ADCS command error: {e}"
             print(f"❌ {error_msg}")
@@ -707,6 +690,92 @@ class ADCSController:
         status = f"{mpu_info} | {gyro_info} | {temp_info} | {ctrl_info} | {lux_info} | Status: {data['status']}"
         print(f"\r{status}", end="", flush=True)
     
+    def start_manual_control(self, direction):
+        """Start manual motor control"""
+        try:
+            if not self.motor_available:
+                return {"status": "error", "message": "Motor control not available"}
+            
+            # Stop PD controller first
+            self.pd_controller.stop_controller()
+            
+            if direction == "CW":
+                rotate_clockwise()
+                print("🔄 Manual clockwise started")
+                return {"status": "success", "message": "Manual CW started"}
+            elif direction == "CCW":
+                rotate_counterclockwise()
+                print("🔄 Manual counterclockwise started")
+                return {"status": "success", "message": "Manual CCW started"}
+            else:
+                return {"status": "error", "message": "Invalid direction"}
+                
+        except Exception as e:
+            return {"status": "error", "message": f"Manual control error: {e}"}
+
+    def stop_manual_control(self):
+        """Stop manual motor control"""
+        try:
+            stop_motor()
+            print("⏹️ Manual control stopped")
+            return {"status": "success", "message": "Manual control stopped"}
+        except Exception as e:
+            return {"status": "error", "message": f"Stop manual control error: {e}"}
+
+    def set_target_yaw(self, target_angle):
+        """Set target yaw angle for PD controller"""
+        try:
+            if target_angle is None:
+                return {"status": "error", "message": "Target angle not provided"}
+            
+            target = float(target_angle)
+            self.pd_controller.set_target(target)
+            return {"status": "success", "message": f"Target yaw set to {target:.1f}°"}
+        except Exception as e:
+            return {"status": "error", "message": f"Set target error: {e}"}
+
+    def start_auto_control(self, mode):
+        """Start automatic control mode"""
+        try:
+            if not self.motor_available:
+                return {"status": "error", "message": "Motor control not available"}
+            
+            if not self.mpu_sensor.sensor_ready:
+                return {"status": "error", "message": "MPU6050 sensor not ready"}
+            
+            self.pd_controller.start_controller()
+            print(f"▶️ {mode} mode started with PD controller")
+            return {"status": "success", "message": f"{mode} mode started"}
+        except Exception as e:
+            return {"status": "error", "message": f"Auto control start error: {e}"}
+
+    def stop_auto_control(self):
+        """Stop automatic control mode"""
+        try:
+            self.pd_controller.stop_controller()
+            print("⏹️ Auto control stopped")
+            return {"status": "success", "message": "Auto control stopped"}
+        except Exception as e:
+            return {"status": "error", "message": f"Auto control stop error: {e}"}
+
+    def set_controller_gains(self, gains):
+        """Set PD controller gains"""
+        try:
+            if isinstance(gains, dict):
+                if 'kp' in gains:
+                    self.pd_controller.kp = float(gains['kp'])
+                if 'kd' in gains:
+                    self.pd_controller.kd = float(gains['kd'])
+                if 'deadband' in gains:
+                    self.pd_controller.deadband = float(gains['deadband'])
+                
+                print(f"Controller gains updated: Kp={self.pd_controller.kp}, Kd={self.pd_controller.kd}, Deadband={self.pd_controller.deadband}")
+                return {"status": "success", "message": "Controller gains updated"}
+            else:
+                return {"status": "error", "message": "Gains must be a dictionary"}
+        except Exception as e:
+            return {"status": "error", "message": f"Set gains error: {e}"}
+
     def shutdown(self):
         """Shutdown the ADCS controller"""
         print("\n🛰️ ADCS Controller shutdown...")

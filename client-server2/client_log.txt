@@ -1273,3 +1273,21 @@
 2025-07-01 20:16:48,000 - INFO - Disconnected from server: transport error
 2025-07-01 21:01:05,845 - INFO - [INFO] Closing application...
 2025-07-01 21:01:05,851 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-01 21:17:29,471 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 21:17:29,651 - INFO - Connected to server
+2025-07-01 21:17:29,654 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 21:17:29,657 - INFO - [INFO] Successfully connected to server
+2025-07-01 21:17:33,571 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 21:17:39,960 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 21:17:49,275 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 21:17:49,282 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 21:17:52,841 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 21:17:52,903 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 21:17:56,217 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 21:17:59,092 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 21:18:01,414 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 21:18:03,784 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_zero', Value: None
+2025-07-01 21:18:07,308 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_pd_values', Value: {'kp': 0.0, 'kd': 0.0, 'min_pulse_time': 0.0, 'deadband': 0.0}
+2025-07-01 21:18:13,777 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 0.0
+2025-07-01 21:21:03,128 - INFO - [INFO] Closing application...
+2025-07-01 21:21:04,333 - INFO - Disconnected from server: client disconnect
