@@ -666,8 +666,8 @@ class MainWindow(QWidget):
     def setup_subsystem_controls_row(self, parent_layout):
         """Setup ADCS controls using ADCSSection widget"""
         row3 = QHBoxLayout()
-        row3.setSpacing(4) 
-        row3.setContentsMargins(4, 4, 4, 4) # Standard margins
+        row3.setSpacing(1) 
+        row3.setContentsMargins(1,0, 1, 1) # Standard margins
         row3.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
         # ADCS section using the new ADCSSection widget - takes half width and full height

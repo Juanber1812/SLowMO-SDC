@@ -495,6 +495,13 @@ class PDControllerPWM:
             
             # Limit motor power to maximum
             motor_power = max(-self.max_power, min(self.max_power, motor_power))
+            
+            # Apply minimum power threshold (20% minimum when active)
+            if motor_power != 0:  # Only apply minimum when motor should be active
+                if motor_power > 0:
+                    motor_power = max(20, motor_power)  # Minimum 20% CW
+                else:
+                    motor_power = min(-20, motor_power)  # Minimum 20% CCW
         
         # Apply motor power
         if self.controller_enabled:
