@@ -1003,8 +1003,6 @@ def main():
         print("  '5' = target -45°")
         print("  '6' = target -90°")
         print("  '0' = target 0°")
-        print("  'l' = start logging")
-        print("  'x' = stop logging")
         print("  'q' = quit")
         print("-" * 50)
         
