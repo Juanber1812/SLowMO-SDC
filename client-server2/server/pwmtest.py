@@ -31,7 +31,7 @@ except (ImportError, RuntimeError):
 IN1_PIN = 13    # Clockwise control pin
 IN2_PIN = 19    # Counter-clockwise control pin
 SLEEP_PIN = 26  # Motor driver enable/sleep pin
-PWM_FREQUENCY = 1000 # Hz (1kHz for smoother motor control)
+PWM_FREQUENCY = 100 # Hz (1kHz for smoother motor control)
 
 # Global PWM object variables
 motor_cw_pwm = None
