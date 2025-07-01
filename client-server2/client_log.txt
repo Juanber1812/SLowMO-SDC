@@ -1102,3 +1102,45 @@
 2025-07-01 17:27:01,211 - INFO - [INFO] Successfully connected to server
 2025-07-01 17:27:23,081 - INFO - [INFO] Closing application...
 2025-07-01 17:27:24,287 - INFO - Disconnected from server: client disconnect
+2025-07-01 17:56:33,792 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 17:56:34,014 - INFO - Connected to server
+2025-07-01 17:56:34,015 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-01 17:56:34,018 - INFO - [INFO] Successfully connected to server
+2025-07-01 17:56:51,397 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 17:56:51,486 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 17:56:52,426 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 17:56:52,894 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 17:56:53,148 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 17:56:53,301 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 17:56:54,287 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 17:56:54,508 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 17:56:54,765 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 17:56:54,921 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 17:56:55,759 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 17:56:56,361 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 17:56:58,172 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 17:56:59,615 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_zero', Value: None
+2025-07-01 17:57:00,127 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_zero', Value: None
+2025-07-01 17:57:00,963 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 17:57:01,183 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 17:57:04,040 - INFO - [INFO] Closing application...
+2025-07-01 17:57:05,246 - INFO - Disconnected from server: client disconnect
+2025-07-01 18:33:16,261 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-01 18:33:20,204 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 18:33:20,330 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 18:33:21,276 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751391196.2639952 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000002513621EE40>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-01 18:33:24,532 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_start', Value: None
+2025-07-01 18:33:25,563 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_clockwise_stop', Value: None
+2025-07-01 18:33:26,694 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_start', Value: None
+2025-07-01 18:33:27,165 - INFO - [ADCSSection] Action for mode 'Manual': Command 'manual_anticlockwise_stop', Value: None
+2025-07-01 18:33:28,220 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: True
+2025-07-01 18:33:29,569 - INFO - [ADCSSection] Action for mode 'Manual': Command 'enable_motor', Value: False
+2025-07-01 18:33:38,837 - INFO - [ADCSSection] Action for mode 'Manual': Command 'calibrate', Value: None
+2025-07-01 18:33:40,712 - INFO - [ADCSSection] Switched to Raw control page
+2025-07-01 18:33:43,272 - INFO - [ADCSSection] Action for mode 'Raw': Command 'start', Value: None
+2025-07-01 18:33:45,845 - INFO - [ADCSSection] Action for mode 'Raw': Command 'stop', Value: None
+2025-07-01 18:33:50,229 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_zero', Value: None
+2025-07-01 18:33:54,413 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_zero', Value: None
+2025-07-01 18:33:59,363 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_pd_values', Value: {'kp': 2.0, 'kd': 2.0}
+2025-07-01 18:34:03,643 - INFO - [ADCSSection] Action for mode 'Raw': Command 'set_value', Value: 10.0
+2025-07-01 18:34:06,343 - INFO - [ADCSSection] Switched to auto selection page
