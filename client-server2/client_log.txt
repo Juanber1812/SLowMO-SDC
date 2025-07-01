@@ -1271,3 +1271,5 @@
 2025-07-01 20:16:39,211 - INFO - [ADCSSection] Switched to auto selection page
 2025-07-01 20:16:40,162 - INFO - [ADCSSection] Switched to Raw control page
 2025-07-01 20:16:48,000 - INFO - Disconnected from server: transport error
+2025-07-01 21:01:05,845 - INFO - [INFO] Closing application...
+2025-07-01 21:01:05,851 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.

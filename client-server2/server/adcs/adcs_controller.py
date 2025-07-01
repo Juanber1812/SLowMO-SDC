@@ -151,49 +151,72 @@ class ADCSController:
 
 if __name__ == "__main__":
     import sys
+    import tty
+    import termios
 
     adcs = ADCSController()
 
-    print("\n🛰️ ADCS Standalone Test Mode")
-    print("Commands:")
-    print("  set <angle>     → Set target yaw (e.g. set 45)")
-    print("  start           → Start controller")
-    print("  stop            → Stop controller")
-    print("  zero            → Zero yaw")
-    print("  gains <kp> <kd> → Set PD gains")
-    print("  deadband <val>  → Set deadband")
-    print("  quit            → Exit")
+    def getch():
+        """Read a single character from stdin (Linux only)"""
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+    print("\n🛰️ ADCS Standalone Test Mode (Key Command Interface)")
+    print("Press:")
+    print("  s → Start motor control loop")
+    print("  x → Stop motor")
+    print("  z → Zero yaw")
+    print("  y → Set target yaw")
+    print("  g → Set PD gains")
+    print("  d → Set deadband")
+    print("  r → Read sensor snapshot")
+    print("  q → Quit")
 
     try:
         while True:
-            try:
-                command = input("\n> ").strip().lower()
-                if command.startswith("set"):
-                    angle = float(command.split()[1])
+            print("\n[Key Input] > ", end="", flush=True)
+            key = getch().lower()
+
+            if key == 'q':
+                break
+            elif key == 's':
+                pass  # Threads already running
+            elif key == 'x':
+                adcs.stop()
+            elif key == 'z':
+                adcs.zero_yaw()
+            elif key == 'y':
+                try:
+                    angle = float(input("Target yaw (deg): "))
                     adcs.set_target_yaw(angle)
-                elif command == "start":
-                    print("Starting control loop...")
-                elif command == "stop":
-                    adcs.stop()
-                    print("Controller stopped")
-                elif command == "zero":
-                    adcs.zero_yaw()
-                elif command.startswith("gains"):
-                    parts = command.split()
-                    kp = float(parts[1])
-                    kd = float(parts[2])
+                except:
+                    pass
+            elif key == 'g':
+                try:
+                    kp = float(input("Kp: "))
+                    kd = float(input("Kd: "))
                     adcs.set_pd_gains(kp, kd)
-                elif command.startswith("deadband"):
-                    db = float(command.split()[1])
+                except:
+                    pass
+            elif key == 'd':
+                try:
+                    db = float(input("Deadband (deg): "))
                     adcs.set_deadband(db)
-                elif command == "quit":
-                    break
-                else:
-                    print("Unknown command.")
-            except Exception as e:
-                print(f"Error: {e}")
+                except:
+                    pass
+            elif key == 'r':
+                data = adcs.get_latest_data()
+                print(f"Yaw: {data['yaw']:.2f}°, Gyro Z: {data['gyro_z']:.2f}, Temp: {data['temperature']:.1f}°C")
+            else:
+                print("Unknown key")
+
     except KeyboardInterrupt:
-        print("\nInterrupted.")
+        pass
 
     adcs.shutdown()
-    print("Exiting.")
