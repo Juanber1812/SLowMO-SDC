@@ -296,7 +296,7 @@ class ADCSSection(QGroupBox):
         super().__init__("ADCS Control", parent)
         self.setObjectName("ADCSSection")
         self.setFixedSize(700, 220)
-        self.current_auto_mode = "Raw" # Default auto mode
+        self.current_auto_mode = "adcs" # Default auto mode
         self._setup_ui()
         self._connect_signals()
 
@@ -417,15 +417,15 @@ class ADCSSection(QGroupBox):
 
     def _connect_signals(self):
         # Mode selection
-        self.raw_btn.clicked.connect(lambda: self._update_current_auto_mode("Raw"))
-        self.env_btn.clicked.connect(lambda: self._update_current_auto_mode("Environmental"))
-        self.apriltag_btn.clicked.connect(lambda: self._update_current_auto_mode("AprilTag"))
+        self.raw_btn.clicked.connect(lambda: self._update_current_auto_mode("adcs"))
+        self.env_btn.clicked.connect(lambda: self._update_current_auto_mode("adcs","Environmental"))
+        self.apriltag_btn.clicked.connect(lambda: self._update_current_auto_mode("adcs","AprilTag"))
 
         # Manual controls
-        self.manual_cw_btn.pressed.connect(lambda: self._handle_action_clicked("Manual", "manual_clockwise_start"))
-        self.manual_cw_btn.released.connect(lambda: self._handle_action_clicked("Manual", "manual_stop"))
-        self.manual_ccw_btn.pressed.connect(lambda: self._handle_action_clicked("Manual", "manual_counterclockwise_start"))
-        self.manual_ccw_btn.released.connect(lambda: self._handle_action_clicked("Manual", "manual_stop"))
+        self.manual_cw_btn.pressed.connect(lambda: self._handle_action_clicked("adcs", "manual_clockwise_start"))
+        self.manual_cw_btn.released.connect(lambda: self._handle_action_clicked("adcs", "manual_stop"))
+        self.manual_ccw_btn.pressed.connect(lambda: self._handle_action_clicked("adcs", "manual_counterclockwise_start"))
+        self.manual_ccw_btn.released.connect(lambda: self._handle_action_clicked("adcs", "manual_stop"))
         self.calibrate_btn.clicked.connect(lambda: self._handle_action_clicked("Calibration", "calibrate"))
 
         # Auto controls

@@ -613,7 +613,7 @@ class ADCSController:
                     return self.calibrate_sensors()
                     
             # Handle manual control commands
-            elif mode == "Manual Orientation" or mode == "Manual":
+            elif mode == "adcs":
                 if command == "zero_yaw":
                     return self.zero_yaw_position()
                 elif command == "manual_clockwise_start":
@@ -622,9 +622,6 @@ class ADCSController:
                     return self.stop_manual_control()
                 elif command == "manual_anticlockwise_start":
                     return self.start_manual_control("CCW")
-            
-            # Handle automatic control modes
-            elif mode in ["Raw", "Env", "AprilTag"]:
                 if command == "set_zero":
                     return self.zero_yaw_position()
                 elif command == "set_value":
