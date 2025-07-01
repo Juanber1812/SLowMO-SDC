@@ -620,7 +620,7 @@ class ADCSController:
                     return self.start_manual_control("CW")
                 elif command == "manual_stop":
                     return self.stop_manual_control()
-                elif command == "manual_anticlockwise_start":
+                elif command == "manual_counterclockwise_start":
                     return self.start_manual_control("CCW")
                 if command == "set_zero":
                     return self.zero_yaw_position()
