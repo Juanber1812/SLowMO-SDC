@@ -313,7 +313,11 @@ class ADCSController:
         
         # Current sensor data (shared between threads)
         self.current_data = {
-            'mpu': {'yaw': 0.0, 'roll': 0.0, 'pitch': 0.0, 'temp': 0.0, 'gyro_rate': 0.0},
+            'mpu': {
+                'yaw': 0.0, 'roll': 0.0, 'pitch': 0.0, 'temp': 0.0,
+                'gyro_rate_x': 0.0, 'gyro_rate_y': 0.0, 'gyro_rate_z': 0.0,
+                'angle_x': 0.0, 'angle_y': 0.0, 'angle_z': 0.0
+            },
             'lux': {ch: 0.0 for ch in LUX_CHANNELS},
             'status': 'Initializing'
         }
@@ -359,7 +363,11 @@ class ADCSController:
     def read_all_sensors(self):
         """Read all sensors and return formatted data"""
         data = {
-            'mpu': {'yaw': 0.0, 'roll': 0.0, 'pitch': 0.0, 'temp': 0.0, 'gyro_rate': 0.0},
+            'mpu': {
+                'yaw': 0.0, 'roll': 0.0, 'pitch': 0.0, 'temp': 0.0,
+                'gyro_rate_x': 0.0, 'gyro_rate_y': 0.0, 'gyro_rate_z': 0.0,
+                'angle_x': 0.0, 'angle_y': 0.0, 'angle_z': 0.0
+            },
             'lux': {ch: 0.0 for ch in LUX_CHANNELS},
             'status': 'Active'
         }
@@ -372,11 +380,22 @@ class ADCSController:
                 accel = self.mpu_sensor.read_accelerometer()
                 temp = self.mpu_sensor.read_temperature()
                 
-                data['mpu']['yaw'] = yaw_angle
-                data['mpu']['roll'] = math.degrees(math.atan2(accel[0], accel[2])) if accel else 0.0
-                data['mpu']['pitch'] = gyro[0] if gyro else 0.0  # Pitch rate
+                # Position angles (integrated from gyro)
+                data['mpu']['yaw'] = yaw_angle  # Primary control angle (Z-axis)
+                data['mpu']['roll'] = self.mpu_sensor.angle_roll  # Y-axis rotation
+                data['mpu']['pitch'] = self.mpu_sensor.angle_pitch  # X-axis rotation
                 data['mpu']['temp'] = temp
-                data['mpu']['gyro_rate'] = gyro[2] if gyro else 0.0  # Yaw rate
+                
+                # All gyro rates (deg/s)
+                if gyro:
+                    data['mpu']['gyro_rate_x'] = gyro[0]  # Pitch rate
+                    data['mpu']['gyro_rate_y'] = gyro[1]  # Roll rate  
+                    data['mpu']['gyro_rate_z'] = gyro[2]  # Yaw rate
+                
+                # All angle positions (degrees)
+                data['mpu']['angle_x'] = self.mpu_sensor.angle_pitch  # Pitch angle
+                data['mpu']['angle_y'] = self.mpu_sensor.angle_roll   # Roll angle
+                data['mpu']['angle_z'] = self.mpu_sensor.angle_yaw    # Yaw angle
                 
             except Exception as e:
                 print(f"MPU read error: {e}")
@@ -404,13 +423,27 @@ class ADCSController:
         data, _ = self.get_current_data()
         
         return {
+            # Primary display values (legacy format)
             'gyro': f"{data['mpu']['yaw']:.1f}°",
-            'orientation': f"Y:{data['mpu']['yaw']:.1f}° R:{data['mpu']['roll']:.1f}° P:{data['mpu']['pitch']:.1f}°/s",
+            'orientation': f"Y:{data['mpu']['yaw']:.1f}° R:{data['mpu']['roll']:.1f}° P:{data['mpu']['pitch']:.1f}°",
             'lux1': f"{data['lux'][1]:.1f}" if 1 in data['lux'] else "0.0",
             'lux2': f"{data['lux'][2]:.1f}" if 2 in data['lux'] else "0.0", 
             'lux3': f"{data['lux'][3]:.1f}" if 3 in data['lux'] else "0.0",
             'rpm': "0.0",  # TODO: Add tachometer in next step
-            'status': data.get('status', 'Unknown')
+            'status': data.get('status', 'Unknown'),
+            
+            # Complete gyro rates (deg/s) for all axes
+            'gyro_rate_x': f"{data['mpu']['gyro_rate_x']:.2f}",  # Pitch rate
+            'gyro_rate_y': f"{data['mpu']['gyro_rate_y']:.2f}",  # Roll rate
+            'gyro_rate_z': f"{data['mpu']['gyro_rate_z']:.2f}",  # Yaw rate
+            
+            # Complete angle positions (degrees) for all axes  
+            'angle_x': f"{data['mpu']['angle_x']:.1f}",  # Pitch angle
+            'angle_y': f"{data['mpu']['angle_y']:.1f}",  # Roll angle
+            'angle_z': f"{data['mpu']['angle_z']:.1f}",  # Yaw angle
+            
+            # Temperature
+            'temperature': f"{data['mpu']['temp']:.1f}°C"
         }
     
     def handle_adcs_command(self, mode, command, value=None):
@@ -494,8 +527,10 @@ class ADCSController:
         """Display current sensor readings (for debugging)"""
         data, reading_time = self.get_current_data()
         
-        # MPU data
-        mpu_info = f"YAW:{data['mpu']['yaw']:+6.1f}° ROLL:{data['mpu']['roll']:+6.1f}° RATE:{data['mpu']['gyro_rate']:+6.1f}°/s T:{data['mpu']['temp']:4.1f}°C"
+        # MPU data with all axes
+        mpu_info = f"YAW:{data['mpu']['angle_z']:+6.1f}° ROLL:{data['mpu']['angle_y']:+6.1f}° PITCH:{data['mpu']['angle_x']:+6.1f}°"
+        gyro_info = f"GyroX:{data['mpu']['gyro_rate_x']:+6.1f}°/s GyroY:{data['mpu']['gyro_rate_y']:+6.1f}°/s GyroZ:{data['mpu']['gyro_rate_z']:+6.1f}°/s"
+        temp_info = f"T:{data['mpu']['temp']:4.1f}°C"
         
         # Lux data
         lux_parts = []
@@ -503,7 +538,7 @@ class ADCSController:
             lux_parts.append(f"L{ch}:{data['lux'][ch]:6.1f}")
         lux_info = " ".join(lux_parts)
         
-        status = f"{mpu_info} | {lux_info} | Status: {data['status']}"
+        status = f"{mpu_info} | {gyro_info} | {temp_info} | {lux_info} | Status: {data['status']}"
         print(f"\r{status}", end="", flush=True)
     
     def shutdown(self):
