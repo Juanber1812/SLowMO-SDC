@@ -1329,50 +1329,7 @@ class MainWindow(QWidget):
                         )
             except Exception as e:
                 logging.error(f"Failed to update power data: {e}")
-
-        @sio.on("thermal_broadcast")
-        def on_thermal_data(data):
-            """Handle thermal subsystem data updates"""
-            try:
-                if hasattr(self, 'thermal_labels'):
-                    # Server now sends only battery_temp and computed status
-                    # Other temperatures come from their respective broadcasts
-                    
-                    # Update battery temperature if available
-                    if "battery_temp" in data and data["battery_temp"] is not None:
-                        self.thermal_labels["battery_temp"].setText(f"Battery: {data['battery_temp']:.1f}°C")
-                    elif "battery_temp" in data and data["battery_temp"] is None:
-                        self.thermal_labels["battery_temp"].setText("Battery: N/A")
-                    
-                    # Update overall thermal status (computed on server using all available temperatures)
-                    if "status" in data:
-                        status = data["status"]
-                        
-                        # Apply color coding based on status
-                        if status == "Critical":
-                            status_color = "#ff4444"  # Red
-                        elif status == "Warning":
-                            status_color = "#ffaa00"  # Orange
-                        elif status == "Elevated":
-                            status_color = "#ffcc00"  # Yellow
-                        elif status == "Warm":
-                            status_color = "#88ff88"  # Light green
-                        elif status == "Normal":
-                            status_color = "#00ff00"  # Green
-                        elif status == "NoData":
-                            status_color = "#666666"  # Gray
-                        else:  # Error or unknown
-                            status_color = "#ff4444"  # Red
-                        
-                        self.thermal_labels["status"].setText(f"Status: {status}")
-                        self.thermal_labels["status"].setStyleSheet(
-                            f"QLabel {{ color: {status_color}; margin: 2px 0px; padding: 2px 0px; "
-                            f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
-                        )
-                        
-            except Exception as e:
-                logging.error(f"Failed to update thermal data: {e}")
-
+                
         @sio.on("communication_broadcast")
         def on_communication_data(data):
             """Handle communication subsystem data updates"""
