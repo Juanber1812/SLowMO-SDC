@@ -5718,3 +5718,85 @@
 2025-07-02 22:04:26,952 - INFO - Sending ADCS command: Mode='adcs', Command='set_pd_values', Value={'kp': 1600.0, 'kd': 80.0, 'deadband': 0.1, 'min_pulse': 0.1}
 2025-07-02 22:04:59,459 - ERROR - packet queue is empty, aborting
 2025-07-02 22:05:00,399 - INFO - Disconnected from server: transport error
+2025-07-02 22:07:35,908 - INFO - Connected to server
+2025-07-02 22:07:35,912 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 22:07:35,915 - INFO - Stream paused for config application.
+2025-07-02 22:07:48,323 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=-1.148
+2025-07-02 22:08:00,140 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
+2025-07-02 22:08:02,627 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 22:08:02,630 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 22:08:30,828 - INFO - Disconnected from server: transport error
+2025-07-02 22:08:35,623 - INFO - Connected to server
+2025-07-02 22:08:35,626 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 22:08:35,629 - INFO - Stream paused for config application.
+2025-07-02 22:09:51,291 - ERROR - packet queue is empty, aborting
+2025-07-02 22:10:07,216 - INFO - Disconnected from server: transport error
+2025-07-02 22:29:20,136 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:29:25,147 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751491760.1389089 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001D4A1472A50>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 22:29:38,452 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 22:29:38,457 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 22:29:42,239 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 22:29:45,394 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 22:29:45,396 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 22:29:45,856 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 22:29:45,867 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 22:29:45,874 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 22:29:46,854 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 22:29:47,855 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 22:29:47,867 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 22:29:47,888 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 22:29:47,891 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 22:29:49,053 - INFO - [INFO] Closing application...
+2025-07-02 22:29:49,057 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:32:08,395 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:32:13,407 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751491928.3981898 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000224F4C4AA50>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 22:32:25,219 - WARNING - Cannot start LIDAR - not connected to server
+2025-07-02 22:32:26,080 - WARNING - Cannot stop LIDAR - not connected to server
+2025-07-02 22:32:26,088 - INFO - Back button clicked in LidarWidget
+2025-07-02 22:32:33,236 - INFO - [INFO] Closing application...
+2025-07-02 22:32:33,239 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:35:09,023 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:35:14,032 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751492109.027353 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001DCFFF0E900>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 22:36:04,426 - INFO - [INFO] Closing application...
+2025-07-02 22:36:04,432 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:36:11,656 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:36:16,664 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751492171.659998 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001DD93A6A900>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 22:36:55,975 - INFO - [INFO] Closing application...
+2025-07-02 22:36:55,979 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:37:02,920 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:37:07,931 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751492222.9255722 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000122FFF8A900>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 22:37:10,444 - INFO - [INFO] Closing application...
+2025-07-02 22:37:10,447 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:37:15,816 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:37:20,830 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751492235.8199003 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000206FFD6A900>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 22:37:38,811 - INFO - [INFO] Closing application...
+2025-07-02 22:37:38,819 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:37:45,974 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:37:46,880 - INFO - [INFO] Closing application...
+2025-07-02 22:37:46,883 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:38:12,660 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:38:17,672 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751492292.6651511 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001D36877A900>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 22:38:22,126 - INFO - [INFO] Closing application...
+2025-07-02 22:38:22,129 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:38:27,760 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:38:30,963 - INFO - [INFO] Closing application...
+2025-07-02 22:38:30,967 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:38:37,910 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:38:42,488 - INFO - [INFO] Closing application...
+2025-07-02 22:38:42,492 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:38:49,508 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:38:53,136 - INFO - [INFO] Closing application...
+2025-07-02 22:38:53,140 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:38:58,998 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:39:03,188 - INFO - [INFO] Closing application...
+2025-07-02 22:39:03,192 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 22:44:44,562 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 22:44:49,582 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751492684.5638957 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x00000255A6632900>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 22:47:20,347 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-02 22:47:20,826 - INFO - Connected to server
+2025-07-02 22:47:20,830 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 22:47:37,537 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=0.0
+2025-07-02 22:47:47,171 - INFO - Disconnected from server: transport error
+2025-07-02 22:47:53,172 - INFO - Connected to server
+2025-07-02 22:47:53,175 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 22:48:13,434 - INFO - Disconnected from server: transport error

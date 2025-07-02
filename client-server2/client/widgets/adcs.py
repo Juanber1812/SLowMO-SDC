@@ -294,6 +294,7 @@ class ADCSSection(QGroupBox):
         if mode_name == "adcs":
             self.set_zero_btn.setDisabled(False)
             self.set_value_btn.setDisabled(False)
+            self.run_controller_btn.setDisabled(True)
 
     def _handle_run_controller_clicked(self):
         if self.run_controller_btn.isChecked():
@@ -344,6 +345,7 @@ class ADCSSection(QGroupBox):
         # Disable only set_zero_btn, enable set_value_btn
         self.set_zero_btn.setDisabled(True)
         self.set_value_btn.setDisabled(False)
+        self.run_controller_btn.setDisabled(True)
 
     def _handle_apriltag_mode_selected(self):
         self._update_current_auto_mode("adcs")  # Keep mode as adcs
@@ -351,6 +353,8 @@ class ADCSSection(QGroupBox):
         # Disable both set_zero_btn and set_value_btn
         self.set_zero_btn.setDisabled(True)
         self.set_value_btn.setDisabled(True)
+        self.run_controller_btn.setDisabled(False)
+
 
     def _handle_manual_cal_clicked(self):
         try:
