@@ -278,8 +278,8 @@ class PowerMonitor:
         if temperature_c and temperature_c > 60.0:
             return "Overheating"
         
-        # Check for very high current draw (more than 2A = 2000mA) - critical
-        if current_ma > 2000:
+        # Check for very high current draw (more than 2.5A = 2500mA) - critical
+        if current_ma > 2500:
             return "Current Critical"
         
         # Check for critically low battery (less than 15%)
@@ -290,8 +290,8 @@ class PowerMonitor:
         if temperature_c and temperature_c > 50.0:
             return "High Temperature"
         
-        # Check for high current draw (more than 1A = 1000mA)
-        if current_ma > 1000:
+        # Check for high current draw (more than 2A = 2000mA)
+        if current_ma > 2000:
             return "High Current"
         
         # Check for low battery (less than 25%)
