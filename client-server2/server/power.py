@@ -274,16 +274,24 @@ class PowerMonitor:
         if voltage_v < 3.0:
             return "Error"
         
+        # Check for very high current draw (more than 5A = 5000mA) - critical error
+        if current_ma > 5000:
+            return "Current Error"
+        
         # Check for overheating (more than 60°C) - highest priority after Error
         if temperature_c and temperature_c > 60.0:
             return "Overheating"
+        
+        # Check for voltage close to under-voltage lockout (UVLO) - typically around 5.3V
+        if voltage_v < 5.5:
+            return "V close to UVLO"  # Voltage close to under-voltage lockout
         
         # Check for very high current draw (more than 2.5A = 2500mA) - critical
         if current_ma > 2500:
             return "Current Critical"
         
         # Check for critically low battery (less than 15%)
-        if battery_pct < 15:
+        if battery_pct < 10:
             return "Battery Critical"
         
         # Check for high temperature (more than 50°C) but not critical
