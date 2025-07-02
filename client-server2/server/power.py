@@ -81,8 +81,8 @@ class PowerMonitor:
         Estimate battery percentage for 2S Li-ion pack using compensated voltage.
         """
         # 2S Li-ion typical discharge curve (approximate, adjust as needed)
-        self.voltages = np.array([8.4, 8.2, 8.0, 7.8, 7.6, 7.4, 7.2, 7.0, 6.8, 6.6, 6.4, 6.2, 6.0])
-        self.percentages = np.array([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5, 2, 0])
+        self.voltages = np.array([6.0, 6.2, 6.4, 6.6, 6.8, 7.0, 7.2, 7.4, 7.6, 7.8, 8.0, 8.2, 8.4])
+        self.percentages = np.array([0, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
         self.internal_resistance = 0.10  # Ohms, typical for a pack (adjust if needed)
 
         estimated_voltage = voltage + (current * self.internal_resistance)
