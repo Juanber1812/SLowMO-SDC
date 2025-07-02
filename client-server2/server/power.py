@@ -78,23 +78,15 @@ class PowerMonitor:
     
     def get_battery_percentage(self, voltage, current):
         """
-        Estimate battery percentage for 2S Li-ion pack using compensated voltage.
+        Simple linear battery percentage for 2S Li-ion: 8.4V (100%) to 6.0V (0%)
         """
-        # 2S Li-ion typical discharge curve (approximate, adjust as needed)
-        self.voltages = np.array([8.4, 8.2, 8.0, 7.8, 7.6, 7.4, 7.2, 7.0, 6.8, 6.6, 6.4, 6.2, 6.0])
-        self.percentages = np.array([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5, 2, 0])
-        self.internal_resistance = 0.10  # Ohms, typical for a pack (adjust if needed)
-
-        estimated_voltage = voltage + (current * self.internal_resistance)
-        estimated_voltage = max(min(estimated_voltage, self.voltages[0]), self.voltages[-1])
-        soc = np.interp(estimated_voltage, self.voltages, self.percentages)
-        return int(round(soc))
+        pct = (voltage - 6.0) / 2.4 * 100
+        pct = max(0, min(100, pct))  # Clamp between 0 and 100
+        return int(round(pct))
 
     def get_power_values(self):
-        print("[PowerMonitor.get_power_values] Called")
         """Read power values from sensor or return disconnected status"""
         if not self.sensor_connected or not self.ina228:
-            print("[PowerMonitor.get_power_values] Not connected")
             # Return disconnected status with no data
             return {
                 "current_ma": 0.0,
@@ -105,9 +97,7 @@ class PowerMonitor:
                 "battery_percentage": 0,
                 "status": "Disconnected"
             }
-            
         try:
-            print("[PowerMonitor.get_power_values] Reading INA228 values")
             # Read actual values from INA228
             current_ma = self.ina228.current * 1000  # Convert A to mA
             voltage_v = self.ina228.bus_voltage
@@ -115,11 +105,10 @@ class PowerMonitor:
             energy_j = getattr(self.ina228, 'energy', 0.0)  # Some versions may not have energy
             temperature_c = getattr(self.ina228, 'die_temperature', 25.0)  # Fallback temp
             battery_pct = self.get_battery_percentage(voltage_v, current_ma / 1000)  # Convert mA to A for percentage calculation
-            
+
             # Determine intelligent status based on readings
             power_status = self.determine_power_status(current_ma, voltage_v, power_mw, battery_pct, temperature_c)
-            print(f"[PowerMonitor.get_power_values] Readings: I={current_ma:.1f}mA, V={voltage_v:.2f}V, P={power_mw:.1f}mW, E={energy_j:.2f}J, T={temperature_c:.1f}C, B={battery_pct}%, Status={power_status}")
-            
+
             return {
                 "current_ma": current_ma,
                 "voltage_v": voltage_v,
@@ -129,9 +118,8 @@ class PowerMonitor:
                 "battery_percentage": battery_pct,
                 "status": power_status
             }
-            
+
         except Exception as e:
-            print(f"[PowerMonitor.get_power_values] Exception: {e}")
             logging.error(f"Error reading sensor data: {e}")
             # If we get an error reading, mark as disconnected
             self.sensor_connected = False
@@ -192,46 +180,40 @@ class PowerMonitor:
             logging.error(f"Error saving CSV log: {e}")
 
     def monitoring_loop(self):
-        print("[PowerMonitor.monitoring_loop] Started")
         """Main monitoring loop running in separate thread"""
         logging.info("Power monitoring loop started")
-        
+
         while self.running:
             try:
-                print("[PowerMonitor.monitoring_loop] Looping...")
                 # Get power data
                 power_data = self.get_power_values()
-                
+
                 if power_data:
                     self.last_data = power_data
-                    
+
                     # Log to CSV
                     self.log_data_to_csv(power_data)
-                    
+
                     # Send update via callback
                     if self.callback:
                         try:
-                            print("[PowerMonitor.monitoring_loop] Calling callback")
                             self.callback(power_data)
                         except Exception as e:
-                            print(f"[PowerMonitor.monitoring_loop] Callback exception: {e}")
                             logging.error(f"Error in power data callback: {e}")
-                    
+
                     # Debug logging (reduced frequency)
                     if len(self.log_data) % 30 == 0:  # Log every 30 readings
                         logging.debug(f"Power: {power_data['power_mw']:.1f}mW, "
                                     f"Current: {power_data['current_ma']:.1f}mA, "
                                     f"Voltage: {power_data['voltage_v']:.2f}V, "
                                     f"Temp: {power_data['temperature_c']:.1f}°C")
-                
+
                 time.sleep(self.update_interval)
-                
+
             except Exception as e:
-                print(f"[PowerMonitor.monitoring_loop] Exception: {e}")
                 logging.error(f"Error in power monitoring loop: {e}")
                 time.sleep(self.update_interval)
-                
-        print("[PowerMonitor.monitoring_loop] Stopped")
+
         logging.info("Power monitoring loop stopped")
 
     def start_monitoring(self):
