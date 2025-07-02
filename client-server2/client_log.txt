@@ -4484,3 +4484,10 @@
 2025-07-02 16:48:57,972 - INFO - Connected to server
 2025-07-02 16:48:57,975 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
 2025-07-02 16:48:57,979 - INFO - [INFO] Successfully connected to server
+2025-07-02 16:51:04,902 - INFO - Disconnected from server: transport error
+2025-07-02 16:51:14,652 - INFO - [INFO] Closing application...
+2025-07-02 16:51:14,656 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 16:51:37,170 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 16:51:37,599 - INFO - Connected to server
+2025-07-02 16:51:37,603 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 16:51:37,609 - INFO - [INFO] Successfully connected to server

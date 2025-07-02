@@ -479,6 +479,8 @@ def power_data_callback(power_data):
                 "battery_percentage": power_data['battery_percentage'],
                 "status": client_status
             }
+        # Print the full dictionary being sent
+        print(f"[SERVER] Sending power_broadcast: {formatted_data}")
         socketio.emit("power_broadcast", formatted_data)
         import time
         if not hasattr(power_data_callback, 'last_log') or time.time() - power_data_callback.last_log > 10:
@@ -740,23 +742,6 @@ def handle_get_battery_temp():
             "error": str(e)
         })
         print(f"[SERVER] Battery temp read failed: {e}")
-
-@socketio.on("get_thermal_status")
-def handle_get_thermal_status():
-    """Handle request for current thermal status"""
-    try:
-        # Force an immediate thermal broadcast
-        thermal_data_broadcast()
-        emit("thermal_status_response", {
-            "success": True,
-            "message": "Thermal status updated"
-        })
-    except Exception as e:
-        emit("thermal_status_response", {
-            "success": False,
-            "error": str(e)
-        })
-        logging.error(f"Error getting thermal status: {e}")
 
 @socketio.on("power_data")
 def handle_power_data(data):
