@@ -2,7 +2,7 @@ import sys
 import time
 import datetime
 from collections import deque
-from PyQt6 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 import pyqtgraph as pg
 import random
 
