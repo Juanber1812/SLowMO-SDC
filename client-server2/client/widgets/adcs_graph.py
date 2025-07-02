@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QStackedWidget, QPushButton, QVBoxLayout, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QStackedWidget, QPushButton, QVBoxLayout, QHBoxLayout, QGroupBox
 from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtGui import QPainter, QColor, QPen, QFont
 import time
@@ -8,7 +8,8 @@ from theme import (
     PLOT_BACKGROUND, PLOT_LINE_PRIMARY, PLOT_LINE_SECONDARY,
     GRID_COLOR, TICK_COLOR,
     FONT_FAMILY, FONT_SIZE_LABEL, FONT_SIZE_NORMAL,
-    BORDER_COLOR, BUTTON_COLOR, BUTTON_TEXT, BUTTON_DISABLED, BUTTON_HOVER, 
+    BORDER_COLOR, BUTTON_COLOR, BUTTON_TEXT, BUTTON_DISABLED, BUTTON_HOVER, BOX_BACKGROUND, BORDER_RADIUS,
+    TEXT_COLOR, BACKGROUND
 )
 
 class YawGraphWidget(QWidget):
@@ -141,14 +142,14 @@ class YawGraphStacked(QWidget):
         self.page1 = QWidget()
         self.graph = YawGraphWidget(self.page1)
 
-        # --- Button style copied from camera_controls.py ---
+        # --- Use ADCS_BUTTON_STYLE for all buttons in this widget ---
         self.BUTTON_STYLE = f"""
         QPushButton {{
-            background-color: {BUTTON_COLOR};
-            color: {BUTTON_TEXT};
+            background-color: {BOX_BACKGROUND};
+            color: {TEXT_COLOR};
             border: 2px solid {BUTTON_COLOR};
-            border-radius: 6px;
-            padding: 4px 12px;
+            border-radius: {BORDER_RADIUS}px;
+            padding: 6px 12px;
             min-height: 24px;
             font-size: {FONT_SIZE_NORMAL}pt;
             font-family: {FONT_FAMILY};
@@ -168,7 +169,19 @@ class YawGraphStacked(QWidget):
         QPushButton:disabled {{
             background-color: {BUTTON_DISABLED};
             color: #777;
-            border: 2px solid #555;
+            border: 0px solid #555;
+        }}
+        """
+
+        # --- GroupBox style for the graph box, matching video box ---
+        self.BOX_STYLE = f"""
+        QGroupBox {{
+            background-color: {PLOT_BACKGROUND};
+            border: 2px solid {BORDER_COLOR};
+            border-radius: 8px;
+            font-size: {FONT_SIZE_NORMAL}pt;
+            font-family: {FONT_FAMILY};
+            color: {BUTTON_TEXT};
         }}
         """
 
@@ -180,15 +193,22 @@ class YawGraphStacked(QWidget):
         vbox0.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         vbox0.addStretch(1)
 
-        # Page 1: the graph and a back button
-        vbox1 = QVBoxLayout(self.page1)
+        # Page 1: the graph and a back button, in a styled box
+        self.graph_group = QGroupBox()
+        self.graph_group.setStyleSheet(self.BOX_STYLE)
+        graph_layout = QVBoxLayout(self.graph_group)
         hbox = QHBoxLayout()
         self.back_btn = QPushButton("Back")
         self.back_btn.setStyleSheet(self.BUTTON_STYLE)
         hbox.addWidget(self.back_btn, alignment=Qt.AlignmentFlag.AlignLeft)
         hbox.addStretch(1)
-        vbox1.addLayout(hbox)
-        vbox1.addWidget(self.graph)
+        graph_layout.addLayout(hbox)
+        graph_layout.addWidget(self.graph)
+        graph_layout.setContentsMargins(8, 8, 8, 8)
+        self.graph_group.setFixedSize(self.graph.width() + 20, self.graph.height() + 60)
+
+        vbox1 = QVBoxLayout(self.page1)
+        vbox1.addWidget(self.graph_group)
         vbox1.setContentsMargins(0, 0, 0, 0)
 
         self.stacked.addWidget(self.page0)

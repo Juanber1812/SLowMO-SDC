@@ -1088,14 +1088,20 @@ class ADCSController:
         print("[AUTO ZERO ENV] Performing 2 slow full rotations for peak detection...")
         self.pd_controller.stop_controller()
         self.manual_control_active = True
-        min_power = 20  # Minimum reliable power
+
+        # --- Burst at 80% for 100ms, then constant 10% ---
+        burst_power = 80
+        slow_power = 10  # 10% for slow constant rotation
+
+        set_motor_power(burst_power)
+        time.sleep(0.1)  # 100 ms burst
+
+        set_motor_power(slow_power)
         rotation_count = 0
         last_yaw = None
         yaw_wraps = 0
         peak_log = []
 
-        # Start slow rotation
-        set_motor_power(min_power)
         start_time = time.time()
         while rotation_count < 2:
             with self.data_lock:

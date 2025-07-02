@@ -5307,3 +5307,20 @@
 2025-07-02 21:20:06,828 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
 2025-07-02 21:21:11,392 - INFO - [INFO] Closing application...
 2025-07-02 21:21:12,598 - INFO - Disconnected from server: client disconnect
+2025-07-02 21:22:17,252 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 21:22:17,430 - INFO - Connected to server
+2025-07-02 21:22:17,436 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 21:22:17,440 - INFO - [INFO] Successfully connected to server
+2025-07-02 21:22:49,200 - INFO - [INFO] Closing application...
+2025-07-02 21:22:50,407 - INFO - Disconnected from server: client disconnect
+2025-07-02 21:22:59,125 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 21:22:59,537 - INFO - Connected to server
+2025-07-02 21:22:59,540 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 21:22:59,543 - INFO - [INFO] Successfully connected to server
+2025-07-02 21:23:08,634 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:23:08,642 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 21:23:32,832 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:23:36,138 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 21:23:36,252 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:29:37,420 - INFO - [INFO] Closing application...
+2025-07-02 21:29:38,625 - INFO - Disconnected from server: client disconnect
