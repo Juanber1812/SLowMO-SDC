@@ -4456,3 +4456,31 @@
 2025-07-02 16:40:55,487 - INFO - [INFO] Successfully connected to server
 2025-07-02 16:41:00,754 - INFO - [INFO] Closing application...
 2025-07-02 16:41:01,960 - INFO - Disconnected from server: client disconnect
+2025-07-02 16:42:32,131 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 16:42:32,303 - INFO - Connected to server
+2025-07-02 16:42:32,304 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 16:42:32,309 - INFO - [INFO] Successfully connected to server
+2025-07-02 16:43:43,753 - INFO - Requesting LIDAR streaming start
+2025-07-02 16:43:45,919 - INFO - Requesting LIDAR streaming stop
+2025-07-02 16:43:45,925 - INFO - Back button clicked in LidarWidget
+2025-07-02 16:43:47,023 - INFO - Requesting LIDAR streaming start
+2025-07-02 16:43:48,030 - INFO - Requesting LIDAR streaming stop
+2025-07-02 16:43:48,035 - INFO - Back button clicked in LidarWidget
+2025-07-02 16:47:59,255 - INFO - [INFO] Closing application...
+2025-07-02 16:48:00,462 - INFO - Disconnected from server: client disconnect
+2025-07-02 16:48:08,544 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 16:48:08,721 - INFO - Connected to server
+2025-07-02 16:48:08,722 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 16:48:08,726 - INFO - [INFO] Successfully connected to server
+2025-07-02 16:48:22,928 - INFO - [INFO] Closing application...
+2025-07-02 16:48:24,132 - INFO - Disconnected from server: client disconnect
+2025-07-02 16:48:30,668 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 16:48:31,084 - INFO - Connected to server
+2025-07-02 16:48:31,088 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 16:48:31,096 - INFO - [INFO] Successfully connected to server
+2025-07-02 16:48:50,704 - INFO - [INFO] Closing application...
+2025-07-02 16:48:51,910 - INFO - Disconnected from server: client disconnect
+2025-07-02 16:48:57,770 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 16:48:57,972 - INFO - Connected to server
+2025-07-02 16:48:57,975 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 16:48:57,979 - INFO - [INFO] Successfully connected to server

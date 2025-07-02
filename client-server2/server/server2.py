@@ -709,29 +709,6 @@ def handle_throughput_response(data):
     except Exception as e:
         logging.error(f"Error handling throughput response: {e}")
 
-@socketio.on("get_power_status")
-def handle_get_power_status():
-    try:
-        if power_monitor:
-            status = power_monitor.get_status()
-            latest_data = power_monitor.get_latest_data()
-            response = {
-                "success": True,
-                "status": status,
-                "latest_data": latest_data
-            }
-        else:
-            response = {
-                "success": False,
-                "error": "Power monitoring not available"
-            }
-        emit("power_status_response", response)
-    except Exception as e:
-        emit("power_status_response", {
-            "success": False,
-            "error": str(e)
-        })
-        logging.error(f"Error getting power status: {e}")
 
 
 

@@ -1371,22 +1371,7 @@ class MainWindow(QWidget):
                     # Server sends formatted data like: 
                     # {"current": "0.123", "voltage": "5.0", "power": "0.62", "energy": "0.01", 
                     #  "temperature": "25.5", "battery_percentage": 75, "status": "Nominal"}
-                    
-                    # Handle disconnected state
-                    if data.get("status") == "Disconnected":
-                        self.power_labels["current"].setText("Current: -- A")
-                        self.power_labels["voltage"].setText("Voltage: -- V") 
-                        self.power_labels["power"].setText("Power: -- W")
-                        self.power_labels["energy"].setText("Energy: -- Wh")
-                        self.power_labels["battery"].setText("Battery: --%")
-                        self.power_labels["status"].setText("Status: Disconnected")
-                        self.power_labels["status"].setMinimumHeight(self.power_labels["status"].sizeHint().height())
-
-                        self.power_labels["status"].setStyleSheet(
-                            f"QLabel {{ color: #666666; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; "
-                            f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
-                        )
-                        return
+                    print("[CLIENT] Received power_broadcast:", data)
                     
                     # Handle normal data updates
                     if "current" in data:
