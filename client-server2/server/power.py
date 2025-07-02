@@ -88,7 +88,7 @@ class PowerMonitor:
         estimated_voltage = voltage + (current * self.internal_resistance)
         estimated_voltage = max(min(estimated_voltage, self.voltages[0]), self.voltages[-1])
         pct = np.interp(estimated_voltage, self.voltages, self.percentages)
-        print("pct")
+        print("pct={pct:.2f}")
         return int(round(pct))
         
     print
