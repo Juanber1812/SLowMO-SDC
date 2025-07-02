@@ -3398,3 +3398,172 @@
 2025-07-02 13:02:31,601 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
 2025-07-02 13:02:32,098 - INFO - [INFO] Closing application...
 2025-07-02 13:02:32,101 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 13:17:37,092 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 13:17:37,516 - INFO - Connected to server
+2025-07-02 13:17:37,519 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 13:17:37,522 - INFO - [INFO] Successfully connected to server
+2025-07-02 13:17:43,209 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:17:44,198 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:45,202 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:46,616 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:47,866 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:48,212 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:49,197 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:50,198 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:51,199 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:51,883 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:17:52,507 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:17:53,082 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:17:53,538 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:17:54,020 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:17:55,009 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:56,020 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:57,015 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:17:57,113 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:17:57,726 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:18:01,720 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:18:02,729 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:03,735 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:04,736 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:05,738 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:06,885 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:07,729 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:09,107 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:09,737 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:10,728 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:12,301 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:12,739 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:13,732 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:14,727 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:15,727 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:16,871 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:17,739 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:18,740 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:18:39,801 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 13:18:40,313 - INFO - Connected to server
+2025-07-02 13:18:40,316 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 13:18:40,319 - INFO - [INFO] Successfully connected to server
+2025-07-02 13:18:55,195 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 13:18:55,286 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:18:58,573 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 13:18:58,631 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:18:59,903 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 13:19:00,051 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:19:03,576 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:19:04,326 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 13:19:04,593 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:04,609 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:19:04,925 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 13:19:05,081 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:19:05,586 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:05,695 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 13:19:05,871 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:19:06,585 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:06,707 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 13:19:06,846 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:19:07,510 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 13:19:07,599 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:07,668 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:19:08,591 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:09,600 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:10,591 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:11,041 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:19:14,764 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:19:17,118 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:19:19,151 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:19:19,862 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:19:19,880 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:19:21,313 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:19:21,762 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:19:23,273 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:19:34,798 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:19:35,791 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:36,796 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:37,788 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:38,801 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:39,790 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:40,798 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:41,275 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 13:19:41,794 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:42,788 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:19:43,133 - INFO - [INFO] Starting detector...
+2025-07-02 13:19:43,809 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:43.809Z', 'mode': 'scanning'}
+2025-07-02 13:19:44,807 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:44.807Z', 'mode': 'scanning'}
+2025-07-02 13:19:45,840 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:45.840Z', 'mode': 'scanning'}
+2025-07-02 13:19:46,817 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:46.817Z', 'mode': 'scanning'}
+2025-07-02 13:19:47,839 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:47.839Z', 'mode': 'scanning'}
+2025-07-02 13:19:48,860 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:48.860Z', 'mode': 'scanning'}
+2025-07-02 13:19:49,861 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:49.860Z', 'mode': 'scanning'}
+2025-07-02 13:19:50,838 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:50.838Z', 'mode': 'scanning'}
+2025-07-02 13:19:51,837 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 6.2, 'timestamp': '2025-07-02T12:19:51.837Z', 'mode': 'scanning'}
+2025-07-02 13:19:52,870 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 6.0, 'timestamp': '2025-07-02T12:19:52.870Z', 'mode': 'scanning'}
+2025-07-02 13:19:53,849 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.3, 'timestamp': '2025-07-02T12:19:53.849Z', 'mode': 'scanning'}
+2025-07-02 13:19:54,836 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:54.836Z', 'mode': 'scanning'}
+2025-07-02 13:19:55,844 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.9, 'timestamp': '2025-07-02T12:19:55.844Z', 'mode': 'scanning'}
+2025-07-02 13:19:56,840 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.7, 'timestamp': '2025-07-02T12:19:56.839Z', 'mode': 'scanning'}
+2025-07-02 13:19:57,855 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:57.855Z', 'mode': 'scanning'}
+2025-07-02 13:19:58,848 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:19:58.848Z', 'mode': 'scanning'}
+2025-07-02 13:19:59,862 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 4.6, 'timestamp': '2025-07-02T12:19:59.861Z', 'mode': 'scanning'}
+2025-07-02 13:20:00,858 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 4.1, 'timestamp': '2025-07-02T12:20:00.857Z', 'mode': 'scanning'}
+2025-07-02 13:20:01,912 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -2.8, 'timestamp': '2025-07-02T12:20:01.912Z', 'mode': 'scanning'}
+2025-07-02 13:20:02,856 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -2.7, 'timestamp': '2025-07-02T12:20:02.856Z', 'mode': 'scanning'}
+2025-07-02 13:20:03,897 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.1, 'timestamp': '2025-07-02T12:20:03.896Z', 'mode': 'scanning'}
+2025-07-02 13:20:04,874 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.1, 'timestamp': '2025-07-02T12:20:04.874Z', 'mode': 'scanning'}
+2025-07-02 13:20:05,940 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:05.940Z', 'mode': 'scanning'}
+2025-07-02 13:20:06,909 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:06.909Z', 'mode': 'scanning'}
+2025-07-02 13:20:07,902 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:07.902Z', 'mode': 'scanning'}
+2025-07-02 13:20:08,914 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:08.914Z', 'mode': 'scanning'}
+2025-07-02 13:20:09,904 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:09.903Z', 'mode': 'scanning'}
+2025-07-02 13:20:10,924 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:10.924Z', 'mode': 'scanning'}
+2025-07-02 13:20:11,940 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:11.940Z', 'mode': 'scanning'}
+2025-07-02 13:20:12,919 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:12.919Z', 'mode': 'scanning'}
+2025-07-02 13:20:13,911 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:13.911Z', 'mode': 'scanning'}
+2025-07-02 13:20:14,899 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:14.899Z', 'mode': 'scanning'}
+2025-07-02 13:20:15,974 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:15.974Z', 'mode': 'scanning'}
+2025-07-02 13:20:16,297 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 13:20:16,333 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:20:16,946 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:16.945Z', 'mode': 'scanning'}
+2025-07-02 13:20:16,986 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 13:20:17,080 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:20:17,920 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:17.919Z', 'mode': 'scanning'}
+2025-07-02 13:20:18,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:18.932Z', 'mode': 'scanning'}
+2025-07-02 13:20:19,940 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:19.940Z', 'mode': 'scanning'}
+2025-07-02 13:20:20,982 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:20.982Z', 'mode': 'scanning'}
+2025-07-02 13:20:22,000 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:22.000Z', 'mode': 'scanning'}
+2025-07-02 13:20:22,967 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:22.966Z', 'mode': 'scanning'}
+2025-07-02 13:20:23,981 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:23.981Z', 'mode': 'scanning'}
+2025-07-02 13:20:24,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:24.932Z', 'mode': 'scanning'}
+2025-07-02 13:20:25,941 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:25.941Z', 'mode': 'scanning'}
+2025-07-02 13:20:26,981 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:26.981Z', 'mode': 'scanning'}
+2025-07-02 13:20:27,956 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:27.955Z', 'mode': 'scanning'}
+2025-07-02 13:20:29,000 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:29.000Z', 'mode': 'scanning'}
+2025-07-02 13:20:29,988 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:29.988Z', 'mode': 'scanning'}
+2025-07-02 13:20:30,959 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:20:30.958Z', 'mode': 'scanning'}
+2025-07-02 13:20:31,744 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:20:35,229 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:20:42,555 - INFO - [INFO] Stopping detector...
+2025-07-02 13:20:44,275 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:20:56,336 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 13:20:56,425 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 13:21:51,847 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:21:52,838 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:21:53,102 - INFO - [INFO] Closing application...
+2025-07-02 13:21:54,307 - INFO - Disconnected from server: client disconnect
+2025-07-02 13:21:54,611 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:22:23,308 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 13:22:23,498 - INFO - Connected to server
+2025-07-02 13:22:23,500 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 13:22:23,501 - INFO - [INFO] Successfully connected to server
+2025-07-02 13:22:24,917 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 13:22:25,678 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
+2025-07-02 13:22:28,578 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 13:22:29,082 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
+2025-07-02 13:22:31,714 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 13:22:32,653 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 13:22:34,630 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=0.0
+2025-07-02 13:22:38,173 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=10.0
+2025-07-02 13:22:50,195 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:22:50,813 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:22:51,583 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:22:54,338 - INFO - [INFO] Closing application...
+2025-07-02 13:22:55,543 - INFO - Disconnected from server: client disconnect

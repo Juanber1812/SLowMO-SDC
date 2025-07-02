@@ -810,12 +810,14 @@ class ADCSController:
                     return self.stop_auto_control()
                 elif command == "set_pd_values":
                     return self.set_controller_gains(value)
-                elif command == "AprilTag":
+                # --- Handle new zero commands ---
+                elif command == "auto_zero_tag":
                     self.auto_zero_tag()
-                elif command == "Environmental":
+                    return {"status": "success", "message": "AprilTag zeroed"}
+                elif command == "auto_zero_lux":
                     self.auto_zero_lux()
+                    return {"status": "success", "message": "Environmental zeroed"}
 
-        
         except Exception as e:
             error_msg = f"ADCS command error: {e}"
             print(f"❌ {error_msg}")
