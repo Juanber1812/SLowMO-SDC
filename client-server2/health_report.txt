@@ -1,55 +1,61 @@
+--- CubeSat Health Check Report ---
 
-=== Power Subsystem ===
+Date: 2025-07-02
+Time: 12:01:09 BST
+
+
+--- Power Subsystem ---
 Current: -- A
 Voltage: -- V
 Power: -- W
 Energy: -- Wh
 Battery: --%
-Temperature: -- °C
 Status: Disconnected
 
-=== Thermal Subsystem ===
-Pi: 47.2°C
+--- Thermal Subsystem ---
+Pi: 41.9°C
 Power PCB: Pending...
-Battery: Pending...
-Status: Pending...
+Battery: 21.4°C
+Payload: 25.7°C
+Status: Nominal
 
-=== Communication Subsystem ===
+--- Communication Subsystem ---
 Downlink Frequency: 5.180 GHz
 Uplink Frequency: 5.000 GHz
-Server Signal: -67 dBm
-Client Signal: -41 dBm
-Data Transmission Rate: 848.0 KB/s
-Latency: -1024.1 ms
+Server Signal: -59 dBm
+Client Signal: -39 dBm
+Data Transmission Rate: 1010.1 KB/s
+Latency: -987.3 ms
 Status: Good
 
-=== ADCS Subsystem ===
-Gyro X: -3.92 °/s
-Gyro Y: -0.73 °/s
-Gyro Z: -1.61 °/s
-Angle X: -64.5 °
-Angle Y: -14.0 °
-Angle Z: -24.2 °
-Lux1: 450.5 lux
-Lux2: 323.1 lux
-Lux3: 724.7 lux
+--- ADCS Subsystem ---
+Gyro X: 0.09 °/s
+Gyro Y: -0.04 °/s
+Gyro Z: -0.08 °/s
+Angle X: -78.7 °
+Angle Y: -16.9 °
+Angle Z: -32.4 °
+Lux1: 316.1 lux
+Lux2: 211.3 lux
+Lux3: 417.2 lux
 Status: Active
 
-=== Payload Subsystem ===
+--- Payload Subsystem ---
 Camera: Connected
 Lidar: Connected
 Status: OK
 
-=== Command & Data Handling Subsystem ===
-CPU Usage: 5.2%
-Memory Usage: 28.1%
-Last Command: Pending...
-Uptime: 0m 14s
+--- Command & Data Handling Subsystem ---
+CPU Usage: 5.1%
+Memory Usage: 29.0%
+Uptime: 1h 20m 58s
 Status: Optimal
 
-=== Error Log ===
-No Critical Errors Detected: Pending...
+--- Error Log ---
+No Critical Errors Detected
 
-=== Overall Status ===
-No Anomalies Detected: Pending...
-Recommended Actions: Pending...
+--- Overall Status ---
+No Anomalies Detected
+Recommended Actions: None Required
+
+--- End of Report ---

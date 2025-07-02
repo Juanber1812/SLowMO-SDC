@@ -8,44 +8,83 @@ from PyQt6.QtCore import pyqtSignal, Qt
 import logging
 
 # --- THEME AND STYLE CONFIGURATION ---
-ADCS_BUTTON_STYLE = """
-    QPushButton {
-        background-color: #444444; color: white; border: 1px solid #555555; border-radius: 3px; padding: 5px;
-    }
-    QPushButton:hover { background-color: #555555; }
-    QPushButton:checked {
-        background-color: #00ff88;
-        color: black;
-    }
-    QPushButton:checked:hover {
-        background-color: #00dd77;
-        color: black;
-    }
-    QPushButton:disabled { 
-        background-color: #444444; color: white; border: 1px solid #555555;
-    }
-"""
-ADCS_LABEL_STYLE = "color: white; font-size: 10pt;"
 
+
+# --- THEME AND STYLE CONFIGURATION ---
 try:
     from theme import (
-        BUTTON_TEXT, BUTTON_COLOR, BUTTON_HOVER, BORDER_RADIUS, BORDER_WIDTH,
-        FONT_FAMILY, FONT_SIZE_NORMAL, TEXT_COLOR, BORDER_COLOR
+        BUTTON_TEXT, BUTTON_COLOR, BUTTON_HOVER, BUTTON_DISABLED,
+        BORDER_RADIUS, BORDER_WIDTH, FONT_FAMILY, FONT_SIZE_NORMAL, TEXT_COLOR, BORDER_COLOR, BOX_BACKGROUND, BOX_TITLE_COLOR,
+        PLOT_LINE_PRIMARY, BACKGROUND
     )
     ADCS_BUTTON_STYLE = f"""
         QPushButton {{
-            background-color: {BUTTON_COLOR}; color: {BUTTON_TEXT};
-            border: {BORDER_WIDTH}px solid {BORDER_COLOR}; border-radius: {BORDER_RADIUS}px;
-            padding: 6px 12px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;
+            background-color: {BACKGROUND};
+            color: {TEXT_COLOR};
+            border: 2px solid {BUTTON_COLOR};
+            border-radius: {BORDER_RADIUS}px;
+            padding: 6px 12px;
+            min-height: 24px;
+            font-size: {FONT_SIZE_NORMAL}pt;
+            font-family: {FONT_FAMILY};
         }}
-        QPushButton:hover {{ background-color: {BUTTON_HOVER}; }}
-        QPushButton:checked {{ background-color: #00ff88; color: black; border-color: #00ff88; }}
-        QPushButton:checked:hover {{ background-color: #00dd77; }}
-        QPushButton:disabled {{ background-color: #333; color: #888; border-color: #444; }}
+        QPushButton:hover, QPushButton:pressed {{
+            background-color: {BUTTON_HOVER};
+            color: black;
+        }}
+        QPushButton:checked {{
+            background-color: {PLOT_LINE_PRIMARY};
+            color: black;
+        }}
+        QPushButton:checked:hover {{
+            background-color: {BUTTON_HOVER};
+            color: black;
+        }}
+        QPushButton:disabled {{
+            background-color: {BUTTON_DISABLED};
+            color: #777;
+            border: 0px solid #555;
+        }}
     """
     ADCS_LABEL_STYLE = f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt;"
-except ImportError:
-    print("[ADCSSection] Warning: Theme file not found. Using fallback styles.")
+    ADCS_GROUPBOX_STYLE = f"""
+        QGroupBox {{
+            border: 0px solid {BORDER_COLOR};
+            border-radius: 4px;
+            background-color: {BACKGROUND};
+            margin-top: 6px;
+            color: {BOX_TITLE_COLOR};
+        }}
+        QGroupBox::title {{
+            subcontrol-origin: margin;
+            left: 6px;
+            padding: 0 2px;
+            font-size: {FONT_SIZE_NORMAL}pt;
+            font-family: {FONT_FAMILY};
+            color: {BOX_TITLE_COLOR};
+        }}
+    """
+except (ImportError, NameError):
+    print("[ADCSSection] Warning: Theme file not found or missing variables. Using fallback styles.")
+    ADCS_BUTTON_STYLE = """
+        QPushButton {
+            background-color: #444444; color: white; border: 1px solid #555555; border-radius: 3px; padding: 5px;
+        }
+        QPushButton:hover { background-color: #555555; }
+        QPushButton:checked {
+            background-color: #00ff88;
+            color: black;
+        }
+        QPushButton:checked:hover {
+            background-color: #00dd77;
+            color: black;
+        }
+        QPushButton:disabled { 
+            background-color: #444444; color: white; border: 1px solid #555555;
+        }
+    """
+    ADCS_LABEL_STYLE = "color: white; font-size: 10pt;"
+    ADCS_GROUPBOX_STYLE = ""
 
 # --- MAIN ADCS WIDGET ---
 
@@ -55,8 +94,11 @@ class ADCSSection(QGroupBox):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ADCSSection")
-        self.setFixedSize(1230,235)
+        self.setFixedSize(1250,235)
         self.current_auto_mode = "adcs" # Default auto mode
+        # Apply groupbox style to self
+        if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
+            self.setStyleSheet(ADCS_GROUPBOX_STYLE)
         self._setup_ui()
         self._connect_signals()
 
@@ -77,6 +119,8 @@ class ADCSSection(QGroupBox):
 
     def _create_mode_selection_group(self):
         group = QGroupBox()
+        if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
+            group.setStyleSheet(ADCS_GROUPBOX_STYLE)
         layout = QHBoxLayout()
         self.mode_button_group = QButtonGroup(self)
         self.mode_button_group.setExclusive(True)
@@ -108,6 +152,8 @@ class ADCSSection(QGroupBox):
 
     def _create_manual_controls_group(self):
         group = QGroupBox()
+        if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
+            group.setStyleSheet(ADCS_GROUPBOX_STYLE)
         layout = QVBoxLayout()
         
         cw_ccw_layout = QHBoxLayout()
@@ -131,6 +177,8 @@ class ADCSSection(QGroupBox):
 
     def _create_auto_controls_group(self):
         group = QGroupBox()
+        if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
+            group.setStyleSheet(ADCS_GROUPBOX_STYLE)
         layout = QGridLayout()
 
         layout.addWidget(QLabel("Target Angle:"), 0, 0)
@@ -157,6 +205,8 @@ class ADCSSection(QGroupBox):
 
     def _create_pd_tuning_group(self):
         group = QGroupBox()
+        if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
+            group.setStyleSheet(ADCS_GROUPBOX_STYLE)
         layout = QGridLayout()
 
         # Row 0

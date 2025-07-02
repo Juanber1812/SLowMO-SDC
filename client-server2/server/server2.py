@@ -1,3 +1,4 @@
+
 # server2.py
 
 from gevent import monkey; monkey.patch_all()
@@ -72,6 +73,17 @@ def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
 
 connected_clients = set()
+
+# ===================== SCANNING MODE DATA RECEIVER (TEST) =====================
+
+@socketio.on("scanning_mode_data")
+def handle_scanning_mode_data(data):
+    """Receive and print scanning mode data from client for testing."""
+    try:
+        print(f"[SCANNING MODE DATA RECEIVED] {data}")
+        # Optionally, you could emit an ack or log to file here
+    except Exception as e:
+        print(f"[ERROR] Failed to handle scanning_mode_data: {e}")
 
 # ===================== CAMERA/LIVE STREAM/IMAGE SECTION =====================
 

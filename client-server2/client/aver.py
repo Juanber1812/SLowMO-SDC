@@ -124,6 +124,61 @@ bridge = Bridge()
 ##############################################################################
 
 class MainWindow(QWidget):
+    def emit_scanning_mode_data(self, relative_angle=None):
+        """
+        Emit the relative angle and a special timestamp when AprilTag is detected and detector is running.
+        This should be called when the AprilTag button is pressed in the ADCS section.
+        """
+        import datetime
+        if not getattr(self, 'detector_active', False):
+            logging.info("[SCANNING MODE] Detector not active, not emitting scanning mode data.")
+            return
+        # If relative_angle is not provided, try to get it from the detector or last known value
+        if relative_angle is None:
+            try:
+                # Try to get from detector_instance or angular_plotter
+                if hasattr(self, 'angular_plotter') and hasattr(self.angular_plotter, 'last_angle'):
+                    relative_angle = self.angular_plotter.last_angle
+                else:
+                    relative_angle = 0.0
+            except Exception:
+                relative_angle = 0.0
+        # Special timestamp (UTC ISO format with ms)
+        timestamp = datetime.datetime.utcnow().isoformat(timespec='milliseconds') + 'Z'
+        data = {
+            'relative_angle': relative_angle,
+            'timestamp': timestamp,
+            'mode': 'scanning',
+        }
+        # Emit via socket
+        try:
+            sio.emit('scanning_mode_data', data)
+            logging.info(f"[SCANNING MODE] Emitted: {data}")
+        except Exception as e:
+            logging.error(f"[SCANNING MODE] Failed to emit scanning mode data: {e}")
+    def update_status_boxes_to_nominal(self):
+        """Set the Error Log and Overall Status boxes to nominal/default values."""
+        # Error Log
+        if hasattr(self, 'error_labels') and 'critical_errors' in self.error_labels:
+            self.error_labels['critical_errors'].setText("No Critical Errors Detected: Nominal")
+        # Overall Status
+        if hasattr(self, 'overall_labels'):
+            if 'anomalies' in self.overall_labels:
+                self.overall_labels['anomalies'].setText("No Anomalies Detected: Nominal")
+            if 'recommendations' in self.overall_labels:
+                self.overall_labels['recommendations'].setText("Recommended Actions: None Required")
+    def set_error_log_status(self, text: str):
+        """Set the text of the Error Log status box."""
+        if hasattr(self, 'error_labels') and 'critical_errors' in self.error_labels:
+            self.error_labels['critical_errors'].setText(text)
+
+    def set_overall_status(self, anomalies: str = None, recommendations: str = None):
+        """Set the text of the Overall Status box. Pass None to leave unchanged."""
+        if hasattr(self, 'overall_labels'):
+            if anomalies is not None and 'anomalies' in self.overall_labels:
+                self.overall_labels['anomalies'].setText(anomalies)
+            if recommendations is not None and 'recommendations' in self.overall_labels:
+                self.overall_labels['recommendations'].setText(recommendations)
     latencyUpdated = pyqtSignal(float)
 
     #=========================================================================
@@ -218,6 +273,7 @@ class MainWindow(QWidget):
     #                           INITIALIZATION                               
     #=========================================================================
 
+
     def __init__(self):
         super().__init__()
         self.show_crosshairs = False 
@@ -251,7 +307,6 @@ class MainWindow(QWidget):
         # Client-side communication metrics
         self.client_uplink_frequency = 0.0
         self.client_signal_strength = 0
-
 
         # display‐FPS counters
         self.display_frame_counter = 0
@@ -294,6 +349,9 @@ class MainWindow(QWidget):
 
         # Setup UI and connections
         self.setup_ui() # self.camera_settings and self.graph_section are created here
+
+        # Update Error Log and Overall Status boxes to nominal on startup
+        self.update_status_boxes_to_nominal()
 
         # ── Hook the graph‐rate spinbox to each plotter’s redraw rate ─────────
         if hasattr(self, 'graph_section') and self.graph_section:
@@ -679,6 +737,9 @@ class MainWindow(QWidget):
         self.adcs_control_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
 
         self.adcs_control_widget.adcs_command_sent.connect(self.handle_adcs_command)
+        # Connect AprilTag button to emit_scanning_mode_data
+        if hasattr(self.adcs_control_widget, 'apriltag_btn'):
+            self.adcs_control_widget.apriltag_btn.clicked.connect(self.emit_scanning_mode_data)
         row3.addWidget(self.adcs_control_widget, 1)  # stretch factor 1 for ADCS controls
         
         parent_layout.addLayout(row3)
@@ -746,20 +807,37 @@ class MainWindow(QWidget):
             return
 
         try:
+            import datetime
+            try:
+                import zoneinfo  # Python 3.9+
+                tz_uk = zoneinfo.ZoneInfo("Europe/London")
+                now_uk = datetime.datetime.now(tz_uk)
+                tz_label = now_uk.tzname() or "UK Local Time"
+            except ImportError:
+                # Fallback for Python <3.9: use UTC and label as such
+                now_uk = datetime.datetime.utcnow()
+                tz_label = "GMT/UTC"
+
             lines = []
+            # Add UK local time as the first section (date and time on separate lines)
+            lines.append("--- CubeSat Health Check Report ---\n")
+            lines.append(f"Date: {now_uk.strftime('%Y-%m-%d')}")
+            lines.append(f"Time: {now_uk.strftime('%H:%M:%S')} {tz_label}")
+            lines.append("")
 
             # Export each subsystem status group
             if hasattr(self, 'info_container'):
                 groups = self.info_container.findChildren(QGroupBox)
                 for grp in groups:
                     title = grp.title()
-                    lines.append(f"\n=== {title} ===")
-                    # all QLabel children under this group
+                    lines.append(f"\n--- {title} ---")
                     for child in grp.findChildren(QLabel):
-                        # skip the group title if it's also a QLabel
                         if child is grp:
                             continue
                         lines.append(child.text())
+
+            # Add end of report marker
+            lines.append("\n--- End of Report ---")
 
             # write out
             with open(file_path, 'w', encoding='utf-8') as f:
@@ -770,7 +848,7 @@ class MainWindow(QWidget):
                 f"Health report exported to:\n{file_path}",
                 QMessageBox.Icon.Information
             )
-            logging(f"[INFO] Health report exported to: {file_path}")
+            logging.info(f"[INFO] Health report exported to: {file_path}")
 
         except Exception as e:
             self.show_message(
@@ -778,7 +856,7 @@ class MainWindow(QWidget):
                 f"Failed to export health report:\n{e}",
                 QMessageBox.Icon.Critical
             )
-            logging(f"[ERROR] Health report export failed: {e}")
+            logging.error(f"[ERROR] Health report export failed: {e}")
 
     def setup_subsystem_status_groups(self, parent_layout):
         """Setup all subsystem status monitoring groups"""
@@ -829,7 +907,7 @@ class MainWindow(QWidget):
                 # Store references to power labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references to match your power.py data structure
@@ -850,7 +928,7 @@ class MainWindow(QWidget):
                 # Store references to thermal labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb;margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references for your new thermal labels
@@ -869,7 +947,7 @@ class MainWindow(QWidget):
                 # Store references to ADCS labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references for the individual ADCS components
@@ -898,7 +976,7 @@ class MainWindow(QWidget):
                 # Store references to CDH labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references
@@ -915,7 +993,7 @@ class MainWindow(QWidget):
                 # Store references to communication labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references for the new communication labels
@@ -936,17 +1014,17 @@ class MainWindow(QWidget):
             elif name == "Payload Subsystem":
                 # Create payload subsystem labels with combined format
                 self.payload_camera_label = QLabel("Camera: Checking...")
-                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_camera_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_camera_label)
                 
                 self.payload_lidar_label = QLabel("Lidar: Checking...")
-                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_lidar_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_lidar_label)
                 
                 self.payload_status_label = QLabel("Status: Not Ready")
-                self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_status_label.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_status_label)
                 
@@ -957,7 +1035,7 @@ class MainWindow(QWidget):
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     if name != "Error Log" and name != "Overall Status":
                         lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
@@ -1455,7 +1533,7 @@ class MainWindow(QWidget):
                         
                         self.comms_labels['status'].setText(f"Status: {status}")
                         self.comms_labels['status'].setStyleSheet(
-                            f"QLabel {{ color: {status_color}; margin: 2px 0px; padding: 2px 0px; "
+                            f"QLabel {{ color: {status_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; "
                             f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                         )
                         

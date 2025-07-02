@@ -2459,3 +2459,448 @@
 2025-07-02 10:31:51,284 - INFO - Stream restart scheduled (if it was on before apply_config).
 2025-07-02 10:32:13,566 - INFO - [INFO] Closing application...
 2025-07-02 10:32:15,272 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:35:22,962 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:35:23,670 - INFO - Connected to server
+2025-07-02 10:35:23,672 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:35:23,676 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:35:49,126 - INFO - [INFO] Closing application...
+2025-07-02 10:35:50,832 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:36:04,827 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:36:04,989 - INFO - Connected to server
+2025-07-02 10:36:04,990 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:36:04,992 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:36:07,183 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:36:07,186 - INFO - Stream paused for config application.
+2025-07-02 10:36:07,689 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 10:36:07,695 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 10:36:07,900 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 10:37:09,108 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:37:09,280 - INFO - Connected to server
+2025-07-02 10:37:09,281 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:37:09,283 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:37:23,689 - INFO - Disconnected from server: transport error
+2025-07-02 10:37:25,372 - INFO - Connected to server
+2025-07-02 10:37:25,375 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:38:29,775 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 10:38:29,952 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 10:38:30,638 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 10:38:30,948 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 10:38:52,964 - INFO - [INFO] Closing application...
+2025-07-02 10:38:54,170 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:39:59,724 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:40:02,170 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751449199.729242 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000015CD178A7B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-02 10:40:05,195 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-02 10:40:07,299 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751449205.1974826 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000015CD17ED090>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-02 10:40:17,549 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-02 10:40:18,073 - INFO - Connected to server
+2025-07-02 10:40:18,077 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:40:32,519 - INFO - [INFO] Closing application...
+2025-07-02 10:40:33,725 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:43:51,624 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:43:52,168 - INFO - Connected to server
+2025-07-02 10:43:52,171 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:43:52,175 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:47:33,436 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:47:33,597 - INFO - Connected to server
+2025-07-02 10:47:33,599 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:47:33,601 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:47:39,320 - INFO - [INFO] Health report exported to: C:/Users/juanb/OneDrive/Documents/GitHub/SLowMO-SDC-juan/SLowMO-SDC/client-server2/health_report.txt
+2025-07-02 10:47:56,766 - INFO - [INFO] Closing application...
+2025-07-02 10:47:57,971 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:50:08,374 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:50:08,783 - INFO - Connected to server
+2025-07-02 10:50:08,785 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:50:08,788 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:50:16,280 - INFO - [INFO] Health report exported to: C:/Users/juanb/OneDrive/Documents/GitHub/SLowMO-SDC-juan/SLowMO-SDC/client-server2/health_report.txt
+2025-07-02 10:51:24,335 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:51:24,493 - INFO - Connected to server
+2025-07-02 10:51:24,495 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:51:24,499 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:51:32,561 - INFO - [INFO] Health report exported to: C:/Users/juanb/OneDrive/Documents/GitHub/SLowMO-SDC-juan/SLowMO-SDC/client-server2/health_report.txt
+2025-07-02 10:52:39,686 - INFO - [INFO] Health report exported to: C:/Users/juanb/OneDrive/Documents/GitHub/SLowMO-SDC-juan/SLowMO-SDC/client-server2/health_report.txt
+2025-07-02 10:52:59,556 - INFO - [INFO] Closing application...
+2025-07-02 10:53:00,759 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:53:26,049 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:53:26,526 - INFO - Connected to server
+2025-07-02 10:53:26,530 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:53:26,533 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:53:33,869 - INFO - [INFO] Health report exported to: C:/Users/juanb/OneDrive/Documents/GitHub/SLowMO-SDC-juan/SLowMO-SDC/client-server2/health_report.txt
+2025-07-02 10:56:01,413 - INFO - [INFO] Closing application...
+2025-07-02 10:56:02,617 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:56:10,267 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:56:10,665 - INFO - Connected to server
+2025-07-02 10:56:10,668 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:56:10,671 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:56:19,685 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:56:19,749 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-02 10:56:19,919 - INFO - Connected to server
+2025-07-02 10:56:19,921 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:56:22,863 - INFO - [INFO] Closing application...
+2025-07-02 10:56:24,068 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:58:15,177 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:58:15,714 - INFO - Connected to server
+2025-07-02 10:58:15,717 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:58:15,722 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:58:22,754 - INFO - [INFO] Closing application...
+2025-07-02 10:58:23,960 - INFO - Disconnected from server: client disconnect
+2025-07-02 10:59:41,671 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 10:59:41,914 - INFO - Connected to server
+2025-07-02 10:59:41,917 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:59:41,919 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:00:08,011 - INFO - [INFO] Closing application...
+2025-07-02 11:00:09,216 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:04:31,655 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:04:31,928 - INFO - Connected to server
+2025-07-02 11:04:31,932 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:04:31,934 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:04:41,666 - INFO - [INFO] Closing application...
+2025-07-02 11:04:42,872 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:07:43,969 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:07:44,214 - INFO - Connected to server
+2025-07-02 11:07:44,216 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:07:44,218 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:07:50,721 - INFO - [INFO] Closing application...
+2025-07-02 11:07:51,929 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:10:17,127 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:10:17,606 - INFO - Connected to server
+2025-07-02 11:10:17,609 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:10:17,611 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:10:35,437 - INFO - [INFO] Closing application...
+2025-07-02 11:10:36,641 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:14:28,606 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:14:28,801 - INFO - Connected to server
+2025-07-02 11:14:28,802 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:14:28,805 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:14:34,431 - INFO - [INFO] Closing application...
+2025-07-02 11:14:35,636 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:14:55,135 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:14:55,567 - INFO - Connected to server
+2025-07-02 11:14:55,570 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:14:55,577 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:15:01,131 - INFO - [INFO] Closing application...
+2025-07-02 11:15:02,337 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:18:41,069 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:18:41,250 - INFO - Connected to server
+2025-07-02 11:18:41,252 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:18:41,253 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:18:49,476 - INFO - [INFO] Closing application...
+2025-07-02 11:18:50,682 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:21:02,392 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:21:02,600 - INFO - Connected to server
+2025-07-02 11:21:02,602 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:21:02,605 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:21:15,100 - INFO - [INFO] Closing application...
+2025-07-02 11:21:16,305 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:21:50,785 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:21:50,947 - INFO - Connected to server
+2025-07-02 11:21:50,949 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:21:50,951 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:21:58,547 - INFO - [INFO] Closing application...
+2025-07-02 11:21:59,753 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:22:20,828 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:22:21,388 - INFO - Connected to server
+2025-07-02 11:22:21,394 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:22:21,397 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:22:25,688 - INFO - [INFO] Closing application...
+2025-07-02 11:22:26,892 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:22:54,217 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:22:54,453 - INFO - Connected to server
+2025-07-02 11:22:54,455 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:22:54,458 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:23:03,740 - INFO - [INFO] Closing application...
+2025-07-02 11:23:04,946 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:25:04,866 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:25:05,431 - INFO - Connected to server
+2025-07-02 11:25:05,434 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:25:05,436 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:25:17,319 - INFO - [INFO] Closing application...
+2025-07-02 11:25:18,525 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:26:30,663 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:26:31,130 - INFO - Connected to server
+2025-07-02 11:26:31,132 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:26:31,135 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:26:38,967 - INFO - [INFO] Closing application...
+2025-07-02 11:26:40,172 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:28:04,127 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:28:04,342 - INFO - Connected to server
+2025-07-02 11:28:04,345 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:28:04,348 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:28:07,269 - INFO - [INFO] Closing application...
+2025-07-02 11:28:08,474 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:29:37,402 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:29:37,871 - INFO - Connected to server
+2025-07-02 11:29:37,874 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:29:37,877 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:29:59,454 - INFO - [INFO] Closing application...
+2025-07-02 11:30:00,661 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:30:34,882 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:30:35,344 - INFO - Connected to server
+2025-07-02 11:30:35,347 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:30:35,352 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:30:46,052 - INFO - [INFO] Closing application...
+2025-07-02 11:30:47,257 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:30:57,210 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:30:57,663 - INFO - Connected to server
+2025-07-02 11:30:57,666 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:30:57,672 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:30:59,790 - INFO - [INFO] Closing application...
+2025-07-02 11:31:00,996 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:32:13,861 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:32:14,253 - INFO - Connected to server
+2025-07-02 11:32:14,255 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:32:14,259 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:32:21,725 - INFO - [INFO] Closing application...
+2025-07-02 11:32:22,930 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:32:38,920 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:32:39,375 - INFO - Connected to server
+2025-07-02 11:32:39,379 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:32:39,381 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:32:47,115 - INFO - [INFO] Closing application...
+2025-07-02 11:32:48,319 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:33:50,731 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:33:50,917 - INFO - Connected to server
+2025-07-02 11:33:50,919 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:33:50,922 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:34:10,102 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:34:10,278 - INFO - Connected to server
+2025-07-02 11:34:10,281 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:34:10,285 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:34:12,740 - INFO - [INFO] Closing application...
+2025-07-02 11:34:13,945 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:34:36,835 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:34:37,014 - INFO - Connected to server
+2025-07-02 11:34:37,015 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:34:37,018 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:34:40,599 - INFO - [INFO] Closing application...
+2025-07-02 11:34:41,804 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:35:31,210 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:35:31,749 - INFO - Connected to server
+2025-07-02 11:35:31,752 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:35:31,755 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:35:45,791 - INFO - [INFO] Closing application...
+2025-07-02 11:35:46,996 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:36:55,637 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:36:55,889 - INFO - Connected to server
+2025-07-02 11:36:55,893 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:36:55,896 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:37:00,971 - INFO - [INFO] Closing application...
+2025-07-02 11:37:02,176 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:37:42,553 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:37:42,732 - INFO - Connected to server
+2025-07-02 11:37:42,739 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:37:42,746 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:37:48,760 - INFO - [INFO] Closing application...
+2025-07-02 11:37:49,967 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:38:49,116 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:38:49,521 - INFO - Connected to server
+2025-07-02 11:38:49,523 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:38:49,526 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:38:52,406 - INFO - [INFO] Closing application...
+2025-07-02 11:38:53,611 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:40:19,687 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:40:20,873 - INFO - Connected to server
+2025-07-02 11:40:20,877 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:40:20,881 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:40:26,558 - INFO - [INFO] Closing application...
+2025-07-02 11:40:27,763 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:42:19,136 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:42:19,347 - INFO - Connected to server
+2025-07-02 11:42:19,349 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:42:19,352 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:43:12,888 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:43:13,105 - INFO - Connected to server
+2025-07-02 11:43:13,108 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:43:13,113 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:43:21,542 - INFO - [INFO] Closing application...
+2025-07-02 11:43:22,748 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:43:42,349 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:43:42,528 - INFO - Connected to server
+2025-07-02 11:43:42,532 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:43:42,536 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:43:46,760 - INFO - [INFO] Closing application...
+2025-07-02 11:43:47,964 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:45:36,786 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:45:37,329 - INFO - Connected to server
+2025-07-02 11:45:37,335 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:45:37,339 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:45:41,003 - INFO - [INFO] Closing application...
+2025-07-02 11:45:42,208 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:47:02,518 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:47:03,044 - INFO - Connected to server
+2025-07-02 11:47:03,048 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:47:03,053 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:47:07,712 - INFO - [INFO] Closing application...
+2025-07-02 11:47:08,919 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:47:23,839 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:47:24,065 - INFO - Connected to server
+2025-07-02 11:47:24,069 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:47:24,071 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:47:28,990 - INFO - [INFO] Closing application...
+2025-07-02 11:47:30,196 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:47:44,482 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:47:44,669 - INFO - Connected to server
+2025-07-02 11:47:44,670 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:47:44,671 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:47:46,696 - INFO - [INFO] Closing application...
+2025-07-02 11:47:47,901 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:50:47,986 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:50:48,482 - INFO - Connected to server
+2025-07-02 11:50:48,485 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:50:48,491 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:50:53,380 - INFO - [INFO] Closing application...
+2025-07-02 11:50:54,585 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:52:10,665 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:52:11,120 - INFO - Connected to server
+2025-07-02 11:52:11,123 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:52:11,129 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:52:18,859 - INFO - [INFO] Closing application...
+2025-07-02 11:52:20,064 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:52:38,388 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:52:38,766 - INFO - Connected to server
+2025-07-02 11:52:38,769 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:52:38,771 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:52:40,388 - INFO - [INFO] Closing application...
+2025-07-02 11:52:41,594 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:53:47,208 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:53:47,501 - INFO - Connected to server
+2025-07-02 11:53:47,504 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:53:47,506 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:53:59,247 - INFO - [INFO] Closing application...
+2025-07-02 11:54:00,453 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:54:41,578 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:54:41,857 - INFO - Connected to server
+2025-07-02 11:54:41,860 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:54:41,864 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:54:44,888 - INFO - [INFO] Closing application...
+2025-07-02 11:54:46,094 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:56:37,218 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:56:37,369 - INFO - Connected to server
+2025-07-02 11:56:37,370 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:56:37,372 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:56:39,166 - INFO - [INFO] Closing application...
+2025-07-02 11:56:40,370 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:57:28,390 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:57:28,654 - INFO - Connected to server
+2025-07-02 11:57:28,656 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:57:28,663 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:57:30,067 - INFO - [INFO] Closing application...
+2025-07-02 11:57:31,272 - INFO - Disconnected from server: client disconnect
+2025-07-02 11:58:15,301 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:58:15,461 - INFO - Connected to server
+2025-07-02 11:58:15,463 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:58:15,465 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:58:37,969 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 11:58:38,155 - INFO - Connected to server
+2025-07-02 11:58:38,158 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 11:58:38,161 - INFO - [INFO] Successfully connected to server
+2025-07-02 11:58:49,046 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 11:58:49,181 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 11:58:49,841 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 11:58:49,992 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 11:58:50,464 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 11:58:50,593 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 11:58:50,884 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 11:58:51,008 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 11:58:51,549 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 11:58:51,648 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 11:58:51,998 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 11:58:52,118 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 11:58:54,940 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 11:58:55,994 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 11:58:57,822 - INFO - Sending ADCS command: Mode='adcs', Command='calibrate', Value=None
+2025-07-02 11:58:59,436 - INFO - Sending ADCS command: Mode='adcs', Command='set_pd_values', Value={'kp': 0.5, 'kd': 0.1, 'deadband': 1.0, 'min_pulse': 0.1}
+2025-07-02 11:59:02,085 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-02 11:59:02,714 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 11:59:03,080 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-02 11:59:03,575 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 11:59:08,762 - INFO - [INFO] Closing application...
+2025-07-02 11:59:10,468 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:00:01,913 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:00:02,358 - INFO - Connected to server
+2025-07-02 12:00:02,361 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:00:02,365 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:00:05,293 - INFO - [INFO] Closing application...
+2025-07-02 12:00:06,498 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:00:57,267 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:00:57,444 - INFO - Connected to server
+2025-07-02 12:00:57,451 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:00:57,454 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:01:22,634 - INFO - [INFO] Health report exported to: C:/Users/juanb/OneDrive/Documents/GitHub/SLowMO-SDC-juan/SLowMO-SDC/client-server2/health_report.txt
+2025-07-02 12:01:26,775 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:01:26,777 - INFO - Stream paused for config application.
+2025-07-02 12:01:27,282 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:01:27,287 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:01:27,493 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:01:27,982 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:01:27,986 - INFO - Stream paused for config application.
+2025-07-02 12:01:28,490 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:01:28,496 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:01:28,701 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:01:38,509 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:01:38,524 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-02 12:01:38,698 - INFO - Connected to server
+2025-07-02 12:01:38,700 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:01:39,209 - INFO - Restarting stream after reconnect...
+2025-07-02 12:01:39,993 - INFO - [INFO] Starting detector...
+2025-07-02 12:01:41,366 - INFO - [INFO] Stopping detector...
+2025-07-02 12:01:41,807 - INFO - [INFO] Starting detector...
+2025-07-02 12:01:42,805 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 12:03:04,989 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:03:05,464 - INFO - Connected to server
+2025-07-02 12:03:05,467 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:03:05,470 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:03:14,870 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 12:03:18,079 - INFO - [INFO] Starting detector...
+2025-07-02 12:03:45,442 - INFO - [INFO] Stopping detector...
+2025-07-02 12:03:54,136 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-02 12:03:54,596 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:03:54,969 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 12:03:58,510 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=0.0
+2025-07-02 12:04:00,847 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 12:04:01,681 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 12:04:02,582 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 12:04:10,068 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=10.0
+2025-07-02 12:04:11,656 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
+2025-07-02 12:04:12,719 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 12:04:12,801 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 12:04:13,092 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 12:04:13,218 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 12:04:13,441 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 12:04:13,539 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 12:04:13,731 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 12:04:13,865 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 12:04:30,600 - INFO - [INFO] Starting detector...
+2025-07-02 12:06:11,248 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:06:11,432 - INFO - Connected to server
+2025-07-02 12:06:11,433 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:06:11,434 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:06:17,496 - INFO - [INFO] Starting detector...
+2025-07-02 12:06:23,238 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 12:06:59,317 - INFO - [GraphSection] Update frequency set to: 2.0 Hz via spinbox
+2025-07-02 12:07:16,504 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-07-02 12:08:04,893 - INFO - [INFO] Closing application...
+2025-07-02 12:08:06,598 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:08:19,411 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:08:19,605 - INFO - Connected to server
+2025-07-02 12:08:19,606 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:08:19,609 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:08:45,818 - INFO - [INFO] Starting detector...
+2025-07-02 12:08:47,720 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 12:08:58,031 - WARNING - LIDAR not streaming. Cannot start recording metrics.
+2025-07-02 12:09:03,302 - INFO - Requesting LIDAR streaming start
+2025-07-02 12:09:05,099 - INFO - LIDAR metrics recording started (live data only, relative timestamps).
+2025-07-02 12:09:07,139 - INFO - LIDAR metrics recording saved to c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\recordings\lidar_2025-07-02_12-09-07.csv
+2025-07-02 12:09:15,196 - INFO - [INFO] Closing application...
+2025-07-02 12:09:16,903 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:09:31,947 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:09:32,539 - INFO - Connected to server
+2025-07-02 12:09:32,541 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:09:32,546 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:09:53,416 - INFO - [INFO] Closing application...
+2025-07-02 12:09:54,624 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:16:37,205 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:16:37,384 - INFO - Connected to server
+2025-07-02 12:16:37,387 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:16:37,389 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:17:57,243 - INFO - [INFO] Closing application...
+2025-07-02 12:17:58,451 - INFO - Disconnected from server: client disconnect

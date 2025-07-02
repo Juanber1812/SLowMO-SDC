@@ -1,3 +1,7 @@
+# === Status Box Colors ===
+STATUS_NOMINAL_COLOR   = "#00FF66"  # Bright Green for Nominal
+STATUS_WARNING_COLOR   = "#FFD700"  # Gold/Yellow for Warning
+STATUS_ERROR_COLOR     = "#FF3333"  # Bright Red for Error
 # -*- coding: utf-8 -*-
 """
 Electric Blue / Cyber UI Theme
@@ -14,9 +18,9 @@ SECOND_COLUMN      = "#1E2130"  # Dark Blue for sidebars
 
 # === Text Colors ===
 TEXT_COLOR         = "#00FFFF"  # Electric Cyan
-TEXT_SECONDARY     = "#60AFFF"  # Lighter Sky Blue
+TEXT_SECONDARY     = "#FFFFFF"  # Lighter Sky Blue
 BOX_TITLE_COLOR    = "#00FFFF"  # Electric Cyan
-LABEL_COLOR        = "#60AFFF"  # Lighter Sky Blue for labels
+LABEL_COLOR        = "#FFFFFF"  # Lighter Sky Blue for labels
 
 # === Button Colors ===
 BUTTON_COLOR       = "#00224D"  # Dark Navy Blue
@@ -38,7 +42,7 @@ BORDER_HIGHLIGHT   = "#00FFFF"  # Electric Cyan Highlight
 
 # === Fonts ===
 FONT_FAMILY        = "Consolas, 'Courier New', monospace" # Keeping font for cyber feel
-FONT_SIZE_NORMAL   = 10
+FONT_SIZE_NORMAL   = 8
 FONT_SIZE_LABEL    = 9
 FONT_SIZE_TITLE    = 11
 
