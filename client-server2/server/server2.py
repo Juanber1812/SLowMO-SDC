@@ -485,7 +485,7 @@ def power_data_callback(power_data):
             if power_data.get('status') == 'Disconnected':
                 logging.debug("Power broadcast: Disconnected")
             else:
-                logging.debug(f"Power broadcast: {power_data['power_mw']:.1f}mW, {power_data['voltage_v']:.2f}V, {power_data['current_ma']:.1f}mA")
+                print(f"Power broadcast: {power_data['power_mw']:.1f}mW, {power_data['voltage_v']:.2f}V, {power_data['current_ma']:.1f}mA")
             power_data_callback.last_log = time.time()
     except Exception as e:
         logging.error(f"Error in power data callback: {e}")
