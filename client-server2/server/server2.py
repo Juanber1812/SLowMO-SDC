@@ -459,10 +459,12 @@ def power_data_callback(power_data):
                 "Battery Low": "Battery Low", 
                 "Battery Critical": "Battery Critical",
                 "High Current": "High Current",
-                "Current Critical": "Current Critical", 
+                "Current Critical": "Current Critical",
+                "Current Error": "Current Error",
                 "High Power": "High Power",
                 "High Temperature": "High Temperature",
                 "Overheating": "Overheating",
+                "V close to UVLO": "Near UVLO", # Under voltage lockout
                 "Operational": "Nominal"  # Legacy fallback
             }
             
