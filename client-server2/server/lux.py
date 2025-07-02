@@ -68,6 +68,7 @@ class LuxSensorManager:
         lux_data = {ch: 0.0 for ch in LUX_CHANNELS}
         now = time.time()
         if not self.sensors_ready:
+            print("[WARN] Sensors not ready")
             return lux_data
 
         for ch in LUX_CHANNELS:
@@ -76,9 +77,11 @@ class LuxSensorManager:
                     self.select_lux_channel(ch)
                     value = self.lux_sensors[ch].lux
                     lux_data[ch] = value
+                    print(f"[DATA] {time.strftime('%H:%M:%S', time.localtime(now))} | Channel {ch} | Value: {value:.2f}")
                 else:
                     value = 0.0
                     lux_data[ch] = 0.0
+                    print(f"[ERROR] Channel {ch} not available")
             except Exception as e:
                 try:
                     self.select_lux_channel(ch)
@@ -86,10 +89,12 @@ class LuxSensorManager:
                     self.lux_sensors[ch] = VEML7700(self.lux_i2c)
                     value = self.lux_sensors[ch].lux
                     lux_data[ch] = value
+                    print(f"[RECOVER] Channel {ch} recovered | Value: {value:.2f}")
                 except:
                     value = 0.0
                     lux_data[ch] = 0.0
                     self.lux_sensors[ch] = None
+                    print(f"[FAIL] Channel {ch} failed to recover")
             # Store (timestamp, value) for analysis
             self.history[ch].append((now, value))
         return lux_data
@@ -145,13 +150,19 @@ class LuxSensorManager:
 
 if __name__ == "__main__":
     manager = LuxSensorManager()
+    last_display = 0
     try:
         while True:
             readings = manager.read_lux_sensors()
+            print(f"[READ] {time.strftime('%H:%M:%S')} | " + " | ".join([f"Ch{ch}: {readings[ch]:.2f}" for ch in LUX_CHANNELS]))
 
-            manager.analyse_and_log_maxima(min_distance=10, threshold=5.0)
-            lux_str = " | ".join([f"Lux{ch}: {readings[ch]:7.2f}" for ch in LUX_CHANNELS])
-            print(f"\r{lux_str}  {time.strftime('%H:%M:%S')}", end="", flush=True)
+            manager.analyse_peaks_gradient(threshold=10.0, min_time_between_peaks=0.2)
+
+            now = time.time()
+            if now - last_display >= 1.0:
+                lux_str = " | ".join([f"Lux{ch}: {readings[ch]:7.2f}" for ch in LUX_CHANNELS])
+                print(f"[LIVE] {lux_str}  {time.strftime('%H:%M:%S')}")
+                last_display = now
             time.sleep(0.01)
     except KeyboardInterrupt:
         print("\nExiting lux sensor live display.")
