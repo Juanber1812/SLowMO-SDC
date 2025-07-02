@@ -3605,3 +3605,52 @@
 2025-07-02 13:26:41,778 - INFO - [INFO] Closing application...
 2025-07-02 13:26:42,983 - INFO - Disconnected from server: client disconnect
 2025-07-02 13:26:43,284 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:29:49,969 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 13:29:51,667 - INFO - Connected to server
+2025-07-02 13:29:51,669 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 13:29:51,673 - INFO - [INFO] Successfully connected to server
+2025-07-02 13:30:02,523 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:30:02,539 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 13:30:02,544 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 13:30:03,522 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:30:04,539 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:30:05,541 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:30:06,545 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:30:06,617 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:30:06,629 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-02 13:30:06,634 - INFO - Sending ADCS command: Mode='adcs', Command='stop_auto_zero_tag', Value=None
+2025-07-02 13:30:06,638 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 13:30:09,006 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:30:09,008 - INFO - Sending ADCS command: Mode='adcs', Command='stop_auto_zero_lux', Value=None
+2025-07-02 13:30:39,056 - INFO - [INFO] Closing application...
+2025-07-02 13:30:40,261 - INFO - Disconnected from server: client disconnect
+2025-07-02 13:33:53,118 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 13:33:53,292 - INFO - Connected to server
+2025-07-02 13:33:53,297 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 13:33:53,300 - INFO - [INFO] Successfully connected to server
+2025-07-02 13:33:54,649 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:33:54,651 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 13:33:55,300 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:33:55,317 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:33:55,320 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 13:33:56,290 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:33:56,540 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:33:56,551 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:33:56,554 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 13:33:56,975 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:33:57,517 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:33:57,520 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 13:33:57,946 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:33:57,957 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:33:57,961 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 13:33:58,338 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:33:58,357 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:33:58,836 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:33:58,842 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 13:33:59,196 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:33:59,213 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:33:59,216 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 13:34:00,175 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:34:00,197 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:34:01,679 - INFO - [INFO] Closing application...
+2025-07-02 13:34:02,885 - INFO - Disconnected from server: client disconnect

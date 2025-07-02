@@ -253,7 +253,6 @@ class ADCSSection(QGroupBox):
         self.set_pd_btn.clicked.connect(self._handle_set_pd_clicked)
 
     def _update_current_auto_mode(self, mode_name):
-        # Determine previous mode for stopping auto zero if needed
         prev_mode = getattr(self, "current_auto_mode", "adcs")
         self.current_auto_mode = mode_name
         logging.info(f"[ADCSSection] Auto mode set to: {mode_name}")
@@ -264,13 +263,10 @@ class ADCSSection(QGroupBox):
         elif prev_mode == "Environmental" and mode_name != "Environmental":
             self._handle_action_clicked("adcs", "stop_auto_zero_lux")
 
-        # Disable/enable buttons based on mode (optional, or remove if not needed)
-        if mode_name in ("AprilTag", "Environmental"):
-            self.set_value_btn.setDisabled(True)
-            self.set_zero_btn.setDisabled(True)
-        else:
-            self.set_value_btn.setDisabled(False)
+        # If switching to raw, enable both buttons
+        if mode_name == "adcs":
             self.set_zero_btn.setDisabled(False)
+            self.set_value_btn.setDisabled(False)
 
     def _handle_run_controller_clicked(self):
         if self.run_controller_btn.isChecked():
@@ -316,9 +312,15 @@ class ADCSSection(QGroupBox):
             self.min_pulse_input.setText(str(controller_data.get('min_pulse', '')))
 
     def _handle_env_mode_selected(self):
-        self._update_current_auto_mode("Environmental")
+        self._update_current_auto_mode("adcs")  # Keep mode as adcs
         self._handle_action_clicked("adcs", "auto_zero_lux")
+        # Disable only set_zero_btn, enable set_value_btn
+        self.set_zero_btn.setDisabled(True)
+        self.set_value_btn.setDisabled(False)
 
     def _handle_apriltag_mode_selected(self):
-        self._update_current_auto_mode("AprilTag")
+        self._update_current_auto_mode("adcs")  # Keep mode as adcs
         self._handle_action_clicked("adcs", "auto_zero_tag")
+        # Disable both set_zero_btn and set_value_btn
+        self.set_zero_btn.setDisabled(True)
+        self.set_value_btn.setDisabled(True)

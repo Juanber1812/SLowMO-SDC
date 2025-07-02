@@ -19,6 +19,8 @@ from datetime import datetime
 import logging
 import csv
 import os
+from collections import deque
+import datetime
 
 # Try to import hardware libraries
 try:
@@ -592,6 +594,12 @@ class ADCSController:
             }
         }
         
+        # Yaw history for timestamp matching
+        self.yaw_history = deque(maxlen=100)  # Store (timestamp, yaw) tuples
+        
+        # Auto zero tag control
+        self.auto_zero_tag_enabled = False
+        
         # Start high-speed data acquisition
         self.start_data_thread()
         
@@ -624,6 +632,8 @@ class ADCSController:
                     with self.data_lock:
                         self.current_data.update(new_data)
                         self.last_reading_time = current_time
+                        # Store yaw history for timestamp matching
+                        self.yaw_history.append((current_time, new_data['mpu']['yaw']))
                     
                     next_read_time += interval
                     
@@ -812,10 +822,10 @@ class ADCSController:
                     return self.set_controller_gains(value)
                 # --- Handle new zero commands ---
                 elif command == "auto_zero_tag":
-                    self.auto_zero_tag()
+                    self.start_auto_zero_tag()
                     return {"status": "success", "message": "AprilTag zeroed"}
                 elif command == "auto_zero_lux":
-                    self.auto_zero_lux()
+                    self.Start_auto_zero_lux()
                     return {"status": "success", "message": "Environmental zeroed"}
                 elif command == "stop_auto_zero_tag":
                     self.stop_auto_zero_tag()
@@ -999,19 +1009,57 @@ class ADCSController:
         cleanup_motor_control()
         print("✓ ADCS Controller shutdown complete")
 
-    def auto_zero_tag(self):
-        """Automatically zero MPU for AprilTag mode (placeholder)"""
-        print("[ADCS] Auto-zero for AprilTag mode (placeholder)")
+    def auto_zero_tag(self, data):
+        """
+        Called when scanning_mode_data is received or when AprilTag command is triggered.
+        Sets the MPU yaw to the received relative angle at the matching timestamp.
+        """
+        if not self.auto_zero_tag_enabled:
+            print("[AUTO ZERO] auto_zero_tag is disabled, ignoring data.")
+            return
+        try:
+            rel_angle = data.get("relative_angle")
+            timestamp_str = data.get("timestamp")
+            if rel_angle is None or not timestamp_str:
+                print("[AUTO ZERO] Invalid data received.")
+                return
 
-    def auto_zero_lux(self):
-        """Automatically zero MPU for Environmental mode (placeholder)"""
-        print("[ADCS] Auto-zero for Environmental mode (placeholder)")
+            # Parse ISO timestamp to epoch
+            ts = datetime.datetime.fromisoformat(timestamp_str.replace("Z", "+00:00")).timestamp()
+
+            # Find the closest yaw measurement in history
+            with self.data_lock:
+                if not self.yaw_history:
+                    print("[AUTO ZERO] No yaw history available.")
+                    return
+                closest = min(self.yaw_history, key=lambda tup: abs(tup[0] - ts))
+                yaw_at_ts = closest[1]
+                print(f"[AUTO ZERO] Closest yaw at {closest[0]:.3f} (diff {abs(closest[0]-ts):.3f}s): {yaw_at_ts:.2f}")
+
+            # Optionally flip sign here if needed:
+            # rel_angle = -rel_angle
+
+            # Set the MPU yaw to the relative angle
+            with self.data_lock:
+                self.mpu_sensor.angle_yaw = float(rel_angle)
+                self.mpu_sensor.angle_yaw_pure = float(rel_angle)
+
+            # Set PD controller target to 0
+            self.pd_controller.set_target(0.0)
+            print(f"[AUTO ZERO] MPU yaw set to {rel_angle:.2f}, PD target set to 0.")
+
+        except Exception as e:
+            print(f"[AUTO ZERO] Error: {e}")
+
+    def start_auto_zero_tag(self):
+        """Enable AprilTag auto zeroing."""
+        self.auto_zero_tag_enabled = True
+        print("[AUTO ZERO] auto_zero_tag ENABLED.")
 
     def stop_auto_zero_tag(self):
-        print("[ADCS] Stopped auto zero for AprilTag (placeholder)")
-
-    def stop_auto_zero_lux(self):
-        print("[ADCS] Stopped auto zero for Environmental (placeholder)")
+        """Disable AprilTag auto zeroing."""
+        self.auto_zero_tag_enabled = False
+        print("[AUTO ZERO] auto_zero_tag DISABLED.")
 
 def main():
     """Main function for testing"""

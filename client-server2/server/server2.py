@@ -1,4 +1,3 @@
-
 # server2.py
 
 from gevent import monkey; monkey.patch_all()
@@ -78,10 +77,11 @@ connected_clients = set()
 
 @socketio.on("scanning_mode_data")
 def handle_scanning_mode_data(data):
-    """Receive and print scanning mode data from client for testing."""
     try:
         print(f"[SCANNING MODE DATA RECEIVED] {data}")
-        # Optionally, you could emit an ack or log to file here
+        # Only run auto zero if enabled
+        if adcs_controller and getattr(adcs_controller, "auto_zero_tag_enabled", False):
+            adcs_controller.auto_zero_tag(data)
     except Exception as e:
         print(f"[ERROR] Failed to handle scanning_mode_data: {e}")
 
