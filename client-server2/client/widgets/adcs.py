@@ -55,7 +55,7 @@ class ADCSSection(QGroupBox):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ADCSSection")
-        self.setFixedSize(1300,235)
+        self.setFixedSize(1230,235)
         self.current_auto_mode = "adcs" # Default auto mode
         self._setup_ui()
         self._connect_signals()

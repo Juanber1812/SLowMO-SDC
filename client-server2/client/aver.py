@@ -619,7 +619,7 @@ class MainWindow(QWidget):
         # self.log_display_widget was created in __init__
         # Set minimum size to make it bigger and match graph section height
         self.log_display_widget.setMinimumHeight(self.graph_section.height() - 10)  # Slightly smaller than graph for padding
-        self.log_display_widget.setMinimumWidth(300)  # Ensure reasonable minimum width
+        self.log_display_widget.setMinimumWidth(250)  # Ensure reasonable minimum width
         log_display_layout.addWidget(self.log_display_widget)
         log_display_group.setLayout(log_display_layout)
 
@@ -829,7 +829,7 @@ class MainWindow(QWidget):
                 # Store references to power labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references to match your power.py data structure
@@ -850,7 +850,7 @@ class MainWindow(QWidget):
                 # Store references to thermal labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb;margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references for your new thermal labels
@@ -869,7 +869,7 @@ class MainWindow(QWidget):
                 # Store references to ADCS labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references for the individual ADCS components
@@ -898,7 +898,7 @@ class MainWindow(QWidget):
                 # Store references to CDH labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references
@@ -915,7 +915,7 @@ class MainWindow(QWidget):
                 # Store references to communication labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references for the new communication labels
@@ -936,17 +936,17 @@ class MainWindow(QWidget):
             elif name == "Payload Subsystem":
                 # Create payload subsystem labels with combined format
                 self.payload_camera_label = QLabel("Camera: Checking...")
-                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_camera_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_camera_label)
                 
                 self.payload_lidar_label = QLabel("Lidar: Checking...")
-                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_lidar_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_lidar_label)
                 
                 self.payload_status_label = QLabel("Status: Not Ready")
-                self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_status_label.setStyleSheet(f"QLabel {{ color: #bbb; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_status_label)
                 
@@ -957,7 +957,7 @@ class MainWindow(QWidget):
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: 2px 0px; padding: 2px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: #bbb; margin: margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     if name != "Error Log" and name != "Overall Status":
                         lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
@@ -1286,8 +1286,10 @@ class MainWindow(QWidget):
                         self.power_labels["energy"].setText("Energy: -- Wh")
                         self.power_labels["battery"].setText("Battery: --%")
                         self.power_labels["status"].setText("Status: Disconnected")
+                        self.power_labels["status"].setMinimumHeight(self.power_labels["status"].sizeHint().height())
+
                         self.power_labels["status"].setStyleSheet(
-                            f"QLabel {{ color: #666666; margin: 2px 0px; padding: 2px 0px; "
+                            f"QLabel {{ color: #666666; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; "
                             f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                         )
                         return
@@ -1323,8 +1325,9 @@ class MainWindow(QWidget):
                             status_color = "#00ff00"  # Green for normal
                         
                         self.power_labels["status"].setText(f"Status: {status}")
+                        self.power_labels["status"].setMinimumHeight(self.power_labels["status"].sizeHint().height())
                         self.power_labels["status"].setStyleSheet(
-                            f"QLabel {{ color: {status_color}; margin: 2px 0px; padding: 2px 0px; "
+                            f"QLabel {{ color: {status_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; "
                             f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                         )
             except Exception as e:
@@ -1398,8 +1401,9 @@ class MainWindow(QWidget):
                             status_color = "#00ff00"  # Green for normal
                         
                         self.thermal_labels["status"].setText(f"Status: {status}")
+                        self.thermal_labels["status"].setMinimumHeight(self.thermal_labels["status"].sizeHint().height())
                         self.thermal_labels["status"].setStyleSheet(
-                            f"QLabel {{ color: {status_color}; margin: 2px 0px; padding: 2px 0px; "
+                            f"QLabel {{ color: {status_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; "
                             f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                         )
             except Exception as e:
@@ -1844,10 +1848,10 @@ class MainWindow(QWidget):
         self.detector_active = not self.detector_active
 
         if self.detector_active:
-            logging.info("[INFO] 🚀 Starting detector...")
+            logging.info("[INFO] Starting detector...")
             threading.Thread(target=self.run_detector, daemon=True).start()
         else:
-            logging.info("[INFO] 🛑 Stopping detector...")
+            logging.info("[INFO] Stopping detector...")
             self.clear_queue()
 
     def show_full_image(self):
@@ -2175,6 +2179,10 @@ class MainWindow(QWidget):
     #=========================================================================
     #                          UTILITY METHODS                              
     #=========================================================================
+
+    def get_battery_temp(self):
+        if sio.connected:
+            sio.emit("get_battery_temp")
 
     def handle_adcs_command(self, mode_name, command_name, value):
         data = {

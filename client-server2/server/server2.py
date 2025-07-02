@@ -719,6 +719,32 @@ def handle_get_power_status():
         })
         logging.error(f"Error getting power status: {e}")
 
+from temperature import W1ThermSensor, BATTERY_SENSOR_ID, W1THERM_AVAILABLE
+
+@socketio.on("get_battery_temp")
+def handle_get_battery_temp():
+    """Handle request for current battery temperature (one-shot)"""
+    try:
+        if not W1THERM_AVAILABLE:
+            emit("battery_temp_response", {
+                "success": False,
+                "error": "w1thermsensor not available"
+            })
+            return
+        sensor = W1ThermSensor(sensor_id=BATTERY_SENSOR_ID)
+        temp_c = sensor.get_temperature()
+        emit("battery_temp_response", {
+            "success": True,
+            "battery_temp": round(temp_c, 1)
+        })
+        print(f"[SERVER] Battery temp reading: {temp_c:.1f}°C")
+    except Exception as e:
+        emit("battery_temp_response", {
+            "success": False,
+            "error": str(e)
+        })
+        print(f"[SERVER] Battery temp read failed: {e}")
+
 @socketio.on("get_thermal_status")
 def handle_get_thermal_status():
     """Handle request for current thermal status"""

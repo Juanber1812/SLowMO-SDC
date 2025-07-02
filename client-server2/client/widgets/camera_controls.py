@@ -24,6 +24,9 @@ class CameraControlsWidget(QGroupBox):
         self.toggle_btn = QPushButton("Run Stream")
         self.reconnect_btn = QPushButton("Reconnect")
         self.capture_btn = QPushButton("Capture Image")
+
+        # New: Get Battery Temp Button
+        self.get_batt_temp_btn = QPushButton("Get Battery Temp")
         
         # Detector Control Button
         self.detector_btn = QPushButton("Run Detector")
@@ -64,7 +67,7 @@ class CameraControlsWidget(QGroupBox):
         """
 
         # Apply the same style to all buttons
-        for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.detector_btn, self.orientation_btn):
+        for btn in (self.toggle_btn, self.reconnect_btn, self.capture_btn, self.detector_btn, self.orientation_btn, self.get_batt_temp_btn):
             btn.setStyleSheet(self.BUTTON_STYLE)
             
         # Make the Start Detector button checkable and set it to stay pressed when toggled
@@ -93,6 +96,9 @@ class CameraControlsWidget(QGroupBox):
                 self.detector_btn.clicked.connect(self.parent_window.toggle_detector)
             if hasattr(self.parent_window, 'toggle_orientation'):
                 self.orientation_btn.clicked.connect(self.parent_window.toggle_orientation)
+            # Optionally connect Get Battery Temp button if handler exists
+            if hasattr(self.parent_window, 'get_battery_temp'):
+                self.get_batt_temp_btn.clicked.connect(self.parent_window.get_battery_temp)
 
         # Default states
         self.toggle_btn.setEnabled(False)
@@ -106,7 +112,7 @@ class CameraControlsWidget(QGroupBox):
         self.layout.addWidget(self.toggle_btn)
         self.layout.addWidget(self.reconnect_btn)
         self.layout.addWidget(self.capture_btn)
-
+        self.layout.addWidget(self.get_batt_temp_btn)
         self.layout.addWidget(self.orientation_btn)
 
         #self.layout.addWidget(self.run_something_btn)
