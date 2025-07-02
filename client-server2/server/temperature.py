@@ -1,39 +1,39 @@
-# thermal_subprocess.py
+# temperature.py
 
-from multiprocessing import Process, Queue
 import time
 import logging
-from w1thermsensor import W1ThermSensor, units, RESOLUTION_9_BIT
+from multiprocessing import Process, Queue
+from w1thermsensor import W1ThermSensor, units
 
-# ID of your battery sensor
+# Your DS18B20 ID
 BATTERY_SENSOR_ID = '0b24404e94cd'
 
 def _thermal_worker(q: Queue):
     """
-    Runs in a separate process: reads the sensor every second
-    at 9-bit resolution (≈94 ms conversion) and pushes a dict into q.
+    Runs in its own process. Configures the sensor for 9-bit reads
+    (~94 ms conversions) and pushes one reading per second into q.
     """
     try:
         sensor = W1ThermSensor(sensor_id=BATTERY_SENSOR_ID)
-        sensor.set_resolution(RESOLUTION_9_BIT)
+        # 9-bit resolution = ~94 ms per conversion
+        sensor.set_resolution(9)
     except Exception as e:
-        logging.error(f"Could not initialize W1ThermSensor: {e}")
+        logging.error(f"[ThermalWorker] init failed: {e}")
         return
 
     while True:
         try:
             temp = sensor.get_temperature(units.DEGREES_C)
-            q.put({"battery_temp": round(temp, 1)})
+            q.put({ "battery_temp": round(temp, 1) })
         except Exception as e:
-            logging.error(f"Error reading temperature: {e}")
-            q.put({"battery_temp": None})
+            logging.error(f"[ThermalWorker] read failed: {e}")
+            q.put({ "battery_temp": None })
         time.sleep(1.0)
-
 
 def start_thermal_subprocess() -> Queue:
     """
-    Spawns the thermal worker in its own process.
-    Returns a multiprocessing.Queue you can .get() from to receive readings.
+    Spawns the thermal worker in a child process.
+    Returns a Queue that will receive a dict {"battery_temp": …} each second.
     """
     q = Queue()
     p = Process(target=_thermal_worker, args=(q,), daemon=True)
@@ -42,9 +42,8 @@ def start_thermal_subprocess() -> Queue:
 
 
 if __name__ == "__main__":
-    # Quick test of the subprocess
+    # Quick standalone test
     q = start_thermal_subprocess()
-    print("Thermal subprocess started; reading 5 samples...")
     for _ in range(5):
-        data = q.get()   # blocks until the first reading arrives
-        print(data)
+        data = q.get()   # blocks for up to ~1 s
+        print(f"Got: {data}")
