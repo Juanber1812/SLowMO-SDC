@@ -2256,3 +2256,14 @@
 2025-07-02 09:26:16,770 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
 2025-07-02 09:26:17,283 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
 2025-07-02 09:26:17,305 - INFO - Disconnected from server: client disconnect
+2025-07-02 09:35:31,714 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 09:35:31,890 - INFO - Connected to server
+2025-07-02 09:35:31,897 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 09:35:31,907 - INFO - [INFO] Successfully connected to server
+2025-07-02 09:36:52,699 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 09:36:52,702 - INFO - Stream paused for config application.
+2025-07-02 09:36:53,206 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 09:36:53,212 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 09:36:53,416 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 09:37:56,251 - INFO - [INFO] Closing application...
+2025-07-02 09:37:57,957 - INFO - Disconnected from server: client disconnect
