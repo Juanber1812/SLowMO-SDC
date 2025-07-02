@@ -150,7 +150,7 @@ class YawGraphStacked(QWidget):
             border: 2px solid {BUTTON_COLOR};
             border-radius: {BORDER_RADIUS}px;
             padding: 6px 12px;
-            min-height: 24px;
+            min-height: 25px;
             font-size: {FONT_SIZE_NORMAL}pt;
             font-family: {FONT_FAMILY};
         }}
@@ -177,7 +177,7 @@ class YawGraphStacked(QWidget):
         self.BOX_STYLE = f"""
         QGroupBox {{
             background-color: {PLOT_BACKGROUND};
-            border: 2px solid {BORDER_COLOR};
+            border: 0px solid {BORDER_COLOR};
             border-radius: 8px;
             font-size: {FONT_SIZE_NORMAL}pt;
             font-family: {FONT_FAMILY};

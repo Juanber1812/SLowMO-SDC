@@ -5324,3 +5324,60 @@
 2025-07-02 21:23:36,252 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
 2025-07-02 21:29:37,420 - INFO - [INFO] Closing application...
 2025-07-02 21:29:38,625 - INFO - Disconnected from server: client disconnect
+2025-07-02 21:29:48,088 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 21:29:50,165 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751488188.0949008 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000013DE7E6E900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-02 21:30:05,033 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:30:05,036 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 21:30:09,333 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-02 21:30:09,745 - INFO - Connected to server
+2025-07-02 21:30:09,749 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 21:30:12,398 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:30:21,328 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:30:21,330 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 21:30:41,467 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 21:30:41,547 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:30:42,353 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:33:30,870 - INFO - [INFO] Closing application...
+2025-07-02 21:33:32,082 - INFO - Disconnected from server: client disconnect
+2025-07-02 21:33:40,221 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 21:33:40,784 - INFO - Connected to server
+2025-07-02 21:33:40,786 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 21:33:40,791 - INFO - [INFO] Successfully connected to server
+2025-07-02 21:33:58,649 - INFO - [INFO] Closing application...
+2025-07-02 21:33:59,858 - INFO - Disconnected from server: client disconnect
+2025-07-02 21:38:21,672 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 21:38:21,861 - INFO - Connected to server
+2025-07-02 21:38:21,863 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 21:38:21,865 - INFO - [INFO] Successfully connected to server
+2025-07-02 21:38:23,057 - INFO - Sending ADCS command: Mode='adcs', Command='calibrate', Value=None
+2025-07-02 21:38:56,447 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 21:39:53,729 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 21:39:53,920 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:39:55,347 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 21:39:55,580 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:40:02,061 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:40:02,065 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 21:40:34,143 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:40:35,074 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 21:40:35,199 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:40:35,839 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 21:40:35,947 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:40:36,485 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 21:40:36,501 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:40:38,107 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:40:38,112 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 21:41:01,955 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 21:41:04,671 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:41:05,789 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 21:41:05,875 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:41:06,066 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 21:41:06,167 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:41:07,035 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:41:07,040 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 21:41:19,085 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 21:41:19,444 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 21:41:19,517 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:41:19,815 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 21:41:19,870 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 21:41:31,849 - INFO - [INFO] Closing application...
+2025-07-02 21:41:33,556 - INFO - Disconnected from server: client disconnect

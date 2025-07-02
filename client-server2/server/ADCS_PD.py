@@ -116,11 +116,11 @@ def set_motor_power(power):
 
 def rotate_clockwise():
     """Rotate motor clockwise (full power) - for manual control"""
-    set_motor_power(100)
+    set_motor_power(50)
 
 def rotate_counterclockwise():
     """Rotate motor counterclockwise (full power) - for manual control"""
-    set_motor_power(-100)
+    set_motor_power(-50)
 
 def stop_motor():
     """Stop motor (no power)"""
@@ -1054,7 +1054,7 @@ class ADCSController:
         Environmental auto-zeroing routine:
         1. Zero yaw and start controller.
         2. Wait until stationary.
-        3. Perform 2 slow full rotations, recording lux peaks and corresponding yaw.
+        3. Prompt user to manually perform 2 full rotations, recording lux peaks and corresponding yaw.
         4. Print comparison of peak angles and sensor angles.
         5. Enter continuous mode: update sun reference to 0° on new peaks.
         6. Allow user to point to any target.
@@ -1084,26 +1084,17 @@ class ADCSController:
             time.sleep(0.1)
         print("[AUTO ZERO ENV] Stationary achieved.")
 
-        # 3. Perform 2 slow full rotations (minimum motor power)
-        print("[AUTO ZERO ENV] Performing 2 slow full rotations for peak detection...")
-        self.pd_controller.stop_controller()
-        self.manual_control_active = True
+        # 3. Prompt user for manual rotation
+        print("[AUTO ZERO ENV] Please manually rotate the system through 2 full rotations (720°) at a slow, steady speed.")
+        print("[AUTO ZERO ENV] The system will automatically detect lux peaks during your manual rotation.")
 
-        # --- Burst at 80% for 100ms, then constant 10% ---
-        burst_power = 80
-        slow_power = 10  # 10% for slow constant rotation
-
-        set_motor_power(burst_power)
-        time.sleep(0.1)  # 100 ms burst
-
-        set_motor_power(slow_power)
         rotation_count = 0
         last_yaw = None
         yaw_wraps = 0
         peak_log = []
 
         start_time = time.time()
-        while rotation_count < 2:
+        while yaw_wraps < 2:
             with self.data_lock:
                 yaw = self.current_data['mpu']['yaw']
                 lux = self.current_data['lux'].copy()
@@ -1125,13 +1116,9 @@ class ADCSController:
                         peak_log.append({'ch': ch, 'lux': win[1], 'yaw': yaw, 'time': time.time()})
                         print(f"[AUTO ZERO ENV] Peak detected: Lux{ch} {win[1]:.1f} at yaw {yaw:.1f}")
 
-            if yaw_wraps >= 2:
-                rotation_count = 2
             time.sleep(0.02)
 
-        stop_motor()
-        self.manual_control_active = False
-        print("[AUTO ZERO ENV] Rotations complete. Analysing peaks...")
+        print("[AUTO ZERO ENV] 2 full rotations detected. Rotations complete. Analysing peaks...")
 
         # 4. Analyse and print comparison
         for peak in peak_log:
@@ -1171,8 +1158,9 @@ class ADCSController:
         print("[AUTO ZERO ENV] You may now point to any target. Sun reference will update on new peaks.")
     
     def stop_auto_zero_env(self):
-        """Disable environmental (lux-based) auto zeroing."""
+        """Disable environmental (lux-based) auto zeroing and stop motor cleanly."""
         self.auto_zero_env_enabled = False
+        stop_motor()
         print("[AUTO ZERO ENV] Environmental auto zero DISABLED.")
 
     def auto_zero_env(self):
