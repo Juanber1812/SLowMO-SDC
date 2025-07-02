@@ -3902,3 +3902,309 @@
 2025-07-02 14:07:56,912 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
 2025-07-02 14:08:03,624 - INFO - [INFO] Closing application...
 2025-07-02 14:08:05,328 - INFO - Disconnected from server: client disconnect
+2025-07-02 14:09:32,787 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 14:09:33,123 - INFO - Connected to server
+2025-07-02 14:09:33,127 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:09:33,130 - INFO - [INFO] Successfully connected to server
+2025-07-02 14:09:57,140 - INFO - [INFO] Starting detector...
+2025-07-02 14:10:01,967 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:10:01,969 - INFO - Stream paused for config application.
+2025-07-02 14:10:02,471 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 14:10:02,477 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 14:10:02,681 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 14:10:02,926 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:10:02,931 - INFO - Stream paused for config application.
+2025-07-02 14:10:03,440 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 14:10:03,447 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 14:10:03,652 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 14:10:07,703 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:10:07,706 - INFO - Stream paused for config application.
+2025-07-02 14:10:08,210 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 14:10:08,214 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 14:10:08,416 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 14:10:12,917 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:10:12,918 - INFO - Stream paused for config application.
+2025-07-02 14:10:13,423 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 14:10:13,428 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 14:10:13,632 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 14:10:20,935 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:10:21,081 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:10:21,539 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:10:21,688 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:10:22,246 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:10:22,383 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:10:22,736 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:10:22,885 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:10:23,215 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:10:23,359 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:10:24,879 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:10:25,022 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:10:25,312 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:10:25,440 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:10:27,485 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 14:10:27,497 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:10:27,500 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 14:10:28,519 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:10:28.519Z', 'mode': 'scanning'}
+2025-07-02 14:10:29,542 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:10:29.542Z', 'mode': 'scanning'}
+2025-07-02 14:10:30,525 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:10:30.525Z', 'mode': 'scanning'}
+2025-07-02 14:10:31,490 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -3.4, 'timestamp': '2025-07-02T13:10:31.490Z', 'mode': 'scanning'}
+2025-07-02 14:10:32,733 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.9, 'timestamp': '2025-07-02T13:10:32.733Z', 'mode': 'scanning'}
+2025-07-02 14:10:33,528 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:10:33.528Z', 'mode': 'scanning'}
+2025-07-02 14:10:33,878 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:10:33,880 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 14:10:34,553 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:10:34.552Z', 'mode': 'scanning'}
+2025-07-02 14:10:35,525 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:10:35.525Z', 'mode': 'scanning'}
+2025-07-02 14:10:36,509 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:10:36.509Z', 'mode': 'scanning'}
+2025-07-02 14:10:36,587 - INFO - Manual orientation crosshairs enabled
+2025-07-02 14:10:37,669 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:10:37.669Z', 'mode': 'scanning'}
+2025-07-02 14:10:38,511 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -3.0, 'timestamp': '2025-07-02T13:10:38.510Z', 'mode': 'scanning'}
+2025-07-02 14:10:39,514 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.0, 'timestamp': '2025-07-02T13:10:39.514Z', 'mode': 'scanning'}
+2025-07-02 14:10:40,479 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.1, 'timestamp': '2025-07-02T13:10:40.479Z', 'mode': 'scanning'}
+2025-07-02 14:10:41,507 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 14:10:41,509 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.9, 'timestamp': '2025-07-02T13:10:41.509Z', 'mode': 'scanning'}
+2025-07-02 14:10:42,670 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.5, 'timestamp': '2025-07-02T13:10:42.670Z', 'mode': 'scanning'}
+2025-07-02 14:10:43,494 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.1, 'timestamp': '2025-07-02T13:10:43.494Z', 'mode': 'scanning'}
+2025-07-02 14:10:44,505 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T13:10:44.505Z', 'mode': 'scanning'}
+2025-07-02 14:10:45,542 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.2, 'timestamp': '2025-07-02T13:10:45.542Z', 'mode': 'scanning'}
+2025-07-02 14:10:46,512 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.9, 'timestamp': '2025-07-02T13:10:46.512Z', 'mode': 'scanning'}
+2025-07-02 14:10:47,616 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -10.6, 'timestamp': '2025-07-02T13:10:47.616Z', 'mode': 'scanning'}
+2025-07-02 14:10:48,482 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.1, 'timestamp': '2025-07-02T13:10:48.482Z', 'mode': 'scanning'}
+2025-07-02 14:10:49,555 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 9.5, 'timestamp': '2025-07-02T13:10:49.555Z', 'mode': 'scanning'}
+2025-07-02 14:10:50,551 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 9.6, 'timestamp': '2025-07-02T13:10:50.551Z', 'mode': 'scanning'}
+2025-07-02 14:10:51,537 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 9.4, 'timestamp': '2025-07-02T13:10:51.537Z', 'mode': 'scanning'}
+2025-07-02 14:10:52,708 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -17.4, 'timestamp': '2025-07-02T13:10:52.707Z', 'mode': 'scanning'}
+2025-07-02 14:10:53,544 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -14.9, 'timestamp': '2025-07-02T13:10:53.544Z', 'mode': 'scanning'}
+2025-07-02 14:10:54,546 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -5.4, 'timestamp': '2025-07-02T13:10:54.545Z', 'mode': 'scanning'}
+2025-07-02 14:10:55,564 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:10:55.564Z', 'mode': 'scanning'}
+2025-07-02 14:10:56,592 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.0, 'timestamp': '2025-07-02T13:10:56.592Z', 'mode': 'scanning'}
+2025-07-02 14:10:57,657 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:10:57.657Z', 'mode': 'scanning'}
+2025-07-02 14:10:58,565 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.0, 'timestamp': '2025-07-02T13:10:58.565Z', 'mode': 'scanning'}
+2025-07-02 14:10:59,575 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.9, 'timestamp': '2025-07-02T13:10:59.574Z', 'mode': 'scanning'}
+2025-07-02 14:11:00,593 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.9, 'timestamp': '2025-07-02T13:11:00.592Z', 'mode': 'scanning'}
+2025-07-02 14:11:01,558 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.5, 'timestamp': '2025-07-02T13:11:01.558Z', 'mode': 'scanning'}
+2025-07-02 14:11:02,700 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -5.2, 'timestamp': '2025-07-02T13:11:02.700Z', 'mode': 'scanning'}
+2025-07-02 14:11:03,548 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.4, 'timestamp': '2025-07-02T13:11:03.548Z', 'mode': 'scanning'}
+2025-07-02 14:11:04,600 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.2, 'timestamp': '2025-07-02T13:11:04.600Z', 'mode': 'scanning'}
+2025-07-02 14:11:05,557 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.1, 'timestamp': '2025-07-02T13:11:05.557Z', 'mode': 'scanning'}
+2025-07-02 14:11:06,579 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.2, 'timestamp': '2025-07-02T13:11:06.579Z', 'mode': 'scanning'}
+2025-07-02 14:11:07,663 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.1, 'timestamp': '2025-07-02T13:11:07.663Z', 'mode': 'scanning'}
+2025-07-02 14:11:08,555 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.4, 'timestamp': '2025-07-02T13:11:08.555Z', 'mode': 'scanning'}
+2025-07-02 14:11:09,568 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.3, 'timestamp': '2025-07-02T13:11:09.567Z', 'mode': 'scanning'}
+2025-07-02 14:11:10,594 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:11:10.594Z', 'mode': 'scanning'}
+2025-07-02 14:11:11,566 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:11:11.565Z', 'mode': 'scanning'}
+2025-07-02 14:11:12,652 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.9, 'timestamp': '2025-07-02T13:11:12.652Z', 'mode': 'scanning'}
+2025-07-02 14:11:13,567 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.9, 'timestamp': '2025-07-02T13:11:13.567Z', 'mode': 'scanning'}
+2025-07-02 14:11:14,599 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.9, 'timestamp': '2025-07-02T13:11:14.599Z', 'mode': 'scanning'}
+2025-07-02 14:11:15,616 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.7, 'timestamp': '2025-07-02T13:11:15.616Z', 'mode': 'scanning'}
+2025-07-02 14:11:16,571 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.8, 'timestamp': '2025-07-02T13:11:16.571Z', 'mode': 'scanning'}
+2025-07-02 14:11:17,678 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.4, 'timestamp': '2025-07-02T13:11:17.678Z', 'mode': 'scanning'}
+2025-07-02 14:11:18,593 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -2.1, 'timestamp': '2025-07-02T13:11:18.592Z', 'mode': 'scanning'}
+2025-07-02 14:11:19,593 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:11:19.593Z', 'mode': 'scanning'}
+2025-07-02 14:11:20,593 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.2, 'timestamp': '2025-07-02T13:11:20.593Z', 'mode': 'scanning'}
+2025-07-02 14:11:21,606 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:21.606Z', 'mode': 'scanning'}
+2025-07-02 14:11:22,613 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:22.613Z', 'mode': 'scanning'}
+2025-07-02 14:11:23,596 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:23.596Z', 'mode': 'scanning'}
+2025-07-02 14:11:24,632 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:24.632Z', 'mode': 'scanning'}
+2025-07-02 14:11:25,597 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:25.597Z', 'mode': 'scanning'}
+2025-07-02 14:11:26,633 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:26.633Z', 'mode': 'scanning'}
+2025-07-02 14:11:27,642 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:27.642Z', 'mode': 'scanning'}
+2025-07-02 14:11:28,606 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:28.605Z', 'mode': 'scanning'}
+2025-07-02 14:11:29,212 - INFO - Sending ADCS command: Mode='adcs', Command='calibrate', Value=None
+2025-07-02 14:11:29,617 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:29.617Z', 'mode': 'scanning'}
+2025-07-02 14:11:30,638 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:30.638Z', 'mode': 'scanning'}
+2025-07-02 14:11:31,674 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:31.674Z', 'mode': 'scanning'}
+2025-07-02 14:11:32,620 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:32.619Z', 'mode': 'scanning'}
+2025-07-02 14:11:33,639 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:33.639Z', 'mode': 'scanning'}
+2025-07-02 14:11:34,616 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:34.616Z', 'mode': 'scanning'}
+2025-07-02 14:11:35,620 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:35.620Z', 'mode': 'scanning'}
+2025-07-02 14:11:36,626 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:36.626Z', 'mode': 'scanning'}
+2025-07-02 14:11:37,661 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:37.661Z', 'mode': 'scanning'}
+2025-07-02 14:11:38,633 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:38.633Z', 'mode': 'scanning'}
+2025-07-02 14:11:39,659 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:39.659Z', 'mode': 'scanning'}
+2025-07-02 14:11:40,659 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:40.659Z', 'mode': 'scanning'}
+2025-07-02 14:11:41,624 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:41.624Z', 'mode': 'scanning'}
+2025-07-02 14:11:42,673 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:42.672Z', 'mode': 'scanning'}
+2025-07-02 14:11:43,673 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:43.673Z', 'mode': 'scanning'}
+2025-07-02 14:11:44,626 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:44.626Z', 'mode': 'scanning'}
+2025-07-02 14:11:45,648 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:45.648Z', 'mode': 'scanning'}
+2025-07-02 14:11:46,657 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:46.657Z', 'mode': 'scanning'}
+2025-07-02 14:11:47,634 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:47.634Z', 'mode': 'scanning'}
+2025-07-02 14:11:48,614 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:48.613Z', 'mode': 'scanning'}
+2025-07-02 14:11:49,609 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:49.608Z', 'mode': 'scanning'}
+2025-07-02 14:11:50,654 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:50.654Z', 'mode': 'scanning'}
+2025-07-02 14:11:51,639 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:51.639Z', 'mode': 'scanning'}
+2025-07-02 14:11:52,621 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:52.621Z', 'mode': 'scanning'}
+2025-07-02 14:11:53,618 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:53.618Z', 'mode': 'scanning'}
+2025-07-02 14:11:54,617 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:54.617Z', 'mode': 'scanning'}
+2025-07-02 14:11:55,642 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:55.641Z', 'mode': 'scanning'}
+2025-07-02 14:11:56,653 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:56.653Z', 'mode': 'scanning'}
+2025-07-02 14:11:57,668 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:57.667Z', 'mode': 'scanning'}
+2025-07-02 14:11:58,648 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:58.648Z', 'mode': 'scanning'}
+2025-07-02 14:11:59,643 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:11:59.643Z', 'mode': 'scanning'}
+2025-07-02 14:12:00,656 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:00.656Z', 'mode': 'scanning'}
+2025-07-02 14:12:00,730 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 14:12:00,746 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:12:02,165 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 14:12:05,309 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 14:12:06,180 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
+2025-07-02 14:12:10,931 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 14:12:12,095 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 14:12:12,113 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:12:12,116 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 14:12:13,156 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:13.156Z', 'mode': 'scanning'}
+2025-07-02 14:12:14,118 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:14.118Z', 'mode': 'scanning'}
+2025-07-02 14:12:15,105 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.4, 'timestamp': '2025-07-02T13:12:15.105Z', 'mode': 'scanning'}
+2025-07-02 14:12:16,155 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:16.155Z', 'mode': 'scanning'}
+2025-07-02 14:12:16,753 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 14:12:17,111 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:17.111Z', 'mode': 'scanning'}
+2025-07-02 14:12:18,114 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.4, 'timestamp': '2025-07-02T13:12:18.114Z', 'mode': 'scanning'}
+2025-07-02 14:12:19,126 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.1, 'timestamp': '2025-07-02T13:12:19.126Z', 'mode': 'scanning'}
+2025-07-02 14:12:20,141 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -4.5, 'timestamp': '2025-07-02T13:12:20.141Z', 'mode': 'scanning'}
+2025-07-02 14:12:21,155 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 8.6, 'timestamp': '2025-07-02T13:12:21.154Z', 'mode': 'scanning'}
+2025-07-02 14:12:22,113 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.5, 'timestamp': '2025-07-02T13:12:22.113Z', 'mode': 'scanning'}
+2025-07-02 14:12:23,140 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.3, 'timestamp': '2025-07-02T13:12:23.140Z', 'mode': 'scanning'}
+2025-07-02 14:12:24,139 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.8, 'timestamp': '2025-07-02T13:12:24.139Z', 'mode': 'scanning'}
+2025-07-02 14:12:25,155 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 12.4, 'timestamp': '2025-07-02T13:12:25.155Z', 'mode': 'scanning'}
+2025-07-02 14:12:26,108 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 12.3, 'timestamp': '2025-07-02T13:12:26.108Z', 'mode': 'scanning'}
+2025-07-02 14:12:27,149 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T13:12:27.149Z', 'mode': 'scanning'}
+2025-07-02 14:12:28,160 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.4, 'timestamp': '2025-07-02T13:12:28.160Z', 'mode': 'scanning'}
+2025-07-02 14:12:29,113 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 8.0, 'timestamp': '2025-07-02T13:12:29.113Z', 'mode': 'scanning'}
+2025-07-02 14:12:30,133 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 8.9, 'timestamp': '2025-07-02T13:12:30.132Z', 'mode': 'scanning'}
+2025-07-02 14:12:31,160 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.9, 'timestamp': '2025-07-02T13:12:31.159Z', 'mode': 'scanning'}
+2025-07-02 14:12:32,160 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.7, 'timestamp': '2025-07-02T13:12:32.160Z', 'mode': 'scanning'}
+2025-07-02 14:12:33,180 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.4, 'timestamp': '2025-07-02T13:12:33.180Z', 'mode': 'scanning'}
+2025-07-02 14:12:34,138 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.6, 'timestamp': '2025-07-02T13:12:34.138Z', 'mode': 'scanning'}
+2025-07-02 14:12:35,147 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.1, 'timestamp': '2025-07-02T13:12:35.147Z', 'mode': 'scanning'}
+2025-07-02 14:12:36,137 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -6.3, 'timestamp': '2025-07-02T13:12:36.137Z', 'mode': 'scanning'}
+2025-07-02 14:12:37,167 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 7.4, 'timestamp': '2025-07-02T13:12:37.167Z', 'mode': 'scanning'}
+2025-07-02 14:12:38,135 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 9.1, 'timestamp': '2025-07-02T13:12:38.135Z', 'mode': 'scanning'}
+2025-07-02 14:12:39,127 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.7, 'timestamp': '2025-07-02T13:12:39.126Z', 'mode': 'scanning'}
+2025-07-02 14:12:40,139 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 10.9, 'timestamp': '2025-07-02T13:12:40.139Z', 'mode': 'scanning'}
+2025-07-02 14:12:41,158 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -9.0, 'timestamp': '2025-07-02T13:12:41.158Z', 'mode': 'scanning'}
+2025-07-02 14:12:42,144 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.6, 'timestamp': '2025-07-02T13:12:42.144Z', 'mode': 'scanning'}
+2025-07-02 14:12:43,196 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 7.3, 'timestamp': '2025-07-02T13:12:43.195Z', 'mode': 'scanning'}
+2025-07-02 14:12:44,161 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:44.161Z', 'mode': 'scanning'}
+2025-07-02 14:12:45,168 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:45.168Z', 'mode': 'scanning'}
+2025-07-02 14:12:46,193 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:46.193Z', 'mode': 'scanning'}
+2025-07-02 14:12:47,171 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:47.171Z', 'mode': 'scanning'}
+2025-07-02 14:12:48,171 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:48.171Z', 'mode': 'scanning'}
+2025-07-02 14:12:49,172 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:49.172Z', 'mode': 'scanning'}
+2025-07-02 14:12:50,162 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:50.162Z', 'mode': 'scanning'}
+2025-07-02 14:12:51,194 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:51.194Z', 'mode': 'scanning'}
+2025-07-02 14:12:52,176 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:52.176Z', 'mode': 'scanning'}
+2025-07-02 14:12:53,176 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:53.176Z', 'mode': 'scanning'}
+2025-07-02 14:12:54,216 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:54.216Z', 'mode': 'scanning'}
+2025-07-02 14:12:55,159 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:55.158Z', 'mode': 'scanning'}
+2025-07-02 14:12:56,156 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:56.155Z', 'mode': 'scanning'}
+2025-07-02 14:12:57,190 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:57.190Z', 'mode': 'scanning'}
+2025-07-02 14:12:58,188 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:58.188Z', 'mode': 'scanning'}
+2025-07-02 14:12:59,202 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:12:59.202Z', 'mode': 'scanning'}
+2025-07-02 14:13:00,165 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:00.165Z', 'mode': 'scanning'}
+2025-07-02 14:13:01,171 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:01.171Z', 'mode': 'scanning'}
+2025-07-02 14:13:02,216 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:02.215Z', 'mode': 'scanning'}
+2025-07-02 14:13:03,185 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:03.185Z', 'mode': 'scanning'}
+2025-07-02 14:13:04,159 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:04.158Z', 'mode': 'scanning'}
+2025-07-02 14:13:05,170 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:05.170Z', 'mode': 'scanning'}
+2025-07-02 14:13:06,188 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:06.188Z', 'mode': 'scanning'}
+2025-07-02 14:13:07,189 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:07.189Z', 'mode': 'scanning'}
+2025-07-02 14:13:08,196 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:08.195Z', 'mode': 'scanning'}
+2025-07-02 14:13:09,163 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:09.163Z', 'mode': 'scanning'}
+2025-07-02 14:13:10,175 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:10.175Z', 'mode': 'scanning'}
+2025-07-02 14:13:11,154 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:11.154Z', 'mode': 'scanning'}
+2025-07-02 14:13:12,179 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:12.179Z', 'mode': 'scanning'}
+2025-07-02 14:13:13,215 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:13.215Z', 'mode': 'scanning'}
+2025-07-02 14:13:14,210 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:14.210Z', 'mode': 'scanning'}
+2025-07-02 14:13:15,175 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:15.174Z', 'mode': 'scanning'}
+2025-07-02 14:13:16,210 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:16.210Z', 'mode': 'scanning'}
+2025-07-02 14:13:17,197 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:17.197Z', 'mode': 'scanning'}
+2025-07-02 14:13:18,205 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:18.205Z', 'mode': 'scanning'}
+2025-07-02 14:13:19,232 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:19.232Z', 'mode': 'scanning'}
+2025-07-02 14:13:20,190 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:20.190Z', 'mode': 'scanning'}
+2025-07-02 14:13:21,242 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:21.242Z', 'mode': 'scanning'}
+2025-07-02 14:13:22,237 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:22.237Z', 'mode': 'scanning'}
+2025-07-02 14:13:23,216 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:23.216Z', 'mode': 'scanning'}
+2025-07-02 14:13:24,213 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:24.213Z', 'mode': 'scanning'}
+2025-07-02 14:13:25,246 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:25.246Z', 'mode': 'scanning'}
+2025-07-02 14:13:26,251 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:26.251Z', 'mode': 'scanning'}
+2025-07-02 14:13:27,277 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:27.277Z', 'mode': 'scanning'}
+2025-07-02 14:13:28,264 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:28.263Z', 'mode': 'scanning'}
+2025-07-02 14:13:29,264 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:29.264Z', 'mode': 'scanning'}
+2025-07-02 14:13:30,252 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:30.252Z', 'mode': 'scanning'}
+2025-07-02 14:13:31,239 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:31.239Z', 'mode': 'scanning'}
+2025-07-02 14:13:32,255 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:32.255Z', 'mode': 'scanning'}
+2025-07-02 14:13:33,232 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:33.232Z', 'mode': 'scanning'}
+2025-07-02 14:13:34,258 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:34.258Z', 'mode': 'scanning'}
+2025-07-02 14:13:35,230 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:35.229Z', 'mode': 'scanning'}
+2025-07-02 14:13:36,232 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:36.232Z', 'mode': 'scanning'}
+2025-07-02 14:13:37,266 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:37.265Z', 'mode': 'scanning'}
+2025-07-02 14:13:38,255 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:38.255Z', 'mode': 'scanning'}
+2025-07-02 14:13:39,292 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:39.292Z', 'mode': 'scanning'}
+2025-07-02 14:13:40,263 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:40.263Z', 'mode': 'scanning'}
+2025-07-02 14:13:41,238 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:41.238Z', 'mode': 'scanning'}
+2025-07-02 14:13:42,278 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:42.278Z', 'mode': 'scanning'}
+2025-07-02 14:13:43,283 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:43.282Z', 'mode': 'scanning'}
+2025-07-02 14:13:44,272 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:44.272Z', 'mode': 'scanning'}
+2025-07-02 14:13:45,271 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:45.271Z', 'mode': 'scanning'}
+2025-07-02 14:13:46,290 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:46.290Z', 'mode': 'scanning'}
+2025-07-02 14:13:47,269 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:47.269Z', 'mode': 'scanning'}
+2025-07-02 14:13:48,274 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:48.274Z', 'mode': 'scanning'}
+2025-07-02 14:13:49,258 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:49.258Z', 'mode': 'scanning'}
+2025-07-02 14:13:50,250 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:50.250Z', 'mode': 'scanning'}
+2025-07-02 14:13:51,239 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:51.239Z', 'mode': 'scanning'}
+2025-07-02 14:13:52,291 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:52.291Z', 'mode': 'scanning'}
+2025-07-02 14:13:53,272 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:53.271Z', 'mode': 'scanning'}
+2025-07-02 14:13:54,273 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:54.273Z', 'mode': 'scanning'}
+2025-07-02 14:13:55,263 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:55.263Z', 'mode': 'scanning'}
+2025-07-02 14:13:55,349 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
+2025-07-02 14:13:56,283 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:56.283Z', 'mode': 'scanning'}
+2025-07-02 14:13:57,276 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:57.276Z', 'mode': 'scanning'}
+2025-07-02 14:13:58,264 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:58.264Z', 'mode': 'scanning'}
+2025-07-02 14:13:59,270 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:13:59.270Z', 'mode': 'scanning'}
+2025-07-02 14:14:00,267 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:00.267Z', 'mode': 'scanning'}
+2025-07-02 14:14:01,256 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:01.256Z', 'mode': 'scanning'}
+2025-07-02 14:14:02,297 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:02.297Z', 'mode': 'scanning'}
+2025-07-02 14:14:03,262 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:03.262Z', 'mode': 'scanning'}
+2025-07-02 14:14:04,287 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:04.287Z', 'mode': 'scanning'}
+2025-07-02 14:14:05,256 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:05.256Z', 'mode': 'scanning'}
+2025-07-02 14:14:06,278 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:06.278Z', 'mode': 'scanning'}
+2025-07-02 14:14:07,255 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:07.255Z', 'mode': 'scanning'}
+2025-07-02 14:14:08,290 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:08.290Z', 'mode': 'scanning'}
+2025-07-02 14:14:09,295 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:09.294Z', 'mode': 'scanning'}
+2025-07-02 14:14:10,264 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:10.264Z', 'mode': 'scanning'}
+2025-07-02 14:14:11,293 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:11.293Z', 'mode': 'scanning'}
+2025-07-02 14:14:12,323 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:12.323Z', 'mode': 'scanning'}
+2025-07-02 14:14:13,298 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:13.298Z', 'mode': 'scanning'}
+2025-07-02 14:14:14,298 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:14.298Z', 'mode': 'scanning'}
+2025-07-02 14:14:15,327 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:15.327Z', 'mode': 'scanning'}
+2025-07-02 14:14:16,304 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:16.304Z', 'mode': 'scanning'}
+2025-07-02 14:14:17,291 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:17.290Z', 'mode': 'scanning'}
+2025-07-02 14:14:18,283 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:18.283Z', 'mode': 'scanning'}
+2025-07-02 14:14:19,303 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:19.303Z', 'mode': 'scanning'}
+2025-07-02 14:14:20,339 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:20.338Z', 'mode': 'scanning'}
+2025-07-02 14:14:21,325 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:21.325Z', 'mode': 'scanning'}
+2025-07-02 14:14:22,328 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:22.327Z', 'mode': 'scanning'}
+2025-07-02 14:14:23,353 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:23.352Z', 'mode': 'scanning'}
+2025-07-02 14:14:24,295 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:24.295Z', 'mode': 'scanning'}
+2025-07-02 14:14:25,334 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:25.334Z', 'mode': 'scanning'}
+2025-07-02 14:14:26,309 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:26.309Z', 'mode': 'scanning'}
+2025-07-02 14:14:27,352 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:27.352Z', 'mode': 'scanning'}
+2025-07-02 14:14:28,346 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:28.345Z', 'mode': 'scanning'}
+2025-07-02 14:14:29,331 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:29.330Z', 'mode': 'scanning'}
+2025-07-02 14:14:30,339 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:30.339Z', 'mode': 'scanning'}
+2025-07-02 14:14:31,360 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:31.360Z', 'mode': 'scanning'}
+2025-07-02 14:14:32,333 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:32.333Z', 'mode': 'scanning'}
+2025-07-02 14:14:33,367 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:33.367Z', 'mode': 'scanning'}
+2025-07-02 14:14:34,360 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:34.360Z', 'mode': 'scanning'}
+2025-07-02 14:14:35,328 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:35.328Z', 'mode': 'scanning'}
+2025-07-02 14:14:36,327 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:36.327Z', 'mode': 'scanning'}
+2025-07-02 14:14:37,311 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:37.311Z', 'mode': 'scanning'}
+2025-07-02 14:14:38,342 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:38.342Z', 'mode': 'scanning'}
+2025-07-02 14:14:39,325 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:39.325Z', 'mode': 'scanning'}
+2025-07-02 14:14:40,370 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:40.370Z', 'mode': 'scanning'}
+2025-07-02 14:14:41,311 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:41.311Z', 'mode': 'scanning'}
+2025-07-02 14:14:42,312 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:42.311Z', 'mode': 'scanning'}
+2025-07-02 14:14:43,306 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:43.306Z', 'mode': 'scanning'}
+2025-07-02 14:14:44,357 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:44.357Z', 'mode': 'scanning'}
+2025-07-02 14:14:45,345 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:45.345Z', 'mode': 'scanning'}
+2025-07-02 14:14:46,359 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:46.359Z', 'mode': 'scanning'}
+2025-07-02 14:14:47,347 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:47.347Z', 'mode': 'scanning'}
