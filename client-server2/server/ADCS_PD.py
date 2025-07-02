@@ -1054,10 +1054,9 @@ class ADCSController:
         Environmental auto-zeroing routine:
         1. Zero yaw and start controller.
         2. Wait until stationary.
-        3. Prompt user to manually perform 2 full rotations, recording lux peaks and corresponding yaw.
-        4. Print comparison of peak angles and sensor angles.
+        3. Set PD controller target to yaw+30° in a loop (fixed error), record lux peaks.
+        4. After 2 full rotations, set target to 0° and leave PD controller on.
         5. Enter continuous mode: update sun reference to 0° on new peaks.
-        6. Allow user to point to any target.
         """
         print("[AUTO ZERO ENV] Starting environmental auto-zeroing routine...")
         self.auto_zero_env_enabled = True
@@ -1084,20 +1083,19 @@ class ADCSController:
             time.sleep(0.1)
         print("[AUTO ZERO ENV] Stationary achieved.")
 
-        # 3. Prompt user for manual rotation
-        print("[AUTO ZERO ENV] Please manually rotate the system through 2 full rotations (720°) at a slow, steady speed.")
-        print("[AUTO ZERO ENV] The system will automatically detect lux peaks during your manual rotation.")
-
-        rotation_count = 0
-        last_yaw = None
+        # 3. Set PD controller target to yaw+30° in a loop, record peaks, detect 2 wraps
+        print("[AUTO ZERO ENV] Rotating with fixed error (target = yaw + 30°)...")
         yaw_wraps = 0
+        last_yaw = None
         peak_log = []
 
-        start_time = time.time()
         while yaw_wraps < 2:
             with self.data_lock:
                 yaw = self.current_data['mpu']['yaw']
                 lux = self.current_data['lux'].copy()
+            # Set PD target to always be 30° ahead of current yaw
+            self.pd_controller.set_target(wrap_angle(yaw + 30))
+
             # Detect yaw wrap-around
             if last_yaw is not None:
                 if (last_yaw < -150 and yaw > 150):
@@ -1120,13 +1118,17 @@ class ADCSController:
 
         print("[AUTO ZERO ENV] 2 full rotations detected. Rotations complete. Analysing peaks...")
 
-        # 4. Analyse and print comparison
+        # 4. Set PD controller target to 0 and leave controller on
+        self.pd_controller.set_target(0.0)
+        print("[AUTO ZERO ENV] Target set to 0°. PD controller remains ON.")
+
+        # 5. Analyse and print comparison
         for peak in peak_log:
             ch = peak['ch']
             sensor_angle = self.lux_angles[ch]
             print(f"  Peak: Lux{ch} at yaw {peak['yaw']:.1f}°, sensor angle {sensor_angle}° (lux={peak['lux']:.1f})")
 
-        # 5. Enter continuous mode: update sun reference on new peaks
+        # 6. Enter continuous mode: update sun reference on new peaks
         print("[AUTO ZERO ENV] Entering continuous sun reference mode (sun = 0°)...")
         self.env_peak_log = []
         self.lux_zero_offset = 0.0
@@ -1145,15 +1147,14 @@ class ADCSController:
                         # Thresholds: lux > 50, angle change > 10°
                         if win[1] > win[0] and win[1] > win[2] and win[1] > 50:
                             last_peak = self.env_peak_log[-1] if self.env_peak_log else None
-                            if not last_peak or abs(self.wrap_angle(yaw - last_peak['yaw'])) > 10:
+                            if not last_peak or abs(wrap_angle(yaw - last_peak['yaw'])) > 10:
                                 sensor_angle = self.lux_angles[ch]
-                                offset = self.wrap_angle(yaw - sensor_angle)
+                                offset = wrap_angle(yaw - sensor_angle)
                                 self.lux_zero_offset = offset
                                 self.env_peak_log.append({'ch': ch, 'lux': win[1], 'yaw': yaw, 'offset': offset, 'time': time.time()})
                                 print(f"[AUTO ZERO ENV] [LIVE] Peak Lux{ch} {win[1]:.1f} at yaw {yaw:.1f}°, offset set to {offset:.1f}°")
                 time.sleep(0.05)
 
-        # Start continuous peak analysis in a background thread
         threading.Thread(target=continuous_env_loop, daemon=True).start()
         print("[AUTO ZERO ENV] You may now point to any target. Sun reference will update on new peaks.")
     
