@@ -118,47 +118,29 @@ class LuxSensorManager:
                     # Print log with timestamp and channel
                     print(f"\n[PEAK LOG] {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t_curr))} | Channel: {ch} | Value: {v_curr:.2f}")
 
-    def analyse_peaks_gradient(self, window_size=50, min_time_between_peaks=0.2):
+    def analyse_peaks_gradient(self, threshold=10.0, min_time_between_peaks=0.2):
         """
-        Analyse each lux sensor stream for peaks using gradient of line of best fit.
-        A peak is detected when the gradient changes from positive to negative.
+        Simple peak detection: look for sign flip in difference and apply threshold.
         """
         for ch in LUX_CHANNELS:
             data = list(self.history[ch])
-            if len(data) < window_size + 1:
-                continue  # Not enough data
+            if len(data) < 3:
+                continue
 
-            # Get sliding windows for gradient calculation
-            gradients = []
-            times = []
-            for i in range(len(data) - window_size):
-                window = data[i:i+window_size]
-                t_vals = np.array([t for t, v in window])
-                v_vals = np.array([v for t, v in window])
-                # Linear fit: v = m*t + c
-                A = np.vstack([t_vals, np.ones(len(t_vals))]).T
-                m, c = np.linalg.lstsq(A, v_vals, rcond=None)[0]
-                gradients.append(m)
-                times.append(t_vals[-1])  # Use the last time in the window
+            for i in range(1, len(data) - 1):
+                t_prev, v_prev = data[i - 1]
+                t_curr, v_curr = data[i]
+                t_next, v_next = data[i + 1]
 
-            # Look for sign change in gradient (from + to -)
-            for i in range(1, len(gradients)):
-                if gradients[i-1] > 0 and gradients[i] <= 0:
-                    # Interpolate zero crossing for more accurate peak time
-                    t1, t2 = times[i-1], times[i]
-                    g1, g2 = gradients[i-1], gradients[i]
-                    if g2 - g1 != 0:
-                        t_peak = t1 + (0 - g1) * (t2 - t1) / (g2 - g1)
-                    else:
-                        t_peak = t2
-                    # Find value at t_peak (approximate as value at t2)
-                    v_peak = [v for t, v in data if abs(t - t_peak) == min([abs(t - t_peak) for t, v in data])][0]
-                    # Check min_time_between_peaks
-                    last_max = self.last_maxima[ch]
-                    if last_max is None or (t_peak - last_max[0]) > min_time_between_peaks:
-                        self.last_maxima[ch] = (t_peak, v_peak)
-                        self.detected_maxima.append((t_peak, ch, v_peak))
-                        print(f"\n[PEAK-GRAD] {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t_peak))} | Channel: {ch} | Value: {v_peak:.2f}")
+                # Sign flip: up then down
+                if (v_curr - v_prev) > 0 and (v_next - v_curr) < 0:
+                    # Threshold: value must drop by at least threshold after peak
+                    if (v_curr - v_next) >= threshold:
+                        last_max = self.last_maxima[ch]
+                        if last_max is None or (t_curr - last_max[0]) > min_time_between_peaks:
+                            self.last_maxima[ch] = (t_curr, v_curr)
+                            self.detected_maxima.append((t_curr, ch, v_curr))
+                            print(f"\n[PEAK-SIMPLE] {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t_curr))} | Channel: {ch} | Value: {v_curr:.2f}")
 
 def print_hello():
     print("Hello")
