@@ -86,7 +86,7 @@ class PowerMonitor:
         self.internal_resistance = 0.10  # Ohms, typical for a pack (adjust if needed)
 
         estimated_voltage = voltage + (current * self.internal_resistance)
-        estimated_voltage = max(min(estimated_voltage, self.voltages[0]), self.voltages[-1])
+        estimated_voltage = min(max(estimated_voltage, self.voltages[0]), self.voltages[-1])
         pct = np.interp(estimated_voltage, self.voltages, self.percentages)
         print(f"[DEBUG] Battery percentage calculation: voltage={voltage:.2f}V, current={current:.2f}A, estimated_voltage={estimated_voltage:.2f}V, pct={pct:.2f}")
         return int(round(pct))
