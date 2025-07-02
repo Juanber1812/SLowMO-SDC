@@ -999,21 +999,20 @@ class ADCSController:
             return {"status": "error", "message": error_msg}
     
 
-    def manual_calibration(self, yaw_offset):
+    def manual_calibration(self, yaw_rate_offset):
         """
-        Manually calibrate the yaw by setting a yaw offset.
+        Manually calibrate the gyro Z rate by setting a bias offset.
         Args:
-            yaw_offset: The value (in degrees) to set as the current yaw.
+            yaw_rate_offset: The value (in deg/s) to offset the gyro Z rate.
         """
         try:
-            if yaw_offset is None:
-                return {"status": "error", "message": "No yaw offset provided"}
-            offset = float(yaw_offset)
+            if yaw_rate_offset is None:
+                return {"status": "error", "message": "No yaw rate offset provided"}
+            offset = float(yaw_rate_offset)
             with self.data_lock:
-                self.mpu_sensor.angle_yaw = offset
-                self.mpu_sensor.angle_yaw_pure = offset
-            print(f"[MANUAL CAL] Yaw manually set to {offset:.2f}°")
-            return {"status": "success", "message": f"Yaw manually set to {offset:.2f}°"}
+                self.mpu_sensor.gyro_z_cal = offset
+            print(f"[MANUAL CAL] Gyro Z rate offset set to {offset:.3f} deg/s")
+            return {"status": "success", "message": f"Gyro Z rate offset set to {offset:.3f} deg/s"}
         except Exception as e:
             return {"status": "error", "message": f"Manual calibration failed: {e}"}
 
