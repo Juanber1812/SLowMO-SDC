@@ -4497,3 +4497,70 @@
 2025-07-02 17:03:31,322 - INFO - [INFO] Successfully connected to server
 2025-07-02 17:03:36,092 - INFO - [INFO] Closing application...
 2025-07-02 17:03:37,301 - INFO - Disconnected from server: client disconnect
+2025-07-02 17:12:47,594 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 17:12:48,138 - INFO - Connected to server
+2025-07-02 17:12:48,142 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 17:12:48,145 - INFO - [INFO] Successfully connected to server
+2025-07-02 17:14:53,143 - INFO - Disconnected from server: transport error
+2025-07-02 17:14:53,826 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 17:14:54,558 - INFO - Connected to server
+2025-07-02 17:14:54,562 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 17:14:54,563 - INFO - Stream paused for config application.
+2025-07-02 17:15:00,380 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:00,479 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:01,815 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:01,951 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:07,112 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:07,187 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:09,668 - INFO - Manual orientation crosshairs enabled
+2025-07-02 17:15:10,962 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:11,030 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:12,092 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 17:15:12,220 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:13,132 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 17:15:13,560 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:32,225 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:32,475 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:36,818 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 17:15:36,926 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:37,177 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:37,268 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:44,900 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:44,979 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:45,922 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:45,983 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:46,328 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:46,421 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:46,552 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:46,670 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:46,856 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:46,941 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:48,693 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:48,803 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:49,276 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 17:15:52,860 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 17:15:53,715 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
+2025-07-02 17:15:55,792 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:15:56,911 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:15:57,239 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 17:15:58,593 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:16:02,619 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:16:03,094 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:16:03,456 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:16:04,595 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:16:05,076 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 17:16:05,670 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:16:06,071 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:16:06,450 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:16:11,294 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:16:12,611 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:16:13,809 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 17:16:14,017 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 17:16:17,231 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 17:16:17,831 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 17:16:35,323 - INFO - [INFO] Closing application...
+2025-07-02 17:16:37,032 - INFO - Disconnected from server: client disconnect
+2025-07-02 17:16:44,827 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 17:16:46,949 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751473004.8345127 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002284C42E900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-02 17:16:51,918 - INFO - [INFO] Closing application...
+2025-07-02 17:16:51,927 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.

@@ -325,6 +325,163 @@ class MPU6050Sensor:
             print(f"✗ MPU6050 reconnection failed: {e}")
             return False
 
+    def wrap_angle(self, angle):
+        """Wrap angle to [-180, 180]"""
+        return ((angle + 180) % 360) - 180
+
+    def start_auto_zero_env(self):
+        """
+        Environmental auto-zeroing routine:
+        1. Zero yaw and start controller.
+        2. Wait until stationary.
+        3. Perform 2 slow full rotations, recording lux peaks and corresponding yaw.
+        4. Print comparison of peak angles and sensor angles.
+        5. Enter continuous mode: update sun reference to 0° on new peaks.
+        6. Allow user to point to any target.
+        """
+        print("[AUTO ZERO ENV] Starting environmental auto-zeroing routine...")
+        self.auto_zero_env_enabled = True
+        self.lux_peak_windows = {1: [], 2: [], 3: []}
+        self.lux_angles = {1: 90, 2: -150, 3: -30}
+        self.lux_zero_offset = 0.0
+        self.env_peak_log = []
+
+        # 1. Zero yaw and start controller
+        self.zero_yaw_position()
+        self.pd_controller.set_target(0.0)
+        self.pd_controller.start_controller()
+        print("[AUTO ZERO ENV] Controller started, waiting to reach stationary...")
+
+        # 2. Wait until stationary (yaw rate < 1 deg/s for 2 seconds)
+        stationary_time = 0
+        while stationary_time < 2.0:
+            with self.data_lock:
+                gyro_rate = abs(self.current_data['mpu']['gyro_rate_z'])
+            if gyro_rate < 1.0:
+                stationary_time += 0.1
+            else:
+                stationary_time = 0
+            time.sleep(0.1)
+        print("[AUTO ZERO ENV] Stationary achieved.")
+
+        # 3. Perform 2 slow full rotations (minimum motor power)
+        print("[AUTO ZERO ENV] Performing 2 slow full rotations for peak detection...")
+        self.pd_controller.stop_controller()
+        self.manual_control_active = True
+        min_power = 25  # Minimum reliable power
+        rotation_count = 0
+        last_yaw = None
+        yaw_wraps = 0
+        peak_log = []
+
+        # Start slow rotation
+        set_motor_power(min_power)
+        start_time = time.time()
+        while rotation_count < 2:
+            with self.data_lock:
+                yaw = self.current_data['mpu']['yaw']
+                lux = self.current_data['lux'].copy()
+            # Detect yaw wrap-around
+            if last_yaw is not None:
+                if (last_yaw < -150 and yaw > 150):
+                    yaw_wraps += 1
+                    print(f"[AUTO ZERO ENV] Yaw wrap detected: {yaw_wraps}")
+            last_yaw = yaw
+
+            # Peak detection for each channel
+            for ch in [1, 2, 3]:
+                win = self.lux_peak_windows[ch]
+                win.append(lux[ch])
+                if len(win) > 3:
+                    win.pop(0)
+                if len(win) == 3:
+                    if win[1] > win[0] and win[1] > win[2] and win[1] > 50:  # 50 lux threshold
+                        peak_log.append({'ch': ch, 'lux': win[1], 'yaw': yaw, 'time': time.time()})
+                        print(f"[AUTO ZERO ENV] Peak detected: Lux{ch} {win[1]:.1f} at yaw {yaw:.1f}")
+
+            if yaw_wraps >= 2:
+                rotation_count = 2
+            time.sleep(0.02)
+
+        stop_motor()
+        self.manual_control_active = False
+        print("[AUTO ZERO ENV] Rotations complete. Analysing peaks...")
+
+        # 4. Analyse and print comparison
+        for peak in peak_log:
+            ch = peak['ch']
+            sensor_angle = self.lux_angles[ch]
+            print(f"  Peak: Lux{ch} at yaw {peak['yaw']:.1f}°, sensor angle {sensor_angle}° (lux={peak['lux']:.1f})")
+
+        # 5. Enter continuous mode: update sun reference on new peaks
+        print("[AUTO ZERO ENV] Entering continuous sun reference mode (sun = 0°)...")
+        self.env_peak_log = []
+        self.lux_zero_offset = 0.0
+
+        def continuous_env_loop():
+            while self.auto_zero_env_enabled:
+                with self.data_lock:
+                    yaw = self.current_data['mpu']['yaw']
+                    lux = self.current_data['lux'].copy()
+                for ch in [1, 2, 3]:
+                    win = self.lux_peak_windows[ch]
+                    win.append(lux[ch])
+                    if len(win) > 3:
+                        win.pop(0)
+                    if len(win) == 3:
+                        # Thresholds: lux > 50, angle change > 10°
+                        if win[1] > win[0] and win[1] > win[2] and win[1] > 50:
+                            last_peak = self.env_peak_log[-1] if self.env_peak_log else None
+                            if not last_peak or abs(self.wrap_angle(yaw - last_peak['yaw'])) > 10:
+                                sensor_angle = self.lux_angles[ch]
+                                offset = self.wrap_angle(yaw - sensor_angle)
+                                self.lux_zero_offset = offset
+                                self.env_peak_log.append({'ch': ch, 'lux': win[1], 'yaw': yaw, 'offset': offset, 'time': time.time()})
+                                print(f"[AUTO ZERO ENV] [LIVE] Peak Lux{ch} {win[1]:.1f} at yaw {yaw:.1f}°, offset set to {offset:.1f}°")
+                time.sleep(0.05)
+
+        # Start continuous peak analysis in a background thread
+        threading.Thread(target=continuous_env_loop, daemon=True).start()
+        print("[AUTO ZERO ENV] You may now point to any target. Sun reference will update on new peaks.")
+    
+    def stop_auto_zero_env(self):
+        """Disable environmental (lux-based) auto zeroing."""
+        self.auto_zero_env_enabled = False
+        print("[AUTO ZERO ENV] Environmental auto zero DISABLED.")
+
+    def auto_zero_env(self):
+        """
+        Call this method regularly (e.g. in your data thread) to analyze live lux data,
+        detect peaks, and set the yaw offset so the sun is at 0°.
+        """
+        if not getattr(self, "auto_zero_env_enabled", False):
+            return
+
+        # Get current lux and yaw data (thread-safe)
+        with self.data_lock:
+            lux_data = self.current_data['lux'].copy()
+            mpu_yaw = self.current_data['mpu']['yaw']
+
+        for ch in [1, 2, 3]:
+            win = self.lux_peak_windows[ch]
+            win.append(lux_data[ch])
+            if len(win) > 3:
+                win.pop(0)
+            if len(win) == 3:
+                if win[1] > win[0] and win[1] > win[2]:
+                    # Peak detected for this channel
+                    sensor_angle = self.lux_angles[ch]
+                    offset = self.wrap_angle(mpu_yaw - sensor_angle)
+                    self.lux_zero_offset = offset
+                    print(f"[AUTO ZERO ENV] Peak detected on Lux{ch} at yaw {mpu_yaw:.1f}°, sensor angle {sensor_angle}°, offset set to {offset:.1f}°")
+                    # Optionally, break after first peak detected
+                    break
+
+    def get_zeroed_yaw(self, mpu_yaw):
+        """Return yaw adjusted so sun is at 0° using the last detected offset."""
+        offset = getattr(self, "lux_zero_offset", 0.0)
+        return self.wrap_angle(mpu_yaw - offset)
+
 class LuxSensorManager:
     """Manages VEML7700 lux sensors with multiplexer"""
     
@@ -1058,6 +1215,7 @@ class ADCSController:
 
         except Exception as e:
             print(f"[AUTO ZERO] Error: {e}")
+
 
     def start_auto_zero_tag(self):
         """Enable AprilTag auto zeroing."""

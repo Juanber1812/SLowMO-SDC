@@ -1371,7 +1371,6 @@ class MainWindow(QWidget):
                     # Server sends formatted data like: 
                     # {"current": "0.123", "voltage": "5.0", "power": "0.62", "energy": "0.01", 
                     #  "temperature": "25.5", "battery_percentage": 75, "status": "Nominal"}
-                    print("[CLIENT] Received power_broadcast:", data)
                     
                     # Handle normal data updates
                     if "current" in data:
