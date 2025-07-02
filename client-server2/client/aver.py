@@ -63,7 +63,7 @@ from payload import detector4
 from widgets.camera_controls import CameraControlsWidget
 from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
-from widgets.adcs_graph import YawGraphWidget
+from widgets.adcs_graph import YawGraphStacked
 from widgets.detector_control import DetectorControlWidget
 from widgets.adcs import ADCSSection
 from widgets.detector_settings_widget import DetectorSettingsWidget
@@ -341,7 +341,7 @@ class MainWindow(QWidget):
         self.distance_plotter = RelativeDistancePlotter()
         self.angular_plotter  = RelativeAnglePlotter()
 
-        self.yaw_graph = YawGraphWidget()
+        self.yaw_graph = YawGraphStacked()
         # ── end instantiation ───────────────────────────────────────
 
         # Setup Log Display Widget

@@ -18,7 +18,7 @@ try:
     )
     ADCS_BUTTON_STYLE = f"""
         QPushButton {{
-            background-color: {BACKGROUND};
+            background-color: {BOX_BACKGROUND};
             color: {TEXT_COLOR};
             border: 2px solid {BUTTON_COLOR};
             border-radius: {BORDER_RADIUS}px;
@@ -93,7 +93,7 @@ class ADCSSection(QGroupBox):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ADCSSection")
-        self.setFixedSize(900,235)
+        self.setFixedSize(850,240)
         self.current_auto_mode = "adcs" # Default auto mode
         # Apply groupbox style to self
         if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
@@ -163,19 +163,24 @@ class ADCSSection(QGroupBox):
         layout = QVBoxLayout()
         
         cw_ccw_layout = QHBoxLayout()
+        # --- Switch order: CCW first (left), CW second (right) ---
+        self.manual_ccw_btn = QPushButton("Rotate CCW")
+        self.manual_ccw_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        # Make buttons 20% smaller in height
+        self.manual_ccw_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.manual_ccw_btn.setMinimumHeight(int(0.8 * 24))
+        cw_ccw_layout.addWidget(self.manual_ccw_btn)
         self.manual_cw_btn = QPushButton("Rotate CW")
         self.manual_cw_btn.setStyleSheet(ADCS_BUTTON_STYLE)
         self.manual_cw_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.manual_cw_btn.setMinimumHeight(int(0.8 * 24))
         cw_ccw_layout.addWidget(self.manual_cw_btn)
-        self.manual_ccw_btn = QPushButton("Rotate CCW")
-        self.manual_ccw_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.manual_ccw_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        cw_ccw_layout.addWidget(self.manual_ccw_btn)
         layout.addLayout(cw_ccw_layout)
 
         self.calibrate_btn = QPushButton("Calibrate Sensors")
         self.calibrate_btn.setStyleSheet(ADCS_BUTTON_STYLE)
         self.calibrate_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.calibrate_btn.setMinimumHeight(int(0.8 * 24))
         layout.addWidget(self.calibrate_btn)
 
         # --- Manual Calibrate Yaw ---
@@ -187,6 +192,7 @@ class ADCSSection(QGroupBox):
         self.manual_cal_btn = QPushButton("Manual Calibrate Yaw")
         self.manual_cal_btn.setStyleSheet(ADCS_BUTTON_STYLE)
         self.manual_cal_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.manual_cal_btn.setMinimumHeight(int(0.8 * 24))
         manual_cal_layout.addWidget(self.manual_cal_btn)
         layout.addLayout(manual_cal_layout)
         # --- End Manual Calibrate Yaw ---
