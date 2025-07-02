@@ -253,10 +253,18 @@ class ADCSSection(QGroupBox):
         self.set_pd_btn.clicked.connect(self._handle_set_pd_clicked)
 
     def _update_current_auto_mode(self, mode_name):
+        # Determine previous mode for stopping auto zero if needed
+        prev_mode = getattr(self, "current_auto_mode", "adcs")
         self.current_auto_mode = mode_name
         logging.info(f"[ADCSSection] Auto mode set to: {mode_name}")
 
-        # Disable/enable buttons based on mode
+        # Stop auto zero if switching away from AprilTag or Environmental
+        if prev_mode == "AprilTag" and mode_name != "AprilTag":
+            self._handle_action_clicked("adcs", "stop_auto_zero_tag")
+        elif prev_mode == "Environmental" and mode_name != "Environmental":
+            self._handle_action_clicked("adcs", "stop_auto_zero_lux")
+
+        # Disable/enable buttons based on mode (optional, or remove if not needed)
         if mode_name in ("AprilTag", "Environmental"):
             self.set_value_btn.setDisabled(True)
             self.set_zero_btn.setDisabled(True)
@@ -308,9 +316,9 @@ class ADCSSection(QGroupBox):
             self.min_pulse_input.setText(str(controller_data.get('min_pulse', '')))
 
     def _handle_env_mode_selected(self):
-        self._update_current_auto_mode("adcs")
+        self._update_current_auto_mode("Environmental")
         self._handle_action_clicked("adcs", "auto_zero_lux")
 
     def _handle_apriltag_mode_selected(self):
-        self._update_current_auto_mode("adcs")
+        self._update_current_auto_mode("AprilTag")
         self._handle_action_clicked("adcs", "auto_zero_tag")

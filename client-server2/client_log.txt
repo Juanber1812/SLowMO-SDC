@@ -3567,3 +3567,41 @@
 2025-07-02 13:22:51,583 - INFO - [ADCSSection] Auto mode set to: adcs
 2025-07-02 13:22:54,338 - INFO - [INFO] Closing application...
 2025-07-02 13:22:55,543 - INFO - Disconnected from server: client disconnect
+2025-07-02 13:26:16,684 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 13:26:17,014 - INFO - Connected to server
+2025-07-02 13:26:17,017 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 13:26:17,019 - INFO - [INFO] Successfully connected to server
+2025-07-02 13:26:20,198 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:26:20,200 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 13:26:25,984 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:26:25,997 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:26:25,999 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 13:26:26,977 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:26:27,976 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:26:28,976 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:26:29,984 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:26:30,981 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:26:31,977 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:26:32,981 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:26:33,786 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:26:33,804 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:26:33,807 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 13:26:34,416 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:26:34,432 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:26:34,435 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 13:26:35,416 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:26:36,061 - INFO - [INFO] Starting detector...
+2025-07-02 13:26:36,497 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:26:36.496Z', 'mode': 'scanning'}
+2025-07-02 13:26:37,418 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:26:37.418Z', 'mode': 'scanning'}
+2025-07-02 13:26:38,422 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:26:38.422Z', 'mode': 'scanning'}
+2025-07-02 13:26:38,492 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:26:38,510 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:26:38,512 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 13:26:39,144 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:26:39,163 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:26:39,165 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 13:26:40,134 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:26:40.134Z', 'mode': 'scanning'}
+2025-07-02 13:26:41,134 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:26:41.134Z', 'mode': 'scanning'}
+2025-07-02 13:26:41,778 - INFO - [INFO] Closing application...
+2025-07-02 13:26:42,983 - INFO - Disconnected from server: client disconnect
+2025-07-02 13:26:43,284 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.

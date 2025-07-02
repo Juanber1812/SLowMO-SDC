@@ -817,6 +817,12 @@ class ADCSController:
                 elif command == "auto_zero_lux":
                     self.auto_zero_lux()
                     return {"status": "success", "message": "Environmental zeroed"}
+                elif command == "stop_auto_zero_tag":
+                    self.stop_auto_zero_tag()
+                    return {"status": "success", "message": "Stopped AprilTag zero"}
+                elif command == "stop_auto_zero_lux":
+                    self.stop_auto_zero_lux()
+                    return {"status": "success", "message": "Stopped Environmental zero"}
 
         except Exception as e:
             error_msg = f"ADCS command error: {e}"
@@ -1000,6 +1006,12 @@ class ADCSController:
     def auto_zero_lux(self):
         """Automatically zero MPU for Environmental mode (placeholder)"""
         print("[ADCS] Auto-zero for Environmental mode (placeholder)")
+
+    def stop_auto_zero_tag(self):
+        print("[ADCS] Stopped auto zero for AprilTag (placeholder)")
+
+    def stop_auto_zero_lux(self):
+        print("[ADCS] Stopped auto zero for Environmental (placeholder)")
 
 def main():
     """Main function for testing"""
