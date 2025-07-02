@@ -7,6 +7,8 @@ try:
     import threading
     import logging
     from datetime import datetime
+    import numpy as np
+
 except ImportError as e:
     print(f"Error importing libraries: {e}")
     print("Make sure you have the required libraries installed.")
@@ -66,19 +68,28 @@ class PowerMonitor:
             logging.info("Power sensor hardware not responding - status will be disconnected")
             self.sensor_connected = False
             return False
+    
+    def get_battery_percentage(self, voltage, current):
+        """
+        Estimate battery percentage using compensated voltage.
+        Returns:
+        - int: Estimated battery state-of-charge percentage
+        """
 
-    def get_battery_percentage(self, voltage=7.4):
-        """Calculate battery percentage based on voltage (placeholder logic)"""
-        # TODO: Implement proper battery percentage calculation
-        # For now, use a simple linear approximation
-        # Typical Li-ion: 3.0V (0%) to 4.2V (100%) per cell
-        # Assuming 2S battery pack: 6.0V (0%) to 8.4V (100%)
-        if voltage >= 8.4:
-            return 100
-        elif voltage <= 6.0:
-            return 0
-        else:
-            return int(((voltage - 6.0) / (8.4 - 6.0)) * 100)
+        self.voltages = np.array([8.4, 8.2, 8.0, 7.8, 7.6, 7.4, 7.2, 7.0, 6.8, 6.5, 6.0, 5.5])
+        self.percentages = np.array([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5, 0])
+        self.internal_resistance = 0.05  # Ohms
+
+        # Estimate terminal voltage by compensating for voltage drop across internal resistance
+        estimated_voltage = voltage + (current * self.internal_resistance)
+
+        # Clamp to range to get min 6V, max
+        estimated_voltage = max(min(estimated_voltage, self.voltages[0]), self.voltages[-1])
+
+        # Interpolating to get SoC
+        soc = np.interp(estimated_voltage, self.voltages, self.percentages)
+
+        return int(round(soc))
 
     def get_power_values(self):
         """Read power values from sensor or return disconnected status"""
@@ -101,7 +112,7 @@ class PowerMonitor:
             power_mw = self.ina228.power * 1000  # Convert W to mW
             energy_j = getattr(self.ina228, 'energy', 0.0)  # Some versions may not have energy
             temperature_c = getattr(self.ina228, 'die_temperature', 25.0)  # Fallback temp
-            battery_pct = self.get_battery_percentage(voltage_v)
+            battery_pct = self.get_battery_percentage(voltage_v, current_ma / 1000)  # Convert mA to A for percentage calculation
             
             # Determine intelligent status based on readings
             power_status = self.determine_power_status(current_ma, voltage_v, power_mw, battery_pct, temperature_c)
