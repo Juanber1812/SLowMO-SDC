@@ -3,15 +3,15 @@
 import time
 import logging
 from multiprocessing import Process, Queue
-from w1thermsensor import W1ThermSensor, units
+from w1thermsensor import W1ThermSensor
 
-# Your DS18B20 ID
+# Your DS18B20’s ID
 BATTERY_SENSOR_ID = '0b24404e94cd'
 
 def _thermal_worker(q: Queue):
     """
-    Child process loop: reads the sensor once a second
-    (at its default resolution) and pushes results into q.
+    Runs in its own process. Reads the sensor once per second
+    (blocking in the child process only) and pushes {"battery_temp": …} into q.
     """
     try:
         sensor = W1ThermSensor(sensor_id=BATTERY_SENSOR_ID)
@@ -21,8 +21,9 @@ def _thermal_worker(q: Queue):
 
     while True:
         try:
-            temp = sensor.get_temperature(units.DEGREES_C)
-            q.put({"battery_temp": round(temp, 1)})
+            # Default get_temperature() returns °C
+            temp_c = sensor.get_temperature()
+            q.put({"battery_temp": round(temp_c, 1)})
         except Exception as e:
             logging.error(f"[ThermalWorker] read failed: {e}")
             q.put({"battery_temp": None})
@@ -31,8 +32,8 @@ def _thermal_worker(q: Queue):
 
 def start_thermal_subprocess() -> Queue:
     """
-    Spawns the thermal worker in a child process.
-    Returns a Queue that will receive dicts {"battery_temp": …}.
+    Spawn the thermal worker in a separate process.
+    Returns a multiprocessing.Queue on which you'll receive dicts {"battery_temp": …}.
     """
     q = Queue()
     p = Process(target=_thermal_worker, args=(q,), daemon=True)
@@ -45,5 +46,5 @@ if __name__ == "__main__":
     q = start_thermal_subprocess()
     print("Reading 5 samples (one per second)…")
     for _ in range(5):
-        data = q.get()   # blocks until next reading
+        data = q.get()
         print(data)
