@@ -76,7 +76,7 @@ class PowerMonitor:
             self.sensor_connected = False
             return False
     
-    def get_battery_percentage(self, voltage, current):
+    def get_battery_percentage(self, voltage_v, current_ma):
         """
         Estimate battery percentage for 2S Li-ion pack using compensated voltage.
         """
@@ -85,7 +85,7 @@ class PowerMonitor:
         self.percentages = np.array([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5, 2, 0])
         self.internal_resistance = 0.10  # Ohms, typical for a pack (adjust if needed)
 
-        estimated_voltage = voltage + (current * self.internal_resistance)
+        estimated_voltage = voltage_v + (current_ma * self.internal_resistance)
         estimated_voltage = max(min(estimated_voltage, self.voltages[0]), self.voltages[-1])
         pct = np.interp(estimated_voltage, self.voltages, self.percentages)
         return int(round(pct))

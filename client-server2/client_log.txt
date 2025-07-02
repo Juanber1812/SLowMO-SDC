@@ -4564,3 +4564,8 @@
 2025-07-02 17:16:46,949 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751473004.8345127 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002284C42E900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
 2025-07-02 17:16:51,918 - INFO - [INFO] Closing application...
 2025-07-02 17:16:51,927 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 18:03:27,519 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 18:03:27,856 - INFO - Connected to server
+2025-07-02 18:03:27,859 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 18:03:27,862 - INFO - [INFO] Successfully connected to server
+2025-07-02 18:03:35,888 - INFO - Disconnected from server: transport error
