@@ -1049,8 +1049,8 @@ class ADCSController:
 
             # Set the MPU yaw to the relative angle
             with self.data_lock:
-                self.mpu_sensor.angle_yaw = float(rel_angle)
-                self.mpu_sensor.angle_yaw_pure = float(rel_angle)
+                self.mpu_sensor.angle_yaw = -float(rel_angle)
+                self.mpu_sensor.angle_yaw_pure = -float(rel_angle)
 
             # Set PD controller target to 0
             self.pd_controller.set_target(0.0)

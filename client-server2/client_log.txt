@@ -4209,3 +4209,52 @@
 2025-07-02 14:14:46,359 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:46.359Z', 'mode': 'scanning'}
 2025-07-02 14:14:47,347 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:47.347Z', 'mode': 'scanning'}
 2025-07-02 15:46:14,436 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 16:20:55,555 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 16:20:55,742 - INFO - Connected to server
+2025-07-02 16:20:55,744 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 16:20:55,747 - INFO - [INFO] Successfully connected to server
+2025-07-02 16:21:15,229 - INFO - [INFO] Closing application...
+2025-07-02 16:21:16,434 - INFO - Disconnected from server: client disconnect
+2025-07-02 16:21:40,645 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 16:21:41,204 - INFO - Connected to server
+2025-07-02 16:21:41,210 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 16:21:41,217 - INFO - [INFO] Successfully connected to server
+2025-07-02 16:21:53,567 - INFO - Sending ADCS command: Mode='adcs', Command='calibrate', Value=None
+2025-07-02 16:22:42,515 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 16:22:43,318 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 16:22:45,789 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 16:22:47,387 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 16:22:49,014 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 16:23:14,866 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 16:23:14,869 - INFO - Stream paused for config application.
+2025-07-02 16:23:15,516 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 16:23:15,520 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 16:23:15,722 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 16:23:34,416 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=10.0
+2025-07-02 16:23:39,194 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=20.0
+2025-07-02 16:23:43,798 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=90.0
+2025-07-02 16:24:00,831 - INFO - [INFO] Starting detector...
+2025-07-02 16:24:03,036 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 16:24:03,038 - INFO - Stream paused for config application.
+2025-07-02 16:24:03,599 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 16:24:03,608 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 16:24:03,817 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 16:24:12,399 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 16:24:12,416 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 16:24:12,418 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 16:24:13,428 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 9.6, 'timestamp': '2025-07-02T15:24:13.427Z', 'mode': 'scanning'}
+2025-07-02 16:24:14,443 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 10.9, 'timestamp': '2025-07-02T15:24:14.443Z', 'mode': 'scanning'}
+2025-07-02 16:24:15,489 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 21.0, 'timestamp': '2025-07-02T15:24:15.489Z', 'mode': 'scanning'}
+2025-07-02 16:24:16,467 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T15:24:16.467Z', 'mode': 'scanning'}
+2025-07-02 16:24:17,411 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T15:24:17.410Z', 'mode': 'scanning'}
+2025-07-02 16:24:18,436 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 21.0, 'timestamp': '2025-07-02T15:24:18.436Z', 'mode': 'scanning'}
+2025-07-02 16:24:19,467 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T15:24:19.467Z', 'mode': 'scanning'}
+2025-07-02 16:24:20,472 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T15:24:20.472Z', 'mode': 'scanning'}
+2025-07-02 16:24:21,319 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 16:24:21,322 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 16:24:21,454 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 15.5, 'timestamp': '2025-07-02T15:24:21.454Z', 'mode': 'scanning'}
+2025-07-02 16:24:22,411 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 18.9, 'timestamp': '2025-07-02T15:24:22.410Z', 'mode': 'scanning'}
+2025-07-02 16:24:22,794 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 16:24:22,809 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 16:24:27,030 - INFO - [INFO] Closing application...
+2025-07-02 16:24:28,739 - INFO - Disconnected from server: client disconnect
