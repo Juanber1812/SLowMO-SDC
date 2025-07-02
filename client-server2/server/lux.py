@@ -3,6 +3,7 @@ import datetime
 from collections import deque
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import sys
 
 # Dummy I2C read function (replace with your actual sensor reading logic)
 def read_lux_sensor(sensor_id):
@@ -53,4 +54,5 @@ def animate(frame):
 if __name__ == "__main__":
     fig = plt.figure(figsize=(10, 6))
     anim = animation.FuncAnimation(fig, animate, interval=500, cache_frame_data=False)
+    sys.modules[__name__].anim = anim
     plt.show()
