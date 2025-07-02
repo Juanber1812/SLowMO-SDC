@@ -270,8 +270,8 @@ class PowerMonitor:
         if power_mw == 0 and current_ma != 0:
             return "Error"
         
-        # Check for abnormally low voltage (could indicate sensor issues)
-        if voltage_v < 3.0:
+        # Check for abnormally low/high voltage (could indicate sensor issues)
+        if voltage_v < 3.0 or voltage_v > 12.0:
             return "Error"
         
         # Check for very high current draw (more than 5A = 5000mA) - critical error
@@ -282,15 +282,15 @@ class PowerMonitor:
         if temperature_c and temperature_c > 60.0:
             return "Overheating"
         
-        # Check for voltage close to under-voltage lockout (UVLO) - typically around 5.3V
-        if voltage_v < 5.5:
-            return "V close to UVLO"  # Voltage close to under-voltage lockout
-        
         # Check for very high current draw (more than 2.5A = 2500mA) - critical
         if current_ma > 2500:
             return "Current Critical"
         
-        # Check for critically low battery (less than 15%)
+        # Check for voltage close to under-voltage lockout (UVLO) - typically around 5.3V
+        if voltage_v < 5.5:
+            return "V close to UVLO"  # Voltage close to under-voltage lockout
+        
+        # Check for critically low battery (less than 10%)
         if battery_pct < 10:
             return "Battery Critical"
         
@@ -306,8 +306,8 @@ class PowerMonitor:
         if battery_pct < 25:
             return "Battery Low"
         
-        # Check for high power consumption (more than 10W = 10000mW)
-        if power_mw > 10000:
+        # Check for high power consumption (more than 15W)
+        if power_mw > 15000:
             return "High Power"
         
         # If all checks pass, system is OK
