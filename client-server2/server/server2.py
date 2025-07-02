@@ -61,6 +61,8 @@ if POWER_AVAILABLE:
 thermal_queue = None
 if TEMPERATURE_AVAILABLE:
     thermal_queue = start_thermal_subprocess()
+    if thermal_queue is None:
+        logging.warning("Failed to initialize thermal monitoring - continuing without battery temperature")
 
 # Initialize communication monitor
 communication_monitor = None
@@ -632,13 +634,13 @@ def thermal_data_broadcast():
     
     try:
         # Get battery temperature from thermal queue
-        if thermal_queue and not thermal_queue.empty():
+        if thermal_queue:
             try:
                 while not thermal_queue.empty():  # Get the most recent reading
                     thermal_data = thermal_queue.get_nowait()
                     latest_battery_temp = thermal_data.get('battery_temp')
             except:
-                pass  # Queue was empty
+                pass  # Queue was empty or error occurred
         
         # Get Pi temperature from sensor data (stored globally when sensor_data is received)
         # We'll update this in the sensor_data handler
@@ -663,6 +665,10 @@ def thermal_data_broadcast():
         if not hasattr(thermal_data_broadcast, 'last_log') or time.time() - thermal_data_broadcast.last_log > 30:
             thermal_data_broadcast.last_log = time.time()
             logging.info(f"Thermal broadcast: Battery={thermal_data['battery_temp']}°C, Pi={thermal_data['pi_temp']}°C, Payload={thermal_data['payload_temp']}°C, Status={status}")
+            
+            # Debug info about data sources
+            battery_source = "thermal_queue" if thermal_queue else "N/A"
+            logging.debug(f"Thermal sources - Battery: {battery_source}, Pi: sensor_data, Payload: ADCS")
             
     except Exception as e:
         logging.error(f"Error in thermal data broadcast: {e}")

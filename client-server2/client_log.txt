@@ -2183,3 +2183,76 @@
 2025-07-02 09:19:31,746 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
 2025-07-02 09:19:35,658 - INFO - [INFO] Closing application...
 2025-07-02 09:19:35,663 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 09:25:46,714 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 09:25:46,897 - INFO - Connected to server
+2025-07-02 09:25:46,899 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 09:25:46,902 - INFO - [INFO] Successfully connected to server
+2025-07-02 09:25:47,065 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:47,527 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:48,012 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:48,581 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:49,052 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:49,562 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:50,043 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:50,548 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:51,081 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:51,567 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:52,085 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:52,601 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:53,083 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:53,594 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:54,114 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:54,589 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:55,124 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:55,640 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:56,140 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:56,605 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:57,122 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:57,635 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:57,800 - INFO - Manual orientation crosshairs enabled
+2025-07-02 09:25:58,147 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:58,666 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:59,128 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:25:59,640 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:00,155 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:00,657 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:01,170 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:01,641 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:02,154 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:02,656 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:03,172 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:03,681 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:04,192 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:04,688 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:05,240 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:05,751 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:06,216 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:06,759 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:07,235 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:07,750 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:07,844 - INFO - Manual orientation crosshairs disabled
+2025-07-02 09:26:08,216 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:08,753 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:08,867 - INFO - Manual orientation crosshairs enabled
+2025-07-02 09:26:09,222 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:09,728 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:10,057 - INFO - Manual orientation crosshairs disabled
+2025-07-02 09:26:10,259 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:10,453 - INFO - Manual orientation crosshairs enabled
+2025-07-02 09:26:10,674 - INFO - Manual orientation crosshairs disabled
+2025-07-02 09:26:10,736 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:11,260 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:11,752 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:12,263 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:12,771 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:13,250 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:13,790 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:14,264 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:14,792 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:15,304 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:15,780 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:16,100 - INFO - [INFO] Closing application...
+2025-07-02 09:26:16,273 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:16,770 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:17,283 - ERROR - Failed to update thermal data: Unknown format code 'f' for object of type 'str'
+2025-07-02 09:26:17,305 - INFO - Disconnected from server: client disconnect

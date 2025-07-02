@@ -1335,17 +1335,73 @@ class MainWindow(QWidget):
             """Handle thermal subsystem data updates"""
             try:
                 if hasattr(self, 'thermal_labels'):
-                    # Update thermal labels with your new labels
+                    # Update thermal labels - server sends: pi_temp, battery_temp, payload_temp, status
                     if "pi_temp" in data:
-                        self.thermal_labels["pi_temp"].setText(f"Pi: {data['pi_temp']:.1f}°C")
-                    if "power_pcb_temp" in data:
-                        self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {data['power_pcb_temp']:.1f}°C")
+                        pi_temp_str = data['pi_temp']
+                        if pi_temp_str != "N/A" and pi_temp_str != "Error":
+                            try:
+                                temp_val = float(pi_temp_str)
+                                self.thermal_labels["pi_temp"].setText(f"Pi: {temp_val:.1f}°C")
+                            except ValueError:
+                                self.thermal_labels["pi_temp"].setText(f"Pi: {pi_temp_str}")
+                        else:
+                            self.thermal_labels["pi_temp"].setText(f"Pi: {pi_temp_str}")
+                    
                     if "battery_temp" in data:
-                        self.thermal_labels["battery_temp"].setText(f"Battery: {data['battery_temp']:.1f}°C")
+                        battery_temp_str = data['battery_temp']
+                        if battery_temp_str != "N/A" and battery_temp_str != "Error":
+                            try:
+                                temp_val = float(battery_temp_str)
+                                self.thermal_labels["battery_temp"].setText(f"Battery: {temp_val:.1f}°C")
+                            except ValueError:
+                                self.thermal_labels["battery_temp"].setText(f"Battery: {battery_temp_str}")
+                        else:
+                            self.thermal_labels["battery_temp"].setText(f"Battery: {battery_temp_str}")
+                    
                     if "payload_temp" in data:
-                        self.thermal_labels["payload_temp"].setText(f"Payload: {data['payload_temp']:.1f}°C")
+                        payload_temp_str = data['payload_temp']
+                        if payload_temp_str != "N/A" and payload_temp_str != "Error":
+                            try:
+                                temp_val = float(payload_temp_str)
+                                self.thermal_labels["payload_temp"].setText(f"Payload: {temp_val:.1f}°C")
+                            except ValueError:
+                                self.thermal_labels["payload_temp"].setText(f"Payload: {payload_temp_str}")
+                        else:
+                            self.thermal_labels["payload_temp"].setText(f"Payload: {payload_temp_str}")
+                    
+                    # Handle Power PCB temperature (comes from power_broadcast, not thermal_broadcast)
+                    # Keep this handler for any legacy data, but it's normally updated via power_broadcast
+                    if "power_pcb_temp" in data:
+                        power_pcb_temp_str = data['power_pcb_temp']
+                        if power_pcb_temp_str != "N/A" and power_pcb_temp_str != "Error":
+                            try:
+                                temp_val = float(power_pcb_temp_str)
+                                self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {temp_val:.1f}°C")
+                            except ValueError:
+                                self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {power_pcb_temp_str}")
+                        else:
+                            self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {power_pcb_temp_str}")
+                    
+                    # Update thermal status with color coding
                     if "status" in data:
-                        self.thermal_labels["status"].setText(f"Status: {data['status']}")
+                        status = data['status']
+                        # Apply color coding based on thermal status
+                        if status == "Critical":
+                            status_color = "#ff4444"  # Red for critical
+                        elif status == "Hot":
+                            status_color = "#ffaa00"  # Orange for hot
+                        elif status == "Warm":
+                            status_color = "#ffdd00"  # Yellow for warm
+                        elif status == "Error":
+                            status_color = "#ff4444"  # Red for error
+                        else:  # Nominal
+                            status_color = "#00ff00"  # Green for normal
+                        
+                        self.thermal_labels["status"].setText(f"Status: {status}")
+                        self.thermal_labels["status"].setStyleSheet(
+                            f"QLabel {{ color: {status_color}; margin: 2px 0px; padding: 2px 0px; "
+                            f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                        )
             except Exception as e:
                 logging.error(f"Failed to update thermal data: {e}")
 
