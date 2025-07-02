@@ -158,9 +158,13 @@ class LuxSensorManager:
             entry = {'timestamp': timestamp}
             for ch in LUX_CHANNELS:
                 entry[f'ch{ch}'] = readings[ch]
-            # Use a window matching half the sampling interval (0.025s for 20Hz)
-            entry['peak'] = 1 if any(abs(timestamp - t) < 0.03 for t in self.peak_timestamps) else 0
+            # Mark peak if this timestamp matches a detected peak (with small tolerance)
+            is_peak = any(abs(timestamp - t) < 1e-3 for t in self.peak_timestamps)
+            entry['peak'] = 1 if is_peak else 0
             self.log_data.append(entry)
+            # Optionally, remove the timestamp from peak_timestamps to avoid duplicate marking
+            if is_peak:
+                self.peak_timestamps = {t for t in self.peak_timestamps if abs(timestamp - t) >= 1e-3}
 
     def export_log(self, filename="lux_log.csv"):
         """Export logged data to CSV."""
