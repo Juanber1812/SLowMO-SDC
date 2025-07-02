@@ -78,12 +78,19 @@ class PowerMonitor:
     
     def get_battery_percentage(self, voltage, current):
         """
-        Simple linear battery percentage for 2S Li-ion: 8.4V (100%) to 6.0V (0%)
+        Estimate battery percentage for 2S Li-ion pack using compensated voltage.
         """
-        pct = (voltage - 6.0) / 2.4 * 100
-        pct = max(0, min(100, pct))  # Clamp between 0 and 100
-        return int(round(pct))
+        # 2S Li-ion typical discharge curve (approximate, adjust as needed)
+        self.voltages = np.array([8.4, 8.2, 8.0, 7.8, 7.6, 7.4, 7.2, 7.0, 6.8, 6.6, 6.4, 6.2, 6.0])
+        self.percentages = np.array([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5, 2, 0])
+        self.internal_resistance = 0.10  # Ohms, typical for a pack (adjust if needed)
 
+        estimated_voltage = voltage + (current * self.internal_resistance)
+        estimated_voltage = max(min(estimated_voltage, self.voltages[0]), self.voltages[-1])
+        pct = np.interp(estimated_voltage, self.voltages, self.percentages)
+        return int(round(pct))
+        
+    print
     def get_power_values(self):
         """Read power values from sensor or return disconnected status"""
         if not self.sensor_connected or not self.ina228:
