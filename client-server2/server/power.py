@@ -72,10 +72,13 @@ class PowerMonitor:
     def get_battery_percentage(self, voltage, current):
         """
         Estimate battery percentage using compensated voltage.
+        Uses data sheet values and curves from https://docs.rs-online.com/c165/A700000007945034.pdf
         Returns:
         - int: Estimated battery state-of-charge percentage
         """
 
+        # Uses data sheet values and curves
+        # See data sheet
         self.voltages = np.array([8.4, 8.2, 8.0, 7.8, 7.6, 7.4, 7.2, 7.0, 6.8, 6.5, 6.0, 5.5])
         self.percentages = np.array([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5, 0])
         self.internal_resistance = 0.05  # Ohms
