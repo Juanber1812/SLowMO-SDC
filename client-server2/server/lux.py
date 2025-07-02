@@ -208,9 +208,12 @@ if __name__ == "__main__":
 
             if now - last_display >= 1.0:
                 lux_str = " | ".join([f"Lux{ch}: {readings[ch]:7.2f}" for ch in LUX_CHANNELS])
-                print(f"[LIVE] {lux_str}  {time.strftime('%H:%M:%S')}")
+                # Check if a peak was detected in the last second
+                recent_peaks = [t for t in manager.peak_timestamps if now - 1.0 < t <= now]
+                peak_msg = " [LIVE PEAK!]" if recent_peaks else ""
+                print(f"[LIVE] {lux_str}  {time.strftime('%H:%M:%S')}{peak_msg}")
                 last_display = now
-            time.sleep(0.01)
+            time.sleep(0.05)  # 20 Hz
     except KeyboardInterrupt:
         print("\nExiting lux sensor live display.")
         if manager.logging_enabled:
