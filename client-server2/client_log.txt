@@ -4208,3 +4208,4 @@
 2025-07-02 14:14:45,345 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:45.345Z', 'mode': 'scanning'}
 2025-07-02 14:14:46,359 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:46.359Z', 'mode': 'scanning'}
 2025-07-02 14:14:47,347 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:14:47.347Z', 'mode': 'scanning'}
+2025-07-02 15:46:14,436 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
