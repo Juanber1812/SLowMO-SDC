@@ -142,16 +142,12 @@ class LuxSensorManager:
                             self.detected_maxima.append((t_curr, ch, v_curr))
                             print(f"\n[PEAK-SIMPLE] {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t_curr))} | Channel: {ch} | Value: {v_curr:.2f}")
 
-def print_hello():
-    print("Hello")
 
 if __name__ == "__main__":
-    print_hello()  # Call the hello function
     manager = LuxSensorManager()
     try:
         while True:
             readings = manager.read_lux_sensors()
-            print_hello()  # Call the hello function
 
             manager.analyse_and_log_maxima(min_distance=10, threshold=5.0)
             lux_str = " | ".join([f"Lux{ch}: {readings[ch]:7.2f}" for ch in LUX_CHANNELS])
