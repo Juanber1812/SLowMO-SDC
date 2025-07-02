@@ -2,11 +2,11 @@ import sys
 import time
 import datetime
 from collections import deque
+import random
+import os
 from PyQt5 import QtWidgets, QtCore
 import pyqtgraph as pg
-import random
 
-# Dummy I2C read function (replace with your actual sensor reading logic)
 def read_lux_sensor(sensor_id):
     return 100 + 50 * random.random() + 50 * (sensor_id + 1) * (0.5 - random.random())
 
@@ -71,4 +71,10 @@ if __name__ == "__main__":
     win.setWindowTitle("Lux Sensors Live (PyQtGraph)")
     win.resize(900, 500)
     win.show()
-    sys.exit(app.exec())
+    try:
+        sys.exit(app.exec())
+    except SystemExit:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
+        app.quit()
