@@ -2134,3 +2134,29 @@
 2025-07-02 08:39:02,902 - INFO - Stream paused for config application.
 2025-07-02 08:39:03,836 - INFO - [INFO] Closing application...
 2025-07-02 08:39:05,042 - INFO - Disconnected from server: client disconnect
+2025-07-02 08:41:16,596 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 08:41:16,855 - INFO - Connected to server
+2025-07-02 08:41:16,858 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:41:16,863 - INFO - [INFO] Successfully connected to server
+2025-07-02 08:42:11,427 - ERROR - Failed to update thermal data: unsupported format string passed to NoneType.__format__
+2025-07-02 08:42:33,896 - INFO - Manual orientation crosshairs enabled
+2025-07-02 08:42:46,041 - INFO - [INFO] Closing application...
+2025-07-02 08:42:47,747 - INFO - Disconnected from server: client disconnect
+2025-07-02 08:43:33,703 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 08:43:34,262 - INFO - Connected to server
+2025-07-02 08:43:34,265 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:43:34,270 - INFO - [INFO] Successfully connected to server
+2025-07-02 08:43:41,737 - ERROR - Failed to update thermal data: unsupported format string passed to NoneType.__format__
+2025-07-02 08:43:52,169 - INFO - Requesting LIDAR streaming start
+2025-07-02 08:43:53,700 - INFO - Requesting LIDAR streaming stop
+2025-07-02 08:43:53,706 - INFO - Back button clicked in LidarWidget
+2025-07-02 08:43:54,927 - INFO - [INFO] Closing application...
+2025-07-02 08:43:56,633 - INFO - Disconnected from server: client disconnect
+2025-07-02 08:46:14,388 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 08:46:14,926 - INFO - Connected to server
+2025-07-02 08:46:14,930 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:46:14,934 - INFO - [INFO] Successfully connected to server
+2025-07-02 08:46:29,215 - INFO - Sending ADCS command: Mode='adcs', Command='calibrate', Value=None
+2025-07-02 08:47:16,595 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 08:47:19,230 - INFO - [INFO] Closing application...
+2025-07-02 08:47:20,435 - INFO - Disconnected from server: client disconnect

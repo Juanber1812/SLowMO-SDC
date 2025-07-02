@@ -1335,17 +1335,41 @@ class MainWindow(QWidget):
             """Handle thermal subsystem data updates"""
             try:
                 if hasattr(self, 'thermal_labels'):
-                    # Update thermal labels with your new labels
-                    if "pi_temp" in data:
-                        self.thermal_labels["pi_temp"].setText(f"Pi: {data['pi_temp']:.1f}°C")
-                    if "power_pcb_temp" in data:
-                        self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {data['power_pcb_temp']:.1f}°C")
-                    if "battery_temp" in data:
+                    # Server now sends only battery_temp and computed status
+                    # Other temperatures come from their respective broadcasts
+                    
+                    # Update battery temperature if available
+                    if "battery_temp" in data and data["battery_temp"] is not None:
                         self.thermal_labels["battery_temp"].setText(f"Battery: {data['battery_temp']:.1f}°C")
-                    if "payload_temp" in data:
-                        self.thermal_labels["payload_temp"].setText(f"Payload: {data['payload_temp']:.1f}°C")
+                    elif "battery_temp" in data and data["battery_temp"] is None:
+                        self.thermal_labels["battery_temp"].setText("Battery: N/A")
+                    
+                    # Update overall thermal status (computed on server using all available temperatures)
                     if "status" in data:
-                        self.thermal_labels["status"].setText(f"Status: {data['status']}")
+                        status = data["status"]
+                        
+                        # Apply color coding based on status
+                        if status == "Critical":
+                            status_color = "#ff4444"  # Red
+                        elif status == "Warning":
+                            status_color = "#ffaa00"  # Orange
+                        elif status == "Elevated":
+                            status_color = "#ffcc00"  # Yellow
+                        elif status == "Warm":
+                            status_color = "#88ff88"  # Light green
+                        elif status == "Normal":
+                            status_color = "#00ff00"  # Green
+                        elif status == "NoData":
+                            status_color = "#666666"  # Gray
+                        else:  # Error or unknown
+                            status_color = "#ff4444"  # Red
+                        
+                        self.thermal_labels["status"].setText(f"Status: {status}")
+                        self.thermal_labels["status"].setStyleSheet(
+                            f"QLabel {{ color: {status_color}; margin: 2px 0px; padding: 2px 0px; "
+                            f"font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                        )
+                        
             except Exception as e:
                 logging.error(f"Failed to update thermal data: {e}")
 
