@@ -1329,7 +1329,26 @@ class MainWindow(QWidget):
                         )
             except Exception as e:
                 logging.error(f"Failed to update power data: {e}")
-                
+
+        @sio.on("thermal_broadcast")
+        def on_thermal_data(data):
+            """Handle thermal subsystem data updates"""
+            try:
+                if hasattr(self, 'thermal_labels'):
+                    # Update thermal labels with your new labels
+                    if "pi_temp" in data:
+                        self.thermal_labels["pi_temp"].setText(f"Pi: {data['pi_temp']:.1f}°C")
+                    if "power_pcb_temp" in data:
+                        self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {data['power_pcb_temp']:.1f}°C")
+                    if "battery_temp" in data:
+                        self.thermal_labels["battery_temp"].setText(f"Battery: {data['battery_temp']:.1f}°C")
+                    if "payload_temp" in data:
+                        self.thermal_labels["payload_temp"].setText(f"Payload: {data['payload_temp']:.1f}°C")
+                    if "status" in data:
+                        self.thermal_labels["status"].setText(f"Status: {data['status']}")
+            except Exception as e:
+                logging.error(f"Failed to update thermal data: {e}")
+
         @sio.on("communication_broadcast")
         def on_communication_data(data):
             """Handle communication subsystem data updates"""

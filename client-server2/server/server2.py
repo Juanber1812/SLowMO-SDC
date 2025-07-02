@@ -10,8 +10,6 @@ import threading
 import logging
 import time
 
-from temperature import start_thermal_subprocess
-
 # Import power monitoring
 try:
     from power import PowerMonitor
@@ -64,60 +62,6 @@ def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
 
 connected_clients = set()
-
-# Thermal, Pi, and ADCS temperature storage for thermal broadcasts
-last_battery_temp = None
-last_pi_temp = None
-last_adcs_temp = None
-
-# Thermal status computation utilities
-
-def compute_thermal_status(battery, pi, adcs):
-    """
-    Compute overall thermal status based on thresholds for battery, Pi, and ADCS temperatures.
-    """
-    # Define thresholds: (normal, moderate, high, critical)
-    thresholds = {
-        'battery': (None, 40, 50, 60),  # °C
-        'pi':      (None, 60, 70, 80),
-        'adcs':    (None, 50, 60, 70)
-    }
-    def severity(value, th):
-        if value is None:
-            return -1
-        if value >= th[3]: return 3
-        if value >= th[2]: return 2
-        if value >= th[1]: return 1
-        return 0
-    sev_b = severity(battery, thresholds['battery'])
-    sev_p = severity(pi, thresholds['pi'])
-    sev_a = severity(adcs, thresholds['adcs'])
-    overall = max(sev_b, sev_p, sev_a)
-    mapping = {3: 'Critical', 2: 'High', 1: 'Moderate', 0: 'Normal', -1: 'Unknown'}
-    return mapping.get(overall, 'Unknown')
-
-def emit_thermal_broadcast():
-    """
-    Emit thermal_broadcast with latest battery, Pi, ADCS temps and status label.
-    """
-    global last_battery_temp, last_pi_temp, last_adcs_temp
-    status = compute_thermal_status(last_battery_temp, last_pi_temp, last_adcs_temp)
-    payload = {
-        'battery_temp': last_battery_temp,
-        'pi_temp': last_pi_temp,
-        'adcs_temp': last_adcs_temp,
-        'status': status
-    }
-    socketio.emit('thermal_broadcast', payload)
-
-
-def battery_temp_loop(q):
-    """Background loop reading battery temps and emitting thermal updates."""
-    global last_battery_temp
-    while True:
-        data = q.get()
-        last_battery_temp = data.get('battery_temp')
-        emit_thermal_broadcast()
 
 # ===================== CAMERA/LIVE STREAM/IMAGE SECTION =====================
 
@@ -296,13 +240,6 @@ def start_background_tasks():
         threading.Thread(target=camera.start_stream, daemon=True).start()
         threading.Thread(target=sensors.start_sensors, daemon=True).start()
         threading.Thread(target=lidar.start_lidar, daemon=True).start()
-        # Start thermal monitoring subprocess and loop
-        try:
-            thermal_queue = start_thermal_subprocess()
-            threading.Thread(target=battery_temp_loop, args=(thermal_queue,), daemon=True).start()
-            logging.info("Thermal monitoring started successfully")
-        except Exception as e:
-            logging.error(f"Failed to start thermal monitoring: {e}")
         # Start power monitoring
         if power_monitor:
             power_monitor.set_update_callback(power_data_callback)
@@ -387,9 +324,6 @@ def handle_adcs_command(data):
 @socketio.on("sensor_data")
 def handle_sensor_data(data):
     try:
-        global last_pi_temp
-        # Store latest Pi temperature for thermal status
-        last_pi_temp = data.get("temperature")
         # Enhanced sensor data now includes memory usage, uptime, and smart status
         # Format: {
         #   "temperature": 45.2,
@@ -566,10 +500,9 @@ def adcs_data_broadcast():
     """Broadcast ADCS data at 20Hz"""
     if not adcs_controller:
         return
-    global last_adcs_temp  # Track latest ADCS temperature
+    
     try:
         adcs_data = adcs_controller.get_adcs_data_for_server()
-        last_adcs_temp = adcs_data.get('temperature')  # Update ADCS temp
         socketio.emit("adcs_broadcast", adcs_data)
         
         # Log ADCS data periodically (every 10 seconds)
