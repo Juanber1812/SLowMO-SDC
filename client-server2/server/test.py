@@ -7,7 +7,7 @@ def test_pd_symmetry():
 
     # Start the PD controller
     controller.start_auto_control("PWM PD")
-    time.sleep(2)
+    time.sleep(5)
 
     # Test sequence: small and large positive/negative targets
     test_targets = [10, 0, -10, 0, 20, 0, -20, 0, 5, 0, -5, 0]
