@@ -236,8 +236,8 @@ class ADCSSection(QGroupBox):
     def _connect_signals(self):
         # Mode selection
         self.raw_btn.clicked.connect(lambda: self._update_current_auto_mode("adcs"))
-        self.env_btn.clicked.connect(lambda: self._update_current_auto_mode("Environmental"))
-        self.apriltag_btn.clicked.connect(lambda: self._update_current_auto_mode("AprilTag"))
+        self.env_btn.clicked.connect(lambda: self._update_current_auto_mode("adcs","Environmental"))
+        self.apriltag_btn.clicked.connect(lambda: self._update_current_auto_mode("adcs","AprilTag"))
 
         # Manual controls
         self.manual_cw_btn.pressed.connect(lambda: self._handle_action_clicked("adcs", "manual_clockwise_start"))

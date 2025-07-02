@@ -785,12 +785,6 @@ class ADCSController:
         try:
             print(f"🎛️ ADCS Command: Mode='{mode}', Command='{command}', Value='{value}'")
 
-            # Call auto-zero methods when AprilTag or Environmental mode is selected
-            if mode == "AprilTag":
-                self.auto_zero_tag()
-            elif mode == "Environmental":
-                self.auto_zero_lux()
-
             # Handle calibration commands
             if mode == "Calibration" or (mode == "adcs" and command == "calibrate"):
                 if command == "start_calibration" or command == "calibrate":
@@ -816,6 +810,11 @@ class ADCSController:
                     return self.stop_auto_control()
                 elif command == "set_pd_values":
                     return self.set_controller_gains(value)
+                elif command == "AprilTag":
+                    self.auto_zero_tag()
+                elif command == "Environmental":
+                    self.auto_zero_lux()
+
         
         except Exception as e:
             error_msg = f"ADCS command error: {e}"

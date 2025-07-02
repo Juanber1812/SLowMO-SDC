@@ -632,12 +632,24 @@ class ADCSController:
                     return self.stop_auto_control()
                 elif command == "set_pd_values":
                     return self.set_controller_gains(value)
+                elif command == "AprilTag":
+                    self.auto_zero_tag()
+                elif command == "Environmental":
+                    self.auto_zero_lux()
         
         except Exception as e:
             error_msg = f"ADCS command error: {e}"
             print(f"❌ {error_msg}")
             return {"status": "error", "message": error_msg}
     
+    def auto_zero_tag(self):
+        """Automatically zero MPU for AprilTag mode (placeholder)"""
+        print("[ADCS] Auto-zero for AprilTag mode (placeholder)")
+
+    def auto_zero_lux(self):
+        """Automatically zero MPU for Environmental mode (placeholder)"""
+        print("[ADCS] Auto-zero for Environmental mode (placeholder)")
+        
     def zero_yaw_position(self):
         """Zero the yaw position"""
         try:
