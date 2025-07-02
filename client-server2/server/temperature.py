@@ -10,7 +10,7 @@ import logging
 # Last edited 20250628T15:12
 
 BATTERY_SENSOR_ID = '0b24404e94cd' # depending on setup, you may need to swap these
-MAIN_SENSOR_ID = '0b2440864105'
+#MAIN_SENSOR_ID = '0b2440864105'
 
 # Global variable to store the latest temperature data
 latest_temperatures = {
@@ -39,8 +39,8 @@ def get_all_temperatures():
         if temp is not None:
             if sensor.id == BATTERY_SENSOR_ID:
                 temperatures['battery'] = temp
-            elif sensor.id == MAIN_SENSOR_ID:
-                temperatures['main'] = temp
+            #elif sensor.id == MAIN_SENSOR_ID:
+                #temperatures['main'] = temp
             else:
                 temperatures[sensor.id] = temp
     temperatures["number_of_sensors"] = len(temperatures)
@@ -59,29 +59,20 @@ def update_thermal_data():
         # Read battery temperature
         battery_temp = get_temperature(BATTERY_SENSOR_ID)
         
-        # Read main sensor temperature (power PCB)
-        main_temp = get_temperature(MAIN_SENSOR_ID)
-        
-        # Update global temperature data
+        # Update global temperature data - only battery temperature
         if battery_temp is not None:
             latest_temperatures["battery_temp"] = round(battery_temp, 1)
-        
-        if main_temp is not None:
-            latest_temperatures["power_pcb_temp"] = round(main_temp, 1)
-        
-        # Determine status based on sensor readings
-        if battery_temp is not None or main_temp is not None:
-            latest_temperatures["status"] = "OK"
         else:
-            latest_temperatures["status"] = "Disconnected"
+            latest_temperatures["battery_temp"] = None
         
         # Call the callback function to broadcast data if it's set
+        # Status computation is now handled in the server
         if thermal_data_callback:
             thermal_data_callback(latest_temperatures.copy())
             
     except Exception as e:
         logging.error(f"Error updating thermal data: {e}")
-        latest_temperatures["status"] = "Error"
+        latest_temperatures["battery_temp"] = None
         if thermal_data_callback:
             thermal_data_callback(latest_temperatures.copy())
 

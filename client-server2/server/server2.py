@@ -341,6 +341,7 @@ def handle_adcs_command(data):
 
 @socketio.on("sensor_data")
 def handle_sensor_data(data):
+    global latest_sensor_data
     try:
         # Enhanced sensor data now includes memory usage, uptime, and smart status
         # Format: {
@@ -350,6 +351,9 @@ def handle_sensor_data(data):
         #   "uptime": "2h 34m 12s",
         #   "status": "Moderate Load"
         # }
+        
+        # Store latest sensor data globally for thermal status computation
+        latest_sensor_data = data.copy()
         
         # Prepare enhanced sensor data for broadcast
         memory_info = data.get("memory", {})
@@ -428,7 +432,11 @@ def handle_stop_lidar():
 
 
 def power_data_callback(power_data):
+    global latest_power_data
     try:
+        # Store latest power data globally for thermal status computation
+        latest_power_data = power_data.copy()
+        
         if power_data.get('status') in ['Disconnected', 'Error - Disconnected', 'Error']:
             formatted_data = {
                 "current": "0.000",
@@ -514,13 +522,72 @@ def throughput_test_callback(event_type, data):
     except Exception as e:
         logging.error(f"Error in throughput test callback: {e}")
 
+# Global variables to store latest temperature data from different sources
+latest_sensor_data = {}
+latest_adcs_data = {}
+latest_power_data = {}
+
+def get_thermal_status_from_temperatures(temperatures):
+    """
+    Analyze all available temperature sensors and generate single-word thermal status
+    Args:
+        temperatures: dict with temperature values (only available/non-None values)
+    Returns:
+        str: Single-word status ("Critical", "Warning", "Elevated", "Warm", "Normal", "NoData")
+    """
+    # Filter out None values and collect only available temperatures
+    available_temps = [temp for temp in temperatures.values() if temp is not None]
+    
+    if not available_temps:
+        return "NoData"
+    
+    max_temp = max(available_temps)
+    
+    # Determine status based on highest available temperature
+    if max_temp >= 80:
+        return "Critical"
+    elif max_temp >= 70:
+        return "Warning"
+    elif max_temp >= 60:
+        return "Elevated"
+    elif max_temp >= 45:
+        return "Warm"
+    else:
+        return "Normal"
+
 def thermal_data_callback(thermal_data):
     """Handle thermal data updates and broadcast to clients"""
     try:
-        # Format data for thermal broadcast - only battery temperature
+        # Get battery temperature from thermal monitoring
+        battery_temp = thermal_data.get('battery_temp')
+        
+        # Collect all available temperatures for status analysis
+        all_temperatures = {
+            'battery': battery_temp,
+            'pi': latest_sensor_data.get('temperature'),
+            'adcs_payload': None,  # Will be filled from ADCS data
+            'power_pcb': latest_power_data.get('temperature_c')
+        }
+        
+        # Extract ADCS/Payload temperature if available
+        if latest_adcs_data.get('temperature'):
+            try:
+                # ADCS temperature comes as "25.5°C", extract numeric value
+                temp_str = latest_adcs_data['temperature']
+                if '°C' in temp_str:
+                    all_temperatures['adcs_payload'] = float(temp_str.replace('°C', ''))
+                else:
+                    all_temperatures['adcs_payload'] = float(temp_str)
+            except (ValueError, TypeError):
+                all_temperatures['adcs_payload'] = None
+        
+        # Compute thermal status using all available temperatures
+        computed_status = get_thermal_status_from_temperatures(all_temperatures)
+        
+        # Format data for thermal broadcast - only battery temperature and computed status
         formatted_data = {
-            "battery_temp": thermal_data.get('battery_temp'),
-            "status": thermal_data.get('status', 'Disconnected')
+            "battery_temp": battery_temp,
+            "status": computed_status
         }
         
         socketio.emit("thermal_broadcast", formatted_data)
@@ -528,9 +595,8 @@ def thermal_data_callback(thermal_data):
         # Log thermal data periodically (every 30 seconds)
         if not hasattr(thermal_data_callback, 'last_log') or time.time() - thermal_data_callback.last_log > 30:
             thermal_data_callback.last_log = time.time()
-            battery_temp = thermal_data.get('battery_temp', 'N/A')
-            status = thermal_data.get('status', 'Unknown')
-            logging.info(f"Thermal broadcast: Battery={battery_temp}°C, Status={status}")
+            available_temps = {k: v for k, v in all_temperatures.items() if v is not None}
+            logging.info(f"Thermal broadcast: Battery={battery_temp}°C, Status={computed_status}, Available temps: {available_temps}")
             
     except Exception as e:
         logging.error(f"Error in thermal data callback: {e}")
@@ -542,11 +608,16 @@ def thermal_data_callback(thermal_data):
 
 def adcs_data_broadcast():
     """Broadcast ADCS data at 20Hz"""
+    global latest_adcs_data
     if not adcs_controller:
         return
     
     try:
         adcs_data = adcs_controller.get_adcs_data_for_server()
+        
+        # Store latest ADCS data globally for thermal status computation
+        latest_adcs_data = adcs_data.copy()
+        
         socketio.emit("adcs_broadcast", adcs_data)
         
         # Log ADCS data periodically (every 10 seconds)

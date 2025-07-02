@@ -2107,3 +2107,30 @@
 2025-07-02 08:28:47,714 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
 2025-07-02 08:28:49,210 - INFO - [INFO] Closing application...
 2025-07-02 08:28:50,417 - INFO - Disconnected from server: client disconnect
+2025-07-02 08:31:07,807 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 08:31:08,010 - INFO - Connected to server
+2025-07-02 08:31:08,013 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:31:08,016 - INFO - [INFO] Successfully connected to server
+2025-07-02 08:37:10,551 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 08:37:10,709 - INFO - Connected to server
+2025-07-02 08:37:10,710 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:37:10,713 - INFO - [INFO] Successfully connected to server
+2025-07-02 08:37:11,741 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 08:38:07,876 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:38:07,881 - INFO - Stream paused for config application.
+2025-07-02 08:38:08,390 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 08:38:08,395 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 08:38:08,599 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 08:38:14,896 - INFO - [INFO] Closing application...
+2025-07-02 08:38:16,603 - INFO - Disconnected from server: client disconnect
+2025-07-02 08:38:50,621 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 08:38:50,823 - INFO - Connected to server
+2025-07-02 08:38:50,825 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:38:50,827 - INFO - [INFO] Successfully connected to server
+2025-07-02 08:39:01,153 - WARNING - Frame decode failed
+2025-07-02 08:39:01,156 - INFO - Disconnected from server: transport error
+2025-07-02 08:39:02,897 - INFO - Connected to server
+2025-07-02 08:39:02,900 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:39:02,902 - INFO - Stream paused for config application.
+2025-07-02 08:39:03,836 - INFO - [INFO] Closing application...
+2025-07-02 08:39:05,042 - INFO - Disconnected from server: client disconnect
