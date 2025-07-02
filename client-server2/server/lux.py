@@ -158,13 +158,16 @@ class LuxSensorManager:
             entry = {'timestamp': timestamp}
             for ch in LUX_CHANNELS:
                 entry[f'ch{ch}'] = readings[ch]
-            # Mark peak if this timestamp matches a detected peak (with small tolerance)
-            is_peak = any(abs(timestamp - t) < 1e-3 for t in self.peak_timestamps)
-            entry['peak'] = 1 if is_peak else 0
+            # Find all channels with a peak at this timestamp (within tolerance)
+            tolerance = 0.03  # 30 ms, suitable for ~20 Hz
+            peak_channels = [ch for (t, ch, v) in self.detected_maxima if abs(timestamp - t) < tolerance]
+            entry['peak'] = 1 if peak_channels else 0
+            entry['peak_channel'] = ','.join(str(ch) for ch in peak_channels) if peak_channels else ''
             self.log_data.append(entry)
-            # Optionally, remove the timestamp from peak_timestamps to avoid duplicate marking
-            if is_peak:
-                self.peak_timestamps = {t for t in self.peak_timestamps if abs(timestamp - t) >= 1e-3}
+            # Optionally, remove matched peaks to avoid duplicate marking
+            if peak_channels:
+                self.detected_maxima = [(t, ch, v) for (t, ch, v) in self.detected_maxima if abs(timestamp - t) >= tolerance]
+                self.peak_timestamps = {t for t in self.peak_timestamps if abs(timestamp - t) >= tolerance}
 
     def export_log(self, filename="lux_log.csv"):
         """Export logged data to CSV."""
@@ -172,7 +175,10 @@ class LuxSensorManager:
             print("[LOG] No data to export.")
             return
         with open(filename, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=['timestamp'] + [f'ch{ch}' for ch in LUX_CHANNELS] + ['peak'])
+            writer = csv.DictWriter(
+                f,
+                fieldnames=['timestamp'] + [f'ch{ch}' for ch in LUX_CHANNELS] + ['peak', 'peak_channel']
+            )
             writer.writeheader()
             writer.writerows(self.log_data)
         print(f"[LOG] Exported {len(self.log_data)} rows to {filename}")
@@ -196,7 +202,9 @@ def logging_control(manager):
 
 if __name__ == "__main__":
     manager = LuxSensorManager()
-    last_display = 0
+    # Store last 20 timestamps to estimate actual rate
+    sample_times = deque(maxlen=20)
+    live_update_counter = 0
 
     # Start logging control thread
     threading.Thread(target=logging_control, args=(manager,), daemon=True).start()
@@ -205,19 +213,30 @@ if __name__ == "__main__":
         while True:
             readings = manager.read_lux_sensors()
             now = time.time()
-            # print(f"[READ] ...")  # Comment out to reduce spam
+            sample_times.append(now)
 
             manager.analyse_peaks_gradient(threshold=10.0, min_time_between_peaks=0.2)
             manager.log_lux(readings, now)
 
-            if now - last_display >= 1.0:
+            # Estimate actual data collection rate
+            if len(sample_times) > 1:
+                intervals = [t2 - t1 for t1, t2 in zip(sample_times, list(sample_times)[1:])]
+                avg_interval = sum(intervals) / len(intervals)
+                actual_rate = 1.0 / avg_interval if avg_interval > 0 else 0
+            else:
+                actual_rate = 0
+
+            # Update live display every ~1 second worth of samples
+            live_update_counter += 1
+            update_every = int(actual_rate) if actual_rate > 0 else 1
+            if live_update_counter >= update_every:
                 lux_str = " | ".join([f"Lux{ch}: {readings[ch]:7.2f}" for ch in LUX_CHANNELS])
-                # Check if a peak was detected in the last second
                 recent_peaks = [t for t in manager.peak_timestamps if now - 1.0 < t <= now]
                 peak_msg = " [LIVE PEAK!]" if recent_peaks else ""
-                print(f"[LIVE] {lux_str}  {time.strftime('%H:%M:%S')}{peak_msg}")
-                last_display = now
-            time.sleep(0.05)  # 20 Hz
+                print(f"[LIVE] {lux_str}  {time.strftime('%H:%M:%S')} | Rate: {actual_rate:.2f} Hz{peak_msg}")
+                live_update_counter = 0
+
+            time.sleep(0.05)  # Still target 20 Hz, but live display matches actual rate
     except KeyboardInterrupt:
         print("\nExiting lux sensor live display.")
         if manager.logging_enabled:
