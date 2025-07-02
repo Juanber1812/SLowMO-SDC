@@ -140,6 +140,11 @@ def cleanup_motor_control():
         except:
             pass
 
+# --- Add this utility function near the top (after imports) ---
+def wrap_angle(angle):
+    """Wrap angle to [-180, 180]"""
+    return ((angle + 180) % 360) - 180
+
 class MPU6050Sensor:
     """Dedicated MPU6050 sensor class for ADCS"""
     
@@ -291,7 +296,8 @@ class MPU6050Sensor:
         if gyro and self.dt > 0:
             # Pure gyro integration for yaw (primary control axis)
             self.angle_yaw_pure += gyro[2] * self.dt  # Z-axis gyro for yaw
-            
+            self.angle_yaw_pure = wrap_angle(self.angle_yaw_pure)  # <-- Add this line
+
             # Update other angles for completeness
             self.angle_roll += gyro[1] * self.dt
             self.angle_pitch += gyro[0] * self.dt
@@ -450,10 +456,10 @@ class PDControllerPWM:
         
     def set_target(self, target_angle):
         """Set target yaw angle in degrees"""
-        self.target_yaw = target_angle
+        self.target_yaw = wrap_angle(target_angle)
         # Reset integral when target changes to prevent windup
         self.integral = 0.0
-        print(f"Target yaw set to: {target_angle:.1f}°")
+        print(f"Target yaw set to: {self.target_yaw:.1f}°")
     
     def start_controller(self):
         """Start the PD controller"""
@@ -482,8 +488,8 @@ class PDControllerPWM:
             error: Current error in degrees
             pd_output: Raw PD output before limiting
         """
-        # Calculate error
-        error = self.target_yaw - current_yaw
+        # Calculate error using shortest path (wrap-around)
+        error = wrap_angle(self.target_yaw - current_yaw)
         
         # If controller is disabled or in input mode, don't execute control
         if not self.controller_enabled or self.input_mode:
@@ -722,15 +728,15 @@ class ADCSController:
         # Read MPU6050
         if self.mpu_sensor.sensor_ready:
             try:
-                yaw_angle = self.mpu_sensor.get_yaw_angle()
+                yaw_angle = wrap_angle(self.mpu_sensor.get_yaw_angle())
                 gyro = self.mpu_sensor.read_gyroscope()
                 accel = self.mpu_sensor.read_accelerometer()
                 temp = self.mpu_sensor.read_temperature()
                 
                 # Position angles (integrated from gyro)
                 data['mpu']['yaw'] = yaw_angle  # Primary control angle (Z-axis)
-                data['mpu']['roll'] = self.mpu_sensor.angle_roll  # Y-axis rotation
-                data['mpu']['pitch'] = self.mpu_sensor.angle_pitch  # X-axis rotation
+                data['mpu']['roll'] = wrap_angle(self.mpu_sensor.angle_roll)
+                data['mpu']['pitch'] = wrap_angle(self.mpu_sensor.angle_pitch)
                 data['mpu']['temp'] = temp
                 
                 # All gyro rates (deg/s)
@@ -740,9 +746,9 @@ class ADCSController:
                     data['mpu']['gyro_rate_z'] = gyro[2]  # Yaw rate
                 
                 # All angle positions (degrees)
-                data['mpu']['angle_x'] = self.mpu_sensor.angle_pitch  # Pitch angle
-                data['mpu']['angle_y'] = self.mpu_sensor.angle_roll   # Roll angle
-                data['mpu']['angle_z'] = self.mpu_sensor.angle_yaw    # Yaw angle
+                data['mpu']['angle_x'] = wrap_angle(self.mpu_sensor.angle_pitch)  # Pitch angle
+                data['mpu']['angle_y'] = wrap_angle(self.mpu_sensor.angle_roll)   # Roll angle
+                data['mpu']['angle_z'] = wrap_angle(self.mpu_sensor.angle_yaw)    # Yaw angle
                 
             except Exception as e:
                 print(f"MPU read error: {e}")
@@ -768,11 +774,14 @@ class ADCSController:
     def get_adcs_data_for_server(self):
         """Format data for server ADCS broadcast"""
         data, _ = self.get_current_data()
+        yaw = wrap_angle(data['mpu']['yaw'])
+        roll = wrap_angle(data['mpu']['roll'])
+        pitch = wrap_angle(data['mpu']['pitch'])
         
         return {
             # Primary display values (legacy format)
-            'gyro': f"{data['mpu']['yaw']:.1f}°",
-            'orientation': f"Y:{data['mpu']['yaw']:.1f}° R:{data['mpu']['roll']:.1f}° P:{data['mpu']['pitch']:.1f}°",
+            'gyro': f"{yaw:.1f}°",
+            'orientation': f"Y:{yaw:.1f}° R:{roll:.1f}° P:{pitch:.1f}°",
             'lux1': f"{data['lux'][1]:.1f}" if 1 in data['lux'] else "0.0",
             'lux2': f"{data['lux'][2]:.1f}" if 2 in data['lux'] else "0.0", 
             'lux3': f"{data['lux'][3]:.1f}" if 3 in data['lux'] else "0.0",
