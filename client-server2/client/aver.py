@@ -792,8 +792,8 @@ class MainWindow(QWidget):
         self.overall_labels = {}
         
         subsystems = [
-            ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Battery: Pending...", "Temperature: Pending...", "Status: Pending..."]),
-            ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Status: Pending..."]),
+            ("Power Subsystem", ["Current: Pending...", "Voltage: Pending...", "Power: Pending...", "Energy: Pending...", "Battery: Pending...", "Status: Pending..."]),
+            ("Thermal Subsystem", ["Pi: Pending...", "Power PCB: Pending...", "Battery: Pending...", "Payload: Pending...", "Status: Pending..."]),
             ("Communication Subsystem", ["Downlink Frequency: Pending...", "Uplink Frequency: Pending...", "Server Signal: Pending...", "Client Signal: Pending...", "Data Transmission Rate: Pending...", "Latency: Pending...", "Status: Pending..."]),
             ("ADCS Subsystem", [
                 "Gyro X: -- °/s", 
@@ -843,8 +843,6 @@ class MainWindow(QWidget):
                         self.power_labels["energy"] = lbl
                     elif "Battery:" in text:
                         self.power_labels["battery"] = lbl
-                    elif "Temperature:" in text:
-                        self.power_labels["temperature"] = lbl
                     elif "Status:" in text:
                         self.power_labels["status"] = lbl
                         
@@ -862,6 +860,8 @@ class MainWindow(QWidget):
                         self.thermal_labels["power_pcb_temp"] = lbl
                     elif "Battery:" in text:
                         self.thermal_labels["battery_temp"] = lbl
+                    elif "Payload:" in text:
+                        self.thermal_labels["payload_temp"] = lbl
                     elif "Status:" in text:
                         self.thermal_labels["status"] = lbl
                         
@@ -1253,6 +1253,21 @@ class MainWindow(QWidget):
                     if hasattr(self.adcs_control_widget, 'update_sensor_data'):
                         self.adcs_control_widget.update_sensor_data(adcs_detailed_data)
                 
+                # Update payload temperature in thermal subsystem from ADCS temperature data
+                if hasattr(self, 'thermal_labels') and 'payload_temp' in self.thermal_labels:
+                    temperature_str = data.get('temperature', '0.0°C')
+                    # Extract numeric value from temperature string (e.g., "25.5°C" -> 25.5)
+                    try:
+                        if '°C' in temperature_str:
+                            temp_value = float(temperature_str.replace('°C', ''))
+                            self.thermal_labels["payload_temp"].setText(f"Payload: {temp_value:.1f}°C")
+                        else:
+                            # If no °C suffix, try to parse as float
+                            temp_value = float(temperature_str)
+                            self.thermal_labels["payload_temp"].setText(f"Payload: {temp_value:.1f}°C")
+                    except (ValueError, TypeError):
+                        self.thermal_labels["payload_temp"].setText(f"Payload: {temperature_str}")
+                
             except Exception as e:
                 logging.error(f"Failed to update ADCS data: {e}")
 
@@ -1272,7 +1287,6 @@ class MainWindow(QWidget):
                         self.power_labels["power"].setText("Power: -- W")
                         self.power_labels["energy"].setText("Energy: -- Wh")
                         self.power_labels["battery"].setText("Battery: --%")
-                        self.power_labels["temperature"].setText("Temperature: -- °C")
                         self.power_labels["status"].setText("Status: Disconnected")
                         self.power_labels["status"].setStyleSheet(
                             f"QLabel {{ color: #666666; margin: 2px 0px; padding: 2px 0px; "
@@ -1292,8 +1306,10 @@ class MainWindow(QWidget):
                     if "battery_percentage" in data:
                         battery_pct = data['battery_percentage']
                         self.power_labels["battery"].setText(f"Battery: {battery_pct}%")
-                    if "temperature" in data:
-                        self.power_labels["temperature"].setText(f"Temperature: {data['temperature']}°C")
+                    
+                    # Handle power PCB temperature from power broadcast and update thermal subsystem
+                    if "temperature" in data and hasattr(self, 'thermal_labels') and 'power_pcb_temp' in self.thermal_labels:
+                        self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {data['temperature']}°C")
                     
                     # Update status with appropriate color coding
                     if "status" in data:
@@ -1328,6 +1344,8 @@ class MainWindow(QWidget):
                         self.thermal_labels["power_pcb_temp"].setText(f"Power PCB: {data['power_pcb_temp']:.1f}°C")
                     if "battery_temp" in data:
                         self.thermal_labels["battery_temp"].setText(f"Battery: {data['battery_temp']:.1f}°C")
+                    if "payload_temp" in data:
+                        self.thermal_labels["payload_temp"].setText(f"Payload: {data['payload_temp']:.1f}°C")
                     if "status" in data:
                         self.thermal_labels["status"].setText(f"Status: {data['status']}")
             except Exception as e:
