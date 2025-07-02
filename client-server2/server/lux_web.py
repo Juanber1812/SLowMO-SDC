@@ -1,14 +1,42 @@
 import time
 import datetime
-import random
 from collections import deque
 
 from dash import Dash, dcc, html, Output, Input
 import plotly.graph_objs as go
 
+import smbus2
+
+# Multiplexer and sensor settings
+MUX_ADDR = 0x70  # TCA9548A default address
+MUX_CHANNELS = [1, 2, 3]  # Channels for your sensors (1-indexed)
+SENSOR_ADDR = 0x23  # BH1750 default address
+I2C_BUS = 1  # Usually 1 on Raspberry Pi
+
+bus = smbus2.SMBus(I2C_BUS)
+
+def select_mux_channel(channel):
+    """Select a channel on the TCA9548A multiplexer."""
+    if 1 <= channel <= 8:
+        bus.write_byte(MUX_ADDR, 1 << (channel - 1))
+        time.sleep(0.002)  # Small delay for channel switching
+
+def read_bh1750():
+    """Read lux value from BH1750 sensor."""
+    try:
+        bus.write_byte(SENSOR_ADDR, 0x10)  # 0x10 = Continuously H-Resolution Mode
+        time.sleep(0.18)  # Wait for measurement
+        data = bus.read_i2c_block_data(SENSOR_ADDR, 0x00, 2)
+        lux = ((data[0] << 8) | data[1]) / 1.2
+        return lux
+    except Exception as e:
+        print(f"Error reading BH1750: {e}")
+        return 0.0
+
 def read_lux_sensor(sensor_id):
-    # Replace with your actual sensor reading logic
-    return 100 + 50 * random.random() + 50 * (sensor_id + 1) * (0.5 - random.random())
+    """Read from the correct channel and return the lux value."""
+    select_mux_channel(MUX_CHANNELS[sensor_id])
+    return read_bh1750()
 
 class LuxTracker:
     def __init__(self, history_len=300):
