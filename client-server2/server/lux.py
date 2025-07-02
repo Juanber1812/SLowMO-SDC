@@ -1,6 +1,8 @@
 import time
 from collections import deque
 import numpy as np
+import threading
+import csv
 
 # Hardware/library imports
 try:
@@ -26,6 +28,9 @@ class LuxSensorManager:
         self.history = {ch: deque(maxlen=500) for ch in LUX_CHANNELS}  # Store (timestamp, value)
         self.last_maxima = {ch: None for ch in LUX_CHANNELS}
         self.detected_maxima = []  # List of (timestamp, channel, value)
+        self.logging_enabled = False
+        self.log_data = []  # List of dicts: {'timestamp':..., 'ch1':..., 'ch2':..., 'ch3':..., 'peak':...}
+        self.peak_timestamps = set()
         if LUX_AVAILABLE:
             self.initialize_lux_sensors()
     
@@ -145,24 +150,69 @@ class LuxSensorManager:
                         if last_max is None or (t_curr - last_max[0]) > min_time_between_peaks:
                             self.last_maxima[ch] = (t_curr, v_curr)
                             self.detected_maxima.append((t_curr, ch, v_curr))
+                            self.peak_timestamps.add(t_curr)
                             print(f"\n[PEAK-SIMPLE] {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t_curr))} | Channel: {ch} | Value: {v_curr:.2f}")
 
+    def log_lux(self, readings, timestamp):
+        """Append current readings to log_data if logging is enabled."""
+        if self.logging_enabled:
+            entry = {'timestamp': timestamp}
+            for ch in LUX_CHANNELS:
+                entry[f'ch{ch}'] = readings[ch]
+            # Mark peak if any channel has a peak at this timestamp
+            entry['peak'] = 1 if any(abs(timestamp - t) < 0.02 for t in self.peak_timestamps) else 0
+            self.log_data.append(entry)
+
+    def export_log(self, filename="lux_log.csv"):
+        """Export logged data to CSV."""
+        if not self.log_data:
+            print("[LOG] No data to export.")
+            return
+        with open(filename, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=['timestamp'] + [f'ch{ch}' for ch in LUX_CHANNELS] + ['peak'])
+            writer.writeheader()
+            writer.writerows(self.log_data)
+        print(f"[LOG] Exported {len(self.log_data)} rows to {filename}")
+
+def logging_control(manager):
+    """Thread: Wait for user to press 'l' then enable logging."""
+    while True:
+        cmd = input("Press 'l' + Enter to start logging, 'e' + Enter to export and stop: ").strip().lower()
+        if cmd == 'l':
+            if not manager.logging_enabled:
+                manager.logging_enabled = True
+                print("[LOG] Logging started.")
+            else:
+                print("[LOG] Already logging.")
+        elif cmd == 'e':
+            manager.export_log()
+            manager.logging_enabled = False
+            print("[LOG] Logging stopped and exported.")
+        else:
+            print("[LOG] Unknown command.")
 
 if __name__ == "__main__":
     manager = LuxSensorManager()
     last_display = 0
+
+    # Start logging control thread
+    threading.Thread(target=logging_control, args=(manager,), daemon=True).start()
+
     try:
         while True:
             readings = manager.read_lux_sensors()
+            now = time.time()
             print(f"[READ] {time.strftime('%H:%M:%S')} | " + " | ".join([f"Ch{ch}: {readings[ch]:.2f}" for ch in LUX_CHANNELS]))
 
             manager.analyse_peaks_gradient(threshold=10.0, min_time_between_peaks=0.2)
+            manager.log_lux(readings, now)
 
-            now = time.time()
             if now - last_display >= 1.0:
                 lux_str = " | ".join([f"Lux{ch}: {readings[ch]:7.2f}" for ch in LUX_CHANNELS])
                 print(f"[LIVE] {lux_str}  {time.strftime('%H:%M:%S')}")
                 last_display = now
-            time.sleep(1)
+            time.sleep(0.01)
     except KeyboardInterrupt:
         print("\nExiting lux sensor live display.")
+        if manager.logging_enabled:
+            manager.export_log()
