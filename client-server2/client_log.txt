@@ -4491,3 +4491,9 @@
 2025-07-02 16:51:37,599 - INFO - Connected to server
 2025-07-02 16:51:37,603 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
 2025-07-02 16:51:37,609 - INFO - [INFO] Successfully connected to server
+2025-07-02 17:03:31,130 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 17:03:31,317 - INFO - Connected to server
+2025-07-02 17:03:31,320 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 17:03:31,322 - INFO - [INFO] Successfully connected to server
+2025-07-02 17:03:36,092 - INFO - [INFO] Closing application...
+2025-07-02 17:03:37,301 - INFO - Disconnected from server: client disconnect

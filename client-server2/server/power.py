@@ -78,27 +78,16 @@ class PowerMonitor:
     
     def get_battery_percentage(self, voltage, current):
         """
-        Estimate battery percentage using compensated voltage.
-        Uses data sheet values and curves from https://docs.rs-online.com/c165/A700000007945034.pdf
-        Returns:
-        - int: Estimated battery state-of-charge percentage
+        Estimate battery percentage for 2S Li-ion pack using compensated voltage.
         """
+        # 2S Li-ion typical discharge curve (approximate, adjust as needed)
+        self.voltages = np.array([8.4, 8.2, 8.0, 7.8, 7.6, 7.4, 7.2, 7.0, 6.8, 6.6, 6.4, 6.2, 6.0])
+        self.percentages = np.array([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5, 2, 0])
+        self.internal_resistance = 0.10  # Ohms, typical for a pack (adjust if needed)
 
-        # Uses data sheet values and curves
-        # See data sheet
-        self.voltages = np.array([8.4, 8.2, 8.0, 7.8, 7.6, 7.4, 7.2, 7.0, 6.8, 6.5, 6.0, 5.5])
-        self.percentages = np.array([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5, 0])
-        self.internal_resistance = 0.05  # Ohms
-
-        # Estimate terminal voltage by compensating for voltage drop across internal resistance
         estimated_voltage = voltage + (current * self.internal_resistance)
-
-        # Clamp to range to get min 6V, max
         estimated_voltage = max(min(estimated_voltage, self.voltages[0]), self.voltages[-1])
-
-        # Interpolating to get SoC
         soc = np.interp(estimated_voltage, self.voltages, self.percentages)
-
         return int(round(soc))
 
     def get_power_values(self):

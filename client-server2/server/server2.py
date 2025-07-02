@@ -480,14 +480,13 @@ def power_data_callback(power_data):
                 "status": client_status
             }
         # Print the full dictionary being sent
-        print(f"[SERVER] Sending power_broadcast: {formatted_data}")
         socketio.emit("power_broadcast", formatted_data)
         import time
         if not hasattr(power_data_callback, 'last_log') or time.time() - power_data_callback.last_log > 10:
             if power_data.get('status') == 'Disconnected':
                 logging.debug("Power broadcast: Disconnected")
             else:
-                print(f"Power broadcast: {power_data['power_mw']:.1f}mW, {power_data['voltage_v']:.2f}V, {power_data['current_ma']:.1f}mA")
+                logging.info(f"Power broadcast: {power_data['power_mw']:.1f}mW, {power_data['voltage_v']:.2f}V, {power_data['current_ma']:.1f}mA")
             power_data_callback.last_log = time.time()
     except Exception as e:
         logging.error(f"Error in power data callback: {e}")
