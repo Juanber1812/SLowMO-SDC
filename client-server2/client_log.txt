@@ -3654,3 +3654,251 @@
 2025-07-02 13:34:00,197 - INFO - [ADCSSection] Auto mode set to: adcs
 2025-07-02 13:34:01,679 - INFO - [INFO] Closing application...
 2025-07-02 13:34:02,885 - INFO - Disconnected from server: client disconnect
+2025-07-02 14:01:20,653 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 14:01:22,747 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751461280.6601188 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019D791CE900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-02 14:01:26,567 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:01:26,668 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:27,457 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:01:27,616 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:27,928 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:01:28,099 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:28,525 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:01:28,651 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:28,768 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:01:28,877 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:40,933 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:01:41,020 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:41,160 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:01:41,263 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:42,060 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:01:42,062 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_lux', Value=None
+2025-07-02 14:01:43,725 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:01:43,859 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:43,979 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:01:44,090 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:44,702 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:01:46,846 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 14:01:46,862 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:01:46,866 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 14:01:47,849 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 14:01:48,660 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:01:48,774 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:48,849 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 14:01:49,028 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:01:49,112 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:01:49,851 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 14:01:50,030 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 14:01:50,049 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:01:56,114 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-02 14:01:56,317 - INFO - Connected to server
+2025-07-02 14:01:56,320 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:02:01,356 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:02:01,495 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:02:02,703 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:02:02,790 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:02:02,924 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:02:02,981 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:02:03,366 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:02:03,476 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:02:04,582 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:02:04,676 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:02:05,664 - INFO - Sending ADCS command: Mode='adcs', Command='calibrate', Value=None
+2025-07-02 14:02:27,740 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 14:02:30,047 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 14:02:30,171 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:02:30,845 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 14:02:30,999 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 14:02:31,906 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 14:02:31,925 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:02:31,928 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 14:02:32,901 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 14:02:33,903 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 14:02:34,905 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 14:02:35,904 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 14:02:36,903 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 14:02:37,908 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 14:02:38,125 - INFO - [INFO] Starting detector...
+2025-07-02 14:02:38,910 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:38.910Z', 'mode': 'scanning'}
+2025-07-02 14:02:39,916 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:39.916Z', 'mode': 'scanning'}
+2025-07-02 14:02:40,919 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:40.919Z', 'mode': 'scanning'}
+2025-07-02 14:02:41,960 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:41.960Z', 'mode': 'scanning'}
+2025-07-02 14:02:42,979 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:42.979Z', 'mode': 'scanning'}
+2025-07-02 14:02:43,915 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.7, 'timestamp': '2025-07-02T13:02:43.915Z', 'mode': 'scanning'}
+2025-07-02 14:02:44,964 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.5, 'timestamp': '2025-07-02T13:02:44.964Z', 'mode': 'scanning'}
+2025-07-02 14:02:45,911 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:45.911Z', 'mode': 'scanning'}
+2025-07-02 14:02:46,902 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:46.902Z', 'mode': 'scanning'}
+2025-07-02 14:02:48,109 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:48.109Z', 'mode': 'scanning'}
+2025-07-02 14:02:49,017 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:49.017Z', 'mode': 'scanning'}
+2025-07-02 14:02:49,953 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:49.952Z', 'mode': 'scanning'}
+2025-07-02 14:02:50,940 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:50.940Z', 'mode': 'scanning'}
+2025-07-02 14:02:51,905 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 13.5, 'timestamp': '2025-07-02T13:02:51.905Z', 'mode': 'scanning'}
+2025-07-02 14:02:52,929 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.4, 'timestamp': '2025-07-02T13:02:52.929Z', 'mode': 'scanning'}
+2025-07-02 14:02:53,958 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:53.958Z', 'mode': 'scanning'}
+2025-07-02 14:02:54,915 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:54.915Z', 'mode': 'scanning'}
+2025-07-02 14:02:55,614 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:02:55,616 - INFO - Stream paused for config application.
+2025-07-02 14:02:55,916 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:55.916Z', 'mode': 'scanning'}
+2025-07-02 14:02:56,118 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 14:02:56,124 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 14:02:56,328 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 14:02:56,970 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:02:56.970Z', 'mode': 'scanning'}
+2025-07-02 14:02:57,916 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.5, 'timestamp': '2025-07-02T13:02:57.916Z', 'mode': 'scanning'}
+2025-07-02 14:02:58,919 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.6, 'timestamp': '2025-07-02T13:02:58.919Z', 'mode': 'scanning'}
+2025-07-02 14:02:59,919 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.6, 'timestamp': '2025-07-02T13:02:59.918Z', 'mode': 'scanning'}
+2025-07-02 14:03:00,942 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.5, 'timestamp': '2025-07-02T13:03:00.942Z', 'mode': 'scanning'}
+2025-07-02 14:03:01,921 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.6, 'timestamp': '2025-07-02T13:03:01.921Z', 'mode': 'scanning'}
+2025-07-02 14:03:02,923 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.6, 'timestamp': '2025-07-02T13:03:02.923Z', 'mode': 'scanning'}
+2025-07-02 14:03:03,916 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.4, 'timestamp': '2025-07-02T13:03:03.916Z', 'mode': 'scanning'}
+2025-07-02 14:03:04,919 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.2, 'timestamp': '2025-07-02T13:03:04.919Z', 'mode': 'scanning'}
+2025-07-02 14:03:05,948 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:05.947Z', 'mode': 'scanning'}
+2025-07-02 14:03:06,934 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:06.934Z', 'mode': 'scanning'}
+2025-07-02 14:03:07,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:07.949Z', 'mode': 'scanning'}
+2025-07-02 14:03:08,934 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:08.934Z', 'mode': 'scanning'}
+2025-07-02 14:03:09,940 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:09.940Z', 'mode': 'scanning'}
+2025-07-02 14:03:10,964 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:10.964Z', 'mode': 'scanning'}
+2025-07-02 14:03:11,931 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:11.931Z', 'mode': 'scanning'}
+2025-07-02 14:03:13,009 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:13.009Z', 'mode': 'scanning'}
+2025-07-02 14:03:13,935 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:13.935Z', 'mode': 'scanning'}
+2025-07-02 14:03:14,936 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:14.936Z', 'mode': 'scanning'}
+2025-07-02 14:03:14,961 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 14:03:16,315 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:16.315Z', 'mode': 'scanning'}
+2025-07-02 14:03:16,961 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:16.961Z', 'mode': 'scanning'}
+2025-07-02 14:03:17,929 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:17.929Z', 'mode': 'scanning'}
+2025-07-02 14:03:18,930 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -2.6, 'timestamp': '2025-07-02T13:03:18.930Z', 'mode': 'scanning'}
+2025-07-02 14:03:19,941 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -6.4, 'timestamp': '2025-07-02T13:03:19.941Z', 'mode': 'scanning'}
+2025-07-02 14:03:20,951 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.1, 'timestamp': '2025-07-02T13:03:20.951Z', 'mode': 'scanning'}
+2025-07-02 14:03:21,933 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.2, 'timestamp': '2025-07-02T13:03:21.933Z', 'mode': 'scanning'}
+2025-07-02 14:03:22,936 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.8, 'timestamp': '2025-07-02T13:03:22.936Z', 'mode': 'scanning'}
+2025-07-02 14:03:23,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 9.6, 'timestamp': '2025-07-02T13:03:23.932Z', 'mode': 'scanning'}
+2025-07-02 14:03:24,934 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 9.3, 'timestamp': '2025-07-02T13:03:24.934Z', 'mode': 'scanning'}
+2025-07-02 14:03:25,945 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.2, 'timestamp': '2025-07-02T13:03:25.944Z', 'mode': 'scanning'}
+2025-07-02 14:03:26,931 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.4, 'timestamp': '2025-07-02T13:03:26.931Z', 'mode': 'scanning'}
+2025-07-02 14:03:27,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.5, 'timestamp': '2025-07-02T13:03:27.931Z', 'mode': 'scanning'}
+2025-07-02 14:03:28,935 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.3, 'timestamp': '2025-07-02T13:03:28.935Z', 'mode': 'scanning'}
+2025-07-02 14:03:29,937 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.5, 'timestamp': '2025-07-02T13:03:29.937Z', 'mode': 'scanning'}
+2025-07-02 14:03:30,953 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.1, 'timestamp': '2025-07-02T13:03:30.953Z', 'mode': 'scanning'}
+2025-07-02 14:03:31,936 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.0, 'timestamp': '2025-07-02T13:03:31.936Z', 'mode': 'scanning'}
+2025-07-02 14:03:32,939 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.3, 'timestamp': '2025-07-02T13:03:32.939Z', 'mode': 'scanning'}
+2025-07-02 14:03:33,928 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.1, 'timestamp': '2025-07-02T13:03:33.928Z', 'mode': 'scanning'}
+2025-07-02 14:03:34,937 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -2.5, 'timestamp': '2025-07-02T13:03:34.937Z', 'mode': 'scanning'}
+2025-07-02 14:03:35,939 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.6, 'timestamp': '2025-07-02T13:03:35.938Z', 'mode': 'scanning'}
+2025-07-02 14:03:36,930 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:03:36.930Z', 'mode': 'scanning'}
+2025-07-02 14:03:37,936 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.8, 'timestamp': '2025-07-02T13:03:37.936Z', 'mode': 'scanning'}
+2025-07-02 14:03:38,933 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.0, 'timestamp': '2025-07-02T13:03:38.933Z', 'mode': 'scanning'}
+2025-07-02 14:03:39,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -2.1, 'timestamp': '2025-07-02T13:03:39.932Z', 'mode': 'scanning'}
+2025-07-02 14:03:40,936 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -9.0, 'timestamp': '2025-07-02T13:03:40.936Z', 'mode': 'scanning'}
+2025-07-02 14:03:41,939 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:03:41.939Z', 'mode': 'scanning'}
+2025-07-02 14:03:42,944 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.6, 'timestamp': '2025-07-02T13:03:42.943Z', 'mode': 'scanning'}
+2025-07-02 14:03:43,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -2.7, 'timestamp': '2025-07-02T13:03:43.931Z', 'mode': 'scanning'}
+2025-07-02 14:03:44,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -3.4, 'timestamp': '2025-07-02T13:03:44.932Z', 'mode': 'scanning'}
+2025-07-02 14:03:45,933 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.2, 'timestamp': '2025-07-02T13:03:45.933Z', 'mode': 'scanning'}
+2025-07-02 14:03:46,930 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.4, 'timestamp': '2025-07-02T13:03:46.930Z', 'mode': 'scanning'}
+2025-07-02 14:03:47,938 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:03:47.938Z', 'mode': 'scanning'}
+2025-07-02 14:03:48,930 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.4, 'timestamp': '2025-07-02T13:03:48.930Z', 'mode': 'scanning'}
+2025-07-02 14:03:49,929 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.6, 'timestamp': '2025-07-02T13:03:49.928Z', 'mode': 'scanning'}
+2025-07-02 14:03:50,937 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.1, 'timestamp': '2025-07-02T13:03:50.937Z', 'mode': 'scanning'}
+2025-07-02 14:03:51,944 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:03:51.944Z', 'mode': 'scanning'}
+2025-07-02 14:03:52,931 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.5, 'timestamp': '2025-07-02T13:03:52.931Z', 'mode': 'scanning'}
+2025-07-02 14:03:53,966 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:03:53.966Z', 'mode': 'scanning'}
+2025-07-02 14:03:54,994 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.8, 'timestamp': '2025-07-02T13:03:54.994Z', 'mode': 'scanning'}
+2025-07-02 14:03:55,966 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.9, 'timestamp': '2025-07-02T13:03:55.965Z', 'mode': 'scanning'}
+2025-07-02 14:03:56,957 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.4, 'timestamp': '2025-07-02T13:03:56.957Z', 'mode': 'scanning'}
+2025-07-02 14:03:57,945 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.3, 'timestamp': '2025-07-02T13:03:57.945Z', 'mode': 'scanning'}
+2025-07-02 14:03:58,946 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:03:58.945Z', 'mode': 'scanning'}
+2025-07-02 14:03:59,948 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.6, 'timestamp': '2025-07-02T13:03:59.948Z', 'mode': 'scanning'}
+2025-07-02 14:04:00,952 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.1, 'timestamp': '2025-07-02T13:04:00.952Z', 'mode': 'scanning'}
+2025-07-02 14:04:01,951 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.9, 'timestamp': '2025-07-02T13:04:01.951Z', 'mode': 'scanning'}
+2025-07-02 14:04:02,993 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.3, 'timestamp': '2025-07-02T13:04:02.993Z', 'mode': 'scanning'}
+2025-07-02 14:04:03,949 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:04:03.949Z', 'mode': 'scanning'}
+2025-07-02 14:04:04,948 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:04:04.948Z', 'mode': 'scanning'}
+2025-07-02 14:04:05,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.8, 'timestamp': '2025-07-02T13:04:05.950Z', 'mode': 'scanning'}
+2025-07-02 14:04:06,947 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:04:06.947Z', 'mode': 'scanning'}
+2025-07-02 14:04:07,946 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:04:07.946Z', 'mode': 'scanning'}
+2025-07-02 14:04:08,998 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.8, 'timestamp': '2025-07-02T13:04:08.998Z', 'mode': 'scanning'}
+2025-07-02 14:04:09,992 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.3, 'timestamp': '2025-07-02T13:04:09.992Z', 'mode': 'scanning'}
+2025-07-02 14:04:10,963 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.5, 'timestamp': '2025-07-02T13:04:10.963Z', 'mode': 'scanning'}
+2025-07-02 14:04:11,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:04:11.949Z', 'mode': 'scanning'}
+2025-07-02 14:04:12,955 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:04:12.954Z', 'mode': 'scanning'}
+2025-07-02 14:04:13,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:04:13.949Z', 'mode': 'scanning'}
+2025-07-02 14:04:15,005 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.5, 'timestamp': '2025-07-02T13:04:15.005Z', 'mode': 'scanning'}
+2025-07-02 14:04:15,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.4, 'timestamp': '2025-07-02T13:04:15.950Z', 'mode': 'scanning'}
+2025-07-02 14:04:16,957 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:04:16.956Z', 'mode': 'scanning'}
+2025-07-02 14:04:17,955 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.5, 'timestamp': '2025-07-02T13:04:17.955Z', 'mode': 'scanning'}
+2025-07-02 14:04:18,948 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:04:18.948Z', 'mode': 'scanning'}
+2025-07-02 14:04:19,956 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.4, 'timestamp': '2025-07-02T13:04:19.956Z', 'mode': 'scanning'}
+2025-07-02 14:04:20,947 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.4, 'timestamp': '2025-07-02T13:04:20.947Z', 'mode': 'scanning'}
+2025-07-02 14:04:21,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.4, 'timestamp': '2025-07-02T13:04:21.950Z', 'mode': 'scanning'}
+2025-07-02 14:04:22,967 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.3, 'timestamp': '2025-07-02T13:04:22.966Z', 'mode': 'scanning'}
+2025-07-02 14:04:23,996 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.4, 'timestamp': '2025-07-02T13:04:23.996Z', 'mode': 'scanning'}
+2025-07-02 14:04:24,945 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.2, 'timestamp': '2025-07-02T13:04:24.945Z', 'mode': 'scanning'}
+2025-07-02 14:04:25,957 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.6, 'timestamp': '2025-07-02T13:04:25.957Z', 'mode': 'scanning'}
+2025-07-02 14:04:26,949 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.2, 'timestamp': '2025-07-02T13:04:26.949Z', 'mode': 'scanning'}
+2025-07-02 14:04:27,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.4, 'timestamp': '2025-07-02T13:04:27.949Z', 'mode': 'scanning'}
+2025-07-02 14:04:28,993 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -2.0, 'timestamp': '2025-07-02T13:04:28.993Z', 'mode': 'scanning'}
+2025-07-02 14:04:29,996 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.9, 'timestamp': '2025-07-02T13:04:29.996Z', 'mode': 'scanning'}
+2025-07-02 14:04:30,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 9.8, 'timestamp': '2025-07-02T13:04:30.950Z', 'mode': 'scanning'}
+2025-07-02 14:04:31,954 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 12.3, 'timestamp': '2025-07-02T13:04:31.954Z', 'mode': 'scanning'}
+2025-07-02 14:04:32,948 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.8, 'timestamp': '2025-07-02T13:04:32.948Z', 'mode': 'scanning'}
+2025-07-02 14:04:33,987 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:04:33.986Z', 'mode': 'scanning'}
+2025-07-02 14:04:34,995 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:04:34.995Z', 'mode': 'scanning'}
+2025-07-02 14:04:35,951 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:04:35.950Z', 'mode': 'scanning'}
+2025-07-02 14:04:36,951 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:04:36.951Z', 'mode': 'scanning'}
+2025-07-02 14:04:37,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.0, 'timestamp': '2025-07-02T13:04:37.949Z', 'mode': 'scanning'}
+2025-07-02 14:04:38,946 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -4.7, 'timestamp': '2025-07-02T13:04:38.946Z', 'mode': 'scanning'}
+2025-07-02 14:04:39,957 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -7.2, 'timestamp': '2025-07-02T13:04:39.956Z', 'mode': 'scanning'}
+2025-07-02 14:04:40,946 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.9, 'timestamp': '2025-07-02T13:04:40.945Z', 'mode': 'scanning'}
+2025-07-02 14:04:41,952 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.8, 'timestamp': '2025-07-02T13:04:41.952Z', 'mode': 'scanning'}
+2025-07-02 14:04:42,947 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.3, 'timestamp': '2025-07-02T13:04:42.947Z', 'mode': 'scanning'}
+2025-07-02 14:04:43,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.6, 'timestamp': '2025-07-02T13:04:43.950Z', 'mode': 'scanning'}
+2025-07-02 14:04:44,953 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 5.1, 'timestamp': '2025-07-02T13:04:44.953Z', 'mode': 'scanning'}
+2025-07-02 14:04:45,951 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.9, 'timestamp': '2025-07-02T13:04:45.951Z', 'mode': 'scanning'}
+2025-07-02 14:04:46,948 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -15.5, 'timestamp': '2025-07-02T13:04:46.948Z', 'mode': 'scanning'}
+2025-07-02 14:04:47,992 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:04:47.991Z', 'mode': 'scanning'}
+2025-07-02 14:04:48,946 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.8, 'timestamp': '2025-07-02T13:04:48.946Z', 'mode': 'scanning'}
+2025-07-02 14:04:49,957 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 10.5, 'timestamp': '2025-07-02T13:04:49.957Z', 'mode': 'scanning'}
+2025-07-02 14:04:50,956 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 14.0, 'timestamp': '2025-07-02T13:04:50.956Z', 'mode': 'scanning'}
+2025-07-02 14:04:51,998 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 12.8, 'timestamp': '2025-07-02T13:04:51.998Z', 'mode': 'scanning'}
+2025-07-02 14:04:52,992 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -5.0, 'timestamp': '2025-07-02T13:04:52.992Z', 'mode': 'scanning'}
+2025-07-02 14:04:53,996 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -7.2, 'timestamp': '2025-07-02T13:04:53.995Z', 'mode': 'scanning'}
+2025-07-02 14:04:54,945 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.3, 'timestamp': '2025-07-02T13:04:54.945Z', 'mode': 'scanning'}
+2025-07-02 14:04:55,945 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.4, 'timestamp': '2025-07-02T13:04:55.945Z', 'mode': 'scanning'}
+2025-07-02 14:04:56,953 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:04:56.953Z', 'mode': 'scanning'}
+2025-07-02 14:04:57,955 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:04:57.955Z', 'mode': 'scanning'}
+2025-07-02 14:04:58,950 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T13:04:58.950Z', 'mode': 'scanning'}
+2025-07-02 14:07:21,225 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 14:07:21,672 - INFO - Connected to server
+2025-07-02 14:07:21,675 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:07:21,678 - INFO - [INFO] Successfully connected to server
+2025-07-02 14:07:24,914 - INFO - [INFO] Starting detector...
+2025-07-02 14:07:29,513 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:07:30,025 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-07-02 14:07:30,031 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 14:07:32,680 - INFO - Manual orientation crosshairs enabled
+2025-07-02 14:07:36,726 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 14:07:36,729 - INFO - Stream paused for config application.
+2025-07-02 14:07:37,235 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 14:07:37,241 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 14:07:37,445 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 14:07:38,268 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 14:07:38,281 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:07:38,284 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 14:07:39,261 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -2.0, 'timestamp': '2025-07-02T13:07:39.261Z', 'mode': 'scanning'}
+2025-07-02 14:07:39,434 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 14:07:40,182 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 14:07:40,195 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:07:43,823 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 14:07:43,837 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:07:43,840 - INFO - Sending ADCS command: Mode='adcs', Command='auto_zero_tag', Value=None
+2025-07-02 14:07:44,829 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:07:44.829Z', 'mode': 'scanning'}
+2025-07-02 14:07:45,825 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.9, 'timestamp': '2025-07-02T13:07:45.825Z', 'mode': 'scanning'}
+2025-07-02 14:07:46,824 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.7, 'timestamp': '2025-07-02T13:07:46.824Z', 'mode': 'scanning'}
+2025-07-02 14:07:47,859 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.9, 'timestamp': '2025-07-02T13:07:47.859Z', 'mode': 'scanning'}
+2025-07-02 14:07:48,874 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:07:48.874Z', 'mode': 'scanning'}
+2025-07-02 14:07:49,823 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T13:07:49.823Z', 'mode': 'scanning'}
+2025-07-02 14:07:50,826 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.8, 'timestamp': '2025-07-02T13:07:50.825Z', 'mode': 'scanning'}
+2025-07-02 14:07:51,826 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.7, 'timestamp': '2025-07-02T13:07:51.826Z', 'mode': 'scanning'}
+2025-07-02 14:07:52,244 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 14:07:52,264 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 14:07:56,912 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 14:08:03,624 - INFO - [INFO] Closing application...
+2025-07-02 14:08:05,328 - INFO - Disconnected from server: client disconnect

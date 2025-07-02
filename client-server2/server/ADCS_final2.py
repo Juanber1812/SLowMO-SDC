@@ -1013,6 +1013,7 @@ class ADCSController:
         """
         Called when scanning_mode_data is received or when AprilTag command is triggered.
         Sets the MPU yaw to the received relative angle at the matching timestamp.
+        If rel_angle is None, sets yaw and PD target to zero.
         """
         if not self.auto_zero_tag_enabled:
             print("[AUTO ZERO] auto_zero_tag is disabled, ignoring data.")
@@ -1020,8 +1021,15 @@ class ADCSController:
         try:
             rel_angle = data.get("relative_angle")
             timestamp_str = data.get("timestamp")
-            if rel_angle is None or not timestamp_str:
-                print("[AUTO ZERO] Invalid data received.")
+            if rel_angle is None:
+                print("[AUTO ZERO] rel_angle is None, setting yaw and PD target to 0.")
+                with self.data_lock:
+                    self.mpu_sensor.angle_yaw = 0.0
+                    self.mpu_sensor.angle_yaw_pure = 0.0
+                self.pd_controller.set_target(0.0)
+                return
+            if not timestamp_str:
+                print("[AUTO ZERO] Invalid data received (no timestamp).")
                 return
 
             # Parse ISO timestamp to epoch
