@@ -114,7 +114,8 @@ class LuxSensorManager:
                 if last_max is None or (data[-2][0] - last_max[0]) > min_distance * 0.01:  # 0.01s per sample
                     self.last_maxima[ch] = data[-2]
                     self.detected_maxima.append((t_curr, ch, v_curr))
-                    print(f"\n[PEAK] Sensor {ch} maxima at {time.strftime('%H:%M:%S', time.localtime(t_curr))} value={v_curr:.2f}")
+                    # Print log with timestamp and channel
+                    print(f"\n[PEAK LOG] {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t_curr))} | Channel: {ch} | Value: {v_curr:.2f}")
 
 if __name__ == "__main__":
     manager = LuxSensorManager()
