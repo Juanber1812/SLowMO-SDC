@@ -163,6 +163,6 @@ if __name__ == "__main__":
                 lux_str = " | ".join([f"Lux{ch}: {readings[ch]:7.2f}" for ch in LUX_CHANNELS])
                 print(f"[LIVE] {lux_str}  {time.strftime('%H:%M:%S')}")
                 last_display = now
-            time.sleep(0.01)
+            time.sleep(1)
     except KeyboardInterrupt:
         print("\nExiting lux sensor live display.")
