@@ -149,6 +149,13 @@ class ADCSSection(QGroupBox):
         group.setLayout(layout)
         return group
 
+    def get_target_yaw(self):
+        """Return the current target yaw as a float (from the input box)."""
+        try:
+            return float(self.value_input.text())
+        except Exception:
+            return 0.0
+
     def _create_manual_controls_group(self):
         group = QGroupBox()
         if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
