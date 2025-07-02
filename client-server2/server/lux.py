@@ -52,5 +52,5 @@ def animate(frame):
 
 if __name__ == "__main__":
     fig = plt.figure(figsize=(10, 6))
-    ani = animation.FuncAnimation(fig, animate, interval=500)
+    anim = animation.FuncAnimation(fig, animate, interval=500, cache_frame_data=False)
     plt.show()
