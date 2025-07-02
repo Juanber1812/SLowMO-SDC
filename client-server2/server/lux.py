@@ -1,15 +1,13 @@
+import sys
 import time
 import datetime
 from collections import deque
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import sys
+from PyQt6 import QtWidgets, QtCore
+import pyqtgraph as pg
+import random
 
 # Dummy I2C read function (replace with your actual sensor reading logic)
 def read_lux_sensor(sensor_id):
-    # Replace this with actual I2C read code for your sensors
-    # For demo, return a fluctuating value
-    import random
     return 100 + 50 * random.random() + 50 * (sensor_id + 1) * (0.5 - random.random())
 
 class LuxTracker:
@@ -34,25 +32,43 @@ class LuxTracker:
     def get_maxima(self):
         return self.maxima
 
-lux_tracker = LuxTracker()
+class LuxPlotter(QtWidgets.QWidget):
+    def __init__(self, tracker):
+        super().__init__()
+        self.tracker = tracker
+        self.plot_widget = pg.PlotWidget(title="Live Lux Sensor Readings and Maxima")
+        self.curves = [self.plot_widget.plot(pen=pg.mkPen(color, width=2), name=f"Lux {i+1}") for i, color in enumerate(['r', 'g', 'b'])]
+        self.max_dots = [self.plot_widget.plot(pen=None, symbol='o', symbolBrush=color, symbolSize=12) for color in ['r', 'g', 'b']]
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(self.plot_widget)
+        self.setLayout(layout)
+        self.plot_widget.addLegend()
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.update_plot)
+        self.timer.start(500)
 
-def animate(frame):
-    lux_tracker.update()
-    plt.clf()
-    times = [datetime.datetime.fromtimestamp(ts) for ts in lux_tracker.timestamps]
-    for i, color in zip(range(3), ['r', 'g', 'b']):
-        plt.plot(times, lux_tracker.values[i], color, label=f"Lux {i+1} (now: {lux_tracker.get_current()[i]:.1f})")
-        max_val, max_ts = lux_tracker.maxima[i]
-        if max_ts:
-            plt.scatter([datetime.datetime.fromtimestamp(max_ts)], [max_val], color=color, marker='o', s=80, label=f"Max {i+1}: {max_val:.1f} @ {datetime.datetime.fromtimestamp(max_ts).strftime('%H:%M:%S')}")
-    plt.legend(loc='upper left')
-    plt.xlabel("Time")
-    plt.ylabel("Lux Value")
-    plt.title("Live Lux Sensor Readings and Maxima")
-    plt.tight_layout()
+    def update_plot(self):
+        self.tracker.update()
+        times = [datetime.datetime.fromtimestamp(ts) for ts in self.tracker.timestamps]
+        if not times:
+            return
+        t0 = times[0]
+        x = [(t-t0).total_seconds() for t in times]
+        for i in range(3):
+            y = list(self.tracker.values[i])
+            self.curves[i].setData(x, y, name=f"Lux {i+1} (now: {y[-1]:.1f})")
+            max_val, max_ts = self.tracker.maxima[i]
+            if max_ts:
+                max_x = (datetime.datetime.fromtimestamp(max_ts)-t0).total_seconds()
+                self.max_dots[i].setData([max_x], [max_val])
+            else:
+                self.max_dots[i].setData([], [])
 
 if __name__ == "__main__":
-    fig = plt.figure(figsize=(10, 6))
-    anim = animation.FuncAnimation(fig, animate, interval=500, cache_frame_data=False)
-    sys.modules[__name__].anim = anim
-    plt.show()
+    app = QtWidgets.QApplication(sys.argv)
+    tracker = LuxTracker()
+    win = LuxPlotter(tracker)
+    win.setWindowTitle("Lux Sensors Live (PyQtGraph)")
+    win.resize(900, 500)
+    win.show()
+    sys.exit(app.exec())
