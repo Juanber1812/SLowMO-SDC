@@ -19,6 +19,15 @@ except ImportError as e:
     PowerMonitor = None
     POWER_AVAILABLE = False
 
+# Import temperature monitoring
+try:
+    from temperature import start_thermal_subprocess
+    TEMPERATURE_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"Temperature monitoring not available: {e}")
+    start_thermal_subprocess = None
+    TEMPERATURE_AVAILABLE = False
+
 # Import communication monitoring
 try:
     from communication import CommunicationMonitor
@@ -47,6 +56,11 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 power_monitor = None
 if POWER_AVAILABLE:
     power_monitor = PowerMonitor(update_interval=2.0)  # Will try to connect to real hardware
+
+# Initialize temperature monitor
+thermal_queue = None
+if TEMPERATURE_AVAILABLE:
+    thermal_queue = start_thermal_subprocess()
 
 # Initialize communication monitor
 communication_monitor = None
@@ -253,6 +267,11 @@ def start_background_tasks():
             start_adcs_broadcast()
             logging.info("ADCS controller initialized and broadcasting started")
         
+        # Start thermal data broadcasting
+        if TEMPERATURE_AVAILABLE or ADCS_AVAILABLE:  # Start if we have any temperature source
+            start_thermal_broadcast()
+            logging.info("Thermal data broadcasting started")
+        
         # Do NOT start communication monitoring here; start on client connect
     # Start the delayed initialization in a separate thread
     threading.Thread(target=delayed_start, daemon=True).start()
@@ -323,6 +342,7 @@ def handle_adcs_command(data):
 
 @socketio.on("sensor_data")
 def handle_sensor_data(data):
+    global latest_pi_temp
     try:
         # Enhanced sensor data now includes memory usage, uptime, and smart status
         # Format: {
@@ -332,6 +352,9 @@ def handle_sensor_data(data):
         #   "uptime": "2h 34m 12s",
         #   "status": "Moderate Load"
         # }
+        
+        # Store Pi temperature for thermal broadcast
+        latest_pi_temp = data.get("temperature")
         
         # Prepare enhanced sensor data for broadcast
         memory_info = data.get("memory", {})
@@ -498,11 +521,22 @@ def throughput_test_callback(event_type, data):
 
 def adcs_data_broadcast():
     """Broadcast ADCS data at 20Hz"""
+    global latest_payload_temp
+    
     if not adcs_controller:
         return
     
     try:
         adcs_data = adcs_controller.get_adcs_data_for_server()
+        
+        # Extract payload temperature from ADCS data
+        temp_str = adcs_data.get('temperature', '0.0°C')
+        try:
+            # Remove the °C suffix and convert to float
+            latest_payload_temp = float(temp_str.replace('°C', ''))
+        except:
+            latest_payload_temp = None
+        
         socketio.emit("adcs_broadcast", adcs_data)
         
         # Log ADCS data periodically (every 10 seconds)
@@ -545,6 +579,114 @@ def start_adcs_broadcast():
     
     threading.Thread(target=adcs_broadcast_loop, daemon=True).start()
     logging.info("ADCS data broadcasting started at 20Hz")
+
+# Global variables to store latest temperature data
+latest_battery_temp = None
+latest_pi_temp = None
+latest_payload_temp = None
+
+def determine_thermal_status(battery_temp, pi_temp, payload_temp):
+    """Determine overall thermal status based on temperature thresholds"""
+    statuses = []
+    
+    # Battery temperature thresholds (°C)
+    if battery_temp is not None:
+        if battery_temp >= 60:
+            statuses.append("Battery Critical")
+        elif battery_temp >= 50:
+            statuses.append("Battery Hot")
+        elif battery_temp >= 40:
+            statuses.append("Battery Warm")
+    
+    # Pi temperature thresholds (°C)
+    if pi_temp is not None:
+        if pi_temp >= 80:
+            statuses.append("Pi Critical")
+        elif pi_temp >= 70:
+            statuses.append("Pi Hot")
+        elif pi_temp >= 60:
+            statuses.append("Pi Warm")
+    
+    # Payload/ADCS temperature thresholds (°C)
+    if payload_temp is not None:
+        if payload_temp >= 70:
+            statuses.append("Payload Critical")
+        elif payload_temp >= 60:
+            statuses.append("Payload Hot")
+        elif payload_temp >= 50:
+            statuses.append("Payload Warm")
+    
+    # Determine overall status
+    if any("Critical" in status for status in statuses):
+        return "Critical"
+    elif any("Hot" in status for status in statuses):
+        return "Hot"
+    elif any("Warm" in status for status in statuses):
+        return "Warm"
+    else:
+        return "Nominal"
+
+def thermal_data_broadcast():
+    """Broadcast thermal data combining all temperature sources"""
+    global latest_battery_temp, latest_pi_temp, latest_payload_temp
+    
+    try:
+        # Get battery temperature from thermal queue
+        if thermal_queue and not thermal_queue.empty():
+            try:
+                while not thermal_queue.empty():  # Get the most recent reading
+                    thermal_data = thermal_queue.get_nowait()
+                    latest_battery_temp = thermal_data.get('battery_temp')
+            except:
+                pass  # Queue was empty
+        
+        # Get Pi temperature from sensor data (stored globally when sensor_data is received)
+        # We'll update this in the sensor_data handler
+        
+        # Get payload temperature from ADCS data (stored globally when ADCS data is received)
+        # We'll update this in the ADCS data handler
+        
+        # Determine overall status
+        status = determine_thermal_status(latest_battery_temp, latest_pi_temp, latest_payload_temp)
+        
+        # Prepare thermal broadcast data
+        thermal_data = {
+            "battery_temp": f"{latest_battery_temp:.1f}" if latest_battery_temp is not None else "N/A",
+            "pi_temp": f"{latest_pi_temp:.1f}" if latest_pi_temp is not None else "N/A",
+            "payload_temp": f"{latest_payload_temp:.1f}" if latest_payload_temp is not None else "N/A",
+            "status": status
+        }
+        
+        socketio.emit("thermal_broadcast", thermal_data)
+        
+        # Log thermal data periodically (every 30 seconds)
+        if not hasattr(thermal_data_broadcast, 'last_log') or time.time() - thermal_data_broadcast.last_log > 30:
+            thermal_data_broadcast.last_log = time.time()
+            logging.info(f"Thermal broadcast: Battery={thermal_data['battery_temp']}°C, Pi={thermal_data['pi_temp']}°C, Payload={thermal_data['payload_temp']}°C, Status={status}")
+            
+    except Exception as e:
+        logging.error(f"Error in thermal data broadcast: {e}")
+        # Send error state to clients
+        socketio.emit("thermal_broadcast", {
+            "battery_temp": "Error",
+            "pi_temp": "Error", 
+            "payload_temp": "Error",
+            "status": "Error"
+        })
+
+def start_thermal_broadcast():
+    """Start thermal data broadcasting at 2Hz"""
+    def thermal_broadcast_loop():
+        while True:
+            try:
+                thermal_data_broadcast()
+                time.sleep(0.5)  # 2Hz = 500ms interval
+            except Exception as e:
+                logging.error(f"Error in thermal broadcast loop: {e}")
+                time.sleep(1)  # Wait 1 second on error before retrying
+    
+    threading.Thread(target=thermal_broadcast_loop, daemon=True).start()
+    logging.info("Thermal data broadcasting started at 2Hz")
 
 @socketio.on('latency_response')
 def handle_latency_response(data):
@@ -592,6 +734,23 @@ def handle_get_power_status():
             "error": str(e)
         })
         logging.error(f"Error getting power status: {e}")
+
+@socketio.on("get_thermal_status")
+def handle_get_thermal_status():
+    """Handle request for current thermal status"""
+    try:
+        # Force an immediate thermal broadcast
+        thermal_data_broadcast()
+        emit("thermal_status_response", {
+            "success": True,
+            "message": "Thermal status updated"
+        })
+    except Exception as e:
+        emit("thermal_status_response", {
+            "success": False,
+            "error": str(e)
+        })
+        logging.error(f"Error getting thermal status: {e}")
 
 @socketio.on("power_data")
 def handle_power_data(data):
