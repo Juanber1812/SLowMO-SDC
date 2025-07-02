@@ -28,6 +28,16 @@ except ImportError as e:
     CommunicationMonitor = None
     COMMUNICATION_AVAILABLE = False
 
+# Import thermal monitoring
+try:
+    from temperature import start_thermal_monitoring, set_thermal_data_callback
+    THERMAL_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"Thermal monitoring not available: {e}")
+    start_thermal_monitoring = None
+    set_thermal_data_callback = None
+    THERMAL_AVAILABLE = False
+
 # Import ADCS controller
 try:
     from ADCS_final2 import ADCSController
@@ -36,6 +46,8 @@ except ImportError as e:
     logging.warning(f"ADCS controller not available: {e}")
     ADCSController = None
     ADCS_AVAILABLE = False
+
+
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -252,6 +264,12 @@ def start_background_tasks():
         if adcs_controller:
             start_adcs_broadcast()
             logging.info("ADCS controller initialized and broadcasting started")
+        
+        # Start thermal monitoring
+        if THERMAL_AVAILABLE:
+            set_thermal_data_callback(thermal_data_callback)
+            start_thermal_monitoring()
+            logging.info("Thermal monitoring started successfully")
         
         # Do NOT start communication monitoring here; start on client connect
     # Start the delayed initialization in a separate thread
@@ -495,6 +513,32 @@ def throughput_test_callback(event_type, data):
             logging.info(f"Throughput test initiated: {data['size']} bytes")
     except Exception as e:
         logging.error(f"Error in throughput test callback: {e}")
+
+def thermal_data_callback(thermal_data):
+    """Handle thermal data updates and broadcast to clients"""
+    try:
+        # Format data for thermal broadcast - only battery temperature
+        formatted_data = {
+            "battery_temp": thermal_data.get('battery_temp'),
+            "status": thermal_data.get('status', 'Disconnected')
+        }
+        
+        socketio.emit("thermal_broadcast", formatted_data)
+        
+        # Log thermal data periodically (every 30 seconds)
+        if not hasattr(thermal_data_callback, 'last_log') or time.time() - thermal_data_callback.last_log > 30:
+            thermal_data_callback.last_log = time.time()
+            battery_temp = thermal_data.get('battery_temp', 'N/A')
+            status = thermal_data.get('status', 'Unknown')
+            logging.info(f"Thermal broadcast: Battery={battery_temp}°C, Status={status}")
+            
+    except Exception as e:
+        logging.error(f"Error in thermal data callback: {e}")
+        # Send error state to clients
+        socketio.emit("thermal_broadcast", {
+            "battery_temp": None,
+            "status": "Error"
+        })
 
 def adcs_data_broadcast():
     """Broadcast ADCS data at 20Hz"""

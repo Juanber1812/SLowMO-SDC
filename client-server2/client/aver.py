@@ -808,7 +808,7 @@ class MainWindow(QWidget):
                 "Status: Pending..."
             ]),
             ("Payload Subsystem", []),  # Special handling for payload
-            ("Command & Data Handling Subsystem", ["CPU Usage: Pending...", "Memory Usage: Pending...", "Last Command: Pending...", "Uptime: Pending...", "Status: Pending..."]),
+            ("Command & Data Handling Subsystem", ["CPU Usage: Pending...", "Memory Usage: Pending...", "Uptime: Pending...", "Status: Pending..."]),
             ("Error Log", ["No Critical Errors Detected: Pending..."]),
             ("Overall Status", ["No Anomalies Detected: Pending...", "Recommended Actions: Pending..."])
         ]
@@ -906,8 +906,6 @@ class MainWindow(QWidget):
                         self.cdh_labels["cpu_usage"] = lbl
                     elif "Memory Usage" in text:
                         self.cdh_labels["memory"] = lbl
-                    elif "Last Command" in text:
-                        self.cdh_labels["last_cmd"] = lbl
                     elif "Uptime" in text:
                         self.cdh_labels["uptime"] = lbl
                     elif "Status" in text:
@@ -1448,8 +1446,6 @@ class MainWindow(QWidget):
                 if hasattr(self, 'cdh_labels'):
                     if "memory_usage" in data:
                         self.cdh_labels["memory"].setText(f"Memory Usage: {data['memory_usage']:.1f}%")
-                    if "last_command" in data:
-                        self.cdh_labels["last_cmd"].setText(f"Last Command: {data['last_command']}")
                     if "uptime" in data:
                         self.cdh_labels["uptime"].setText(f"Uptime: {data['uptime']}")
                     if "status" in data:

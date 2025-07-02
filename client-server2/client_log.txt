@@ -2057,3 +2057,53 @@
 2025-07-02 07:20:58,307 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751437253.3001072 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001F7B89927B0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
 2025-07-02 07:21:40,156 - INFO - [INFO] Closing application...
 2025-07-02 07:21:40,160 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 07:30:50,291 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 07:30:50,685 - INFO - Connected to server
+2025-07-02 07:30:50,689 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 07:30:50,695 - INFO - [INFO] Successfully connected to server
+2025-07-02 07:31:43,583 - INFO - [INFO] Closing application...
+2025-07-02 07:31:44,789 - INFO - Disconnected from server: client disconnect
+2025-07-02 07:34:56,272 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 07:34:56,454 - INFO - Connected to server
+2025-07-02 07:34:56,456 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 07:34:56,459 - INFO - [INFO] Successfully connected to server
+2025-07-02 07:35:11,857 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 07:35:12,207 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 07:35:15,368 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 07:35:16,515 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 07:35:21,380 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 07:35:23,514 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 07:35:29,625 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 07:35:31,737 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 07:35:38,187 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 07:35:39,700 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 07:35:40,409 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 07:35:42,916 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 07:35:59,921 - INFO - [INFO] Closing application...
+2025-07-02 07:36:01,127 - INFO - Disconnected from server: client disconnect
+2025-07-02 08:21:36,949 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 08:21:39,028 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751440896.9520757 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000258FFDE67B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-02 08:22:26,341 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-02 08:22:26,541 - INFO - Connected to server
+2025-07-02 08:22:26,545 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:26:28,517 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 08:26:28,695 - INFO - Connected to server
+2025-07-02 08:26:28,696 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:26:28,699 - INFO - [INFO] Successfully connected to server
+2025-07-02 08:27:19,921 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 08:27:20,345 - INFO - Connected to server
+2025-07-02 08:27:20,348 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 08:27:20,352 - INFO - [INFO] Successfully connected to server
+2025-07-02 08:27:28,537 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 08:27:40,812 - INFO - Manual orientation crosshairs enabled
+2025-07-02 08:28:40,706 - INFO - Manual orientation crosshairs disabled
+2025-07-02 08:28:43,672 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 08:28:43,800 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 08:28:45,413 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 08:28:45,557 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 08:28:46,191 - INFO - Sending ADCS command: Mode='adcs', Command='manual_counterclockwise_start', Value=None
+2025-07-02 08:28:46,323 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 08:28:47,593 - INFO - Sending ADCS command: Mode='adcs', Command='manual_clockwise_start', Value=None
+2025-07-02 08:28:47,714 - INFO - Sending ADCS command: Mode='adcs', Command='manual_stop', Value=None
+2025-07-02 08:28:49,210 - INFO - [INFO] Closing application...
+2025-07-02 08:28:50,417 - INFO - Disconnected from server: client disconnect
