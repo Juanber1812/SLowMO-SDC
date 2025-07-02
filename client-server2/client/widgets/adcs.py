@@ -93,7 +93,7 @@ class ADCSSection(QGroupBox):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ADCSSection")
-        self.setFixedSize(1250,235)
+        self.setFixedSize(900,235)
         self.current_auto_mode = "adcs" # Default auto mode
         # Apply groupbox style to self
         if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:

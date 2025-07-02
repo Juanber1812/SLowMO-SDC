@@ -4890,3 +4890,82 @@
 2025-07-02 19:17:17,226 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=5.0
 2025-07-02 19:17:18,815 - INFO - [INFO] Closing application...
 2025-07-02 19:17:20,520 - INFO - Disconnected from server: client disconnect
+2025-07-02 19:20:32,941 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 19:20:33,128 - INFO - Connected to server
+2025-07-02 19:20:33,133 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:20:33,140 - INFO - [INFO] Successfully connected to server
+2025-07-02 19:20:50,918 - INFO - Disconnected from server: transport error
+2025-07-02 19:20:51,724 - INFO - Connected to server
+2025-07-02 19:20:51,729 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:20:51,735 - INFO - Stream paused for config application.
+2025-07-02 19:20:54,760 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:20:55,264 - INFO - 0.5s pause complete. Getting/sending configuration (stream was False).
+2025-07-02 19:20:55,269 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 19:20:59,773 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:20:59,776 - INFO - Stream paused for config application.
+2025-07-02 19:21:00,279 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 19:21:00,286 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 19:21:00,491 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 19:21:02,925 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:21:02,929 - INFO - Stream paused for config application.
+2025-07-02 19:21:03,432 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 19:21:03,439 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 19:21:03,643 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 19:21:08,057 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:21:08,060 - INFO - Stream paused for config application.
+2025-07-02 19:21:08,598 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 19:21:08,602 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 19:21:08,807 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 19:21:13,603 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:21:13,606 - INFO - Stream paused for config application.
+2025-07-02 19:21:14,109 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 19:21:14,114 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 19:21:14,318 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 19:21:23,847 - INFO - Disconnected from server: transport error
+2025-07-02 19:21:25,724 - INFO - Connected to server
+2025-07-02 19:21:25,726 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:21:25,729 - INFO - Stream paused for config application.
+2025-07-02 19:21:40,512 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 19:21:41,313 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 19:21:48,845 - INFO - Sending ADCS command: Mode='adcs', Command='set_pd_values', Value={'kp': 0.5, 'kd': 0.1, 'deadband': 0.1, 'min_pulse': 0.1}
+2025-07-02 19:21:55,688 - INFO - Disconnected from server: transport error
+2025-07-02 19:21:57,138 - INFO - Connected to server
+2025-07-02 19:21:57,141 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:21:57,145 - INFO - Stream paused for config application.
+2025-07-02 19:21:57,264 - INFO - Disconnected from server: transport error
+2025-07-02 19:21:58,747 - INFO - Connected to server
+2025-07-02 19:21:58,749 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:22:07,687 - INFO - Manual orientation crosshairs enabled
+2025-07-02 19:22:12,294 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=-1.0
+2025-07-02 19:22:21,308 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=-1.4
+2025-07-02 19:22:28,904 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=-1.2
+2025-07-02 19:22:30,032 - INFO - Disconnected from server: transport error
+2025-07-02 19:22:32,193 - INFO - Connected to server
+2025-07-02 19:22:32,195 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:22:32,196 - INFO - Stream paused for config application.
+2025-07-02 19:22:43,533 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=-1.1
+2025-07-02 19:23:08,514 - INFO - Sending ADCS command: Mode='adcs', Command='set_pd_values', Value={'kp': 0.2, 'kd': 0.1, 'deadband': 0.1, 'min_pulse': 0.1}
+2025-07-02 19:23:16,451 - INFO - Sending ADCS command: Mode='adcs', Command='set_pd_values', Value={'kp': 0.2, 'kd': 0.5, 'deadband': 0.1, 'min_pulse': 0.1}
+2025-07-02 19:23:20,200 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=10.0
+2025-07-02 19:23:40,244 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
+2025-07-02 19:24:13,868 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 19:24:14,794 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 19:24:15,814 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=10.0
+2025-07-02 19:24:23,297 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 19:24:47,041 - INFO - Sending ADCS command: Mode='adcs', Command='set_pd_values', Value={'kp': 0.2, 'kd': 0.2, 'deadband': 0.1, 'min_pulse': 0.1}
+2025-07-02 19:25:00,599 - INFO - Sending ADCS command: Mode='adcs', Command='set_pd_values', Value={'kp': 0.2, 'kd': 0.1, 'deadband': 0.1, 'min_pulse': 0.1}
+2025-07-02 19:25:18,241 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=20.0
+2025-07-02 19:25:21,410 - INFO - Disconnected from server: transport error
+2025-07-02 19:25:22,194 - INFO - Connected to server
+2025-07-02 19:25:22,197 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 19:25:22,202 - INFO - Stream paused for config application.
+2025-07-02 19:25:22,733 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=20.0
+2025-07-02 19:25:40,941 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=0.0
+2025-07-02 19:25:48,368 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=-20.0
+2025-07-02 19:25:54,597 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=0.0
+2025-07-02 19:26:02,380 - INFO - [INFO] Closing application...
+2025-07-02 19:26:03,586 - INFO - Disconnected from server: client disconnect
+2025-07-02 19:47:04,853 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 19:47:09,860 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751482024.8570893 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000019B791DEA50>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 19:47:11,768 - INFO - [INFO] Closing application...
+2025-07-02 19:47:11,773 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.

@@ -368,7 +368,7 @@ class MPU6050Sensor:
         print("[AUTO ZERO ENV] Performing 2 slow full rotations for peak detection...")
         self.pd_controller.stop_controller()
         self.manual_control_active = True
-        min_power = 25  # Minimum reliable power
+        min_power = 0  # Minimum reliable power
         rotation_count = 0
         last_yaw = None
         yaw_wraps = 0
@@ -556,119 +556,124 @@ class LuxSensorManager:
 
 class PDControllerPWM:
     """
-    PWM-based PD Controller for smooth motor control
+    PWM-based PID Controller for smooth motor control
     """
-    def __init__(self, kp=10.0, kd=2.0, max_power=80, deadband=1.0, integral_limit=50.0):
+    def __init__(self, kp=10.0, ki=0.0, kd=2.0, max_power=80, deadband=1.0, integral_limit=50.0):
         """
-        PWM PD Controller
-        
+        PWM PID Controller
+
         Args:
             kp: Proportional gain
+            ki: Integral gain
             kd: Derivative gain
             max_power: Maximum PWM power (0-100%)
             deadband: Angle deadband in degrees (no action within this range)
             integral_limit: Maximum integral windup protection
         """
         self.kp = kp
+        self.ki = ki
         self.kd = kd
         self.max_power = max_power
         self.deadband = deadband
         self.integral_limit = integral_limit
-        
+
         # Control state
         self.target_yaw = 0.0
         self.previous_error = 0.0
         self.integral = 0.0
         self.last_time = time.time()
-        
+
         # Controller enable/disable
         self.controller_enabled = False
         self.input_mode = False
-        
+
         # Logging
         self.log_data = []
         self.enable_logging = False
-        
+
         # Yaw data logging for settling time analysis
         self.yaw_log_data = []
         self.enable_yaw_logging = False
         self.yaw_log_start_time = None
-        
+
     def set_target(self, target_angle):
         """Set target yaw angle in degrees"""
         self.target_yaw = target_angle
         # Reset integral when target changes to prevent windup
         self.integral = 0.0
         print(f"Target yaw set to: {target_angle:.1f}°")
-    
+
     def start_controller(self):
-        """Start the PD controller"""
+        """Start the PID controller"""
         self.controller_enabled = True
         self.integral = 0.0  # Reset integral
-        print("PWM PD Controller STARTED - Motor control active")
-    
+        print("PWM PID Controller STARTED - Motor control active")
+
     def stop_controller(self):
-        """Stop the PD controller and motor"""
+        """Stop the PID controller and motor"""
         self.controller_enabled = False
         self.integral = 0.0
         stop_motor()  # Immediately stop motor
-        print("PWM PD Controller STOPPED - Motor disabled")
-    
+        print("PWM PID Controller STOPPED - Motor disabled")
+
     def update(self, current_yaw, gyro_rate, dt):
         """
-        Update PWM PD controller and return motor power
-        
+        Update PWM PID controller and return motor power
+
         Args:
             current_yaw: Current yaw angle in degrees
             gyro_rate: Current yaw rate in °/s
             dt: Time step in seconds
-            
+
         Returns:
             motor_power: PWM power (-100 to 100)
             error: Current error in degrees
-            pd_output: Raw PD output before limiting
+            pid_output: Raw PID output before limiting
         """
         # Calculate error
         error = self.target_yaw - current_yaw
-        
+
         # If controller is disabled or in input mode, don't execute control
         if not self.controller_enabled or self.input_mode:
             return 0, error, 0.0
-        
+
         # Apply deadband - no action if error is small
         if abs(error) < self.deadband:
             motor_power = 0
-            pd_output = 0.0
+            pid_output = 0.0
+            self.integral = 0.0  # Optionally reset integral in deadband
         else:
             # Calculate derivative
             if dt > 0:
                 derivative = (error - self.previous_error) / dt
             else:
                 derivative = 0.0
-            
-            # PD control output
-            pd_output = self.kp * error + self.kd * derivative
-            
+
+            # Accumulate integral with anti-windup
+            self.integral += error * dt
+            self.integral = max(-self.integral_limit, min(self.integral, self.integral_limit))
+
+            # PID control output
+            pid_output = self.kp * error + self.ki * self.integral + self.kd * derivative
+
             # Convert to motor power (-100 to +100)
-            motor_power = pd_output
-            
+            motor_power = pid_output
+
             # Limit motor power to maximum
             motor_power = max(-self.max_power, min(self.max_power, motor_power))
-            
-            # Apply minimum power threshold (20% minimum when active)
-            if motor_power != 0:  # Only apply minimum when motor should be active
-                if motor_power > 0:
-                    motor_power = max(25, motor_power)  # Minimum 20% CW
-                else:
-                    motor_power = min(-25, motor_power)  # Minimum 20% CCW
-        
+
+            # No minimum threshold (as discussed)
+            # if motor_power != 0:
+            #     if abs(motor_power) < 25:
+            #         motor_power = 25 * (1 if motor_power > 0 else -1)
+
         # Apply motor power
         if self.controller_enabled:
             set_motor_power(motor_power)
-        
+
         # Store previous error for next derivative calculation
         self.previous_error = error
-        
+
         # Log data if enabled
         current_time = time.time()
         if self.enable_logging:
@@ -677,18 +682,19 @@ class PDControllerPWM:
                 'target': self.target_yaw,
                 'current': current_yaw,
                 'error': error,
+                'integral': self.integral,
                 'derivative': derivative if 'derivative' in locals() else 0.0,
-                'pd_output': pd_output,
+                'pid_output': pid_output,
                 'motor_power': motor_power,
                 'gyro_rate': gyro_rate
             })
-        
+
         # Log yaw data for settling time analysis
         if self.enable_yaw_logging:
             relative_time = current_time - self.yaw_log_start_time if self.yaw_log_start_time else 0
             self.yaw_log_data.append({
                 'time': current_time,
-                'relative_time': relative_time, 
+                'relative_time': relative_time,
                 'yaw_angle': current_yaw,
                 'target_yaw': self.target_yaw,
                 'error': error,
@@ -696,8 +702,8 @@ class PDControllerPWM:
                 'motor_power': motor_power,
                 'controller_active': self.controller_enabled
             })
-        
-        return motor_power, error, pd_output
+
+        return motor_power, error, pid_output
 
 class ADCSController:
     """

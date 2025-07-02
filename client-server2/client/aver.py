@@ -63,6 +63,7 @@ from payload import detector4
 from widgets.camera_controls import CameraControlsWidget
 from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
+from widgets.adcs_graph import YawGraphWidget
 from widgets.detector_control import DetectorControlWidget
 from widgets.adcs import ADCSSection
 from widgets.detector_settings_widget import DetectorSettingsWidget
@@ -339,6 +340,8 @@ class MainWindow(QWidget):
         self.spin_plotter     = AngularPositionPlotter()
         self.distance_plotter = RelativeDistancePlotter()
         self.angular_plotter  = RelativeAnglePlotter()
+
+        self.yaw_graph = YawGraphWidget()
         # ── end instantiation ───────────────────────────────────────
 
         # Setup Log Display Widget
@@ -759,6 +762,7 @@ class MainWindow(QWidget):
             self.adcs_control_widget.apriltag_btn.toggled.connect(self.handle_scanning_mode_toggle)
         row3.addWidget(self.adcs_control_widget, 1)  # stretch factor 1 for ADCS controls
         parent_layout.addLayout(row3)
+        row3.addWidget(self.yaw_graph, 0)  # Add the yaw graph next to ADCS controls
 
 ##########################################################################################
 #info panel
@@ -1310,6 +1314,11 @@ class MainWindow(QWidget):
                         status = data.get('status', 'Unknown')
                         self.adcs_labels["status"].setText(f"Status: {status}")
                 
+                if hasattr(self, 'yaw_graph'):
+                    target_yaw = self.adcs_control_widget.get_target_yaw() if hasattr(self.adcs_control_widget, 'get_target_yaw') else 0.0
+                    current_yaw = data.get('angle_z', 0.0)
+                    self.yaw_graph.push_data(target_yaw, current_yaw)
+
                 # Forward complete ADCS data to ADCS widget for detailed display
                 if hasattr(self, 'adcs_control_widget') and self.adcs_control_widget:
                     # Pass all the detailed MPU and Lux sensor data
