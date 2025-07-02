@@ -24,6 +24,7 @@ class PowerMonitor:
     """Power monitoring system using INA228 sensor"""
     
     def __init__(self, update_interval=2.0, mock_mode=False):
+        print("[PowerMonitor.__init__] Initializing PowerMonitor")
         self.update_interval = update_interval
         # Never use mock mode - if hardware isn't available, show disconnected
         self.mock_mode = False
@@ -40,14 +41,18 @@ class PowerMonitor:
         self.csv_headers = ['timestamp', 'current_ma', 'voltage_v', 'power_mw', 'energy_j', 'temperature_c', 'battery_percentage']
         
         logging.info(f"PowerMonitor initialized (hardware_available: {self.hardware_available})")
-        
+        print(f"[PowerMonitor.__init__] hardware_available: {self.hardware_available}")
+
     def set_update_callback(self, callback):
+        print("[PowerMonitor.set_update_callback] Callback set")
         """Set callback function to receive power data updates"""
         self.callback = callback
         
     def init_sensor(self):
+        print("[PowerMonitor.init_sensor] Called")
         """Initialize the INA228 sensor"""
         if not self.hardware_available:
+            print("[PowerMonitor.init_sensor] hardware not available")
             logging.warning("Power sensor libraries not available - status will be disconnected")
             self.sensor_connected = False
             return False
@@ -59,11 +64,13 @@ class PowerMonitor:
             
             # Test if we can actually read from the sensor
             test_voltage = self.ina228.bus_voltage
+            print(f"[PowerMonitor.init_sensor] INA228 initialized, test voltage: {test_voltage:.2f}V")
             logging.info(f"INA228 power sensor initialized successfully at 0x40, test voltage: {test_voltage:.2f}V")
             self.sensor_connected = True
             return True
             
         except Exception as e:
+            print(f"[PowerMonitor.init_sensor] Exception: {e}")
             logging.error(f"Error initializing INA228 sensor at 0x40: {e}")
             logging.info("Power sensor hardware not responding - status will be disconnected")
             self.sensor_connected = False
@@ -95,8 +102,10 @@ class PowerMonitor:
         return int(round(soc))
 
     def get_power_values(self):
+        print("[PowerMonitor.get_power_values] Called")
         """Read power values from sensor or return disconnected status"""
         if not self.sensor_connected or not self.ina228:
+            print("[PowerMonitor.get_power_values] Not connected")
             # Return disconnected status with no data
             return {
                 "current_ma": 0.0,
@@ -109,6 +118,7 @@ class PowerMonitor:
             }
             
         try:
+            print("[PowerMonitor.get_power_values] Reading INA228 values")
             # Read actual values from INA228
             current_ma = self.ina228.current * 1000  # Convert A to mA
             voltage_v = self.ina228.bus_voltage
@@ -119,6 +129,7 @@ class PowerMonitor:
             
             # Determine intelligent status based on readings
             power_status = self.determine_power_status(current_ma, voltage_v, power_mw, battery_pct, temperature_c)
+            print(f"[PowerMonitor.get_power_values] Readings: I={current_ma:.1f}mA, V={voltage_v:.2f}V, P={power_mw:.1f}mW, E={energy_j:.2f}J, T={temperature_c:.1f}C, B={battery_pct}%, Status={power_status}")
             
             return {
                 "current_ma": current_ma,
@@ -127,10 +138,11 @@ class PowerMonitor:
                 "energy_j": energy_j,
                 "temperature_c": temperature_c,
                 "battery_percentage": battery_pct,
-                "status": power_status  # Now uses intelligent status determination
+                "status": power_status
             }
             
         except Exception as e:
+            print(f"[PowerMonitor.get_power_values] Exception: {e}")
             logging.error(f"Error reading sensor data: {e}")
             # If we get an error reading, mark as disconnected
             self.sensor_connected = False
@@ -191,11 +203,13 @@ class PowerMonitor:
             logging.error(f"Error saving CSV log: {e}")
 
     def monitoring_loop(self):
+        print("[PowerMonitor.monitoring_loop] Started")
         """Main monitoring loop running in separate thread"""
         logging.info("Power monitoring loop started")
         
         while self.running:
             try:
+                print("[PowerMonitor.monitoring_loop] Looping...")
                 # Get power data
                 power_data = self.get_power_values()
                 
@@ -208,8 +222,10 @@ class PowerMonitor:
                     # Send update via callback
                     if self.callback:
                         try:
+                            print("[PowerMonitor.monitoring_loop] Calling callback")
                             self.callback(power_data)
                         except Exception as e:
+                            print(f"[PowerMonitor.monitoring_loop] Callback exception: {e}")
                             logging.error(f"Error in power data callback: {e}")
                     
                     # Debug logging (reduced frequency)
@@ -222,9 +238,11 @@ class PowerMonitor:
                 time.sleep(self.update_interval)
                 
             except Exception as e:
+                print(f"[PowerMonitor.monitoring_loop] Exception: {e}")
                 logging.error(f"Error in power monitoring loop: {e}")
                 time.sleep(self.update_interval)
                 
+        print("[PowerMonitor.monitoring_loop] Stopped")
         logging.info("Power monitoring loop stopped")
 
     def start_monitoring(self):
@@ -379,17 +397,24 @@ def print_sensor_data_loop():
         print("Power monitoring stopped")
 
 if __name__ == "__main__":
-    # Test the power monitor - will connect to real hardware if available
+    print("=== PowerMonitor Standalone Test ===")
     monitor = PowerMonitor()
+    print("[MAIN] Created PowerMonitor instance")
     
-    if monitor.start_monitoring():
+    started = monitor.start_monitoring()
+    print(f"[MAIN] start_monitoring() returned: {started}")
+    
+    if started:
         try:
-            # Run for a few seconds to test
-            time.sleep(5)
-            latest = monitor.get_latest_data()
-            print("Latest power readings:", latest)
-            print("Monitor status:", monitor.get_status())
+            for i in range(5):
+                print(f"[MAIN] Sleeping... ({i+1}/5)")
+                time.sleep(1)
+                latest = monitor.get_latest_data()
+                print("[MAIN] Latest power readings:", latest)
+                print("[MAIN] Monitor status:", monitor.get_status())
         finally:
+            print("[MAIN] Stopping monitor...")
             monitor.stop_monitoring()
+            print("[MAIN] Power monitoring stopped")
     else:
-        print("Failed to start power monitoring")
+        print("[MAIN] Failed to start power monitoring")
