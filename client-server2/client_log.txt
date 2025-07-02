@@ -2904,3 +2904,497 @@
 2025-07-02 12:16:37,389 - INFO - [INFO] Successfully connected to server
 2025-07-02 12:17:57,243 - INFO - [INFO] Closing application...
 2025-07-02 12:17:58,451 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:18:05,894 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:18:07,960 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751455085.8976758 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000268EE20A900>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-02 12:18:28,338 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-02 12:18:28,509 - INFO - Connected to server
+2025-07-02 12:18:28,515 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:18:47,583 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-02 12:18:50,113 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 12:18:50,938 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:18:50,943 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:18:57,710 - INFO - [INFO] Starting detector...
+2025-07-02 12:19:10,457 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-02 12:19:11,416 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:19:11,420 - INFO - [SCANNING MODE] Emitted: {'relative_angle': True, 'timestamp': '2025-07-02T11:19:11.420Z', 'mode': 'scanning'}
+2025-07-02 12:19:31,881 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:19:31,884 - INFO - [SCANNING MODE] Emitted: {'relative_angle': True, 'timestamp': '2025-07-02T11:19:31.884Z', 'mode': 'scanning'}
+2025-07-02 12:19:42,648 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:19:42,650 - INFO - [SCANNING MODE] Emitted: {'relative_angle': True, 'timestamp': '2025-07-02T11:19:42.650Z', 'mode': 'scanning'}
+2025-07-02 12:19:45,025 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:19:45,029 - INFO - [SCANNING MODE] Emitted: {'relative_angle': True, 'timestamp': '2025-07-02T11:19:45.029Z', 'mode': 'scanning'}
+2025-07-02 12:19:46,909 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:19:46,912 - INFO - [SCANNING MODE] Emitted: {'relative_angle': True, 'timestamp': '2025-07-02T11:19:46.912Z', 'mode': 'scanning'}
+2025-07-02 12:19:48,080 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:19:48,084 - INFO - [SCANNING MODE] Emitted: {'relative_angle': True, 'timestamp': '2025-07-02T11:19:48.084Z', 'mode': 'scanning'}
+2025-07-02 12:19:54,451 - INFO - [INFO] Stopping detector...
+2025-07-02 12:20:00,467 - INFO - Disconnected from server: transport error
+2025-07-02 12:20:02,800 - INFO - [INFO] Closing application...
+2025-07-02 12:20:02,803 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 12:20:10,222 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:20:11,901 - INFO - [INFO] Closing application...
+2025-07-02 12:20:11,904 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-02 12:22:05,499 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:22:05,703 - INFO - Connected to server
+2025-07-02 12:22:05,705 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:22:05,708 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:22:08,567 - INFO - [INFO] Starting detector...
+2025-07-02 12:22:18,754 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:22:18,760 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.35629355768104, 'timestamp': '2025-07-02T11:22:18.759Z', 'mode': 'scanning'}
+2025-07-02 12:22:29,567 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:22:29,570 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -6.01734372112599, 'timestamp': '2025-07-02T11:22:29.570Z', 'mode': 'scanning'}
+2025-07-02 12:22:31,591 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:22:31,594 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -6.60226484332865, 'timestamp': '2025-07-02T11:22:31.594Z', 'mode': 'scanning'}
+2025-07-02 12:22:34,498 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:22:34,501 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -7.128327686257549, 'timestamp': '2025-07-02T11:22:34.500Z', 'mode': 'scanning'}
+2025-07-02 12:22:36,392 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:22:36,395 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -7.1197856502691, 'timestamp': '2025-07-02T11:22:36.394Z', 'mode': 'scanning'}
+2025-07-02 12:22:40,523 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:22:40,528 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -7.947869773957276, 'timestamp': '2025-07-02T11:22:40.528Z', 'mode': 'scanning'}
+2025-07-02 12:22:50,593 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:22:50,596 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -14.348123443877379, 'timestamp': '2025-07-02T11:22:50.596Z', 'mode': 'scanning'}
+2025-07-02 12:22:51,579 - INFO - [INFO] Closing application...
+2025-07-02 12:22:53,284 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:24:04,658 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:24:04,871 - INFO - Connected to server
+2025-07-02 12:24:04,874 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:24:04,878 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:24:11,914 - INFO - [INFO] Closing application...
+2025-07-02 12:24:13,118 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:27:32,534 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:27:32,919 - INFO - Connected to server
+2025-07-02 12:27:32,923 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:27:32,929 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:27:34,287 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 12:27:34,299 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:27:35,276 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:27:36,275 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:27:37,326 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:27:38,276 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:27:39,279 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:27:40,275 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:27:41,277 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:27:42,380 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:27:42,398 - INFO - [INFO] Starting detector...
+2025-07-02 12:27:43,293 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:27:43.293Z', 'mode': 'scanning'}
+2025-07-02 12:27:44,284 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:27:44.284Z', 'mode': 'scanning'}
+2025-07-02 12:27:45,280 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:27:45.280Z', 'mode': 'scanning'}
+2025-07-02 12:27:46,277 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:27:46.277Z', 'mode': 'scanning'}
+2025-07-02 12:27:47,318 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:27:47.318Z', 'mode': 'scanning'}
+2025-07-02 12:27:48,288 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:27:48.288Z', 'mode': 'scanning'}
+2025-07-02 12:27:49,288 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.9, 'timestamp': '2025-07-02T11:27:49.288Z', 'mode': 'scanning'}
+2025-07-02 12:27:50,289 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.1, 'timestamp': '2025-07-02T11:27:50.289Z', 'mode': 'scanning'}
+2025-07-02 12:27:51,303 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.2, 'timestamp': '2025-07-02T11:27:51.303Z', 'mode': 'scanning'}
+2025-07-02 12:27:52,363 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.2, 'timestamp': '2025-07-02T11:27:52.363Z', 'mode': 'scanning'}
+2025-07-02 12:27:53,316 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -15.5, 'timestamp': '2025-07-02T11:27:53.316Z', 'mode': 'scanning'}
+2025-07-02 12:27:54,311 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.8, 'timestamp': '2025-07-02T11:27:54.310Z', 'mode': 'scanning'}
+2025-07-02 12:27:55,307 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.9, 'timestamp': '2025-07-02T11:27:55.307Z', 'mode': 'scanning'}
+2025-07-02 12:27:56,318 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T11:27:56.317Z', 'mode': 'scanning'}
+2025-07-02 12:27:57,348 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -14.6, 'timestamp': '2025-07-02T11:27:57.348Z', 'mode': 'scanning'}
+2025-07-02 12:27:58,312 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -16.3, 'timestamp': '2025-07-02T11:27:58.312Z', 'mode': 'scanning'}
+2025-07-02 12:27:59,281 - INFO - Manual orientation crosshairs enabled
+2025-07-02 12:27:59,314 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -16.3, 'timestamp': '2025-07-02T11:27:59.313Z', 'mode': 'scanning'}
+2025-07-02 12:28:00,312 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -16.3, 'timestamp': '2025-07-02T11:28:00.312Z', 'mode': 'scanning'}
+2025-07-02 12:28:01,316 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -16.3, 'timestamp': '2025-07-02T11:28:01.316Z', 'mode': 'scanning'}
+2025-07-02 12:28:02,314 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -16.3, 'timestamp': '2025-07-02T11:28:02.314Z', 'mode': 'scanning'}
+2025-07-02 12:28:03,311 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:28:03.311Z', 'mode': 'scanning'}
+2025-07-02 12:28:04,308 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -15.4, 'timestamp': '2025-07-02T11:28:04.308Z', 'mode': 'scanning'}
+2025-07-02 12:28:05,307 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.5, 'timestamp': '2025-07-02T11:28:05.307Z', 'mode': 'scanning'}
+2025-07-02 12:28:06,306 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.7, 'timestamp': '2025-07-02T11:28:06.306Z', 'mode': 'scanning'}
+2025-07-02 12:28:07,314 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.6, 'timestamp': '2025-07-02T11:28:07.314Z', 'mode': 'scanning'}
+2025-07-02 12:28:08,305 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.5, 'timestamp': '2025-07-02T11:28:08.304Z', 'mode': 'scanning'}
+2025-07-02 12:28:09,319 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.6, 'timestamp': '2025-07-02T11:28:09.319Z', 'mode': 'scanning'}
+2025-07-02 12:28:10,335 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.6, 'timestamp': '2025-07-02T11:28:10.335Z', 'mode': 'scanning'}
+2025-07-02 12:28:11,325 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.9, 'timestamp': '2025-07-02T11:28:11.325Z', 'mode': 'scanning'}
+2025-07-02 12:28:11,518 - INFO - Manual orientation crosshairs disabled
+2025-07-02 12:28:12,352 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.9, 'timestamp': '2025-07-02T11:28:12.352Z', 'mode': 'scanning'}
+2025-07-02 12:28:13,087 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:28:13,090 - INFO - Stream paused for config application.
+2025-07-02 12:28:13,344 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.9, 'timestamp': '2025-07-02T11:28:13.343Z', 'mode': 'scanning'}
+2025-07-02 12:28:13,594 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:28:13,599 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:28:13,803 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:28:14,372 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.9, 'timestamp': '2025-07-02T11:28:14.372Z', 'mode': 'scanning'}
+2025-07-02 12:28:15,358 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.9, 'timestamp': '2025-07-02T11:28:15.358Z', 'mode': 'scanning'}
+2025-07-02 12:28:16,401 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -10.1, 'timestamp': '2025-07-02T11:28:16.401Z', 'mode': 'scanning'}
+2025-07-02 12:28:17,389 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -7.2, 'timestamp': '2025-07-02T11:28:17.389Z', 'mode': 'scanning'}
+2025-07-02 12:28:18,392 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.4, 'timestamp': '2025-07-02T11:28:18.392Z', 'mode': 'scanning'}
+2025-07-02 12:28:19,391 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.3, 'timestamp': '2025-07-02T11:28:19.390Z', 'mode': 'scanning'}
+2025-07-02 12:28:20,352 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.3, 'timestamp': '2025-07-02T11:28:20.351Z', 'mode': 'scanning'}
+2025-07-02 12:28:21,408 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.3, 'timestamp': '2025-07-02T11:28:21.408Z', 'mode': 'scanning'}
+2025-07-02 12:28:22,363 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.3, 'timestamp': '2025-07-02T11:28:22.363Z', 'mode': 'scanning'}
+2025-07-02 12:28:22,984 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:28:22,987 - INFO - Stream paused for config application.
+2025-07-02 12:28:23,350 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.3, 'timestamp': '2025-07-02T11:28:23.350Z', 'mode': 'scanning'}
+2025-07-02 12:28:23,491 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:28:23,497 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:28:23,703 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:28:24,380 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.3, 'timestamp': '2025-07-02T11:28:24.380Z', 'mode': 'scanning'}
+2025-07-02 12:28:25,359 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.2, 'timestamp': '2025-07-02T11:28:25.359Z', 'mode': 'scanning'}
+2025-07-02 12:28:26,369 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -4.6, 'timestamp': '2025-07-02T11:28:26.369Z', 'mode': 'scanning'}
+2025-07-02 12:28:27,432 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.2, 'timestamp': '2025-07-02T11:28:27.432Z', 'mode': 'scanning'}
+2025-07-02 12:28:28,438 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.1, 'timestamp': '2025-07-02T11:28:28.438Z', 'mode': 'scanning'}
+2025-07-02 12:28:29,382 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.9, 'timestamp': '2025-07-02T11:28:29.382Z', 'mode': 'scanning'}
+2025-07-02 12:28:30,375 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:30.374Z', 'mode': 'scanning'}
+2025-07-02 12:28:31,374 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:31.373Z', 'mode': 'scanning'}
+2025-07-02 12:28:32,377 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:32.377Z', 'mode': 'scanning'}
+2025-07-02 12:28:33,395 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:33.394Z', 'mode': 'scanning'}
+2025-07-02 12:28:34,365 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:34.365Z', 'mode': 'scanning'}
+2025-07-02 12:28:35,364 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:35.364Z', 'mode': 'scanning'}
+2025-07-02 12:28:36,364 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:36.364Z', 'mode': 'scanning'}
+2025-07-02 12:28:37,363 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:37.363Z', 'mode': 'scanning'}
+2025-07-02 12:28:38,413 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:38.413Z', 'mode': 'scanning'}
+2025-07-02 12:28:39,398 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:39.398Z', 'mode': 'scanning'}
+2025-07-02 12:28:40,411 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:40.410Z', 'mode': 'scanning'}
+2025-07-02 12:28:41,376 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:41.376Z', 'mode': 'scanning'}
+2025-07-02 12:28:42,377 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:28:42.377Z', 'mode': 'scanning'}
+2025-07-02 12:28:43,084 - INFO - [INFO] Stopping detector...
+2025-07-02 12:28:43,368 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:28:44,383 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:28:45,371 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:28:46,379 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:28:47,064 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:28:47,374 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:28:48,376 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:28:49,389 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:28:50,406 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:28:50,418 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 12:28:50,436 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 12:28:55,936 - INFO - [INFO] Starting detector...
+2025-07-02 12:29:00,480 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 12:29:00,538 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:29:01,487 - INFO - Disconnected from server: transport error
+2025-07-02 12:29:01,770 - ERROR - [SCANNING MODE] Failed to emit scanning mode data: / is not a connected namespace.
+2025-07-02 12:29:02,548 - ERROR - [SCANNING MODE] Failed to emit scanning mode data: / is not a connected namespace.
+2025-07-02 12:29:02,596 - INFO - Connected to server
+2025-07-02 12:29:02,598 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:29:02,598 - INFO - Stream paused for config application.
+2025-07-02 12:29:03,486 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:03.486Z', 'mode': 'scanning'}
+2025-07-02 12:29:04,490 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:04.489Z', 'mode': 'scanning'}
+2025-07-02 12:29:05,495 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:05.495Z', 'mode': 'scanning'}
+2025-07-02 12:29:06,498 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:06.498Z', 'mode': 'scanning'}
+2025-07-02 12:29:07,503 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:07.503Z', 'mode': 'scanning'}
+2025-07-02 12:29:08,493 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:08.492Z', 'mode': 'scanning'}
+2025-07-02 12:29:09,493 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:09.492Z', 'mode': 'scanning'}
+2025-07-02 12:29:10,496 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:10.496Z', 'mode': 'scanning'}
+2025-07-02 12:29:11,517 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:11.517Z', 'mode': 'scanning'}
+2025-07-02 12:29:12,511 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -3.3, 'timestamp': '2025-07-02T11:29:12.511Z', 'mode': 'scanning'}
+2025-07-02 12:29:13,549 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -3.7, 'timestamp': '2025-07-02T11:29:13.549Z', 'mode': 'scanning'}
+2025-07-02 12:29:14,518 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 3.1, 'timestamp': '2025-07-02T11:29:14.517Z', 'mode': 'scanning'}
+2025-07-02 12:29:15,539 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.9, 'timestamp': '2025-07-02T11:29:15.538Z', 'mode': 'scanning'}
+2025-07-02 12:29:16,567 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.4, 'timestamp': '2025-07-02T11:29:16.567Z', 'mode': 'scanning'}
+2025-07-02 12:29:17,558 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.8, 'timestamp': '2025-07-02T11:29:17.557Z', 'mode': 'scanning'}
+2025-07-02 12:29:18,555 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 4.5, 'timestamp': '2025-07-02T11:29:18.554Z', 'mode': 'scanning'}
+2025-07-02 12:29:19,569 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.9, 'timestamp': '2025-07-02T11:29:19.569Z', 'mode': 'scanning'}
+2025-07-02 12:29:20,537 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:20.537Z', 'mode': 'scanning'}
+2025-07-02 12:29:21,548 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:21.547Z', 'mode': 'scanning'}
+2025-07-02 12:29:22,590 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:22.590Z', 'mode': 'scanning'}
+2025-07-02 12:29:23,533 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:23.532Z', 'mode': 'scanning'}
+2025-07-02 12:29:24,557 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:24.557Z', 'mode': 'scanning'}
+2025-07-02 12:29:25,544 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:25.544Z', 'mode': 'scanning'}
+2025-07-02 12:29:26,562 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:26.562Z', 'mode': 'scanning'}
+2025-07-02 12:29:27,555 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:27.555Z', 'mode': 'scanning'}
+2025-07-02 12:29:28,577 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:28.576Z', 'mode': 'scanning'}
+2025-07-02 12:29:29,550 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -18.0, 'timestamp': '2025-07-02T11:29:29.550Z', 'mode': 'scanning'}
+2025-07-02 12:29:30,260 - INFO - [INFO] Closing application...
+2025-07-02 12:29:31,965 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:29:32,304 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:40:44,946 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:40:45,496 - INFO - Connected to server
+2025-07-02 12:40:45,500 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:40:45,503 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:40:51,194 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 12:40:51,213 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:40:52,190 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:40:53,190 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:40:53,699 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 12:40:54,190 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:40:55,186 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:40:56,185 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:40:57,180 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:40:57,554 - INFO - [INFO] Starting detector...
+2025-07-02 12:40:58,204 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:40:58.204Z', 'mode': 'scanning'}
+2025-07-02 12:40:59,215 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:40:59.215Z', 'mode': 'scanning'}
+2025-07-02 12:41:00,183 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:41:00.183Z', 'mode': 'scanning'}
+2025-07-02 12:41:01,192 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:41:01.192Z', 'mode': 'scanning'}
+2025-07-02 12:41:02,189 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:41:02.189Z', 'mode': 'scanning'}
+2025-07-02 12:41:03,185 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:41:03.185Z', 'mode': 'scanning'}
+2025-07-02 12:41:04,229 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:41:04.229Z', 'mode': 'scanning'}
+2025-07-02 12:41:05,240 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:41:05.240Z', 'mode': 'scanning'}
+2025-07-02 12:41:06,232 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:41:06.232Z', 'mode': 'scanning'}
+2025-07-02 12:41:07,215 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:41:07.215Z', 'mode': 'scanning'}
+2025-07-02 12:41:08,214 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.5, 'timestamp': '2025-07-02T11:41:08.214Z', 'mode': 'scanning'}
+2025-07-02 12:41:09,211 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.5, 'timestamp': '2025-07-02T11:41:09.211Z', 'mode': 'scanning'}
+2025-07-02 12:41:10,199 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.0, 'timestamp': '2025-07-02T11:41:10.199Z', 'mode': 'scanning'}
+2025-07-02 12:41:11,233 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.3, 'timestamp': '2025-07-02T11:41:11.233Z', 'mode': 'scanning'}
+2025-07-02 12:41:12,245 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.3, 'timestamp': '2025-07-02T11:41:12.245Z', 'mode': 'scanning'}
+2025-07-02 12:41:13,236 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:41:13,238 - INFO - Stream paused for config application.
+2025-07-02 12:41:13,242 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.3, 'timestamp': '2025-07-02T11:41:13.242Z', 'mode': 'scanning'}
+2025-07-02 12:41:13,804 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:41:13,815 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:41:14,031 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:41:14,197 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.3, 'timestamp': '2025-07-02T11:41:14.197Z', 'mode': 'scanning'}
+2025-07-02 12:41:15,198 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.3, 'timestamp': '2025-07-02T11:41:15.198Z', 'mode': 'scanning'}
+2025-07-02 12:41:16,204 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.7, 'timestamp': '2025-07-02T11:41:16.204Z', 'mode': 'scanning'}
+2025-07-02 12:41:17,203 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -9.2, 'timestamp': '2025-07-02T11:41:17.202Z', 'mode': 'scanning'}
+2025-07-02 12:41:18,198 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -9.4, 'timestamp': '2025-07-02T11:41:18.198Z', 'mode': 'scanning'}
+2025-07-02 12:41:19,196 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.5, 'timestamp': '2025-07-02T11:41:19.195Z', 'mode': 'scanning'}
+2025-07-02 12:41:20,232 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:20.232Z', 'mode': 'scanning'}
+2025-07-02 12:41:21,209 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:21.209Z', 'mode': 'scanning'}
+2025-07-02 12:41:22,206 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:22.206Z', 'mode': 'scanning'}
+2025-07-02 12:41:23,204 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:23.204Z', 'mode': 'scanning'}
+2025-07-02 12:41:24,200 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:24.200Z', 'mode': 'scanning'}
+2025-07-02 12:41:25,226 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:25.226Z', 'mode': 'scanning'}
+2025-07-02 12:41:26,217 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:26.217Z', 'mode': 'scanning'}
+2025-07-02 12:41:27,183 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:41:27,185 - INFO - Stream paused for config application.
+2025-07-02 12:41:27,212 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:27.212Z', 'mode': 'scanning'}
+2025-07-02 12:41:27,688 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:41:27,694 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:41:27,900 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:41:28,212 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:28.212Z', 'mode': 'scanning'}
+2025-07-02 12:41:29,221 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:29.221Z', 'mode': 'scanning'}
+2025-07-02 12:41:30,212 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:30.212Z', 'mode': 'scanning'}
+2025-07-02 12:41:31,216 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:31.216Z', 'mode': 'scanning'}
+2025-07-02 12:41:32,061 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 12:41:32,216 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:32.215Z', 'mode': 'scanning'}
+2025-07-02 12:41:33,222 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:33.222Z', 'mode': 'scanning'}
+2025-07-02 12:41:34,213 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:41:34.213Z', 'mode': 'scanning'}
+2025-07-02 12:41:35,221 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -14.4, 'timestamp': '2025-07-02T11:41:35.221Z', 'mode': 'scanning'}
+2025-07-02 12:41:36,237 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.4, 'timestamp': '2025-07-02T11:41:36.237Z', 'mode': 'scanning'}
+2025-07-02 12:41:37,218 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.3, 'timestamp': '2025-07-02T11:41:37.217Z', 'mode': 'scanning'}
+2025-07-02 12:41:38,212 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.8, 'timestamp': '2025-07-02T11:41:38.212Z', 'mode': 'scanning'}
+2025-07-02 12:41:39,217 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.8, 'timestamp': '2025-07-02T11:41:39.217Z', 'mode': 'scanning'}
+2025-07-02 12:41:40,288 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -14.2, 'timestamp': '2025-07-02T11:41:40.288Z', 'mode': 'scanning'}
+2025-07-02 12:41:41,272 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -14.9, 'timestamp': '2025-07-02T11:41:41.272Z', 'mode': 'scanning'}
+2025-07-02 12:41:42,232 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -14.9, 'timestamp': '2025-07-02T11:41:42.232Z', 'mode': 'scanning'}
+2025-07-02 12:41:43,281 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -14.9, 'timestamp': '2025-07-02T11:41:43.281Z', 'mode': 'scanning'}
+2025-07-02 12:41:44,069 - INFO - [INFO] Closing application...
+2025-07-02 12:41:45,774 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:41:46,055 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:50:09,764 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:50:10,006 - INFO - Connected to server
+2025-07-02 12:50:10,009 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:50:10,011 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:50:14,869 - INFO - [INFO] Starting detector...
+2025-07-02 12:50:18,328 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:50:18,330 - INFO - Stream paused for config application.
+2025-07-02 12:50:18,833 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:50:18,837 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:50:19,041 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:50:21,663 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:50:21,666 - INFO - Stream paused for config application.
+2025-07-02 12:50:22,168 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:50:22,172 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:50:22,377 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:50:22,768 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 12:50:22,788 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:50:23,792 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:50:23.792Z', 'mode': 'scanning'}
+2025-07-02 12:50:24,765 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:50:24.765Z', 'mode': 'scanning'}
+2025-07-02 12:50:25,788 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.0, 'timestamp': '2025-07-02T11:50:25.788Z', 'mode': 'scanning'}
+2025-07-02 12:50:26,780 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.2, 'timestamp': '2025-07-02T11:50:26.780Z', 'mode': 'scanning'}
+2025-07-02 12:50:27,796 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.1, 'timestamp': '2025-07-02T11:50:27.796Z', 'mode': 'scanning'}
+2025-07-02 12:50:28,787 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -10.2, 'timestamp': '2025-07-02T11:50:28.787Z', 'mode': 'scanning'}
+2025-07-02 12:50:29,789 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -10.2, 'timestamp': '2025-07-02T11:50:29.789Z', 'mode': 'scanning'}
+2025-07-02 12:50:30,781 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -10.2, 'timestamp': '2025-07-02T11:50:30.780Z', 'mode': 'scanning'}
+2025-07-02 12:50:31,779 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -10.2, 'timestamp': '2025-07-02T11:50:31.779Z', 'mode': 'scanning'}
+2025-07-02 12:50:32,821 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.6, 'timestamp': '2025-07-02T11:50:32.821Z', 'mode': 'scanning'}
+2025-07-02 12:50:33,782 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:50:33.782Z', 'mode': 'scanning'}
+2025-07-02 12:50:34,775 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:50:34.775Z', 'mode': 'scanning'}
+2025-07-02 12:50:35,779 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.3, 'timestamp': '2025-07-02T11:50:35.779Z', 'mode': 'scanning'}
+2025-07-02 12:50:35,798 - INFO - [INFO] Closing application...
+2025-07-02 12:50:37,504 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:50:37,846 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:52:49,060 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:52:49,237 - INFO - Connected to server
+2025-07-02 12:52:49,242 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:52:49,246 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:52:50,549 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:52:54,503 - INFO - [INFO] Starting detector...
+2025-07-02 12:53:00,592 - INFO - [INFO] Stopping detector...
+2025-07-02 12:53:02,778 - INFO - [INFO] Starting detector...
+2025-07-02 12:53:10,553 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-02 12:53:11,162 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:53:24,106 - INFO - [INFO] Stopping detector...
+2025-07-02 12:53:26,195 - INFO - [INFO] Closing application...
+2025-07-02 12:53:27,900 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:55:40,794 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 12:55:41,301 - INFO - Connected to server
+2025-07-02 12:55:41,306 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:55:41,313 - INFO - [INFO] Successfully connected to server
+2025-07-02 12:55:44,710 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 12:55:44,724 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:55:45,702 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:55:46,697 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:55:47,702 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:55:47,904 - INFO - [INFO] Starting detector...
+2025-07-02 12:55:48,698 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T11:55:48.698Z', 'mode': 'scanning'}
+2025-07-02 12:55:49,695 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T11:55:49.695Z', 'mode': 'scanning'}
+2025-07-02 12:55:50,697 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T11:55:50.696Z', 'mode': 'scanning'}
+2025-07-02 12:55:51,698 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T11:55:51.697Z', 'mode': 'scanning'}
+2025-07-02 12:55:52,697 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T11:55:52.696Z', 'mode': 'scanning'}
+2025-07-02 12:55:53,743 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 12:55:53,750 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T11:55:53.750Z', 'mode': 'scanning'}
+2025-07-02 12:55:54,748 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T11:55:54.747Z', 'mode': 'scanning'}
+2025-07-02 12:55:55,744 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T11:55:55.744Z', 'mode': 'scanning'}
+2025-07-02 12:55:56,723 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -21.3, 'timestamp': '2025-07-02T11:55:56.723Z', 'mode': 'scanning'}
+2025-07-02 12:55:57,730 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.6, 'timestamp': '2025-07-02T11:55:57.730Z', 'mode': 'scanning'}
+2025-07-02 12:55:58,734 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.5, 'timestamp': '2025-07-02T11:55:58.734Z', 'mode': 'scanning'}
+2025-07-02 12:55:59,730 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.5, 'timestamp': '2025-07-02T11:55:59.730Z', 'mode': 'scanning'}
+2025-07-02 12:56:00,760 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.5, 'timestamp': '2025-07-02T11:56:00.759Z', 'mode': 'scanning'}
+2025-07-02 12:56:01,730 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.5, 'timestamp': '2025-07-02T11:56:01.730Z', 'mode': 'scanning'}
+2025-07-02 12:56:02,735 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.2, 'timestamp': '2025-07-02T11:56:02.735Z', 'mode': 'scanning'}
+2025-07-02 12:56:03,744 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:03.743Z', 'mode': 'scanning'}
+2025-07-02 12:56:04,747 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:04.747Z', 'mode': 'scanning'}
+2025-07-02 12:56:05,756 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:05.755Z', 'mode': 'scanning'}
+2025-07-02 12:56:06,654 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:56:06,731 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:06.731Z', 'mode': 'scanning'}
+2025-07-02 12:56:07,233 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 12:56:07,254 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-02 12:56:07,934 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 12:56:07,947 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:56:08,936 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:08.936Z', 'mode': 'scanning'}
+2025-07-02 12:56:09,943 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:09.943Z', 'mode': 'scanning'}
+2025-07-02 12:56:10,698 - INFO - [INFO] Stopping detector...
+2025-07-02 12:56:10,933 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:56:11,932 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:56:12,174 - INFO - [INFO] Starting detector...
+2025-07-02 12:56:12,930 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:12.930Z', 'mode': 'scanning'}
+2025-07-02 12:56:13,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:13.932Z', 'mode': 'scanning'}
+2025-07-02 12:56:14,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:14.931Z', 'mode': 'scanning'}
+2025-07-02 12:56:15,959 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:15.959Z', 'mode': 'scanning'}
+2025-07-02 12:56:16,945 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:16.945Z', 'mode': 'scanning'}
+2025-07-02 12:56:17,955 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:17.955Z', 'mode': 'scanning'}
+2025-07-02 12:56:18,943 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -20.0, 'timestamp': '2025-07-02T11:56:18.943Z', 'mode': 'scanning'}
+2025-07-02 12:56:19,974 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.0, 'timestamp': '2025-07-02T11:56:19.974Z', 'mode': 'scanning'}
+2025-07-02 12:56:20,949 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.1, 'timestamp': '2025-07-02T11:56:20.949Z', 'mode': 'scanning'}
+2025-07-02 12:56:21,939 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.1, 'timestamp': '2025-07-02T11:56:21.939Z', 'mode': 'scanning'}
+2025-07-02 12:56:22,530 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:56:22,533 - INFO - Stream paused for config application.
+2025-07-02 12:56:22,941 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.1, 'timestamp': '2025-07-02T11:56:22.941Z', 'mode': 'scanning'}
+2025-07-02 12:56:23,036 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:56:23,041 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:56:23,245 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:56:23,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.1, 'timestamp': '2025-07-02T11:56:23.932Z', 'mode': 'scanning'}
+2025-07-02 12:56:24,986 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.1, 'timestamp': '2025-07-02T11:56:24.986Z', 'mode': 'scanning'}
+2025-07-02 12:56:25,958 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -19.1, 'timestamp': '2025-07-02T11:56:25.958Z', 'mode': 'scanning'}
+2025-07-02 12:56:26,979 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.0, 'timestamp': '2025-07-02T11:56:26.979Z', 'mode': 'scanning'}
+2025-07-02 12:56:27,974 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.0, 'timestamp': '2025-07-02T11:56:27.974Z', 'mode': 'scanning'}
+2025-07-02 12:56:28,938 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T11:56:28.938Z', 'mode': 'scanning'}
+2025-07-02 12:56:29,930 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T11:56:29.930Z', 'mode': 'scanning'}
+2025-07-02 12:56:30,933 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T11:56:30.932Z', 'mode': 'scanning'}
+2025-07-02 12:56:31,196 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 12:56:31,987 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T11:56:31.987Z', 'mode': 'scanning'}
+2025-07-02 12:56:32,981 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T11:56:32.981Z', 'mode': 'scanning'}
+2025-07-02 12:56:33,983 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T11:56:33.983Z', 'mode': 'scanning'}
+2025-07-02 12:56:34,242 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 12:56:34,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T11:56:34.931Z', 'mode': 'scanning'}
+2025-07-02 12:56:35,945 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -13.1, 'timestamp': '2025-07-02T11:56:35.945Z', 'mode': 'scanning'}
+2025-07-02 12:56:36,941 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -12.2, 'timestamp': '2025-07-02T11:56:36.941Z', 'mode': 'scanning'}
+2025-07-02 12:56:37,936 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -10.5, 'timestamp': '2025-07-02T11:56:37.936Z', 'mode': 'scanning'}
+2025-07-02 12:56:38,954 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -9.1, 'timestamp': '2025-07-02T11:56:38.954Z', 'mode': 'scanning'}
+2025-07-02 12:56:39,979 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -9.4, 'timestamp': '2025-07-02T11:56:39.979Z', 'mode': 'scanning'}
+2025-07-02 12:56:40,957 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -6.9, 'timestamp': '2025-07-02T11:56:40.957Z', 'mode': 'scanning'}
+2025-07-02 12:56:41,952 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.2, 'timestamp': '2025-07-02T11:56:41.952Z', 'mode': 'scanning'}
+2025-07-02 12:56:42,944 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.2, 'timestamp': '2025-07-02T11:56:42.944Z', 'mode': 'scanning'}
+2025-07-02 12:56:43,932 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.7, 'timestamp': '2025-07-02T11:56:43.932Z', 'mode': 'scanning'}
+2025-07-02 12:56:44,938 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.5, 'timestamp': '2025-07-02T11:56:44.937Z', 'mode': 'scanning'}
+2025-07-02 12:56:45,938 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 12:56:45,943 - INFO - Stream paused for config application.
+2025-07-02 12:56:45,949 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.0, 'timestamp': '2025-07-02T11:56:45.949Z', 'mode': 'scanning'}
+2025-07-02 12:56:46,446 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 12:56:46,450 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 12:56:46,653 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 12:56:46,933 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.0, 'timestamp': '2025-07-02T11:56:46.933Z', 'mode': 'scanning'}
+2025-07-02 12:56:47,942 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -0.2, 'timestamp': '2025-07-02T11:56:47.942Z', 'mode': 'scanning'}
+2025-07-02 12:56:48,989 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.0, 'timestamp': '2025-07-02T11:56:48.989Z', 'mode': 'scanning'}
+2025-07-02 12:56:49,979 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.2, 'timestamp': '2025-07-02T11:56:49.978Z', 'mode': 'scanning'}
+2025-07-02 12:56:50,952 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.8, 'timestamp': '2025-07-02T11:56:50.952Z', 'mode': 'scanning'}
+2025-07-02 12:56:51,940 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.6, 'timestamp': '2025-07-02T11:56:51.939Z', 'mode': 'scanning'}
+2025-07-02 12:56:52,954 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.5, 'timestamp': '2025-07-02T11:56:52.954Z', 'mode': 'scanning'}
+2025-07-02 12:56:52,984 - INFO - Manual orientation crosshairs enabled
+2025-07-02 12:56:53,933 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -1.2, 'timestamp': '2025-07-02T11:56:53.932Z', 'mode': 'scanning'}
+2025-07-02 12:56:54,981 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.5, 'timestamp': '2025-07-02T11:56:54.980Z', 'mode': 'scanning'}
+2025-07-02 12:56:55,951 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.2, 'timestamp': '2025-07-02T11:56:55.951Z', 'mode': 'scanning'}
+2025-07-02 12:56:56,960 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.3, 'timestamp': '2025-07-02T11:56:56.960Z', 'mode': 'scanning'}
+2025-07-02 12:56:57,965 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.3, 'timestamp': '2025-07-02T11:56:57.964Z', 'mode': 'scanning'}
+2025-07-02 12:56:58,935 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.3, 'timestamp': '2025-07-02T11:56:58.935Z', 'mode': 'scanning'}
+2025-07-02 12:56:59,466 - INFO - [GraphSection] Update frequency set to: 30.0 Hz via spinbox
+2025-07-02 12:56:59,944 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.3, 'timestamp': '2025-07-02T11:56:59.943Z', 'mode': 'scanning'}
+2025-07-02 12:57:00,931 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -5.9, 'timestamp': '2025-07-02T11:57:00.931Z', 'mode': 'scanning'}
+2025-07-02 12:57:01,960 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -5.4, 'timestamp': '2025-07-02T11:57:01.960Z', 'mode': 'scanning'}
+2025-07-02 12:57:02,968 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.5, 'timestamp': '2025-07-02T11:57:02.968Z', 'mode': 'scanning'}
+2025-07-02 12:57:03,935 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.3, 'timestamp': '2025-07-02T11:57:03.935Z', 'mode': 'scanning'}
+2025-07-02 12:57:04,944 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 0.1, 'timestamp': '2025-07-02T11:57:04.944Z', 'mode': 'scanning'}
+2025-07-02 12:57:05,994 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.7, 'timestamp': '2025-07-02T11:57:05.994Z', 'mode': 'scanning'}
+2025-07-02 12:57:06,945 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.7, 'timestamp': '2025-07-02T11:57:06.945Z', 'mode': 'scanning'}
+2025-07-02 12:57:07,931 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.7, 'timestamp': '2025-07-02T11:57:07.931Z', 'mode': 'scanning'}
+2025-07-02 12:57:08,800 - INFO - [INFO] Stopping detector...
+2025-07-02 12:57:08,940 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:57:09,944 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 12:57:10,705 - INFO - [INFO] Starting detector...
+2025-07-02 12:57:10,967 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.7, 'timestamp': '2025-07-02T11:57:10.967Z', 'mode': 'scanning'}
+2025-07-02 12:57:11,968 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.7, 'timestamp': '2025-07-02T11:57:11.968Z', 'mode': 'scanning'}
+2025-07-02 12:57:13,062 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -11.7, 'timestamp': '2025-07-02T11:57:13.061Z', 'mode': 'scanning'}
+2025-07-02 12:57:13,105 - INFO - [INFO] Closing application...
+2025-07-02 12:57:14,816 - INFO - Disconnected from server: client disconnect
+2025-07-02 12:57:15,097 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:00:16,910 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 13:00:17,389 - INFO - Connected to server
+2025-07-02 13:00:17,394 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 13:00:17,396 - INFO - [INFO] Successfully connected to server
+2025-07-02 13:00:20,682 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:00:20,695 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 13:00:21,816 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:00:22,685 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:00:23,685 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:00:24,102 - INFO - [INFO] Starting detector...
+2025-07-02 13:00:24,686 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:24.686Z', 'mode': 'scanning'}
+2025-07-02 13:00:25,689 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:25.688Z', 'mode': 'scanning'}
+2025-07-02 13:00:26,851 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:26.851Z', 'mode': 'scanning'}
+2025-07-02 13:00:27,694 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:27.693Z', 'mode': 'scanning'}
+2025-07-02 13:00:28,685 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:28.685Z', 'mode': 'scanning'}
+2025-07-02 13:00:29,719 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:29.719Z', 'mode': 'scanning'}
+2025-07-02 13:00:30,738 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:30.738Z', 'mode': 'scanning'}
+2025-07-02 13:00:31,778 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:31.778Z', 'mode': 'scanning'}
+2025-07-02 13:00:32,682 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:32.682Z', 'mode': 'scanning'}
+2025-07-02 13:00:33,011 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 13:00:33,013 - INFO - Stream paused for config application.
+2025-07-02 13:00:33,517 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 13:00:33,522 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 13:00:33,726 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 13:00:33,729 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:33.729Z', 'mode': 'scanning'}
+2025-07-02 13:00:34,732 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:34.732Z', 'mode': 'scanning'}
+2025-07-02 13:00:35,707 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:35.707Z', 'mode': 'scanning'}
+2025-07-02 13:00:36,763 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -10.6, 'timestamp': '2025-07-02T12:00:36.763Z', 'mode': 'scanning'}
+2025-07-02 13:00:37,707 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.9, 'timestamp': '2025-07-02T12:00:37.707Z', 'mode': 'scanning'}
+2025-07-02 13:00:38,714 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -8.9, 'timestamp': '2025-07-02T12:00:38.714Z', 'mode': 'scanning'}
+2025-07-02 13:00:39,711 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 1.3, 'timestamp': '2025-07-02T12:00:39.710Z', 'mode': 'scanning'}
+2025-07-02 13:00:40,719 - INFO - [SCANNING MODE] Emitted: {'relative_angle': 2.8, 'timestamp': '2025-07-02T12:00:40.719Z', 'mode': 'scanning'}
+2025-07-02 13:00:41,811 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:41.811Z', 'mode': 'scanning'}
+2025-07-02 13:00:42,716 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:42.716Z', 'mode': 'scanning'}
+2025-07-02 13:00:43,715 - INFO - [SCANNING MODE] Emitted: {'relative_angle': -6.8, 'timestamp': '2025-07-02T12:00:43.715Z', 'mode': 'scanning'}
+2025-07-02 13:00:44,716 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:44.716Z', 'mode': 'scanning'}
+2025-07-02 13:00:45,716 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:45.716Z', 'mode': 'scanning'}
+2025-07-02 13:00:46,788 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:46.788Z', 'mode': 'scanning'}
+2025-07-02 13:00:47,719 - INFO - [SCANNING MODE] Emitted: {'relative_angle': None, 'timestamp': '2025-07-02T12:00:47.718Z', 'mode': 'scanning'}
+2025-07-02 13:00:48,303 - INFO - [INFO] Closing application...
+2025-07-02 13:00:50,008 - INFO - Disconnected from server: client disconnect
+2025-07-02 13:00:50,327 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:02:21,519 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 13:02:23,292 - INFO - [SCANNING MODE] Started automatic 1Hz emission.
+2025-07-02 13:02:23,304 - INFO - [ADCSSection] Auto mode set to: AprilTag
+2025-07-02 13:02:23,672 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751457741.5240386 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000291C4546BA0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-07-02 13:02:24,290 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:02:25,289 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:02:26,290 - INFO - [SCANNING MODE] Detector not active, not emitting scanning mode data.
+2025-07-02 13:02:26,654 - INFO - [SCANNING MODE] Stopped automatic emission.
+2025-07-02 13:02:26,677 - INFO - [ADCSSection] Auto mode set to: Environmental
+2025-07-02 13:02:28,062 - INFO - [ADCSSection] Auto mode set to: adcs
+2025-07-02 13:02:28,938 - INFO - Sending ADCS command: Mode='adcs', Command='set_value', Value=0.0
+2025-07-02 13:02:29,694 - INFO - Sending ADCS command: Mode='adcs', Command='set_zero', Value=None
+2025-07-02 13:02:30,739 - INFO - Sending ADCS command: Mode='adcs', Command='start', Value=None
+2025-07-02 13:02:31,601 - INFO - Sending ADCS command: Mode='adcs', Command='stop', Value=None
+2025-07-02 13:02:32,098 - INFO - [INFO] Closing application...
+2025-07-02 13:02:32,101 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.

@@ -124,38 +124,57 @@ bridge = Bridge()
 ##############################################################################
 
 class MainWindow(QWidget):
-    def emit_scanning_mode_data(self, relative_angle=None):
-        """
-        Emit the relative angle and a special timestamp when AprilTag is detected and detector is running.
-        This should be called when the AprilTag button is pressed in the ADCS section.
-        """
+    def emit_scanning_mode_data(self):
         import datetime
         if not getattr(self, 'detector_active', False):
             logging.info("[SCANNING MODE] Detector not active, not emitting scanning mode data.")
             return
-        # If relative_angle is not provided, try to get it from the detector or last known value
-        if relative_angle is None:
-            try:
-                # Try to get from detector_instance or angular_plotter
-                if hasattr(self, 'angular_plotter') and hasattr(self.angular_plotter, 'last_angle'):
-                    relative_angle = self.angular_plotter.last_angle
+        try:
+            if getattr(self, 'tag_detected_in_last_frame', False):
+                # Only send the angle if a tag was detected in the last frame
+                if hasattr(self, 'angular_plotter') and hasattr(self.angular_plotter, 'last_angle') and self.angular_plotter.last_angle is not None:
+                    relative_angle = round(float(self.angular_plotter.last_angle), 1)
                 else:
-                    relative_angle = 0.0
-            except Exception:
-                relative_angle = 0.0
-        # Special timestamp (UTC ISO format with ms)
+                    relative_angle = None
+            else:
+                relative_angle = None  # Or "-" if you prefer
+        except Exception:
+            relative_angle = None
         timestamp = datetime.datetime.utcnow().isoformat(timespec='milliseconds') + 'Z'
         data = {
             'relative_angle': relative_angle,
             'timestamp': timestamp,
             'mode': 'scanning',
         }
-        # Emit via socket
         try:
             sio.emit('scanning_mode_data', data)
             logging.info(f"[SCANNING MODE] Emitted: {data}")
         except Exception as e:
             logging.error(f"[SCANNING MODE] Failed to emit scanning mode data: {e}")
+
+    def start_scanning_mode_stream(self):
+        """Start automatic 1Hz scanning mode data emission."""
+        if hasattr(self, '_scanning_mode_timer') and self._scanning_mode_timer is not None:
+            return  # Already running
+        self._scanning_mode_timer = QTimer(self)
+        self._scanning_mode_timer.timeout.connect(self.emit_scanning_mode_data)
+        self._scanning_mode_timer.start(1000)  # 1Hz
+        logging.info("[SCANNING MODE] Started automatic 1Hz emission.")
+
+    def stop_scanning_mode_stream(self):
+        """Stop automatic scanning mode data emission."""
+        if hasattr(self, '_scanning_mode_timer') and self._scanning_mode_timer is not None:
+            self._scanning_mode_timer.stop()
+            self._scanning_mode_timer = None
+            logging.info("[SCANNING MODE] Stopped automatic emission.")
+
+    def handle_scanning_mode_toggle(self, checked):
+        """Start or stop scanning mode stream based on button state."""
+        if checked:
+            self.start_scanning_mode_stream()
+        else:
+            self.stop_scanning_mode_stream()
+
     def update_status_boxes_to_nominal(self):
         """Set the Error Log and Overall Status boxes to nominal/default values."""
         # Error Log
@@ -276,6 +295,7 @@ class MainWindow(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.tag_detected_in_last_frame = False  # <-- Add this line
         self.show_crosshairs = False 
         # Set global styling
         self.setStyleSheet(f"""
@@ -730,18 +750,14 @@ class MainWindow(QWidget):
 
         # ADCS section using the new ADCSSection widget - takes half width and full height
         self.adcs_control_widget = ADCSSection() # Instantiate your custom widget
-                                                                            
         self.apply_groupbox_style(self.adcs_control_widget, self.COLOR_BOX_BORDER_ADCS)
-
-        # Set size policy to expand vertically and take half width
         self.adcs_control_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-
         self.adcs_control_widget.adcs_command_sent.connect(self.handle_adcs_command)
-        # Connect AprilTag button to emit_scanning_mode_data
+        # Make AprilTag button checkable and connect to scanning mode stream
         if hasattr(self.adcs_control_widget, 'apriltag_btn'):
-            self.adcs_control_widget.apriltag_btn.clicked.connect(self.emit_scanning_mode_data)
+            self.adcs_control_widget.apriltag_btn.setCheckable(True)
+            self.adcs_control_widget.apriltag_btn.toggled.connect(self.handle_scanning_mode_toggle)
         row3.addWidget(self.adcs_control_widget, 1)  # stretch factor 1 for ADCS controls
-        
         parent_layout.addLayout(row3)
 
 ##########################################################################################
@@ -2093,6 +2109,12 @@ class MainWindow(QWidget):
                     self.latencyUpdated.emit(latency_ms)
                     bridge.analysed_frame.emit(analysed)
 
+                    if pose is None:
+                        self.tag_detected_in_last_frame = False
+                        self.graph_section.live_labels["SPIN MODE"].setText("—")
+                        self.graph_section.live_labels["DISTANCE MEASURING MODE"].setText("—")
+                        self.graph_section.live_labels["SCANNING MODE"].setText("—")
+                        
                     # 1) always update all calculators
                     # Apply your recommended safe check structure here
                     if pose is not None and isinstance(pose, (list, tuple)) and len(pose) == 2:
@@ -2105,7 +2127,7 @@ class MainWindow(QWidget):
                             self.spin_plotter.update(rvec, tvec) # Pass only rvec, timestamp will default to time.time()
                             self.distance_plotter.update(rvec, tvec)
                             self.angular_plotter.update(rvec, tvec)
-
+                            self.tag_detected_in_last_frame = True
                             # 2) update the three small live‐value labels WITH UNITS
                             self.graph_section.live_labels["SPIN MODE"]             \
                                 .setText(f"{self.spin_plotter.current_angle:.0f}°")  # Added degree symbol

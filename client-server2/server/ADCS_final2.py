@@ -784,7 +784,13 @@ class ADCSController:
         """Handle ADCS commands from client"""
         try:
             print(f"🎛️ ADCS Command: Mode='{mode}', Command='{command}', Value='{value}'")
-            
+
+            # Call auto-zero methods when AprilTag or Environmental mode is selected
+            if mode == "AprilTag":
+                self.auto_zero_tag()
+            elif mode == "Environmental":
+                self.auto_zero_lux()
+
             # Handle calibration commands
             if mode == "Calibration" or (mode == "adcs" and command == "calibrate"):
                 if command == "start_calibration" or command == "calibrate":
@@ -985,6 +991,14 @@ class ADCSController:
         # Cleanup motor control
         cleanup_motor_control()
         print("✓ ADCS Controller shutdown complete")
+
+    def auto_zero_tag(self):
+        """Automatically zero MPU for AprilTag mode (placeholder)"""
+        print("[ADCS] Auto-zero for AprilTag mode (placeholder)")
+
+    def auto_zero_lux(self):
+        """Automatically zero MPU for Environmental mode (placeholder)"""
+        print("[ADCS] Auto-zero for Environmental mode (placeholder)")
 
 def main():
     """Main function for testing"""

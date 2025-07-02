@@ -43,7 +43,7 @@ class RelativeAnglePlotter(QFrame):
         self.line_color = GRAPH_MODE_COLORS["SCANNING MODE"]
 
         # Current values and average metrics
-        self.current_ang = 0.0
+        self.current_ang = None
         self.average_angle = 0.0
 
         # Recording attributes
@@ -203,7 +203,7 @@ class RelativeAnglePlotter(QFrame):
     def clear_data(self):
         self.data.clear()
         self.time_data.clear()
-        self.current_ang = 0.0
+        self.current_ang = None
         self.average_angle = 0.0
         self.last_angle = None
         self.last_time = None

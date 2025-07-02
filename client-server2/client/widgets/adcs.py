@@ -1,4 +1,3 @@
-
 # filepath: c:\Users\juanb\OneDrive\Documents\GitHub\SLowMO-SDC-juan\SLowMO-SDC\client-server2\client\widgets\adcs.py
 from PyQt6.QtWidgets import (
     QWidget, QGroupBox, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, 
@@ -256,6 +255,14 @@ class ADCSSection(QGroupBox):
     def _update_current_auto_mode(self, mode_name):
         self.current_auto_mode = mode_name
         logging.info(f"[ADCSSection] Auto mode set to: {mode_name}")
+
+        # Disable/enable buttons based on mode
+        if mode_name in ("AprilTag", "Environmental"):
+            self.set_value_btn.setDisabled(True)
+            self.set_zero_btn.setDisabled(True)
+        else:
+            self.set_value_btn.setDisabled(False)
+            self.set_zero_btn.setDisabled(False)
 
     def _handle_run_controller_clicked(self):
         if self.run_controller_btn.isChecked():
