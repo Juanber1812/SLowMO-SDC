@@ -171,6 +171,19 @@ class ADCSSection(QGroupBox):
         self.calibrate_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         layout.addWidget(self.calibrate_btn)
 
+        # --- Manual Calibrate Yaw ---
+        manual_cal_layout = QHBoxLayout()
+        self.manual_cal_input = QLineEdit("0.0")
+        self.manual_cal_input.setPlaceholderText("Yaw Offset (deg)")
+        self.manual_cal_input.setFixedWidth(80)
+        manual_cal_layout.addWidget(self.manual_cal_input)
+        self.manual_cal_btn = QPushButton("Manual Calibrate Yaw")
+        self.manual_cal_btn.setStyleSheet(ADCS_BUTTON_STYLE)
+        self.manual_cal_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        manual_cal_layout.addWidget(self.manual_cal_btn)
+        layout.addLayout(manual_cal_layout)
+        # --- End Manual Calibrate Yaw ---
+
         group.setLayout(layout)
         return group
 
@@ -245,6 +258,7 @@ class ADCSSection(QGroupBox):
         self.manual_ccw_btn.pressed.connect(lambda: self._handle_action_clicked("adcs", "manual_counterclockwise_start"))
         self.manual_ccw_btn.released.connect(lambda: self._handle_action_clicked("adcs", "manual_stop"))
         self.calibrate_btn.clicked.connect(lambda: self._handle_action_clicked("adcs", "calibrate"))
+        self.manual_cal_btn.clicked.connect(self._handle_manual_cal_clicked)
 
         # Auto controls
         self.run_controller_btn.clicked.connect(self._handle_run_controller_clicked)
@@ -324,3 +338,10 @@ class ADCSSection(QGroupBox):
         # Disable both set_zero_btn and set_value_btn
         self.set_zero_btn.setDisabled(True)
         self.set_value_btn.setDisabled(True)
+
+    def _handle_manual_cal_clicked(self):
+        try:
+            value = float(self.manual_cal_input.text())
+            self._handle_action_clicked("adcs", "manual_cal", value)
+        except ValueError:
+            logging.warning(f"Invalid manual cal value: {self.manual_cal_input.text()}")

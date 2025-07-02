@@ -980,22 +980,43 @@ class ADCSController:
                 # --- Handle new zero commands ---
                 elif command == "auto_zero_tag":
                     self.start_auto_zero_tag()
-                    return {"status": "success", "message": "AprilTag zeroed"}
+                    return {"status": "success", "message": "AprilTag"}
                 elif command == "auto_zero_lux":
-                    self.Start_auto_zero_lux()
-                    return {"status": "success", "message": "Environmental zeroed"}
+                    self.start_auto_zero_env()
+                    return {"status": "success", "message": "Environmental"}
                 elif command == "stop_auto_zero_tag":
                     self.stop_auto_zero_tag()
-                    return {"status": "success", "message": "Stopped AprilTag zero"}
+                    return {"status": "success", "message": "Stopped AprilTag"}
                 elif command == "stop_auto_zero_lux":
-                    self.stop_auto_zero_lux()
-                    return {"status": "success", "message": "Stopped Environmental zero"}
-
+                    self.stop_auto_zero_env()
+                    return {"status": "success", "message": "Stopped Environmental"}
+                elif command == "manual_cal":
+                    return self.manual_calibration(value)
+            
         except Exception as e:
             error_msg = f"ADCS command error: {e}"
             print(f"❌ {error_msg}")
             return {"status": "error", "message": error_msg}
     
+
+    def manual_calibration(self, yaw_offset):
+        """
+        Manually calibrate the yaw by setting a yaw offset.
+        Args:
+            yaw_offset: The value (in degrees) to set as the current yaw.
+        """
+        try:
+            if yaw_offset is None:
+                return {"status": "error", "message": "No yaw offset provided"}
+            offset = float(yaw_offset)
+            with self.data_lock:
+                self.mpu_sensor.angle_yaw = offset
+                self.mpu_sensor.angle_yaw_pure = offset
+            print(f"[MANUAL CAL] Yaw manually set to {offset:.2f}°")
+            return {"status": "success", "message": f"Yaw manually set to {offset:.2f}°"}
+        except Exception as e:
+            return {"status": "error", "message": f"Manual calibration failed: {e}"}
+
     def zero_yaw_position(self):
         """Zero the yaw position"""
         try:

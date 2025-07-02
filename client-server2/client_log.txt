@@ -4569,3 +4569,18 @@
 2025-07-02 18:03:27,859 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
 2025-07-02 18:03:27,862 - INFO - [INFO] Successfully connected to server
 2025-07-02 18:03:35,888 - INFO - Disconnected from server: transport error
+2025-07-02 18:22:10,298 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 18:22:10,515 - INFO - Connected to server
+2025-07-02 18:22:10,517 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 18:22:10,519 - INFO - [INFO] Successfully connected to server
+2025-07-02 18:22:14,306 - INFO - [INFO] Closing application...
+2025-07-02 18:22:15,510 - INFO - Disconnected from server: client disconnect
+2025-07-02 18:39:11,830 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-02 18:39:16,013 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=0.1
+2025-07-02 18:39:16,844 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751477951.8329208 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000029BC10CEA50>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-02 18:39:18,562 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=0.1
+2025-07-02 18:39:19,728 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=0.1
+2025-07-02 18:39:24,541 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=-1.0
+2025-07-02 18:39:29,058 - INFO - Sending ADCS command: Mode='adcs', Command='manual_cal', Value=-1.21233
+2025-07-02 18:39:49,706 - INFO - [INFO] Closing application...
+2025-07-02 18:39:49,710 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
