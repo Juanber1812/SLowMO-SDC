@@ -2449,3 +2449,13 @@
 2025-07-02 10:29:15,980 - INFO - Connected to server
 2025-07-02 10:29:15,982 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
 2025-07-02 10:29:15,986 - INFO - [INFO] Successfully connected to server
+2025-07-02 10:31:34,791 - INFO - Disconnected from server: transport error
+2025-07-02 10:31:40,755 - INFO - Connected to server
+2025-07-02 10:31:40,757 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:31:50,561 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-02 10:31:50,564 - INFO - Stream paused for config application.
+2025-07-02 10:31:51,068 - INFO - 0.5s pause complete. Getting/sending configuration (stream was True).
+2025-07-02 10:31:51,074 - INFO - Detector calibration updated: calibrations/calibration_768x432.npz
+2025-07-02 10:31:51,284 - INFO - Stream restart scheduled (if it was on before apply_config).
+2025-07-02 10:32:13,566 - INFO - [INFO] Closing application...
+2025-07-02 10:32:15,272 - INFO - Disconnected from server: client disconnect
