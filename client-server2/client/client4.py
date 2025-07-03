@@ -1607,8 +1607,11 @@ class MainWindow(QWidget):
             "command": command_name,
             "value":   value
         }
-        sio.emit("adcs_command", data)
-        print(f"[CLIENT] ADCS command sent: {data}")
+        if sio.connected:
+            sio.emit("adcs_command", data)
+            print(f"[CLIENT] ADCS command sent: {data}")
+        else:
+            print(f"[CLIENT] Cannot send ADCS command - not connected to server")
 
     def start_lidar_streaming(self):
         """Start LIDAR data streaming from server"""
@@ -1882,7 +1885,8 @@ class MainWindow(QWidget):
         
         # Get and send configuration
         config = self.camera_settings.get_config()
-        sio.emit("camera_config", config)
+        if sio.connected:
+            sio.emit("camera_config", config)
         
         # Store the applied configuration for detector use
         self.active_config_for_detector = config.copy()
@@ -2284,8 +2288,11 @@ class MainWindow(QWidget):
             "command": command_name,
             "value": value
         }
-        sio.emit("adcs_command", data)
-        print(f"[CLIENT] ADCS command sent: {data}")
+        if sio.connected:
+            sio.emit("adcs_command", data)
+            print(f"[CLIENT] ADCS command sent: {data}")
+        else:
+            print(f"[CLIENT] Cannot send ADCS command - not connected to server")
 
     def try_reconnect(self):
         """Attempt to reconnect to server"""
@@ -2388,8 +2395,9 @@ class MainWindow(QWidget):
         
         # Apply the configuration which will now have cropping disabled
         config = self.camera_settings.get_config() 
-        sio.emit("camera_config", config)
-        time.sleep(0.2) # Keep delay if necessary for server to process
+        if sio.connected:
+            sio.emit("camera_config", config)
+            time.sleep(0.2) # Keep delay if necessary for server to process
 
     #=========================================================================
     #                           EVENT HANDLERS                              
@@ -2413,14 +2421,15 @@ class MainWindow(QWidget):
             self.reset_camera_to_default() # This might log
             time.sleep(0.5)
     
-            if self.streaming:
+            if self.streaming and sio.connected:
                 sio.emit("stop_camera") # This might log
                 self.streaming = False
                 # Removed: if hasattr(self, 'camera_controls'): self.camera_controls.toggle_btn.setText("Start Stream")
                 time.sleep(0.5)
     
-            sio.emit("set_camera_idle") # This might log
-            time.sleep(0.5)
+            if sio.connected:
+                sio.emit("set_camera_idle") # This might log
+                time.sleep(0.5)
     
             if sio.connected:
                 sio.disconnect() # This might log

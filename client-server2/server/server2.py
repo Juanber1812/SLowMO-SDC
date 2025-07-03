@@ -92,11 +92,20 @@ def handle_scanning_mode_data(data):
 @socketio.on('frame')
 def handle_frame(data):
     try:
+        # Check if we have connected clients before broadcasting
+        if len(connected_clients) == 0:
+            return
+            
         emit('frame', data, broadcast=True)
         # Note: Frame data no longer tracked for communication monitoring
         # as true channel throughput is now measured via dedicated tests
     except Exception as e:
         print(f"[ERROR] frame broadcast: {e}")
+        print(f"[DEBUG] Connected clients during frame error: {len(connected_clients)}")
+        print(f"[DEBUG] Frame data type: {type(data)}")
+        print(f"[DEBUG] Frame data size: {len(data) if hasattr(data, '__len__') else 'N/A'}")
+        import traceback
+        traceback.print_exc()
 
 @socketio.on('start_camera')
 def handle_start_camera():
@@ -289,36 +298,71 @@ def start_background_tasks():
 
 @socketio.on('connect')
 def handle_connect():
-    print(f"[INFO] Client connected: {request.sid}")
-    connected_clients.add(request.sid)
-    
-    # Request current status from camera and lidar subsystems
-    emit('camera_update', {}, broadcast=True)
-    emit('lidar_update', {}, broadcast=True)
-    print("[INFO] Status update requests sent to camera and lidar subsystems")
-    
-    # Start communication monitoring if not already running
-    if communication_monitor and not communication_monitor.is_monitoring:
-        communication_monitor.set_update_callback(communication_data_callback)
-        communication_monitor.set_throughput_test_callback(throughput_test_callback)
-        if communication_monitor.start_monitoring():
-            logging.info("Communication monitoring started (on client connect)")
-        else:
-            logging.error("Failed to start communication monitoring (on client connect)")
+    try:
+        client_ip = request.environ.get('REMOTE_ADDR', 'unknown')
+        user_agent = request.headers.get('User-Agent', 'unknown')
+        print(f"[DEBUG] Client connecting from {client_ip} with SID: {request.sid}")
+        print(f"[DEBUG] User-Agent: {user_agent}")
+        
+        print(f"[INFO] Client connected: {request.sid}")
+        connected_clients.add(request.sid)
+        print(f"[DEBUG] Total connected clients: {len(connected_clients)}")
+        
+        # Request current status from camera and lidar subsystems
+        emit('camera_update', {}, broadcast=True)
+        emit('lidar_update', {}, broadcast=True)
+        print("[INFO] Status update requests sent to camera and lidar subsystems")
+        
+        # Start communication monitoring if not already running
+        if communication_monitor and not communication_monitor.is_monitoring:
+            communication_monitor.set_update_callback(communication_data_callback)
+            communication_monitor.set_throughput_test_callback(throughput_test_callback)
+            if communication_monitor.start_monitoring():
+                logging.info("Communication monitoring started (on client connect)")
+            else:
+                logging.error("Failed to start communication monitoring (on client connect)")
+        
+        print(f"[DEBUG] Client {request.sid} connection setup completed successfully")
+    except Exception as e:
+        print(f"[ERROR] Exception during client connect: {e}")
+        import traceback
+        traceback.print_exc()
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print(f"[INFO] Client disconnected: {request.sid}")
-    connected_clients.discard(request.sid)
-    # Stop communication monitoring if no clients remain
-    if communication_monitor and len(connected_clients) == 0:
-        communication_monitor.stop_monitoring()
-        logging.info("Communication monitoring stopped (no clients connected)")
+    try:
+        disconnect_reason = request.args.get('reason', 'unknown')
+        client_ip = request.environ.get('REMOTE_ADDR', 'unknown')
+        
+        print(f"[DEBUG] Client disconnecting: {request.sid}")
+        print(f"[DEBUG] Disconnect reason: {disconnect_reason}")
+        print(f"[DEBUG] Client IP: {client_ip}")
+        print(f"[DEBUG] Clients before removal: {len(connected_clients)}")
+        
+        print(f"[INFO] Client disconnected: {request.sid}")
+        connected_clients.discard(request.sid)
+        
+        print(f"[DEBUG] Clients after removal: {len(connected_clients)}")
+        print(f"[DEBUG] Remaining client SIDs: {list(connected_clients)}")
+        
+        # Stop communication monitoring if no clients remain
+        if communication_monitor and len(connected_clients) == 0:
+            print("[DEBUG] No clients remaining, stopping communication monitoring")
+            communication_monitor.stop_monitoring()
+            logging.info("Communication monitoring stopped (no clients connected)")
+        
+        print(f"[DEBUG] Client {request.sid} disconnect handling completed")
+    except Exception as e:
+        print(f"[ERROR] Exception during client disconnect: {e}")
+        import traceback
+        traceback.print_exc()
 
 @socketio.on("adcs_command")
 def handle_adcs_command(data):
     try:
         print(f"[SERVER] Received ADCS command: {data}")
+        print(f"[DEBUG] Current connected clients: {len(connected_clients)}")
+        print(f"[DEBUG] ADCS controller available: {adcs_controller is not None}")
         
         if not adcs_controller:
             print("[ERROR] ADCS controller not available")
@@ -330,25 +374,38 @@ def handle_adcs_command(data):
         command = data.get("command", "unknown")
         value = data.get("value")
         
+        print(f"[DEBUG] Processing ADCS command - Mode: {mode}, Command: {command}, Value: {value}")
+        
         # Use the new ADCS controller command handler
         result = adcs_controller.handle_adcs_command(mode, command, value)
         
+        print(f"[DEBUG] ADCS command result: {result}")
+        
         # Send response back to client
-        emit("adcs_command_ack", {
+        response_data = {
             "status": result.get("status", "error").upper(),
             "message": result.get("message", "Command processed"),
             "mode": mode,
             "command": command
-        }, broadcast=True)
+        }
+        
+        print(f"[DEBUG] Sending ADCS response: {response_data}")
+        emit("adcs_command_ack", response_data, broadcast=True)
         
         print(f"[SERVER] ADCS command result: {result}")
         
     except Exception as e:
         print(f"[ERROR] ADCS command handling: {e}")
-        emit("adcs_command_ack", {
+        print(f"[DEBUG] Exception type: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
+        
+        error_response = {
             "status": "ERROR", 
             "message": f"Command failed: {str(e)}"
-        }, broadcast=True)
+        }
+        print(f"[DEBUG] Sending error response: {error_response}")
+        emit("adcs_command_ack", error_response, broadcast=True)
 
 @socketio.on("sensor_data")
 def handle_sensor_data(data):
@@ -540,6 +597,10 @@ def adcs_data_broadcast():
         return
     
     try:
+        # Check if we have connected clients before broadcasting
+        if len(connected_clients) == 0:
+            return
+            
         adcs_data = adcs_controller.get_adcs_data_for_server()
         
         # Extract payload temperature from ADCS data
@@ -563,34 +624,54 @@ def adcs_data_broadcast():
             adcs_data_broadcast.last_log = time.time()
             
     except Exception as e:
-        logging.error(f"Error in ADCS data broadcast: {e}")
+        print(f"[ERROR] Error in ADCS data broadcast: {e}")
+        print(f"[DEBUG] Connected clients: {len(connected_clients)}")
+        import traceback
+        traceback.print_exc()
+        
         # Send error state to clients
-        socketio.emit("adcs_broadcast", {
-            "gyro": "0.0°",
-            "orientation": "Y:0.0° R:0.0° P:0.0°",
-            "gyro_rate_x": "0.00", "gyro_rate_y": "0.00", "gyro_rate_z": "0.00",
-            "angle_x": "0.0", "angle_y": "0.0", "angle_z": "0.0",
-            "lux1": "0.0", "lux2": "0.0", "lux3": "0.0",
-            "temperature": "0.0°C",
-            "rpm": "0.0",
-            "status": "Error"
-        })
+        try:
+            if len(connected_clients) > 0:
+                socketio.emit("adcs_broadcast", {
+                    "gyro": "0.0°",
+                    "orientation": "Y:0.0° R:0.0° P:0.0°",
+                    "gyro_rate_x": "0.00", "gyro_rate_y": "0.00", "gyro_rate_z": "0.00",
+                    "angle_x": "0.0", "angle_y": "0.0", "angle_z": "0.0",
+                    "lux1": "0.0", "lux2": "0.0", "lux3": "0.0",
+                    "temperature": "0.0°C",
+                    "rpm": "0.0",
+                    "status": "Error"
+                })
+        except Exception as emit_error:
+            print(f"[ERROR] Failed to emit error state: {emit_error}")
 
 def start_adcs_broadcast():
     """Start ADCS data broadcasting at 20Hz"""
     if not adcs_controller:
+        print("[DEBUG] ADCS controller not available, skipping broadcast setup")
         return
     
     def adcs_broadcast_loop():
+        print("[DEBUG] ADCS broadcast loop started")
+        loop_count = 0
         while True:
             try:
                 adcs_data_broadcast()
+                loop_count += 1
+                
+                # Print debug info every 200 loops (10 seconds at 20Hz)
+                if loop_count % 200 == 0:
+                    print(f"[DEBUG] ADCS broadcast loop running, count: {loop_count}, clients: {len(connected_clients)}")
+                
                 time.sleep(0.05)  # 20Hz = 50ms interval
             except Exception as e:
-                logging.error(f"Error in ADCS broadcast loop: {e}")
+                print(f"[ERROR] Error in ADCS broadcast loop: {e}")
+                import traceback
+                traceback.print_exc()
                 time.sleep(1)  # Wait 1 second on error before retrying
     
     threading.Thread(target=adcs_broadcast_loop, daemon=True).start()
+    print("[DEBUG] ADCS data broadcasting thread started at 20Hz")
     logging.info("ADCS data broadcasting started at 20Hz")
 
 # Global variables to store latest temperature data
@@ -775,10 +856,19 @@ if __name__ == "__main__":
     print("🚀 Server starting at http://0.0.0.0:5000")
     print("Background tasks will start after server initialization.")
     print("Press Ctrl+C to stop the server and clean up resources.")
+    
+    # Add debug information about available modules
+    print(f"[DEBUG] Power monitoring available: {POWER_AVAILABLE}")
+    print(f"[DEBUG] Temperature monitoring available: {TEMPERATURE_AVAILABLE}")
+    print(f"[DEBUG] Communication monitoring available: {COMMUNICATION_AVAILABLE}")
+    print(f"[DEBUG] ADCS controller available: {ADCS_AVAILABLE}")
+    
     # Start background tasks with delay
     start_background_tasks()
+    
     try:
-        socketio.run(app, host="0.0.0.0", port=5000)
+        print("[DEBUG] Starting SocketIO server...")
+        socketio.run(app, host="0.0.0.0", port=5000, debug=False, log_output=True)
     except KeyboardInterrupt:
         print("\n[INFO] Shutting down server...")
         try:
