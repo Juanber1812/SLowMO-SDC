@@ -1,35 +1,41 @@
+#!/usr/bin/env python3
 import smbus2, time
 
-I2C_BUS       = 1
-LIDAR_ADDR    = 0x62
-ACQ_COMMAND   = 0x00
-ACQUIRE_VAL   = 0x04
-STATUS_REG    = 0x01
-DIST_LOW_REG  = 0x10
-DIST_HIGH_REG = 0x11
+BUS = 1
+ADDR = 0x62
 
-bus = smbus2.SMBus(I2C_BUS)
+# LiDAR-Lite v4 registers
+ACQ_CMD  = 0x00
+ACQ_VAL  = 0x04
+STATUS   = 0x01
+DIST_LO  = 0x10
+DIST_HI  = 0x11
 
-def read_distance():
-    # 1) Trigger measurement
-    bus.write_byte_data(LIDAR_ADDR, ACQ_COMMAND, ACQUIRE_VAL)
-    # 2) Poll busy flag
-    while (bus.read_byte_data(LIDAR_ADDR, STATUS_REG) & 0x01):
+def read_distance(bus):
+    # 1) Trigger
+    bus.write_byte_data(ADDR, ACQ_CMD, ACQ_VAL)
+    # 2) Wait for bit0 of STATUS to go low
+    while bus.read_byte_data(ADDR, STATUS) & 0x01:
         time.sleep(0.005)
-    # 3) Read low then high
-    low  = bus.read_byte_data(LIDAR_ADDR, DIST_LOW_REG)
-    high = bus.read_byte_data(LIDAR_ADDR, DIST_HIGH_REG)
-    return (high << 8) | low
+    # 3) Read low/high
+    lo = bus.read_byte_data(ADDR, DIST_LO)
+    hi = bus.read_byte_data(ADDR, DIST_HI)
+    return (hi << 8) | lo
 
-try:
-    while True:
-        try:
-            d = read_distance()
-            print(f"Distance: {d} cm")
-        except OSError as e:
-            print("I2C error:", e)
-        time.sleep(1)
-except KeyboardInterrupt:
-    pass
-finally:
-    bus.close()
+def main():
+    bus = smbus2.SMBus(BUS)
+    try:
+        while True:
+            try:
+                d = read_distance(bus)
+                print(f"Distance: {d} cm")
+            except OSError as e:
+                print("I2C error:", e)
+            time.sleep(1.0)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        bus.close()
+
+if __name__ == "__main__":
+    main()
