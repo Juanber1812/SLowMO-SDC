@@ -258,72 +258,31 @@ def start_background_tasks():
     """Start background tasks with a delay to ensure server is ready"""
     def delayed_start():
         time.sleep(2)  # Give the server time to start
-        print("\n[INFO] Starting background tasks...", flush=True)
-        
-        # Start camera stream
-        try:
-            print("[INFO] Starting camera stream...", flush=True)
-            threading.Thread(target=camera.start_stream, daemon=True).start()
-            print("[INFO] ✓ Camera stream thread started", flush=True)
-        except Exception as e:
-            print(f"[ERROR] Failed to start camera stream: {e}", flush=True)
-        
-        # Start sensors
-        try:
-            print("[INFO] Starting sensors...", flush=True)
-            threading.Thread(target=sensors.start_sensors, daemon=True).start()
-            print("[INFO] ✓ Sensors thread started", flush=True)
-        except Exception as e:
-            print(f"[ERROR] Failed to start sensors: {e}", flush=True)
-        
-        # Start lidar
-        try:
-            print("[INFO] Starting lidar...", flush=True)
-            threading.Thread(target=lidar.start_lidar, daemon=True).start()
-            print("[INFO] ✓ Lidar thread started", flush=True)
-        except Exception as e:
-            print(f"[ERROR] Failed to start lidar: {e}", flush=True)
-        
+        print("\n[INFO] Starting background tasks...")
+        threading.Thread(target=camera.start_stream, daemon=True).start()
+        threading.Thread(target=sensors.start_sensors, daemon=True).start()
+        threading.Thread(target=lidar.start_lidar, daemon=True).start()
         # Start power monitoring
         if power_monitor:
-            try:
-                print("[INFO] Starting power monitoring...", flush=True)
-                power_monitor.set_update_callback(power_data_callback)
-                if power_monitor.start_monitoring():
-                    print("[INFO] ✓ Power monitoring started successfully", flush=True)
-                else:
-                    print("[ERROR] Failed to start power monitoring", flush=True)
-            except Exception as e:
-                print(f"[ERROR] Power monitoring error: {e}", flush=True)
+            power_monitor.set_update_callback(power_data_callback)
+            if power_monitor.start_monitoring():
+                logging.info("Power monitoring started successfully")
+            else:
+                logging.error("Failed to start power monitoring")
         
         # Start ADCS data broadcasting
         if adcs_controller:
-            try:
-                print("[INFO] Starting ADCS data broadcasting...", flush=True)
-                start_adcs_broadcast()
-                print("[INFO] ✓ ADCS controller broadcasting started", flush=True)
-            except Exception as e:
-                print(f"[ERROR] ADCS broadcasting error: {e}", flush=True)
+            start_adcs_broadcast()
+            logging.info("ADCS controller initialized and broadcasting started")
         
         # Start thermal data broadcasting
         if TEMPERATURE_AVAILABLE or ADCS_AVAILABLE:  # Start if we have any temperature source
-            try:
-                print("[INFO] Starting thermal data broadcasting...", flush=True)
-                start_thermal_broadcast()
-                print("[INFO] ✓ Thermal data broadcasting started", flush=True)
-            except Exception as e:
-                print(f"[ERROR] Thermal broadcasting error: {e}", flush=True)
+            start_thermal_broadcast()
+            logging.info("Thermal data broadcasting started")
         
-        print("[INFO] Background task initialization complete!", flush=True)
         # Do NOT start communication monitoring here; start on client connect
-    
     # Start the delayed initialization in a separate thread
-    try:
-        print("[INFO] Scheduling background tasks to start in 2 seconds...", flush=True)
-        threading.Thread(target=delayed_start, daemon=True).start()
-        print("[INFO] ✓ Background task scheduler started", flush=True)
-    except Exception as e:
-        print(f"[ERROR] Failed to start background task scheduler: {e}", flush=True)
+    threading.Thread(target=delayed_start, daemon=True).start()
 
 
 @socketio.on('connect')
@@ -618,24 +577,19 @@ def adcs_data_broadcast():
 def start_adcs_broadcast():
     """Start ADCS data broadcasting at 20Hz"""
     if not adcs_controller:
-        print("[WARNING] ADCS controller not available for broadcasting", flush=True)
         return
     
     def adcs_broadcast_loop():
-        print("[INFO] ADCS broadcast loop started (20Hz)", flush=True)
         while True:
             try:
                 adcs_data_broadcast()
                 time.sleep(0.05)  # 20Hz = 50ms interval
             except Exception as e:
-                print(f"[ERROR] Error in ADCS broadcast loop: {e}", flush=True)
+                logging.error(f"Error in ADCS broadcast loop: {e}")
                 time.sleep(1)  # Wait 1 second on error before retrying
     
-    try:
-        threading.Thread(target=adcs_broadcast_loop, daemon=True).start()
-        print("[INFO] ✓ ADCS data broadcasting thread started at 20Hz", flush=True)
-    except Exception as e:
-        print(f"[ERROR] Failed to start ADCS broadcast thread: {e}", flush=True)
+    threading.Thread(target=adcs_broadcast_loop, daemon=True).start()
+    logging.info("ADCS data broadcasting started at 20Hz")
 
 # Global variables to store latest temperature data
 latest_battery_temp = None
@@ -722,20 +676,16 @@ def thermal_data_broadcast():
 def start_thermal_broadcast():
     """Start thermal data broadcasting at 2Hz"""
     def thermal_broadcast_loop():
-        print("[INFO] Thermal broadcast loop started (2Hz)", flush=True)
         while True:
             try:
                 thermal_data_broadcast()
                 time.sleep(0.5)  # 2Hz = 500ms interval
             except Exception as e:
-                print(f"[ERROR] Error in thermal broadcast loop: {e}", flush=True)
+                logging.error(f"Error in thermal broadcast loop: {e}")
                 time.sleep(1)  # Wait 1 second on error before retrying
     
-    try:
-        threading.Thread(target=thermal_broadcast_loop, daemon=True).start()
-        print("[INFO] ✓ Thermal data broadcasting thread started at 2Hz", flush=True)
-    except Exception as e:
-        print(f"[ERROR] Failed to start thermal broadcast thread: {e}", flush=True)
+    threading.Thread(target=thermal_broadcast_loop, daemon=True).start()
+    logging.info("Thermal data broadcasting started at 2Hz")
 
 @socketio.on('latency_response')
 def handle_latency_response(data):
