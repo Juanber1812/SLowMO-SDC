@@ -42,7 +42,7 @@ DIST_HIGH_REG = 0x0f   # High byte of distance
 DIST_LOW_REG  = 0x10   # Low byte of distance
 
 # Delay after triggering measurement (in seconds)
-MEASUREMENT_DELAY = 0.02
+MEASUREMENT_DELAY = 1
 
 
 def select_mux_channel(bus, channel):
