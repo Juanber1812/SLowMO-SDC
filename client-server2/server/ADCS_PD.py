@@ -499,8 +499,10 @@ class PDControllerPWM:
     
     def start_controller(self):
         """Start the PD controller"""
+        print(f"[PD DEBUG] Starting PD controller...")
         self.controller_enabled = True
         self.integral = 0.0  # Reset integral
+        print(f"[PD DEBUG] PD controller started - enabled: {self.controller_enabled}")
         # print("PWM PD Controller STARTED - Motor control active")  # Commented out to reduce spam
     
     def stop_controller(self):
@@ -733,13 +735,20 @@ class ADCSController:
 
     def _control_thread_worker(self):
         """High-speed control worker thread"""
-        interval = 1.0 / 50  # 50Hz control loop
+        print(f"[CONTROL DEBUG] Control thread started")
+        interval = 1.0 / 25  # 25Hz control loop (reduced from 50Hz for stability testing)
         next_control_time = time.time()
         last_time = time.time()
+        loop_count = 0
         
         while not self.stop_control_thread:
             try:
                 current_time = time.time()
+                loop_count += 1
+                
+                # Debug print every 500 loops (20 seconds at 25Hz)
+                if loop_count % 500 == 0:
+                    print(f"[CONTROL DEBUG] Control loop running, count: {loop_count}")
                 
                 # Fix: Make manual_control_active access thread-safe
                 with self.data_lock:
@@ -751,6 +760,10 @@ class ADCSController:
                 
                 if current_time >= next_control_time:
                     try:
+                        # Debug: Print when control loop first starts active control
+                        if loop_count <= 50 and self.pd_controller.controller_enabled:  # First 2 seconds at 25Hz
+                            print(f"[CONTROL DEBUG] Active control loop {loop_count}, enabled: {self.pd_controller.controller_enabled}")
+                        
                         # Get current sensor data
                         with self.data_lock:
                             current_yaw = self.current_data['mpu']['yaw']
@@ -776,16 +789,20 @@ class ADCSController:
                         next_control_time += interval
                         
                     except Exception as e:
-                        print(f"Error in control thread: {e}")
+                        print(f"[CONTROL DEBUG] Error in control thread inner loop: {e}")
+                        import traceback
+                        traceback.print_exc()
                 
                 time.sleep(0.001)  # 1ms sleep
                 
             except (KeyboardInterrupt, SystemExit):
                 # Handle graceful shutdown
-                print("Control thread received shutdown signal")
+                print("[CONTROL DEBUG] Control thread received shutdown signal")
                 break
             except Exception as e:
-                print(f"Unexpected error in control thread: {e}")
+                print(f"[CONTROL DEBUG] Unexpected error in control thread: {e}")
+                import traceback
+                traceback.print_exc()
                 time.sleep(0.01)  # Brief pause on unexpected errors
     
     def read_all_sensors(self):
@@ -1126,21 +1143,43 @@ class ADCSController:
     def start_auto_control(self, mode):
         """Start automatic control mode"""
         try:
+            print(f"[ADCS DEBUG] Starting auto control - mode: {mode}")
+            
             if not self.motor_available:
+                print(f"[ADCS DEBUG] Motor not available")
                 return {"status": "error", "message": "Motor control not available"}
             
             if not self.mpu_sensor.sensor_ready:
+                print(f"[ADCS DEBUG] MPU sensor not ready")
                 return {"status": "error", "message": "MPU6050 sensor not ready"}
             
             # Check if manual control is active
             with self.data_lock:
-                if self.manual_control_active:
+                manual_active = self.manual_control_active
+                print(f"[ADCS DEBUG] Manual control active: {manual_active}")
+                
+                if manual_active:
                     return {"status": "error", "message": "Cannot start auto control - manual control is active. Stop manual control first."}
             
+            print(f"[ADCS DEBUG] Starting PD controller...")
             self.pd_controller.start_controller()
+            
+            # Add a small delay to allow system to stabilize
+            import time
+            time.sleep(0.1)
+            
+            print(f"[ADCS DEBUG] PD controller started successfully")
+            
+            # Check system resources after starting
+            resources = self.get_system_resources()
+            print(f"[ADCS DEBUG] System resources after start - Threads: {resources.get('threads', 'unknown')}, Refs: {resources.get('ref_count', 'unknown')}")
+            
             # print(f"▶️ {mode} mode started with PWM PD controller")  # Commented out to reduce spam
             return {"status": "success", "message": f"{mode} mode started"}
         except Exception as e:
+            print(f"[ADCS DEBUG] Exception in start_auto_control: {e}")
+            import traceback
+            traceback.print_exc()
             return {"status": "error", "message": f"Auto control start error: {e}"}
 
     def stop_auto_control(self):
@@ -1625,6 +1664,29 @@ class ADCSController:
     #         self.auto_zero_tag(data)
     #     else:
     #         print("[AUTO ZERO] Warning: Received AprilTag response without pending request")
+
+    def get_system_resources(self):
+        """Get current system resource usage for debugging"""
+        try:
+            import threading
+            import gc
+            
+            # Get thread count
+            thread_count = threading.active_count()
+            
+            # Force garbage collection to get accurate memory info
+            gc.collect()
+            
+            # Get basic memory info (this is lightweight)
+            import sys
+            ref_count = sys.gettotalrefcount() if hasattr(sys, 'gettotalrefcount') else 0
+            
+            return {
+                "threads": thread_count,
+                "ref_count": ref_count
+            }
+        except Exception as e:
+            return {"error": str(e)}
 
 def main():
     """Main function for testing"""

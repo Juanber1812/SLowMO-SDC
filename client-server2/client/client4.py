@@ -1144,6 +1144,7 @@ class MainWindow(QWidget):
         
         @sio.event
         def connect():
+            print(f"[CLIENT DEBUG] Connected to server successfully")
             logging.info("Connected to server")
             self.camera_controls.toggle_btn.setEnabled(True)
             self.detector_controls.detector_btn.setEnabled(True)
@@ -1159,6 +1160,7 @@ class MainWindow(QWidget):
 
         @sio.event
         def disconnect(reason=None):
+            print(f"[CLIENT DEBUG] Disconnected from server - Reason: {reason}")
             logging.info(f"Disconnected from server: {reason}")
             self.camera_controls.toggle_btn.setEnabled(False)
             self.detector_controls.detector_btn.setEnabled(False)
@@ -1168,7 +1170,11 @@ class MainWindow(QWidget):
                
         @sio.on("frame")
         def on_frame(data):
-            self.handle_frame_data(data)
+            try:
+                self.handle_frame_data(data)
+            except Exception as e:
+                print(f"[CLIENT DEBUG] Error handling frame: {e}")
+                logging.error(f"Frame handling error: {e}")
 
         @sio.on("sensor_broadcast")
         def on_sensor_data(data):
@@ -1371,6 +1377,7 @@ class MainWindow(QWidget):
                         self.thermal_labels["payload_temp"].setText(f"Payload: {temperature_str}")
                 
             except Exception as e:
+                print(f"[CLIENT DEBUG] Error in ADCS broadcast handler: {e}")
                 logging.error(f"Failed to update ADCS data: {e}")
 
         @sio.on("power_broadcast")
@@ -1602,6 +1609,7 @@ class MainWindow(QWidget):
                 logging.error(f"Failed to update CDH data: {e}")
                 
     def handle_adcs_command(self, mode_name, command_name, value):
+        print(f"[CLIENT DEBUG] Sending ADCS command: {mode_name}/{command_name}/{value}")
         data = {
             "mode":    mode_name,
             "command": command_name,
@@ -1645,8 +1653,10 @@ class MainWindow(QWidget):
                 self.frame_counter += 1
                 bridge.frame_received.emit(frame)
             else:
+                print(f"[CLIENT DEBUG] Frame decode failed - data size: {len(data) if data else 'None'}")
                 logging.warning("Frame decode failed")
         except Exception as e:
+            print(f"[CLIENT DEBUG] Frame processing error: {e}")
             logging.error(f"Frame processing error: {e}")
 
     def update_sensor_display(self, data):
@@ -2406,6 +2416,7 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         """Handle application close event"""
         try:
+            print(f"[CLIENT DEBUG] Application close event triggered")
             logging.info("[INFO] Closing application...")
             
             # Remove QtLogHandler from logging FIRST to prevent RuntimeError at exit
@@ -2488,22 +2499,27 @@ def check_all_calibrations():
 ##############################################################################
 
 if __name__ == "__main__":
+    print(f"[CLIENT DEBUG] Starting SLowMO Client application")
     app = QApplication(sys.argv)
     
     app.setApplicationName("SLowMO Client")
     app.setApplicationVersion("3.0")
     
+    print(f"[CLIENT DEBUG] Creating main window")
     window = MainWindow()
     window.showMaximized()
     
     def connect_to_server():
         try:
+            print(f"[CLIENT DEBUG] Attempting connection to {SERVER_URL}")
             logging.info(f"[INFO] Attempting to connect to {SERVER_URL}")
             sio.connect(SERVER_URL, wait_timeout=10)
             logging.info("[INFO] Successfully connected to server")
         except Exception as e:
+            print(f"[CLIENT DEBUG] Connection failed: {e}")
             logging.info(f"[ERROR] Failed to connect to server: {e}")
     
     threading.Thread(target=connect_to_server, daemon=True).start()
     
+    print(f"[CLIENT DEBUG] Starting Qt event loop")
     sys.exit(app.exec())
