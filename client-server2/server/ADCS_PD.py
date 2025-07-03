@@ -21,36 +21,19 @@ import csv
 import os
 from collections import deque
 import datetime
+import re
 
-# ── GEVENT COMPATIBILITY ───────────────────────────────────────────────
-# Handle gevent/threading compatibility for server environments
-# This prevents conflicts when running under gevent-based servers (like Flask-SocketIO)
-# which monkey-patch threading. When gevent is available, we use gevent-compatible
-# locks and greenlets instead of standard threading primitives.
-try:
-    import gevent.lock
-    import gevent
-    GEVENT_AVAILABLE = True
-    print("ℹ️ Using gevent-compatible locks for server threading")
-except ImportError:
-    import threading
-    GEVENT_AVAILABLE = False
-    print("ℹ️ Using standard threading locks")
+# ── SIMPLE COMPATIBILITY ──────────────────────────────────────────────────
+# Simplified approach - remove complex gevent/threading compatibility
+# Just use standard threading since gevent monkey patching handles the rest
+import threading
+import time
 
-def create_thread(target, daemon=True):
-    """Create a thread using gevent or threading based on availability
-    
-    When gevent is available, creates a greenlet (cooperative threading).
-    Otherwise, creates a standard preemptive thread.
-    """
-    if GEVENT_AVAILABLE:
-        # Use gevent's greenlet spawning instead of threads
-        greenlet = gevent.spawn(target)
-        return greenlet
-    else:
-        # Use standard threading
-        thread = threading.Thread(target=target, daemon=daemon)
-        return thread
+# Simple thread creation function
+def create_simple_thread(target, daemon=True):
+    """Create a simple thread - let gevent monkey patching handle compatibility"""
+    thread = threading.Thread(target=target, daemon=daemon)
+    return thread
 
 # Try to import hardware libraries
 try:
@@ -621,17 +604,12 @@ class ADCSController:
             deadband=DEFAULT_DEADBAND     # Deadband (±degrees)
         )
         
-        # Shared data and threading
+        # Shared data with simple synchronization - no complex locks needed
+        # Data sharing will be simple and atomic operations
         self.data_thread = None
         self.control_thread = None
         self.stop_data_thread = False
         self.stop_control_thread = False
-        
-        # Use gevent-compatible locks if available, otherwise standard threading
-        if GEVENT_AVAILABLE:
-            self.data_lock = gevent.lock.RLock()
-        else:
-            self.data_lock = threading.RLock()
             
         self.last_reading_time = time.time()
         
@@ -678,10 +656,8 @@ class ADCSController:
     def start_data_thread(self):
         """Start high-speed data acquisition thread"""
         self.stop_data_thread = False
-        self.data_thread = create_thread(target=self._data_thread_worker)
-        if hasattr(self.data_thread, 'start'):  # threading.Thread
-            self.data_thread.start()
-        # For gevent, spawn already starts the greenlet
+        self.data_thread = create_simple_thread(target=self._data_thread_worker)
+        self.data_thread.start()
         # print(f"🚀 Data acquisition started at {LOG_FREQUENCY}Hz")  # Commented out to reduce spam
     
     def _data_thread_worker(self):
@@ -697,29 +673,25 @@ class ADCSController:
                     # Read all sensors
                     new_data = self.read_all_sensors()
                     
-                    # Thread-safe update
-                    with self.data_lock:
-                        self.current_data.update(new_data)
-                        self.last_reading_time = current_time
-                        # Store yaw history for timestamp matching
-                        self.yaw_history.append((current_time, new_data['mpu']['yaw']))
+                    # Thread-safe update (simplified - no locks needed for atomic updates)
+                    self.current_data.update(new_data)
+                    self.last_reading_time = current_time
+                    # Store yaw history for timestamp matching
+                    self.yaw_history.append((current_time, new_data['mpu']['yaw']))
                     
                     next_read_time += interval
                     
                 except Exception as e:
                     print(f"Error in data thread: {e}")
-                    with self.data_lock:
-                        self.current_data['status'] = 'Error'
+                    self.current_data['status'] = 'Error'
             
             time.sleep(0.001)  # 1ms sleep
     
     def start_control_thread(self):
         """Start high-speed control thread"""
         self.stop_control_thread = False
-        self.control_thread = create_thread(target=self._control_thread_worker)
-        if hasattr(self.control_thread, 'start'):  # threading.Thread
-            self.control_thread.start()
-        # For gevent, spawn already starts the greenlet
+        self.control_thread = create_simple_thread(target=self._control_thread_worker)
+        self.control_thread.start()
         # print(f"🎮 Control thread started at 50Hz")  # Commented out to reduce spam
 
     def _control_thread_worker(self):
@@ -731,9 +703,8 @@ class ADCSController:
         while not self.stop_control_thread:
             current_time = time.time()
             
-            # Fix: Make manual_control_active access thread-safe
-            with self.data_lock:
-                manual_active = self.manual_control_active
+            # Fix: Make manual_control_active access thread-safe (simplified)
+            manual_active = self.manual_control_active
             
             if manual_active:
                 time.sleep(0.05) # Sleep briefly to prevent busy-waiting
@@ -741,10 +712,9 @@ class ADCSController:
             
             if current_time >= next_control_time:
                 try:
-                    # Get current sensor data
-                    with self.data_lock:
-                        current_yaw = self.current_data['mpu']['yaw']
-                        gyro_rate = self.current_data['mpu']['gyro_rate_z']
+                    # Get current sensor data (simplified)
+                    current_yaw = self.current_data['mpu']['yaw']
+                    gyro_rate = self.current_data['mpu']['gyro_rate_z']
                     
                     # Calculate time step
                     dt = current_time - last_time
@@ -753,15 +723,14 @@ class ADCSController:
                     # Update PWM PD controller
                     motor_power, error, pd_output = self.pd_controller.update(current_yaw, gyro_rate, dt)
                     
-                    # Update shared data
-                    with self.data_lock:
-                        self.current_data['controller'].update({
-                            'enabled': self.pd_controller.controller_enabled,
-                            'target_yaw': self.pd_controller.target_yaw,
-                            'error': error,
-                            'motor_power': motor_power,
-                            'pd_output': pd_output
-                        })
+                    # Update shared data (simplified)
+                    self.current_data['controller'].update({
+                        'enabled': self.pd_controller.controller_enabled,
+                        'target_yaw': self.pd_controller.target_yaw,
+                        'error': error,
+                        'motor_power': motor_power,
+                        'pd_output': pd_output
+                    })
                     
                     next_control_time += interval
                     
@@ -824,9 +793,8 @@ class ADCSController:
         return data
     
     def get_current_data(self):
-        """Get current sensor data (thread-safe)"""
-        with self.data_lock:
-            return self.current_data.copy(), self.last_reading_time
+        """Get current sensor data (simplified - no locks needed)"""
+        return self.current_data.copy(), self.last_reading_time
     
     def get_adcs_data_for_server(self):
         """Format data for server ADCS broadcast"""
@@ -929,8 +897,7 @@ class ADCSController:
             if yaw_rate_offset is None:
                 return {"status": "error", "message": "No yaw rate offset provided"}
             offset = float(yaw_rate_offset)
-            with self.data_lock:
-                self.mpu_sensor.set_manual_calibration(offset)
+            self.mpu_sensor.set_manual_calibration(offset)
             # print(f"[MANUAL CAL] Gyro Z rate offset set to {offset:.3f} deg/s (type: manual)")  # Commented out to reduce spam
             return {"status": "success", "message": f"Manual calibration set: {offset:.3f} deg/s (overrides auto calibration)"}
         except Exception as e:
@@ -955,8 +922,7 @@ class ADCSController:
                 self.stop_auto_zero_env()
             
             # Stop manual control
-            with self.data_lock:
-                self.manual_control_active = False
+            self.manual_control_active = False
             
             # Stop motor
             stop_motor()
@@ -1033,8 +999,7 @@ class ADCSController:
                 self.pd_controller.stop_controller()  # Just pause PD controller
                 
                 # Set manual control flag thread-safely
-                with self.data_lock:
-                    self.manual_control_active = True
+                self.manual_control_active = True
 
                 if direction == "CW":
                     rotate_clockwise()
@@ -1056,8 +1021,7 @@ class ADCSController:
                 self.stop_auto_zero_env()
             
             # Set manual control flag thread-safely
-            with self.data_lock:
-                self.manual_control_active = True
+            self.manual_control_active = True
 
             if direction == "CW":
                 rotate_clockwise()
@@ -1077,8 +1041,7 @@ class ADCSController:
         """Stop manual motor control - special handling for AprilTag mode"""
         try:
             # Set manual control flag thread-safely
-            with self.data_lock:
-                self.manual_control_active = False
+            self.manual_control_active = False
             
             stop_motor()
             
@@ -1115,9 +1078,8 @@ class ADCSController:
                 return {"status": "error", "message": "MPU6050 sensor not ready"}
             
             # Check if manual control is active
-            with self.data_lock:
-                if self.manual_control_active:
-                    return {"status": "error", "message": "Cannot start auto control - manual control is active. Stop manual control first."}
+            if self.manual_control_active:
+                return {"status": "error", "message": "Cannot start auto control - manual control is active. Stop manual control first."}
             
             self.pd_controller.start_controller()
             # print(f"▶️ {mode} mode started with PWM PD controller")  # Commented out to reduce spam
@@ -1197,10 +1159,9 @@ class ADCSController:
         5. Enter continuous mode: update sun reference to 0° on new peaks.
         """
         # Check if manual control is active
-        with self.data_lock:
-            if self.manual_control_active:
-                print("[AUTO ZERO ENV] Cannot start - manual control is active. Stop manual control first.")
-                return {"status": "error", "message": "Cannot start Environmental mode - manual control is active"}
+        if self.manual_control_active:
+            print("[AUTO ZERO ENV] Cannot start - manual control is active. Stop manual control first.")
+            return {"status": "error", "message": "Cannot start Environmental mode - manual control is active"}
         
         print("[AUTO ZERO ENV] Starting environmental auto-zeroing routine...")
         self.auto_zero_env_enabled = True
@@ -1218,8 +1179,7 @@ class ADCSController:
         # 2. Wait until stationary (yaw rate < 1 deg/s for 2 seconds)
         stationary_time = 0
         while stationary_time < 2.0:
-            with self.data_lock:
-                gyro_rate = abs(self.current_data['mpu']['gyro_rate_z'])
+            gyro_rate = abs(self.current_data['mpu']['gyro_rate_z'])
             if gyro_rate < 1.0:
                 stationary_time += 0.1
             else:
@@ -1234,9 +1194,8 @@ class ADCSController:
         peak_log = []
 
         while yaw_wraps < 2:
-            with self.data_lock:
-                yaw = self.current_data['mpu']['yaw']
-                lux = self.current_data['lux'].copy()
+            yaw = self.current_data['mpu']['yaw']
+            lux = self.current_data['lux'].copy()
             # Set PD target to always be 30° ahead of current yaw
             self.pd_controller.set_target(yaw + 30)  # No wrapping needed
 
@@ -1279,9 +1238,8 @@ class ADCSController:
 
         def continuous_env_loop():
             while self.auto_zero_env_enabled:
-                with self.data_lock:
-                    yaw = self.current_data['mpu']['yaw']
-                    lux = self.current_data['lux'].copy()
+                yaw = self.current_data['mpu']['yaw']
+                lux = self.current_data['lux'].copy()
                 for ch in [1, 2, 3]:
                     win = self.lux_peak_windows[ch]
                     win.append(lux[ch])
@@ -1299,10 +1257,8 @@ class ADCSController:
                                 print(f"[AUTO ZERO ENV] [LIVE] Peak Lux{ch} {win[1]:.1f} at yaw {yaw:.1f}°, offset set to {offset:.1f}°")
                 time.sleep(0.05)
 
-        env_thread = create_thread(target=continuous_env_loop)
-        if hasattr(env_thread, 'start'):  # threading.Thread
-            env_thread.start()
-        # For gevent, spawn already starts the greenlet
+        env_thread = create_simple_thread(target=continuous_env_loop)
+        env_thread.start()
         print("[AUTO ZERO ENV] You may now point to any target. Sun reference will update on new peaks.")
         return {"status": "success", "message": "Environmental mode started"}
     
@@ -1321,9 +1277,8 @@ class ADCSController:
             return
 
         # Get current lux and yaw data (thread-safe)
-        with self.data_lock:
-            lux_data = self.current_data['lux'].copy()
-            mpu_yaw = self.current_data['mpu']['yaw']
+        lux_data = self.current_data['lux'].copy()
+        mpu_yaw = self.current_data['mpu']['yaw']
 
         for ch in [1, 2, 3]:
             win = self.lux_peak_windows[ch]
@@ -1518,8 +1473,7 @@ class ADCSController:
                 self.stop_auto_zero_env()
             
             # Stop manual control
-            with self.data_lock:
-                self.manual_control_active = False
+            self.manual_control_active = False
             
             # Stop motor
             stop_motor()
