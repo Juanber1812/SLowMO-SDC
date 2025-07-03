@@ -5873,3 +5873,27 @@ You can exit environmental mode at any time by switching back to Raw or AprilTag
 2025-07-02 23:22:18,259 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751494933.2466047 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000002EEA5C2EBA0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
 2025-07-02 23:22:56,458 - INFO - [INFO] Closing application...
 2025-07-02 23:22:56,472 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-03 10:33:24,963 - INFO - [INFO] Attempting to connect to http://192.168.1.146:5000
+2025-07-03 10:33:29,806 - INFO - Attempting to reconnect to http://192.168.1.146:5000...
+2025-07-03 10:33:29,974 - INFO - [ERROR] Failed to connect to server: HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751535204.9668765 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000002541D36ABA0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-03 10:33:34,823 - ERROR - Reconnect failed: ConnectionError - HTTPConnectionPool(host='192.168.1.146', port=5000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1751535209.8078496 (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000002543DAB51D0>, 'Connection to 192.168.1.146 timed out. (connect timeout=5)'))
+2025-07-03 10:34:01,348 - INFO - [INFO] Closing application...
+2025-07-03 10:34:01,354 - INFO - [DEBUG] Cleanup error during closeEvent: / is not a connected namespace.
+2025-07-03 10:34:29,652 - INFO - [INFO] Attempting to connect to http://192.168.139.89:5000
+2025-07-03 10:34:30,550 - INFO - Connected to server
+2025-07-03 10:34:30,553 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-03 10:34:30,557 - INFO - [INFO] Successfully connected to server
+2025-07-03 10:34:41,372 - INFO - Disconnected from server: client disconnect
+2025-07-03 10:34:41,398 - INFO - Attempting to reconnect to http://192.168.139.89:5000...
+2025-07-03 10:34:41,586 - INFO - Connected to server
+2025-07-03 10:34:41,588 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-03 10:35:04,369 - INFO - Disconnected from server: transport error
+2025-07-03 10:35:23,008 - INFO - Connected to server
+2025-07-03 10:35:23,013 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-03 10:35:42,894 - INFO - Disconnected from server: transport error
+2025-07-03 10:35:44,069 - INFO - Connected to server
+2025-07-03 10:35:44,072 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
+2025-07-03 10:35:44,073 - INFO - Stream paused for config application.
+2025-07-03 10:35:44,218 - INFO - Disconnected from server: transport error
+2025-07-03 10:35:44,887 - INFO - Connected to server
+2025-07-03 10:35:44,889 - INFO - Apply config pressed. Initiating 0.5s pause for stream and graph before sending config.
