@@ -9,7 +9,8 @@ from datetime import datetime
 SERVER_URL = "http://localhost:5000"
 LIDAR_ADDR = 0x62
 ACQ_COMMAND = 0x00
-DISTANCE_HIGH = 0x0f
+STATUS_REG = 0x01
+DISTANCE_HIGH = 0x11
 DISTANCE_LOW = 0x10
 MEASURE = 0x04
 
@@ -41,14 +42,42 @@ def on_lidar_update(_):
         print(f"[ERROR] lidar_update handler: {e}")
 
 def read_distance(bus):
-    try:
-        bus.write_byte_data(LIDAR_ADDR, ACQ_COMMAND, MEASURE)
-        time.sleep(0.01)
-        high = bus.read_byte_data(LIDAR_ADDR, DISTANCE_HIGH)
-        low = bus.read_byte_data(LIDAR_ADDR, DISTANCE_LOW)
-        return (high << 8) + low
-    except Exception as e:
-        return None
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            # 1) Trigger measurement
+            bus.write_byte_data(LIDAR_ADDR, ACQ_COMMAND, MEASURE)
+            
+            # 2) Wait for measurement to complete (with timeout)
+            timeout = 100  # 100 iterations max
+            while timeout > 0:
+                status = bus.read_byte_data(LIDAR_ADDR, STATUS_REG)
+                if not (status & 0x01):  # Bit 0 clear means ready
+                    break
+                time.sleep(0.005)
+                timeout -= 1
+            
+            if timeout == 0:
+                raise OSError("Measurement timeout")
+            
+            # 3) Read distance
+            low = bus.read_byte_data(LIDAR_ADDR, DISTANCE_LOW)
+            high = bus.read_byte_data(LIDAR_ADDR, DISTANCE_HIGH)
+            distance = (high << 8) | low
+            
+            # Validate reading (LiDAR-Lite v4 range is typically 5-4000 cm)
+            if 5 <= distance <= 4000:
+                return distance
+            else:
+                raise OSError(f"Invalid distance reading: {distance}")
+                
+        except OSError as e:
+            if attempt == max_retries - 1:  # Last attempt
+                print(f"❌ LIDAR read error (attempt {attempt + 1}): {e}")
+                return None
+            time.sleep(0.1)  # Wait before retry
+    
+    return None
 
 class LidarController:
     def __init__(self):
@@ -101,6 +130,9 @@ class LidarController:
         
     def _collection_loop(self):
         """Main data collection loop"""
+        consecutive_errors = 0
+        max_consecutive_errors = 5
+        
         try:
             with SMBus(1) as bus:
                 while self.is_collecting:
@@ -109,6 +141,13 @@ class LidarController:
                     if distance is not None:
                         sio.emit("lidar_data", {"distance_cm": distance})
                         self.data_count += 1
+                        consecutive_errors = 0  # Reset error counter on successful read
+                    else:
+                        consecutive_errors += 1
+                        if consecutive_errors >= max_consecutive_errors:
+                            print(f"❌ Too many consecutive LIDAR errors ({consecutive_errors}), stopping collection")
+                            self.is_collecting = False
+                            break
                     
                     # Send status update every second
                     current_time = time.time()
@@ -162,39 +201,3 @@ lidar_controller = LidarController()
 def start_lidar():
     """Legacy function for backward compatibility - just connects to server"""
     lidar_controller.connect_to_server()
-
-if __name__ == "__main__":
-    print("🚀 Starting LIDAR module in standalone mode...")
-    print(f"📡 Connecting to server at {SERVER_URL}")
-    
-    try:
-        # Connect to server
-        lidar_controller.connect_to_server()
-        
-        if lidar_controller.connected:
-            print("✅ Connected to server successfully")
-            
-            # Start data collection
-            print("🔄 Starting LIDAR data collection...")
-            lidar_controller.start_collection()
-            
-            print("📊 LIDAR is now collecting data at 20Hz")
-            print("Press Ctrl+C to stop...")
-            
-            # Keep the program running
-            try:
-                while True:
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                print("\n🛑 Stopping LIDAR collection...")
-                lidar_controller.stop_collection()
-                print("✅ LIDAR stopped successfully")
-                
-        else:
-            print("❌ Failed to connect to server")
-            print("Make sure server2.py is running first")
-            
-    except Exception as e:
-        print(f"❌ Error running LIDAR module: {e}")
-    finally:
-        print("👋 LIDAR module shutting down...")
