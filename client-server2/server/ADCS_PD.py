@@ -22,6 +22,36 @@ import os
 from collections import deque
 import datetime
 
+# ── GEVENT COMPATIBILITY ───────────────────────────────────────────────
+# Handle gevent/threading compatibility for server environments
+# This prevents conflicts when running under gevent-based servers (like Flask-SocketIO)
+# which monkey-patch threading. When gevent is available, we use gevent-compatible
+# locks and greenlets instead of standard threading primitives.
+try:
+    import gevent.lock
+    import gevent
+    GEVENT_AVAILABLE = True
+    print("ℹ️ Using gevent-compatible locks for server threading")
+except ImportError:
+    import threading
+    GEVENT_AVAILABLE = False
+    print("ℹ️ Using standard threading locks")
+
+def create_thread(target, daemon=True):
+    """Create a thread using gevent or threading based on availability
+    
+    When gevent is available, creates a greenlet (cooperative threading).
+    Otherwise, creates a standard preemptive thread.
+    """
+    if GEVENT_AVAILABLE:
+        # Use gevent's greenlet spawning instead of threads
+        greenlet = gevent.spawn(target)
+        return greenlet
+    else:
+        # Use standard threading
+        thread = threading.Thread(target=target, daemon=daemon)
+        return thread
+
 # Try to import hardware libraries
 try:
     import RPi.GPIO as GPIO
@@ -596,7 +626,13 @@ class ADCSController:
         self.control_thread = None
         self.stop_data_thread = False
         self.stop_control_thread = False
-        self.data_lock = threading.Lock()
+        
+        # Use gevent-compatible locks if available, otherwise standard threading
+        if GEVENT_AVAILABLE:
+            self.data_lock = gevent.lock.RLock()
+        else:
+            self.data_lock = threading.RLock()
+            
         self.last_reading_time = time.time()
         
         # Current sensor data (shared between threads)
@@ -642,8 +678,10 @@ class ADCSController:
     def start_data_thread(self):
         """Start high-speed data acquisition thread"""
         self.stop_data_thread = False
-        self.data_thread = threading.Thread(target=self._data_thread_worker, daemon=True)
-        self.data_thread.start()
+        self.data_thread = create_thread(target=self._data_thread_worker)
+        if hasattr(self.data_thread, 'start'):  # threading.Thread
+            self.data_thread.start()
+        # For gevent, spawn already starts the greenlet
         # print(f"🚀 Data acquisition started at {LOG_FREQUENCY}Hz")  # Commented out to reduce spam
     
     def _data_thread_worker(self):
@@ -678,8 +716,10 @@ class ADCSController:
     def start_control_thread(self):
         """Start high-speed control thread"""
         self.stop_control_thread = False
-        self.control_thread = threading.Thread(target=self._control_thread_worker, daemon=True)
-        self.control_thread.start()
+        self.control_thread = create_thread(target=self._control_thread_worker)
+        if hasattr(self.control_thread, 'start'):  # threading.Thread
+            self.control_thread.start()
+        # For gevent, spawn already starts the greenlet
         # print(f"🎮 Control thread started at 50Hz")  # Commented out to reduce spam
 
     def _control_thread_worker(self):
@@ -1132,9 +1172,16 @@ class ADCSController:
         self.stop_control_thread = True
         
         if self.data_thread:
-            self.data_thread.join(timeout=1.0)
+            if hasattr(self.data_thread, 'join'):  # threading.Thread
+                self.data_thread.join(timeout=1.0)
+            elif hasattr(self.data_thread, 'kill'):  # gevent.Greenlet
+                self.data_thread.kill()
+                
         if self.control_thread:
-            self.control_thread.join(timeout=1.0)
+            if hasattr(self.control_thread, 'join'):  # threading.Thread
+                self.control_thread.join(timeout=1.0)
+            elif hasattr(self.control_thread, 'kill'):  # gevent.Greenlet
+                self.control_thread.kill()
         
         # Cleanup motor control
         cleanup_motor_control()
@@ -1252,7 +1299,10 @@ class ADCSController:
                                 print(f"[AUTO ZERO ENV] [LIVE] Peak Lux{ch} {win[1]:.1f} at yaw {yaw:.1f}°, offset set to {offset:.1f}°")
                 time.sleep(0.05)
 
-        threading.Thread(target=continuous_env_loop, daemon=True).start()
+        env_thread = create_thread(target=continuous_env_loop)
+        if hasattr(env_thread, 'start'):  # threading.Thread
+            env_thread.start()
+        # For gevent, spawn already starts the greenlet
         print("[AUTO ZERO ENV] You may now point to any target. Sun reference will update on new peaks.")
         return {"status": "success", "message": "Environmental mode started"}
     
