@@ -5,6 +5,8 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import pyqtSignal, Qt
 import logging
+import threading
+import time
 
 # --- THEME AND STYLE CONFIGURATION ---
 
@@ -23,7 +25,6 @@ try:
             border: 2px solid {BUTTON_COLOR};
             border-radius: {BORDER_RADIUS}px;
             padding: 6px 12px;
-            min-height: 24px;
             font-size: {FONT_SIZE_NORMAL}pt;
             font-family: {FONT_FAMILY};
         }}
@@ -93,7 +94,7 @@ class ADCSSection(QGroupBox):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ADCSSection")
-        self.setFixedSize(850,240)
+        self.setFixedSize(850,220)
         self.current_auto_mode = "adcs" # Default auto mode
         # Apply groupbox style to self
         if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
@@ -180,7 +181,7 @@ class ADCSSection(QGroupBox):
         self.calibrate_btn = QPushButton("Calibrate Sensors")
         self.calibrate_btn.setStyleSheet(ADCS_BUTTON_STYLE)
         self.calibrate_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.calibrate_btn.setMinimumHeight(int(0.8 * 24))
+        self.calibrate_btn.setMinimumHeight(int(0.5 * 24))
         layout.addWidget(self.calibrate_btn)
 
         # --- Manual Calibrate Yaw ---
@@ -192,7 +193,7 @@ class ADCSSection(QGroupBox):
         self.manual_cal_btn = QPushButton("Manual Calibrate Yaw")
         self.manual_cal_btn.setStyleSheet(ADCS_BUTTON_STYLE)
         self.manual_cal_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.manual_cal_btn.setMinimumHeight(int(0.8 * 24))
+        self.manual_cal_btn.setMinimumHeight(int(0.5 * 24))
         manual_cal_layout.addWidget(self.manual_cal_btn)
         layout.addLayout(manual_cal_layout)
         # --- End Manual Calibrate Yaw ---
@@ -270,7 +271,7 @@ class ADCSSection(QGroupBox):
         self.manual_cw_btn.released.connect(lambda: self._handle_action_clicked("adcs", "manual_stop"))
         self.manual_ccw_btn.pressed.connect(lambda: self._handle_action_clicked("adcs", "manual_counterclockwise_start"))
         self.manual_ccw_btn.released.connect(lambda: self._handle_action_clicked("adcs", "manual_stop"))
-        self.calibrate_btn.clicked.connect(lambda: self._handle_action_clicked("adcs", "calibrate"))
+        self.calibrate_btn.clicked.connect(self._handle_calibrate_with_countdown)
         self.manual_cal_btn.clicked.connect(self._handle_manual_cal_clicked)
 
         # Auto controls
@@ -279,10 +280,19 @@ class ADCSSection(QGroupBox):
         self.set_value_btn.clicked.connect(self._handle_set_value_clicked)
         self.set_pd_btn.clicked.connect(self._handle_set_pd_clicked)
 
+    def _handle_calibrate_with_countdown(self):
+        logging.info("Calibrating: 10s")
+        def countdown():
+            for i in range(10, 0, -1):
+                logging.info(f"{i}s")
+                time.sleep(1)
+            logging.info("Calibrating...")
+            self._handle_action_clicked("adcs", "calibrate")
+        threading.Thread(target=countdown, daemon=True).start()
+
     def _update_current_auto_mode(self, mode_name):
         prev_mode = getattr(self, "current_auto_mode", "adcs")
         self.current_auto_mode = mode_name
-        logging.info(f"[ADCSSection] Auto mode set to: {mode_name}")
 
         # Stop auto zero if switching away from AprilTag or Environmental
         if prev_mode == "AprilTag" and mode_name != "AprilTag":
@@ -299,9 +309,11 @@ class ADCSSection(QGroupBox):
     def _handle_run_controller_clicked(self):
         if self.run_controller_btn.isChecked():
             self.run_controller_btn.setText("Stop Controller")
+            logging.info("Controller started")
             self._handle_action_clicked(self.current_auto_mode, "start")
         else:
             self.run_controller_btn.setText("Start Controller")
+            logging.info("Controller stopped")
             self._handle_action_clicked(self.current_auto_mode, "stop")
 
     def _handle_set_pd_clicked(self):
@@ -312,18 +324,21 @@ class ADCSSection(QGroupBox):
                 "deadband": float(self.deadband_input.text()),
                 "min_pulse": float(self.min_pulse_input.text())
             }
+            logging.info("PD values set")
             self._handle_action_clicked(self.current_auto_mode, "set_pd_values", pd_values)
         except ValueError:
-            logging.warning("Invalid PD values entered.")
+            logging.warning("Invalid PD values")
 
     def _handle_set_value_clicked(self):
         try:
             value = float(self.value_input.text())
+            logging.info(f"Target {value}° sent")
             self._handle_action_clicked(self.current_auto_mode, "set_value", value)
         except ValueError:
-            logging.warning(f"Invalid target value: {self.value_input.text()}")
+            logging.warning("Invalid target value")
 
     def _handle_set_zero_clicked(self):
+        logging.info("Yaw zeroed")
         self._handle_action_clicked(self.current_auto_mode, "set_zero")
 
     def _handle_action_clicked(self, mode, command, value=None):
@@ -340,25 +355,25 @@ class ADCSSection(QGroupBox):
             self.min_pulse_input.setText(str(controller_data.get('min_pulse', '')))
 
     def _handle_env_mode_selected(self):
-        self._update_current_auto_mode("adcs")  # Keep mode as adcs
+        logging.info("Environmental mode: 2 rotations, sun tracking after. Exit: switch mode.")
+        self._update_current_auto_mode("adcs")
         self._handle_action_clicked("adcs", "auto_zero_lux")
-        # Disable only set_zero_btn, enable set_value_btn
         self.set_zero_btn.setDisabled(True)
         self.set_value_btn.setDisabled(False)
         self.run_controller_btn.setDisabled(True)
 
     def _handle_apriltag_mode_selected(self):
-        self._update_current_auto_mode("adcs")  # Keep mode as adcs
+        logging.info("AprilTag mode")
+        self._update_current_auto_mode("adcs")
         self._handle_action_clicked("adcs", "auto_zero_tag")
-        # Disable both set_zero_btn and set_value_btn
         self.set_zero_btn.setDisabled(True)
         self.set_value_btn.setDisabled(True)
         self.run_controller_btn.setDisabled(False)
 
-
     def _handle_manual_cal_clicked(self):
         try:
             value = float(self.manual_cal_input.text())
+            logging.info(f"Manual cal {value}°")
             self._handle_action_clicked("adcs", "manual_cal", value)
         except ValueError:
-            logging.warning(f"Invalid manual cal value: {self.manual_cal_input.text()}")
+            logging.warning("Invalid manual cal value")

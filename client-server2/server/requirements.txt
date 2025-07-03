@@ -1,152 +1,307 @@
 # ================================================================
-# SERVER-SIDE REQUIREMENTS FOR SLowMO-SDC PROJECT
+# SLowMO-SDC SERVER REQUIREMENTS & RASPBERRY PI SETUP GUIDE
 # ================================================================
-# Complete dependency list for all server-side Python modules
-# Install with: pip install -r requirements.txt
+# Complete dependency list and installation instructions for the SLowMO-SDC
+# (Satellite Low-Motion Spacecraft Dynamics Control) server system
 # 
-# Project: SLowMO-SDC (Satellite Low-Motion Spacecraft Dynamics Control)
+# Project: SLowMO-SDC - Attitude Determination and Control System
 # Location: client-server2/server/
-# Generated: 2025-06-28
+# Updated: July 2, 2025
+# ================================================================
+
+# ================================================================
+# STEP 1: SYSTEM PREPARATION (RUN AS ROOT/SUDO)
+# ================================================================
+
+# Update Raspberry Pi OS and install system packages:
+# sudo apt update && sudo apt upgrade -y
+# sudo apt install -y python3-pip python3-dev python3-venv build-essential
+# sudo apt install -y i2c-tools python3-smbus git
+# sudo apt install -y libcamera-dev python3-picamera2
+# sudo apt install -y libatlas-base-dev libopenblas-dev  # For numpy/scipy
+# sudo apt install -y libhdf5-dev libhdf5-serial-dev    # For data logging
+# sudo apt install -y libxml2-dev libxslt1-dev          # For web parsing
+# sudo apt install -y libjpeg-dev zlib1g-dev            # For image processing
+
+# ================================================================
+# STEP 2: ENABLE HARDWARE INTERFACES
+# ================================================================
+
+# Enable required interfaces via raspi-config:
+# sudo raspi-config
+# Navigate to:
+# - Interface Options > I2C > Enable
+# - Interface Options > SPI > Enable  
+# - Interface Options > Camera > Enable
+# - Interface Options > 1-Wire > Enable
+
+# Verify I2C is working:
+# sudo i2cdetect -y 1
+# (Should show connected devices at addresses like 0x40, 0x68, 0x70, etc.)
+
+# For 1-Wire temperature sensors, add to /boot/config.txt:
+# dtoverlay=w1-gpio,gpiopin=4
+
+# Reboot after enabling interfaces:
+# sudo reboot
+
+# ================================================================
+# STEP 3: CREATE VIRTUAL ENVIRONMENT
+# ================================================================
+
+# Create and activate a virtual environment:
+# python3 -m venv slowmo_venv
+# source slowmo_venv/bin/activate
+
+# To activate in future sessions:
+# source ~/slowmo_venv/bin/activate
+
+# ================================================================
+# STEP 4: PYTHON PACKAGE REQUIREMENTS
 # ================================================================
 
 # ── CORE WEB SERVER & COMMUNICATION ─────────────────────────────
-flask>=2.3.0                    # Main web server framework
+flask>=2.3.0                    # Main web server framework (server2.py)
 flask-socketio>=5.3.0           # Real-time bidirectional communication
-gevent>=23.0.0                  # Async server backend
-python-socketio>=5.8.0          # Socket.IO client for inter-service communication
-speedtest-cli>=2.1.3            # Internet speed testing
-psutil>=5.9.0                   # System and process monitoring
+gevent>=23.0.0                  # Async server backend for Flask-SocketIO
+python-socketio>=5.8.0          # Socket.IO client for camera.py, lidar.py, sensors.py
 
 # ── RASPBERRY PI HARDWARE INTERFACES ───────────────────────────
-RPi.GPIO>=0.7.1                 # GPIO control for motor, sensors, pins
-smbus>=1.1                      # I2C communication (legacy)
-smbus2>=0.4.0                   # Modern I2C communication for LiDAR, MPU
-picamera2>=0.3.0                # Raspberry Pi Camera Module interface
+RPi.GPIO>=0.7.1                 # GPIO control for ADCS motor control, PWM
+smbus2>=0.4.0                   # I2C communication for LiDAR, MPU6050
 
-# ── ADAFRUIT SENSOR LIBRARIES ──────────────────────────────────
-adafruit-circuitpython-veml7700>=1.1.0    # Light sensor (environmental calibration)
+# ── CAMERA SYSTEM ──────────────────────────────────────────────
+picamera2>=0.3.15               # Raspberry Pi Camera Module interface
+opencv-python>=4.8.0            # Image processing, JPEG encoding
+numpy>=1.24.0                   # Numerical arrays for image/sensor data
+
+# ── ADAFRUIT SENSOR ECOSYSTEM ──────────────────────────────────
+adafruit-circuitpython-veml7700>=1.1.0    # Light sensors for ADCS (3x via multiplexer)
 adafruit-circuitpython-busdevice>=5.2.0   # I2C/SPI device base classes
-adafruit-circuitpython-tca9548a>=0.6.0    # I2C multiplexer
-adafruit-blinka>=8.20.0                   # CircuitPython compatibility layer
-adafruit-ina228>=1.0.0                    # Power monitoring sensor
+adafruit-blinka>=8.20.0                   # CircuitPython compatibility layer (includes board, busio)
+adafruit-circuitpython-ina228>=1.0.0      # Power monitoring sensor (INA228)
 
 # ── TEMPERATURE MONITORING ─────────────────────────────────────
-w1thermsensor>=2.0.0            # 1-Wire temperature sensors (DS18B20)
+w1thermsensor>=2.0.0            # DS18B20 1-Wire temperature sensors
 
-# ── COMPUTER VISION & IMAGE PROCESSING ─────────────────────────
-opencv-python>=4.8.0            # Camera streaming, image capture, processing
-numpy>=1.24.0                   # Numerical computing, sensor data processing
-
-# ── DATA PROCESSING & ANALYSIS ─────────────────────────────────
-pandas>=2.0.0                   # Data manipulation and CSV logging
-scipy>=1.10.0                   # Scientific computing, signal processing
-matplotlib>=3.7.0               # Data visualization and plotting
+# ── DATA PROCESSING & CONTROL ALGORITHMS ──────────────────────
+scipy>=1.10.0                   # Signal processing for ADCS control
+matplotlib>=3.7.0               # Data visualization (optional, for debugging)
+pandas>=2.0.0                   # CSV data logging for power monitoring
 
 # ── SYSTEM MONITORING ──────────────────────────────────────────
-psutil>=5.9.0                   # System resource monitoring (CPU, memory)
+psutil>=5.9.0                   # CPU, memory, system monitoring (sensors.py)
 
-# ── PYTHON STANDARD LIBRARY EXTENSIONS ────────────────────────
-# These are typically included with Python but listed for completeness
+# ── COMMUNICATION MONITORING ───────────────────────────────────
+speedtest-cli>=2.1.3            # Network speed testing (communication.py)
+
+# ── PYTHON COMPATIBILITY ──────────────────────────────────────
 typing-extensions>=4.0.0        # Enhanced type hints for older Python versions
 
-# ── DEVELOPMENT & TESTING TOOLS ────────────────────────────────
-# Uncomment for development/debugging
-# pytest>=7.0.0                 # Unit testing framework
-# black>=23.0.0                 # Code formatting
-# flake8>=6.0.0                 # Code linting
+# ── ADDITIONAL STANDARD LIBRARY DEPENDENCIES ──────────────────
+# Note: These are typically included with Python but listed for completeness
+# time, threading, logging, os, csv, json, subprocess, platform, math, datetime
+# collections, multiprocessing - all built-in Python modules
 
 # ================================================================
-# HARDWARE-SPECIFIC NOTES
+# STEP 5: INSTALLATION COMMANDS
 # ================================================================
+
+# With virtual environment activated, install Python packages:
+# pip install --upgrade pip setuptools wheel
+# pip install -r requirements.txt
+
+# For some packages that might need system-level installation:
+# sudo apt install -y python3-numpy python3-opencv  # Fallback if pip fails
+
+# ================================================================
+# STEP 6: HARDWARE VERIFICATION
+# ================================================================
+
+# Test core imports:
+# python3 -c "import cv2, numpy, flask, socketio; print('✅ Core packages OK')"
+
+# Test Raspberry Pi specific imports:
+# python3 -c "import RPi.GPIO, picamera2; print('✅ RPi hardware packages OK')"
+
+# Test Adafruit sensor imports:
+# python3 -c "import board, adafruit_veml7700; print('✅ Adafruit packages OK')"
+
+# Check I2C devices:
+# sudo i2cdetect -y 1
+# Expected devices:
+# - 0x40: INA228 power monitor
+# - 0x62: LiDAR sensor  
+# - 0x68: MPU6050 IMU
+# - 0x70: TCA9548A I2C multiplexer
+
+# Test camera:
+# libcamera-hello --list-cameras
+# rpicam-hello -t 5000  # 5 second preview
+
+# Test 1-Wire temperature:
+# ls /sys/bus/w1/devices/
+# cat /sys/bus/w1/devices/28-*/w1_slave
+
+# ================================================================
+# STEP 7: RUNNING THE SERVER
+# ================================================================
+
+# Start all server components (run from server directory):
+# cd /path/to/SLowMO-SDC/client-server2/server
+
+# Option 1: Start main server (runs most components)
+# python3 server2.py
+
+# Option 2: Start individual components in separate terminals
+# Terminal 1: python3 server2.py
+# Terminal 2: python3 camera.py  
+# Terminal 3: python3 lidar.py
+# Terminal 4: python3 sensors.py
+
+# The server will run on http://localhost:5000
+# Connect from client system to http://[PI_IP]:5000
+
+# ================================================================
+# STEP 8: AUTO-START SETUP (OPTIONAL)
+# ================================================================
+
+# Create systemd service for auto-start on boot:
+# sudo nano /etc/systemd/system/slowmo-server.service
+
+# [Unit]
+# Description=SLowMO-SDC Server
+# After=network.target
 # 
-# 1. RASPBERRY PI REQUIREMENTS:
-#    - Raspberry Pi OS (Bullseye or newer recommended)
-#    - Python 3.9+ (comes with Raspberry Pi OS)
-#    - Enable I2C, SPI, Camera in raspi-config
-#    - Enable 1-Wire interface for temperature sensors
-#
-# 2. CONNECTED HARDWARE:
-#    - Raspberry Pi Camera Module (v2 or v3)
-#    - MPU-6050 6-axis IMU (accelerometer + gyroscope)
-#    - VEML7700 light sensor
-#    - TCA9548A I2C multiplexer
-#    - INA228 power monitoring sensor
-#    - DS18B20 temperature sensors (1-Wire)
-#    - LiDAR sensor (I2C interface)
-#    - Stepper/DC motor drivers
-#    - Various GPIO-connected components
-#
-# 3. SYSTEM SERVICES:
-#    - MPU calibration and data logging
-#    - Camera streaming and image capture
-#    - Motor control and tachometer
-#    - Environmental sensor monitoring
-#    - Power consumption tracking
-#    - ADCS (Attitude Determination and Control System)
-#
-# 4. FILE SYSTEM REQUIREMENTS:
-#    - Write access for log files, calibration data
-#    - Camera image storage directory
-#    - Configuration file storage
-#
+# [Service]
+# Type=simple
+# User=pi
+# WorkingDirectory=/home/pi/SLowMO-SDC/client-server2/server
+# Environment=PATH=/home/pi/slowmo_venv/bin
+# ExecStart=/home/pi/slowmo_venv/bin/python server2.py
+# Restart=always
+# 
+# [Install]
+# WantedBy=multi-user.target
+
+# Enable and start service:
+# sudo systemctl daemon-reload
+# sudo systemctl enable slowmo-server.service
+# sudo systemctl start slowmo-server.service
+
 # ================================================================
-# INSTALLATION INSTRUCTIONS
+# TROUBLESHOOTING
 # ================================================================
-#
-# 1. Update system packages:
-#    sudo apt update && sudo apt upgrade -y
-#
-# 2. Install system dependencies:
-#    sudo apt install -y python3-pip python3-dev build-essential
-#    sudo apt install -y i2c-tools python3-smbus
-#    sudo apt install -y libcamera-dev python3-picamera2
-#
-# 3. Install Python requirements:
-#    pip install -r requirements.txt
-#
-# 4. Enable hardware interfaces:
-#    sudo raspi-config
-#    # Enable: I2C, SPI, Camera, 1-Wire
-#
-# 5. Verify installations:
-#    python3 -c "import cv2, numpy, flask, RPi.GPIO; print('✅ Core imports successful')"
-#    i2cdetect -y 1  # Should show connected I2C devices
-#
+
+# Common issues and solutions:
+
+# 1. Permission denied for GPIO/I2C:
+# sudo usermod -a -G gpio,i2c,spi pi
+# sudo reboot
+
+# 2. Camera not detected:
+# sudo raspi-config  # Re-enable camera
+# vcgencmd get_camera  # Should show supported=1 detected=1
+
+# 3. I2C device not found:
+# sudo i2cdetect -y 1  # Check if device appears
+# Check wiring and power connections
+
+# 4. Import errors for CircuitPython:
+# sudo pip3 install adafruit-blinka --upgrade
+# Check that /boot/config.txt has proper device tree overlays
+
+# 5. Permission denied for 1-Wire:
+# sudo modprobe w1-gpio
+# sudo modprobe w1-therm
+# Check /boot/config.txt for: dtoverlay=w1-gpio
+
+# 6. Flask-SocketIO issues:
+# Ensure gevent is installed and working
+# Check firewall settings: sudo ufw allow 5000
+
 # ================================================================
-# MODULE-SPECIFIC REQUIREMENTS
+# MODULE BREAKDOWN BY FILE
 # ================================================================
-#
-# ┌─ server2.py (Main Server) ────────────────────────────────────
-# │ • flask, flask-socketio, gevent
-# │ • threading (built-in)
-# │ • Imports: camera, sensors, lidar modules
-# ├─ camera.py (Camera Streaming) ───────────────────────────────
-# │ • picamera2, opencv-python
-# │ • python-socketio, gevent
-# ├─ sensors.py (System Monitoring) ─────────────────────────────
-# │ • psutil, python-socketio
-# │ • Temperature reading from /sys/class/thermal/
-# ├─ lidar.py (Distance Measurement) ────────────────────────────
-# │ • smbus2, python-socketio
-# ├─ mpu.py (IMU Data & Calibration) ────────────────────────────
-# │ • numpy, smbus, RPi.GPIO
-# │ • Advanced 6-axis sensor calibration
-# ├─ power.py (Power Monitoring) ────────────────────────────────
-# │ • adafruit-ina228, adafruit-blinka
-# │ • CSV logging, datetime
-# ├─ temperature.py (Temperature Sensors) ───────────────────────
-# │ • w1thermsensor (DS18B20 support)
-# ├─ tachometer.py (Motor Speed) ─────────────────────────────────
-# │ • RPi.GPIO (interrupt-based RPM measurement)
-# ├─ motor_test.py (Motor Control) ───────────────────────────────
-# │ • RPi.GPIO (PWM motor control)
-# ├─ adcs_*.py (Attitude Control System) ────────────────────────
-# │ • adafruit-circuitpython-veml7700
-# │ • adafruit-circuitpython-tca9548a
-# │ • numpy, scipy, matplotlib
-# │ • Complex sensor fusion and control algorithms
-# └─ pd_bangbang.py (Control Algorithm) ─────────────────────────
-#   • RPi.GPIO, threading
-#   • PD controller implementation
-#
+
+# server2.py (Main Server):
+#   - Flask, Flask-SocketIO, gevent
+#   - Imports and coordinates all other modules
+#   - Handles client connections and routing
+
+# camera.py (Camera Streaming):
+#   - picamera2: Raspberry Pi camera interface
+#   - opencv-python: Image processing and JPEG encoding
+#   - python-socketio: Communication with main server
+
+# sensors.py (System Monitoring): 
+#   - psutil: CPU, memory, temperature monitoring
+#   - python-socketio: Data transmission to clients
+
+# lidar.py (Distance Measurement):
+#   - smbus2: I2C communication with LiDAR sensor
+#   - python-socketio: Real-time distance data streaming
+
+# power.py (Power Monitoring):
+#   - adafruit-circuitpython-ina228: INA228 power sensor
+#   - adafruit-blinka: CircuitPython compatibility
+#   - pandas: CSV data logging
+#   - numpy: Battery percentage calculations
+
+# temperature.py (Temperature Monitoring):
+#   - w1thermsensor: DS18B20 1-Wire temperature sensors
+#   - multiprocessing: Non-blocking sensor reads
+
+# communication.py (Network Monitoring):
+#   - psutil: Network interface monitoring
+#   - subprocess: Network commands (ping, etc.)
+#   - speedtest-cli: Bandwidth testing
+
+# ADCS_PD.py / ADCS_PID.py (Attitude Control):
+#   - RPi.GPIO: Motor control via PWM
+#   - smbus2: MPU6050 IMU communication
+#   - adafruit-veml7700: Light sensors via I2C multiplexer
+#   - adafruit-tca9548a: I2C multiplexer control
+#   - numpy, scipy: Control algorithms and sensor fusion
+#   - threading: Real-time control loops
+
+# ================================================================
+# HARDWARE ADDRESSES & CONNECTIONS
+# ================================================================
+
+# I2C Device Map:
+# 0x40 - INA228 Power Monitor
+# 0x62 - LiDAR Distance Sensor
+# 0x68 - MPU6050 6-axis IMU
+# 0x70 - TCA9548A I2C Multiplexer
+#   └─ Channel 1: VEML7700 Light Sensor #1
+#   └─ Channel 2: VEML7700 Light Sensor #2  
+#   └─ Channel 3: VEML7700 Light Sensor #3
+
+# GPIO Pin Map:
+# Pin 13 (GPIO 27) - Motor Control CW (PWM)
+# Pin 19 (GPIO 10) - Motor Control CCW (PWM)
+# Pin 26 (GPIO 7)  - Motor Driver Sleep/Enable
+# Pin 4  (GPIO 4)  - 1-Wire Temperature (DS18B20)
+
+# SPI: Camera interface (automatic)
+# I2C: Sensors (GPIO 2/3 - SDA/SCL)
+
+# ================================================================
+# COMPLETE IMPORT ANALYSIS BY FILE
+# ================================================================
+
+# Based on actual code analysis, here are ALL the imports used:
+
+# Standard Library (built-in Python modules):
+# time, threading, logging, os, csv, json, subprocess, platform, math
+# datetime, collections (deque), multiprocessing, typing
+
+# Third-party packages that need installation:
+# flask, flask-socketio, gevent, python-socketio, psutil, speedtest-cli
+# opencv-python, numpy, scipy, pandas, matplotlib
+# picamera2, RPi.GPIO, smbus2, w1thermsensor
+# board, busio (from adafruit-blinka)
+# adafruit_veml7700, adafruit_ina228
+
 # ================================================================

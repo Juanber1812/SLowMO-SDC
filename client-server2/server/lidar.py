@@ -162,3 +162,39 @@ lidar_controller = LidarController()
 def start_lidar():
     """Legacy function for backward compatibility - just connects to server"""
     lidar_controller.connect_to_server()
+
+if __name__ == "__main__":
+    print("🚀 Starting LIDAR module in standalone mode...")
+    print(f"📡 Connecting to server at {SERVER_URL}")
+    
+    try:
+        # Connect to server
+        lidar_controller.connect_to_server()
+        
+        if lidar_controller.connected:
+            print("✅ Connected to server successfully")
+            
+            # Start data collection
+            print("🔄 Starting LIDAR data collection...")
+            lidar_controller.start_collection()
+            
+            print("📊 LIDAR is now collecting data at 20Hz")
+            print("Press Ctrl+C to stop...")
+            
+            # Keep the program running
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("\n🛑 Stopping LIDAR collection...")
+                lidar_controller.stop_collection()
+                print("✅ LIDAR stopped successfully")
+                
+        else:
+            print("❌ Failed to connect to server")
+            print("Make sure server2.py is running first")
+            
+    except Exception as e:
+        print(f"❌ Error running LIDAR module: {e}")
+    finally:
+        print("👋 LIDAR module shutting down...")

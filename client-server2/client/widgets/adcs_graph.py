@@ -13,7 +13,7 @@ from theme import (
 )
 
 class YawGraphWidget(QWidget):
-    def __init__(self, parent=None, width=400, height=180, window_seconds=10):
+    def __init__(self, parent=None, width=400, height=160, window_seconds=10):
         super().__init__(parent)
         self.setFixedSize(width, height)
         self.window_seconds = window_seconds
