@@ -1318,10 +1318,7 @@ class MainWindow(QWidget):
                     if hasattr(self, 'yaw_graph'):
                         target_yaw = self.adcs_control_widget.get_target_yaw() if hasattr(self.adcs_control_widget, 'get_target_yaw') else 0.0
                         current_yaw = data.get('angle_z', 0.0)
-                        lux1 = data.get('lux1', 0.0)
-                        lux2 = data.get('lux2', 0.0)
-                        lux3 = data.get('lux3', 0.0)
-                        self.yaw_graph.push_data(target_yaw, current_yaw, lux1, lux2, lux3)
+                        self.yaw_graph.push_data(target_yaw, current_yaw)
 
                 # Forward complete ADCS data to ADCS widget for detailed display
                 if hasattr(self, 'adcs_control_widget') and self.adcs_control_widget:

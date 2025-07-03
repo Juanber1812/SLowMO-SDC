@@ -304,7 +304,7 @@ class ADCSSection(QGroupBox):
         if mode_name == "adcs":
             self.set_zero_btn.setDisabled(False)
             self.set_value_btn.setDisabled(False)
-            self.run_controller_btn.setDisabled(True)
+            self.run_controller_btn.setDisabled(False)
 
     def _handle_run_controller_clicked(self):
         if self.run_controller_btn.isChecked():
