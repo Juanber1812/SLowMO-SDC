@@ -116,11 +116,11 @@ def set_motor_power(power):
 
 def rotate_clockwise():
     """Rotate motor clockwise (full power) - for manual control"""
-    set_motor_power(50)
+    set_motor_power(100)
 
 def rotate_counterclockwise():
     """Rotate motor counterclockwise (full power) - for manual control"""
-    set_motor_power(-50)
+    set_motor_power(-100)
 
 def stop_motor():
     """Stop motor (no power)"""
