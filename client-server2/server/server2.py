@@ -9,6 +9,8 @@ import lidar
 import threading
 import logging
 import time
+import os
+import base64
 
 # Import power monitoring
 try:
