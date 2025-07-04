@@ -281,11 +281,25 @@ def handle_download_image(data):
 
 # ===================== OTHER LIVE DATA UPDATES SECTION =====================
 
+# Global flag to prevent multiple background task initialization
+background_tasks_started = False
+
 def start_background_tasks():
     """Start background tasks with a delay to ensure server is ready"""
+    global background_tasks_started
+    
+    if background_tasks_started:
+        print("[INFO] Background tasks already started, skipping...")
+        return
+    
     def delayed_start():
+        global background_tasks_started
         time.sleep(2)  # Give the server time to start
         print("\n[INFO] Starting background tasks...")
+        
+        # Mark as started to prevent multiple initialization
+        background_tasks_started = True
+        
         threading.Thread(target=camera.start_stream, daemon=True).start()
         threading.Thread(target=sensors.start_sensors, daemon=True).start()
         threading.Thread(target=lidar.start_lidar, daemon=True).start()
@@ -306,6 +320,10 @@ def start_background_tasks():
         if TEMPERATURE_AVAILABLE or ADCS_AVAILABLE:  # Start if we have any temperature source
             start_thermal_broadcast()
             logging.info("Thermal data broadcasting started")
+        
+        # Start thread monitoring
+        start_thread_monitor()
+        logging.info("Thread monitoring started")
         
         # Do NOT start communication monitoring here; start on client connect
     # Start the delayed initialization in a separate thread
@@ -337,6 +355,8 @@ def handle_connect():
                 logging.info("Communication monitoring started (on client connect)")
             else:
                 logging.error("Failed to start communication monitoring (on client connect)")
+        elif communication_monitor and communication_monitor.is_monitoring:
+            print("[DEBUG] Communication monitoring already running, skipping start")
         
         print(f"[DEBUG] Client {request.sid} connection setup completed successfully")
     except Exception as e:
@@ -668,8 +688,15 @@ def adcs_data_broadcast():
 
 def start_adcs_broadcast():
     """Start ADCS data broadcasting at 20Hz"""
+    global adcs_broadcast_thread
+    
     if not adcs_controller:
         print("[DEBUG] ADCS controller not available, skipping broadcast setup")
+        return
+    
+    # Check if thread is already running
+    if adcs_broadcast_thread and adcs_broadcast_thread.is_alive():
+        print("[DEBUG] ADCS broadcast thread already running, skipping...")
         return
     
     def adcs_broadcast_loop():
@@ -710,7 +737,8 @@ def start_adcs_broadcast():
         
         print("[DEBUG] ADCS broadcast loop exited")
     
-    threading.Thread(target=adcs_broadcast_loop, daemon=True).start()
+    adcs_broadcast_thread = threading.Thread(target=adcs_broadcast_loop, daemon=True)
+    adcs_broadcast_thread.start()
     print("[DEBUG] ADCS data broadcasting thread started at 20Hz")
     logging.info("ADCS data broadcasting started at 20Hz")
 
@@ -718,6 +746,10 @@ def start_adcs_broadcast():
 latest_battery_temp = None
 latest_pi_temp = None
 latest_payload_temp = None
+
+# Thread tracking variables
+adcs_broadcast_thread = None
+thermal_broadcast_thread = None
 
 def determine_thermal_status(battery_temp, pi_temp, payload_temp):
     """Determine overall thermal status based on temperature thresholds"""
@@ -798,7 +830,15 @@ def thermal_data_broadcast():
 
 def start_thermal_broadcast():
     """Start thermal data broadcasting at 2Hz"""
+    global thermal_broadcast_thread
+    
+    # Check if thread is already running
+    if thermal_broadcast_thread and thermal_broadcast_thread.is_alive():
+        print("[DEBUG] Thermal broadcast thread already running, skipping...")
+        return
+    
     def thermal_broadcast_loop():
+        print("[DEBUG] Thermal broadcast loop started")
         while True:
             try:
                 thermal_data_broadcast()
@@ -807,7 +847,9 @@ def start_thermal_broadcast():
                 logging.error(f"Error in thermal broadcast loop: {e}")
                 time.sleep(1)  # Wait 1 second on error before retrying
     
-    threading.Thread(target=thermal_broadcast_loop, daemon=True).start()
+    thermal_broadcast_thread = threading.Thread(target=thermal_broadcast_loop, daemon=True)
+    thermal_broadcast_thread.start()
+    print("[DEBUG] Thermal data broadcasting thread started at 2Hz")
     logging.info("Thermal data broadcasting started at 2Hz")
 
 @socketio.on('latency_response')
@@ -892,6 +934,92 @@ def handle_request_lidar_update():
     except Exception as e:
         print(f"[ERROR] request_lidar_update: {e}")
 
+# ===================== THREAD MONITORING AND CLEANUP =====================
+
+def get_thread_info():
+    """Get information about currently running threads"""
+    threads = threading.enumerate()
+    thread_info = []
+    
+    for thread in threads:
+        thread_info.append({
+            'name': thread.name,
+            'daemon': thread.daemon,
+            'alive': thread.is_alive(),
+            'ident': thread.ident
+        })
+    
+    return {
+        'count': len(threads),
+        'threads': thread_info
+    }
+
+def log_thread_status():
+    """Log current thread status for debugging"""
+    info = get_thread_info()
+    thread_names = [t['name'] for t in info['threads']]
+    print(f"[THREAD DEBUG] Active threads: {info['count']}")
+    print(f"[THREAD DEBUG] Thread names: {thread_names}")
+    
+    # Count threads by type
+    daemon_count = sum(1 for t in info['threads'] if t['daemon'])
+    non_daemon_count = info['count'] - daemon_count
+    
+    print(f"[THREAD DEBUG] Daemon threads: {daemon_count}, Non-daemon: {non_daemon_count}")
+    
+    if info['count'] > 25:  # Warning threshold
+        print(f"[THREAD WARNING] High thread count detected: {info['count']}")
+        return True
+    return False
+
+def cleanup_dead_threads():
+    """Attempt to clean up any dead thread references"""
+    global adcs_broadcast_thread, thermal_broadcast_thread
+    
+    if adcs_broadcast_thread and not adcs_broadcast_thread.is_alive():
+        print("[THREAD DEBUG] Cleaning up dead ADCS broadcast thread")
+        adcs_broadcast_thread = None
+    
+    if thermal_broadcast_thread and not thermal_broadcast_thread.is_alive():
+        print("[THREAD DEBUG] Cleaning up dead thermal broadcast thread")
+        thermal_broadcast_thread = None
+
+def start_thread_monitor():
+    """Start periodic thread monitoring"""
+    def thread_monitor_loop():
+        print("[DEBUG] Thread monitoring started")
+        while True:
+            try:
+                time.sleep(60)  # Check every minute
+                cleanup_dead_threads()
+                high_count = log_thread_status()
+                
+                # If thread count is very high, log more detailed info
+                if high_count:
+                    info = get_thread_info()
+                    print("[THREAD DEBUG] Detailed thread info:")
+                    for i, thread in enumerate(info['threads'][:10]):  # Show first 10
+                        print(f"  {i+1}. {thread['name']} (daemon={thread['daemon']}, alive={thread['alive']})")
+                    if len(info['threads']) > 10:
+                        print(f"  ... and {len(info['threads']) - 10} more threads")
+                
+            except Exception as e:
+                print(f"[ERROR] Thread monitor error: {e}")
+                time.sleep(5)
+    
+    thread_monitor_thread = threading.Thread(target=thread_monitor_loop, daemon=True)
+    thread_monitor_thread.start()
+    print("[DEBUG] Thread monitoring thread started")
+
+# ===================== END THREAD MONITORING =====================
+
+# Default error handler for SocketIO
+@socketio.on_error_default
+def default_error_handler(e):
+    """Handle SocketIO errors gracefully"""
+    print(f"[ERROR] SocketIO error: {e}")
+    return False  # Don't propagate the error
+
 if __name__ == "__main__":
     print("🚀 Server starting at http://0.0.0.0:5000")
     print("Background tasks will start after server initialization.")
@@ -903,8 +1031,12 @@ if __name__ == "__main__":
     print(f"[DEBUG] Communication monitoring available: {COMMUNICATION_AVAILABLE}")
     print(f"[DEBUG] ADCS controller available: {ADCS_AVAILABLE}")
     
+    # Log initial thread count
+    log_thread_status()
+    
     # Start background tasks with delay
     start_background_tasks()
+    start_thread_monitor()
     
     try:
         print("[DEBUG] Starting SocketIO server...")
