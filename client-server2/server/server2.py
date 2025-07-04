@@ -1,28 +1,6 @@
 # server2.py
-# 🎯 OPTIMIZED FOR ADCS PD CONTROLLER PERFORMANCE 🎯
-# 
-# THREAD PRIORITY STRUCTURE:
-# 🔴 HIGH PRIORITY (separate threads):
-#    - ADCS controller (20Hz) - PD control performance critical
-#    - Camera streaming - real-time video feed
-#    - Lidar collection - kept separate for now
-# 
-# 🟡 LOW PRIORITY (consolidated into 1 thread):
-#    - Thermal monitoring (0.5Hz)
-#    - Power monitoring (callbacks)
-#    - Communication monitoring (callbacks) 
-#    - System sensors (callbacks)
-#
-# This reduces thread count by ~75% while maintaining ADCS performance
 
-# Selective gevent patching - avoid threading conflicts with ADCS
-from gevent import monkey
-# Only patch socket and select, not threading or time
-# Patch early to avoid conflicts with other modules
-monkey.patch_socket()
-monkey.patch_select()
-# Do NOT patch threading - this would conflict with ADCS_PD.py
-
+from gevent import monkey; monkey.patch_all()
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
 import camera
@@ -31,8 +9,6 @@ import lidar
 import threading
 import logging
 import time
-import os
-import base64
 
 # Import power monitoring
 try:
@@ -71,15 +47,7 @@ except ImportError as e:
     ADCS_AVAILABLE = False
 
 app = Flask(__name__)
-# OPTIMIZED FOR ADCS PERFORMANCE - Use threading mode with minimal SocketIO overhead
-socketio = SocketIO(
-    app, 
-    cors_allowed_origins="*", 
-    async_mode='threading',
-    logger=False,  # Reduce logging overhead for ADCS performance
-    engineio_logger=False,  # Reduce logging overhead for ADCS performance
-    max_http_buffer_size=16384  # Reduce buffer size to save memory for ADCS
-)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Camera state is now managed entirely by camera.py via camera_info events
 # No need for server-side state tracking
@@ -98,16 +66,7 @@ if COMMUNICATION_AVAILABLE:
 # Initialize ADCS controller
 adcs_controller = None
 if ADCS_AVAILABLE:
-    try:
-        print("[DEBUG] Initializing ADCS controller...")
-        adcs_controller = ADCSController()
-        # Give the ADCS controller a moment to initialize properly
-        time.sleep(0.5)
-        print("[DEBUG] ADCS controller initialized successfully")
-    except Exception as e:
-        print(f"[ERROR] Failed to initialize ADCS controller: {e}")
-        adcs_controller = None
-        ADCS_AVAILABLE = False
+    adcs_controller = ADCSController()
 
 def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
@@ -131,20 +90,11 @@ def handle_scanning_mode_data(data):
 @socketio.on('frame')
 def handle_frame(data):
     try:
-        # Check if we have connected clients before broadcasting
-        if len(connected_clients) == 0:
-            return
-            
         emit('frame', data, broadcast=True)
         # Note: Frame data no longer tracked for communication monitoring
         # as true channel throughput is now measured via dedicated tests
     except Exception as e:
         print(f"[ERROR] frame broadcast: {e}")
-        print(f"[DEBUG] Connected clients during frame error: {len(connected_clients)}")
-        print(f"[DEBUG] Frame data type: {type(data)}")
-        print(f"[DEBUG] Frame data size: {len(data) if hasattr(data, '__len__') else 'N/A'}")
-        import traceback
-        traceback.print_exc()
 
 @socketio.on('start_camera')
 def handle_start_camera():
@@ -304,25 +254,11 @@ def handle_download_image(data):
 
 # ===================== OTHER LIVE DATA UPDATES SECTION =====================
 
-# Global flag to prevent multiple background task initialization
-background_tasks_started = False
-
 def start_background_tasks():
     """Start background tasks with a delay to ensure server is ready"""
-    global background_tasks_started
-    
-    if background_tasks_started:
-        print("[INFO] Background tasks already started, skipping...")
-        return
-    
     def delayed_start():
-        global background_tasks_started
         time.sleep(2)  # Give the server time to start
         print("\n[INFO] Starting background tasks...")
-        
-        # Mark as started to prevent multiple initialization
-        background_tasks_started = True
-        
         threading.Thread(target=camera.start_stream, daemon=True).start()
         threading.Thread(target=sensors.start_sensors, daemon=True).start()
         threading.Thread(target=lidar.start_lidar, daemon=True).start()
@@ -334,19 +270,15 @@ def start_background_tasks():
             else:
                 logging.error("Failed to start power monitoring")
         
-        # Start ADCS data broadcasting - HIGH PRIORITY (keep separate thread)
+        # Start ADCS data broadcasting
         if adcs_controller:
             start_adcs_broadcast()
             logging.info("ADCS controller initialized and broadcasting started")
         
-        # Start consolidated monitoring - LOW PRIORITY (single thread for efficiency)
-        if TEMPERATURE_AVAILABLE or ADCS_AVAILABLE or power_monitor or communication_monitor:
-            start_consolidated_monitoring()
-            logging.info("Consolidated monitoring started (thermal + power + comms + sensors)")
-        
-        # Start thread monitoring - MINIMAL OVERHEAD
-        start_thread_monitor()
-        logging.info("Thread monitoring started")
+        # Start thermal data broadcasting
+        if TEMPERATURE_AVAILABLE or ADCS_AVAILABLE:  # Start if we have any temperature source
+            start_thermal_broadcast()
+            logging.info("Thermal data broadcasting started")
         
         # Do NOT start communication monitoring here; start on client connect
     # Start the delayed initialization in a separate thread
@@ -355,83 +287,36 @@ def start_background_tasks():
 
 @socketio.on('connect')
 def handle_connect():
-    try:
-        client_ip = request.environ.get('REMOTE_ADDR', 'unknown')
-        user_agent = request.headers.get('User-Agent', 'unknown')
-        print(f"[DEBUG] Client connecting from {client_ip} with SID: {request.sid}")
-        print(f"[DEBUG] User-Agent: {user_agent}")
-        
-        print(f"[INFO] Client connected: {request.sid}")
-        connected_clients.add(request.sid)
-        print(f"[DEBUG] Total connected clients: {len(connected_clients)}")
-        
-        # Log thread count after client connection
-        info = get_thread_info()
-        print(f"[THREAD DEBUG] Thread count after client connect: {info['count']}")
-        
-        # Request current status from camera and lidar subsystems
-        emit('camera_update', {}, broadcast=True)
-        emit('lidar_update', {}, broadcast=True)
-        print("[INFO] Status update requests sent to camera and lidar subsystems")
-        
-        # Start communication monitoring if not already running
-        if communication_monitor and not communication_monitor.is_monitoring:
-            thread_count_before = get_thread_info()['count']
-            communication_monitor.set_update_callback(communication_data_callback)
-            communication_monitor.set_throughput_test_callback(throughput_test_callback)
-            if communication_monitor.start_monitoring():
-                logging.info("Communication monitoring started (on client connect)")
-                thread_count_after = get_thread_info()['count']
-                print(f"[THREAD DEBUG] Communication monitor threads: {thread_count_before} -> {thread_count_after}")
-            else:
-                logging.error("Failed to start communication monitoring (on client connect)")
-        elif communication_monitor and communication_monitor.is_monitoring:
-            print("[DEBUG] Communication monitoring already running, skipping start")
-        
-        print(f"[DEBUG] Client {request.sid} connection setup completed successfully")
-        
-        # Check for thread growth trends
-        check_thread_trend()
-    except Exception as e:
-        print(f"[ERROR] Exception during client connect: {e}")
-        import traceback
-        traceback.print_exc()
+    print(f"[INFO] Client connected: {request.sid}")
+    connected_clients.add(request.sid)
+    
+    # Request current status from camera and lidar subsystems
+    emit('camera_update', {}, broadcast=True)
+    emit('lidar_update', {}, broadcast=True)
+    print("[INFO] Status update requests sent to camera and lidar subsystems")
+    
+    # Start communication monitoring if not already running
+    if communication_monitor and not communication_monitor.is_monitoring:
+        communication_monitor.set_update_callback(communication_data_callback)
+        communication_monitor.set_throughput_test_callback(throughput_test_callback)
+        if communication_monitor.start_monitoring():
+            logging.info("Communication monitoring started (on client connect)")
+        else:
+            logging.error("Failed to start communication monitoring (on client connect)")
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    try:
-        disconnect_reason = request.args.get('reason', 'unknown')
-        client_ip = request.environ.get('REMOTE_ADDR', 'unknown')
-        
-        print(f"[DEBUG] Client disconnecting: {request.sid}")
-        print(f"[DEBUG] Disconnect reason: {disconnect_reason}")
-        print(f"[DEBUG] Client IP: {client_ip}")
-        print(f"[DEBUG] Clients before removal: {len(connected_clients)}")
-        
-        print(f"[INFO] Client disconnected: {request.sid}")
-        connected_clients.discard(request.sid)
-        
-        print(f"[DEBUG] Clients after removal: {len(connected_clients)}")
-        print(f"[DEBUG] Remaining client SIDs: {list(connected_clients)}")
-        
-        # Stop communication monitoring if no clients remain
-        if communication_monitor and len(connected_clients) == 0:
-            print("[DEBUG] No clients remaining, stopping communication monitoring")
-            communication_monitor.stop_monitoring()
-            logging.info("Communication monitoring stopped (no clients connected)")
-        
-        print(f"[DEBUG] Client {request.sid} disconnect handling completed")
-    except Exception as e:
-        print(f"[ERROR] Exception during client disconnect: {e}")
-        import traceback
-        traceback.print_exc()
+    print(f"[INFO] Client disconnected: {request.sid}")
+    connected_clients.discard(request.sid)
+    # Stop communication monitoring if no clients remain
+    if communication_monitor and len(connected_clients) == 0:
+        communication_monitor.stop_monitoring()
+        logging.info("Communication monitoring stopped (no clients connected)")
 
 @socketio.on("adcs_command")
 def handle_adcs_command(data):
     try:
         print(f"[SERVER] Received ADCS command: {data}")
-        print(f"[DEBUG] Current connected clients: {len(connected_clients)}")
-        print(f"[DEBUG] ADCS controller available: {adcs_controller is not None}")
         
         if not adcs_controller:
             print("[ERROR] ADCS controller not available")
@@ -443,38 +328,25 @@ def handle_adcs_command(data):
         command = data.get("command", "unknown")
         value = data.get("value")
         
-        print(f"[DEBUG] Processing ADCS command - Mode: {mode}, Command: {command}, Value: {value}")
-        
         # Use the new ADCS controller command handler
         result = adcs_controller.handle_adcs_command(mode, command, value)
         
-        print(f"[DEBUG] ADCS command result: {result}")
-        
         # Send response back to client
-        response_data = {
+        emit("adcs_command_ack", {
             "status": result.get("status", "error").upper(),
             "message": result.get("message", "Command processed"),
             "mode": mode,
             "command": command
-        }
-        
-        print(f"[DEBUG] Sending ADCS response: {response_data}")
-        emit("adcs_command_ack", response_data, broadcast=True)
+        }, broadcast=True)
         
         print(f"[SERVER] ADCS command result: {result}")
         
     except Exception as e:
         print(f"[ERROR] ADCS command handling: {e}")
-        print(f"[DEBUG] Exception type: {type(e).__name__}")
-        import traceback
-        traceback.print_exc()
-        
-        error_response = {
+        emit("adcs_command_ack", {
             "status": "ERROR", 
             "message": f"Command failed: {str(e)}"
-        }
-        print(f"[DEBUG] Sending error response: {error_response}")
-        emit("adcs_command_ack", error_response, broadcast=True)
+        }, broadcast=True)
 
 @socketio.on("sensor_data")
 def handle_sensor_data(data):
@@ -666,14 +538,6 @@ def adcs_data_broadcast():
         return
     
     try:
-        # Check if we have connected clients before broadcasting
-        if len(connected_clients) == 0:
-            return
-        
-        # Check if ADCS controller is still running
-        if not hasattr(adcs_controller, 'running') or not adcs_controller.running:
-            return
-            
         adcs_data = adcs_controller.get_adcs_data_for_server()
         
         # Extract payload temperature from ADCS data
@@ -697,93 +561,40 @@ def adcs_data_broadcast():
             adcs_data_broadcast.last_log = time.time()
             
     except Exception as e:
-        print(f"[ERROR] Error in ADCS data broadcast: {e}")
-        print(f"[DEBUG] Connected clients: {len(connected_clients)}")
-        print(f"[DEBUG] ADCS controller state: {adcs_controller.running if adcs_controller and hasattr(adcs_controller, 'running') else 'Unknown'}")
-        import traceback
-        traceback.print_exc()
-        
+        logging.error(f"Error in ADCS data broadcast: {e}")
         # Send error state to clients
-        try:
-            if len(connected_clients) > 0:
-                socketio.emit("adcs_broadcast", {
-                    "gyro": "0.0°",
-                    "orientation": "Y:0.0° R:0.0° P:0.0°",
-                    "gyro_rate_x": "0.00", "gyro_rate_y": "0.00", "gyro_rate_z": "0.00",
-                    "angle_x": "0.0", "angle_y": "0.0", "angle_z": "0.0",
-                    "lux1": "0.0", "lux2": "0.0", "lux3": "0.0",
-                    "temperature": "0.0°C",
-                    "rpm": "0.0",
-                    "status": "Error"
-                })
-        except Exception as emit_error:
-            print(f"[ERROR] Failed to emit error state: {emit_error}")
+        socketio.emit("adcs_broadcast", {
+            "gyro": "0.0°",
+            "orientation": "Y:0.0° R:0.0° P:0.0°",
+            "gyro_rate_x": "0.00", "gyro_rate_y": "0.00", "gyro_rate_z": "0.00",
+            "angle_x": "0.0", "angle_y": "0.0", "angle_z": "0.0",
+            "lux1": "0.0", "lux2": "0.0", "lux3": "0.0",
+            "temperature": "0.0°C",
+            "rpm": "0.0",
+            "status": "Error"
+        })
 
 def start_adcs_broadcast():
     """Start ADCS data broadcasting at 20Hz"""
-    global adcs_broadcast_thread
-    
     if not adcs_controller:
-        print("[DEBUG] ADCS controller not available, skipping broadcast setup")
-        return
-    
-    # Check if thread is already running
-    if adcs_broadcast_thread and adcs_broadcast_thread.is_alive():
-        print("[DEBUG] ADCS broadcast thread already running, skipping...")
         return
     
     def adcs_broadcast_loop():
-        print("[DEBUG] ADCS broadcast loop started")
-        loop_count = 0
-        consecutive_errors = 0
-        max_consecutive_errors = 10
-        
         while True:
             try:
-                # Check if ADCS controller is still running
-                if not hasattr(adcs_controller, 'running') or not adcs_controller.running:
-                    print("[INFO] ADCS controller stopped, exiting broadcast loop")
-                    break
-                
                 adcs_data_broadcast()
-                loop_count += 1
-                consecutive_errors = 0  # Reset error counter on success
-                
-                # Print debug info every 200 loops (10 seconds at 20Hz)
-                if loop_count % 200 == 0:
-                    print(f"[DEBUG] ADCS broadcast loop running, count: {loop_count}, clients: {len(connected_clients)}")
-                
                 time.sleep(0.05)  # 20Hz = 50ms interval
-                
             except Exception as e:
-                consecutive_errors += 1
-                print(f"[ERROR] Error in ADCS broadcast loop (error #{consecutive_errors}): {e}")
-                
-                # If too many consecutive errors, exit the loop
-                if consecutive_errors >= max_consecutive_errors:
-                    print(f"[ERROR] Too many consecutive errors ({consecutive_errors}), stopping ADCS broadcast")
-                    break
-                
-                import traceback
-                traceback.print_exc()
+                logging.error(f"Error in ADCS broadcast loop: {e}")
                 time.sleep(1)  # Wait 1 second on error before retrying
-        
-        print("[DEBUG] ADCS broadcast loop exited")
     
-    adcs_broadcast_thread = threading.Thread(target=adcs_broadcast_loop, daemon=True)
-    adcs_broadcast_thread.start()
-    print("[DEBUG] ADCS data broadcasting thread started at 20Hz")
+    threading.Thread(target=adcs_broadcast_loop, daemon=True).start()
     logging.info("ADCS data broadcasting started at 20Hz")
 
 # Global variables to store latest temperature data
 latest_battery_temp = None
 latest_pi_temp = None
 latest_payload_temp = None
-
-# Thread tracking variables - OPTIMIZED FOR ADCS PERFORMANCE
-adcs_broadcast_thread = None  # High priority - keep separate
-consolidated_monitor_thread = None  # Low priority - all monitoring in one thread
-thread_monitor_thread = None
 
 def determine_thermal_status(battery_temp, pi_temp, payload_temp):
     """Determine overall thermal status based on temperature thresholds"""
@@ -862,49 +673,19 @@ def thermal_data_broadcast():
             "status": "Error"
         })
 
-def start_consolidated_monitoring():
-    """Start consolidated monitoring thread for thermal, power, comms, sensors - OPTIMIZED FOR ADCS PERFORMANCE"""
-    global consolidated_monitor_thread
-    
-    # Check if thread is already running
-    if consolidated_monitor_thread and consolidated_monitor_thread.is_alive():
-        print("[DEBUG] Consolidated monitoring thread already running, skipping...")
-        return
-    
-    def consolidated_monitoring_loop():
-        print("[DEBUG] Consolidated monitoring loop started (thermal + power + comms + sensors)")
-        cycle_count = 0
-        
+def start_thermal_broadcast():
+    """Start thermal data broadcasting at 2Hz"""
+    def thermal_broadcast_loop():
         while True:
             try:
-                cycle_count += 1
-                current_time = time.time()
-                
-                # THERMAL DATA - every 4 cycles (2 seconds = 0.5Hz)
-                if cycle_count % 4 == 0:
-                    thermal_data_broadcast()
-                
-                # POWER DATA - handled by power monitor callback, no action needed here
-                
-                # COMMUNICATION DATA - handled by communication monitor callback, no action needed here
-                
-                # SENSOR DATA - handled by sensor data events, no action needed here
-                
-                # Log consolidated status every 60 cycles (30 seconds)
-                if cycle_count % 60 == 0:
-                    print(f"[CONSOLIDATED] Monitoring cycle {cycle_count} - Thermal, Power, Comms, Sensors running")
-                
-                # Sleep for 500ms (2Hz base rate for efficiency)
-                time.sleep(0.5)
-                
+                thermal_data_broadcast()
+                time.sleep(0.5)  # 2Hz = 500ms interval
             except Exception as e:
-                logging.error(f"Error in consolidated monitoring loop: {e}")
+                logging.error(f"Error in thermal broadcast loop: {e}")
                 time.sleep(1)  # Wait 1 second on error before retrying
     
-    consolidated_monitor_thread = threading.Thread(target=consolidated_monitoring_loop, daemon=True)
-    consolidated_monitor_thread.start()
-    print("[DEBUG] Consolidated monitoring thread started at 2Hz base rate")
-    logging.info("Consolidated monitoring started (thermal + power + comms + sensors)")
+    threading.Thread(target=thermal_broadcast_loop, daemon=True).start()
+    logging.info("Thermal data broadcasting started at 2Hz")
 
 @socketio.on('latency_response')
 def handle_latency_response(data):
@@ -988,204 +769,14 @@ def handle_request_lidar_update():
     except Exception as e:
         print(f"[ERROR] request_lidar_update: {e}")
 
-# ===================== THREAD MONITORING AND CLEANUP =====================
-
-def get_thread_info():
-    """Get information about currently running threads"""
-    threads = threading.enumerate()
-    thread_info = []
-    
-    for thread in threads:
-        thread_info.append({
-            'name': thread.name,
-            'daemon': thread.daemon,
-            'alive': thread.is_alive(),
-            'ident': thread.ident
-        })
-    
-    return {
-        'count': len(threads),
-        'threads': thread_info
-    }
-
-def log_thread_status():
-    """Log current thread status for debugging"""
-    info = get_thread_info()
-    thread_names = [t['name'] for t in info['threads']]
-    print(f"[THREAD DEBUG] Active threads: {info['count']}")
-    print(f"[THREAD DEBUG] Thread names: {thread_names}")
-    
-    # Count threads by type
-    daemon_count = sum(1 for t in info['threads'] if t['daemon'])
-    non_daemon_count = info['count'] - daemon_count
-    
-    print(f"[THREAD DEBUG] Daemon threads: {daemon_count}, Non-daemon: {non_daemon_count}")
-    
-    if info['count'] > 25:  # Warning threshold
-        print(f"[THREAD WARNING] High thread count detected: {info['count']}")
-        analyze_thread_growth()  # Show breakdown when high
-        return True
-    return False
-
-def cleanup_dead_threads():
-    """Attempt to clean up any dead thread references - OPTIMIZED"""
-    global adcs_broadcast_thread, consolidated_monitor_thread, thread_monitor_thread
-    
-    if adcs_broadcast_thread and not adcs_broadcast_thread.is_alive():
-        print("[THREAD DEBUG] Cleaning up dead ADCS broadcast thread")
-        adcs_broadcast_thread = None
-    
-    if consolidated_monitor_thread and not consolidated_monitor_thread.is_alive():
-        print("[THREAD DEBUG] Cleaning up dead consolidated monitoring thread")
-        consolidated_monitor_thread = None
-        
-    if thread_monitor_thread and not thread_monitor_thread.is_alive():
-        print("[THREAD DEBUG] Cleaning up dead thread monitor thread")
-        thread_monitor_thread = None
-
-def start_thread_monitor():
-    """Start periodic thread monitoring"""
-    global thread_monitor_thread
-    
-    # Check if thread is already running
-    if thread_monitor_thread and thread_monitor_thread.is_alive():
-        print("[DEBUG] Thread monitor already running, skipping...")
-        return
-    
-    def thread_monitor_loop():
-        print("[DEBUG] Thread monitoring started")
-        while True:
-            try:
-                time.sleep(60)  # Check every minute
-                cleanup_dead_threads()
-                high_count = log_thread_status()
-                
-                # If thread count is very high, log more detailed info
-                if high_count:
-                    analyze_thread_growth()
-                    info = get_thread_info()
-                    print("[THREAD DEBUG] Detailed thread info:")
-                    for i, thread in enumerate(info['threads'][:15]):  # Show first 15
-                        print(f"  {i+1}. {thread['name']} (daemon={thread['daemon']}, alive={thread['alive']})")
-                    if len(info['threads']) > 15:
-                        print(f"  ... and {len(info['threads']) - 15} more threads")
-                
-            except Exception as e:
-                print(f"[ERROR] Thread monitor error: {e}")
-                time.sleep(5)
-    
-    thread_monitor_thread = threading.Thread(target=thread_monitor_loop, daemon=True)
-    thread_monitor_thread.start()
-    print("[DEBUG] Thread monitoring thread started")
-
-# Track thread count trends
-last_thread_analysis = {"time": 0, "count": 0}
-
-def analyze_thread_growth():
-    """Analyze thread growth patterns to identify sources of thread leaks"""
-    info = get_thread_info()
-    thread_types = {}
-    
-    for thread in info['threads']:
-        name = thread['name']
-        # Categorize threads by type - OPTIMIZED FOR ADCS
-        if 'Thread-' in name:
-            if 'data_thread' in name:
-                thread_types['🎯 ADCS Data (HIGH)'] = thread_types.get('🎯 ADCS Data (HIGH)', 0) + 1
-            elif 'control_thread' in name:
-                thread_types['🎯 ADCS Control (HIGH)'] = thread_types.get('🎯 ADCS Control (HIGH)', 0) + 1
-            elif 'adcs_broadcast' in name:
-                thread_types['🎯 ADCS Broadcast (HIGH)'] = thread_types.get('🎯 ADCS Broadcast (HIGH)', 0) + 1
-            elif 'consolidated_monitor' in name:
-                thread_types['📊 Consolidated Monitor (LOW)'] = thread_types.get('📊 Consolidated Monitor (LOW)', 0) + 1
-            elif 'camera' in name or 'stream' in name:
-                thread_types['📷 Camera (HIGH)'] = thread_types.get('📷 Camera (HIGH)', 0) + 1
-            elif 'lidar' in name:
-                thread_types['📡 Lidar (MED)'] = thread_types.get('📡 Lidar (MED)', 0) + 1
-            elif 'socketio' in name.lower():
-                thread_types['🌐 SocketIO'] = thread_types.get('🌐 SocketIO', 0) + 1
-            else:
-                thread_types['⚙️ Generic Worker'] = thread_types.get('⚙️ Generic Worker', 0) + 1
-        elif 'MainThread' in name:
-            thread_types['🏠 Main'] = thread_types.get('🏠 Main', 0) + 1
-        elif 'Dummy' in name:
-            thread_types['💀 Dummy'] = thread_types.get('💀 Dummy', 0) + 1
-        else:
-            thread_types['❓ Other'] = thread_types.get('❓ Other', 0) + 1
-    
-    print(f"[THREAD ANALYSIS] Thread breakdown:")
-    for thread_type, count in thread_types.items():
-        print(f"  {thread_type}: {count}")
-    
-    # Track thread count trends
-    global last_thread_analysis
-    current_time = time.time()
-    if last_thread_analysis["count"] == 0:
-        last_thread_analysis = {"time": current_time, "count": info['count']}
-        return
-    
-    # Calculate time since last analysis
-    time_diff = current_time - last_thread_analysis["time"]
-    thread_diff = info['count'] - last_thread_analysis["count"]
-    
-    # Log significant changes in thread count
-    if abs(thread_diff) > 5:
-        direction = "increased" if thread_diff > 0 else "decreased"
-        print(f"[THREAD TREND] Thread count {direction} by {abs(thread_diff)} (from {last_thread_analysis['count']} to {info['count']}) over {time_diff:.1f} seconds")
-        
-        # Update last analysis time and count
-        last_thread_analysis = {"time": current_time, "count": info['count']}
-
-    return thread_types
-
-def check_thread_trend():
-    """Check for significant thread count changes and log analysis"""
-    global last_thread_analysis
-    
-    current_time = time.time()
-    current_count = get_thread_info()['count']
-    
-    # Check if it's been more than 5 minutes or thread count increased significantly
-    time_diff = current_time - last_thread_analysis["time"]
-    count_diff = current_count - last_thread_analysis["count"]
-    
-    if time_diff > 300 or count_diff >= 5:  # 5 minutes or 5+ new threads
-        if count_diff >= 5:
-            print(f"[THREAD TREND] Thread count increased by {count_diff} ({last_thread_analysis['count']} -> {current_count})")
-            analyze_thread_growth()
-        
-        last_thread_analysis["time"] = current_time
-        last_thread_analysis["count"] = current_count
-
-# ===================== END THREAD MONITORING =====================
-
-# Default error handler for SocketIO
-@socketio.on_error_default
-def default_error_handler(e):
-    """Handle SocketIO errors gracefully"""
-    print(f"[ERROR] SocketIO error: {e}")
-    return False  # Don't propagate the error
-
 if __name__ == "__main__":
     print("🚀 Server starting at http://0.0.0.0:5000")
     print("Background tasks will start after server initialization.")
     print("Press Ctrl+C to stop the server and clean up resources.")
-    
-    # Add debug information about available modules
-    print(f"[DEBUG] Power monitoring available: {POWER_AVAILABLE}")
-    print(f"[DEBUG] Temperature monitoring available: {TEMPERATURE_AVAILABLE}")
-    print(f"[DEBUG] Communication monitoring available: {COMMUNICATION_AVAILABLE}")
-    print(f"[DEBUG] ADCS controller available: {ADCS_AVAILABLE}")
-    
-    # Log initial thread count
-    log_thread_status()
-    
     # Start background tasks with delay
     start_background_tasks()
-    
     try:
-        print("[DEBUG] Starting SocketIO server...")
-        socketio.run(app, host="0.0.0.0", port=5000, debug=False, log_output=True)
+        socketio.run(app, host="0.0.0.0", port=5000)
     except KeyboardInterrupt:
         print("\n[INFO] Shutting down server...")
         try:
