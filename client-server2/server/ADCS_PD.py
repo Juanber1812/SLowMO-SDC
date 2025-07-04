@@ -1307,25 +1307,26 @@ class ADCSController:
         - When a relative angle is received, set MPU yaw to -relative_angle, set PD target to 0.
         - If tag is lost, do nothing (wait for next detection).
         """
-        if not self.auto_zero_tag_enabled:
-            # Silently ignore when disabled to reduce spam
+        # Data is expected to contain only 'relative_angle' (no timestamp).
+        rel_angle = data.get("relative_angle")
+        if rel_angle is None:
+            # Only print once when AprilTag is lost to avoid spam
+            if not hasattr(self, '_apriltag_lost_printed') or not self._apriltag_lost_printed:
+                print("[AUTO ZERO] AprilTag lost (no relative_angle in data)")
+                self._apriltag_lost_printed = True
             return
+        else:
+            self._apriltag_lost_printed = False
         try:
-            rel_angle = data.get("relative_angle")
-            if rel_angle is None:
-                # Only print once when AprilTag is lost to avoid spam
-                if not hasattr(self, '_apriltag_lost_printed') or not self._apriltag_lost_printed:
-                    self._apriltag_lost_printed = True
-                return
-            else:
-                self._apriltag_lost_printed = False
-            # Set MPU yaw to negative of detected tag angle
             desired_mpu_yaw = -float(rel_angle)
             with self.data_lock:
                 self.mpu_sensor.angle_yaw = desired_mpu_yaw
             self.pd_controller.set_target(0.0)
             self.pd_controller.start_controller()
             print(f"[AUTO ZERO] AprilTag: {rel_angle:.1f}° → MPU: {desired_mpu_yaw:.1f}° (PD target 0°)")
+            # Print current yaw for confirmation
+            with self.data_lock:
+                print(f"[AUTO ZERO] MPU yaw is now: {self.mpu_sensor.angle_yaw:.2f}")
         except Exception as e:
             print(f"[AUTO ZERO] Error: {e}")
 

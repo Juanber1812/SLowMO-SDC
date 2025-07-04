@@ -1,54 +1,54 @@
 --- CubeSat Health Check Report ---
 
 Date: 2025-07-04
-Time: 11:11:01 BST
+Time: 22:50:52 BST
 
 
 --- Power Subsystem ---
-Current: 0.459 A
-Voltage: 7.6 V
-Power: 3.48 W
-Energy: 0.02 Wh
-Battery: 61%
+Current: 0.663 A
+Voltage: 7.2 V
+Power: 4.78 W
+Energy: 1.47 Wh
+Battery: 43%
 Status: Nominal
 
 --- Thermal Subsystem ---
-Pi: 36.5°C
-Power PCB: 25.0°C
+Pi: 66.2°C
+Power PCB: 33.3°C
 Battery: N/A
-Payload: 26.5°C
-Status: Nominal
+Payload: 32.0°C
+Status: Warm
 
 --- Communication Subsystem ---
-Downlink Frequency: 2.462 GHz
-Uplink Frequency: 2.450 GHz
-Server Signal: -58 dBm
-Client Signal: -38 dBm
-Data Transmission Rate: 573.3 KB/s
-Latency: -532.3 ms
+Downlink Frequency: 5.180 GHz
+Uplink Frequency: 5.000 GHz
+Server Signal: -69 dBm
+Client Signal: -42 dBm
+Data Transmission Rate: 317.1 KB/s
+Latency: -116.0 ms
 Status: Good
 
 --- ADCS Subsystem ---
-Gyro X: -6.46 °/s
-Gyro Y: -2.08 °/s
-Gyro Z: -9.91 °/s
-Angle X: -70.9 °
-Angle Y: -15.7 °
-Angle Z: -50.2 °
-Lux1: 2097.7 lux
-Lux2: 1123.6 lux
-Lux3: 1146.7 lux
+Gyro X: -0.13 °/s
+Gyro Y: -0.05 °/s
+Gyro Z: 0.42 °/s
+Angle X: 7.1 °
+Angle Y: -80.2 °
+Angle Z: 277.3 °
+Lux1: 12.9 lux
+Lux2: 45.7 lux
+Lux3: 2.0 lux
 Status: Active
 
 --- Payload Subsystem ---
-Camera: Connected
+Camera: Streaming - 27.0 FPS
 Lidar: Connected
 Status: OK
 
 --- Command & Data Handling Subsystem ---
-CPU Usage: 22.4%
-Memory Usage: 32.2%
-Uptime: 0m 16s
+CPU Usage: 33.9%
+Memory Usage: 30.5%
+Uptime: 16m 7s
 Status: Normal
 
 --- Error Log ---

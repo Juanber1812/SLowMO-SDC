@@ -944,6 +944,8 @@ class MainWindow(QWidget):
 
         # Fixed color for all status group labels
         FIXED_LABEL_COLOR = "#B8FFD9"  # Light green, change as desired
+        # Use a single font name for Qt compatibility
+        FONT_FAMILY_QT = "Segoe UI"  # Or another font installed on your system
 
         for name, items in subsystems:
             group = QGroupBox(name)
@@ -954,7 +956,7 @@ class MainWindow(QWidget):
             if name == "Power Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; font-family: {FONT_FAMILY_QT}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                     print(f"[DEBUG] QLabel stylesheet (Power): {style_str}")
                     lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -975,7 +977,7 @@ class MainWindow(QWidget):
             elif name == "Thermal Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; font-family: {FONT_FAMILY_QT}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                     print(f"[DEBUG] QLabel stylesheet (Thermal): {style_str}")
                     lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -994,7 +996,7 @@ class MainWindow(QWidget):
             elif name == "ADCS Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; font-family: {FONT_FAMILY_QT}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                     print(f"[DEBUG] QLabel stylesheet (ADCS): {style_str}")
                     lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -1023,7 +1025,7 @@ class MainWindow(QWidget):
             elif name == "Command & Data Handling Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; font-family: {FONT_FAMILY_QT}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                     print(f"[DEBUG] QLabel stylesheet (CDH): {style_str}")
                     lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -1040,7 +1042,7 @@ class MainWindow(QWidget):
             elif name == "Communication Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; font-family: {FONT_FAMILY_QT}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                     print(f"[DEBUG] QLabel stylesheet (Comms): {style_str}")
                     lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -1062,7 +1064,7 @@ class MainWindow(QWidget):
 
             elif name == "Payload Subsystem":
                 self.payload_camera_label = QLabel("Camera: Checking...")
-                style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; font-family: {FONT_FAMILY_QT}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                 print(f"[DEBUG] QLabel stylesheet (Payload Camera): {style_str}")
                 self.payload_camera_label.setStyleSheet(style_str)
                 self.payload_camera_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -1085,7 +1087,7 @@ class MainWindow(QWidget):
             else:
                 for text in items:
                     lbl = QLabel(text)
-                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; font-family: {FONT_FAMILY_QT}; font-size: {FONT_SIZE_NORMAL}pt; }}"
                     print(f"[DEBUG] QLabel stylesheet (Other): {style_str}")
                     lbl.setStyleSheet(style_str)
                     if name != "Error Log" and name != "Overall Status":
