@@ -207,24 +207,63 @@ class ADCSSection(QGroupBox):
             group.setStyleSheet(ADCS_GROUPBOX_STYLE)
         layout = QGridLayout()
 
+        # Row 0: Target input and current value display
         layout.addWidget(QLabel("Target Angle:"), 0, 0)
         self.value_input = QLineEdit("0.0")
+        self.value_input.setFixedWidth(60)
         layout.addWidget(self.value_input, 0, 1)
-        self.set_value_btn = QPushButton("Set Target")
+        self.set_value_btn = QPushButton("Set")
         self.set_value_btn.setStyleSheet(ADCS_BUTTON_STYLE)
         self.set_value_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.set_value_btn.setFixedWidth(40)
         layout.addWidget(self.set_value_btn, 0, 2)
+        
+        # Current target display
+        layout.addWidget(QLabel("Current:"), 0, 3)
+        self.current_target_label = QLabel("0.0°")
+        # Safe styling for current target label
+        try:
+            if 'TEXT_COLOR' in globals() and 'FONT_FAMILY' in globals() and 'FONT_SIZE_NORMAL' in globals():
+                self.current_target_label.setStyleSheet(f"color: {TEXT_COLOR}; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; font-weight: bold;")
+            else:
+                self.current_target_label.setStyleSheet("color: white; font-size: 10pt; font-weight: bold;")
+        except Exception:
+            self.current_target_label.setStyleSheet("color: white; font-size: 10pt; font-weight: bold;")
+        layout.addWidget(self.current_target_label, 0, 4)
 
+        # Row 1: Quick increment/decrement buttons
+        quick_buttons_layout = QHBoxLayout()
+        
+        self.btn_minus_45 = QPushButton("-45")
+        self.btn_minus_10 = QPushButton("-10")
+        self.btn_minus_1 = QPushButton("-1")
+        self.btn_plus_1 = QPushButton("+1")
+        self.btn_plus_10 = QPushButton("+10")
+        self.btn_plus_45 = QPushButton("+45")
+        
+        # Style and add all quick buttons
+        quick_buttons = [self.btn_minus_45, self.btn_minus_10, self.btn_minus_1, 
+                        self.btn_plus_1, self.btn_plus_10, self.btn_plus_45]
+        
+        for btn in quick_buttons:
+            btn.setStyleSheet(ADCS_BUTTON_STYLE)
+            btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+            btn.setFixedHeight(25)
+            quick_buttons_layout.addWidget(btn)
+        
+        layout.addLayout(quick_buttons_layout, 1, 0, 1, 5)
+
+        # Row 2: Controller and zero buttons
         self.run_controller_btn = QPushButton("Start Controller")
         self.run_controller_btn.setCheckable(True)
         self.run_controller_btn.setStyleSheet(ADCS_BUTTON_STYLE)
         self.run_controller_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        layout.addWidget(self.run_controller_btn, 1, 0, 1, 2)
+        layout.addWidget(self.run_controller_btn, 2, 0, 1, 3)
 
         self.set_zero_btn = QPushButton("Zero Yaw Position")
         self.set_zero_btn.setStyleSheet(ADCS_BUTTON_STYLE)
         self.set_zero_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        layout.addWidget(self.set_zero_btn, 1, 2)
+        layout.addWidget(self.set_zero_btn, 2, 3, 1, 2)
 
         group.setLayout(layout)
         return group
@@ -279,6 +318,14 @@ class ADCSSection(QGroupBox):
         self.set_zero_btn.clicked.connect(self._handle_set_zero_clicked)
         self.set_value_btn.clicked.connect(self._handle_set_value_clicked)
         self.set_pd_btn.clicked.connect(self._handle_set_pd_clicked)
+        
+        # Quick target buttons
+        self.btn_minus_45.clicked.connect(lambda: self._handle_quick_target(-45))
+        self.btn_minus_10.clicked.connect(lambda: self._handle_quick_target(-10))
+        self.btn_minus_1.clicked.connect(lambda: self._handle_quick_target(-1))
+        self.btn_plus_1.clicked.connect(lambda: self._handle_quick_target(1))
+        self.btn_plus_10.clicked.connect(lambda: self._handle_quick_target(10))
+        self.btn_plus_45.clicked.connect(lambda: self._handle_quick_target(45))
 
     def _handle_manual_cw_pressed(self):
         # If in Environmental mode, switch back to Raw mode when manual control is used
@@ -373,8 +420,15 @@ class ADCSSection(QGroupBox):
         try:
             value = float(self.value_input.text())
             self._handle_action_clicked("adcs", "set_value", value)
+            # Update the current target display safely
+            try:
+                self.current_target_label.setText(f"{value:.1f}°")
+            except Exception as e:
+                logging.warning(f"Could not update current target label: {e}")
         except ValueError:
             logging.warning("Invalid target value")
+        except Exception as e:
+            logging.error(f"Error in set value handler: {e}")
 
     def _handle_set_zero_clicked(self):
         self._handle_action_clicked("adcs", "set_zero")
@@ -383,13 +437,29 @@ class ADCSSection(QGroupBox):
         self.adcs_command_sent.emit(mode, command, value)
 
     def update_adcs_data(self, data):
-        if 'controller' in data:
-            controller_data = data['controller']
-            self.kp_input.setText(str(controller_data.get('kp', '')))
-            self.kd_input.setText(str(controller_data.get('kd', '')))
-            self.deadband_input.setText(str(controller_data.get('deadband', '')))
-            self.value_input.setText(str(controller_data.get('target_yaw', '')))
-            self.min_pulse_input.setText(str(controller_data.get('min_pulse', '')))
+        try:
+            if 'controller' in data:
+                controller_data = data['controller']
+                self.kp_input.setText(str(controller_data.get('kp', '')))
+                self.kd_input.setText(str(controller_data.get('kd', '')))
+                self.deadband_input.setText(str(controller_data.get('deadband', '')))
+                
+                # Update target value input and current target display
+                target_yaw = controller_data.get('target_yaw', '')
+                self.value_input.setText(str(target_yaw))
+                if target_yaw != '':
+                    try:
+                        self.current_target_label.setText(f"{float(target_yaw):.1f}°")
+                    except (ValueError, AttributeError) as e:
+                        logging.warning(f"Could not update target display: {e}")
+                        try:
+                            self.current_target_label.setText("--°")
+                        except AttributeError:
+                            pass  # Label doesn't exist yet
+                
+                self.min_pulse_input.setText(str(controller_data.get('min_pulse', '')))
+        except Exception as e:
+            logging.error(f"Error updating ADCS data: {e}")
 
     def _handle_env_mode_selected(self):
         # Stop any running controller first
@@ -430,3 +500,21 @@ class ADCSSection(QGroupBox):
         
         # Update to Raw mode
         self._update_current_auto_mode("adcs")
+
+    def _handle_quick_target(self, increment):
+        """Handle quick target increment/decrement buttons"""
+        try:
+            current_value = float(self.value_input.text())
+            new_value = current_value + increment
+            self.value_input.setText(str(new_value))
+            # Automatically send the new target value
+            self._handle_action_clicked("adcs", "set_value", new_value)
+            # Update the current target display safely
+            try:
+                self.current_target_label.setText(f"{new_value:.1f}°")
+            except Exception as e:
+                logging.warning(f"Could not update current target label: {e}")
+        except ValueError:
+            logging.warning("Invalid current target value for quick adjustment")
+        except Exception as e:
+            logging.error(f"Error in quick target handler: {e}")

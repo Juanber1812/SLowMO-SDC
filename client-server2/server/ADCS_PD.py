@@ -138,6 +138,11 @@ def set_motor_power(power):
     # Clamp power to valid range
     power = max(-100, min(100, power))
     
+    # Debug: Print when motor power is first set (only for non-zero values to reduce spam)
+    if power != 0 and not hasattr(set_motor_power, '_first_power_set'):
+        print(f"[MOTOR DEBUG] First motor power set: {power}")
+        set_motor_power._first_power_set = True
+    
     try:
         if power > 0:  # Clockwise
             motor_ccw_pwm.ChangeDutyCycle(0)
@@ -151,7 +156,9 @@ def set_motor_power(power):
         
         time.sleep(0.001)  # Brief delay to avoid I2C interference
     except Exception as e:
-        print(f"Error setting motor power: {e}")
+        print(f"[MOTOR DEBUG] Error setting motor power: {e}")
+        import traceback
+        traceback.print_exc()
 
 def rotate_clockwise():
     """Rotate motor clockwise (full power) - for manual control"""
@@ -736,7 +743,7 @@ class ADCSController:
     def _control_thread_worker(self):
         """High-speed control worker thread"""
         print(f"[CONTROL DEBUG] Control thread started")
-        interval = 1.0 / 25  # 25Hz control loop (reduced from 50Hz for stability testing)
+        interval = 1.0 / 10  # 10Hz control loop (reduced further for stability testing)
         next_control_time = time.time()
         last_time = time.time()
         loop_count = 0
@@ -746,8 +753,8 @@ class ADCSController:
                 current_time = time.time()
                 loop_count += 1
                 
-                # Debug print every 500 loops (20 seconds at 25Hz)
-                if loop_count % 500 == 0:
+                # Debug print every 200 loops (20 seconds at 10Hz)
+                if loop_count % 200 == 0:
                     print(f"[CONTROL DEBUG] Control loop running, count: {loop_count}")
                 
                 # Fix: Make manual_control_active access thread-safe
@@ -761,13 +768,17 @@ class ADCSController:
                 if current_time >= next_control_time:
                     try:
                         # Debug: Print when control loop first starts active control
-                        if loop_count <= 50 and self.pd_controller.controller_enabled:  # First 2 seconds at 25Hz
+                        if loop_count <= 20 and self.pd_controller.controller_enabled:  # First 2 seconds at 10Hz
                             print(f"[CONTROL DEBUG] Active control loop {loop_count}, enabled: {self.pd_controller.controller_enabled}")
                         
                         # Get current sensor data
                         with self.data_lock:
                             current_yaw = self.current_data['mpu']['yaw']
                             gyro_rate = self.current_data['mpu']['gyro_rate_z']
+                        
+                        # Debug: Print first few control calculations
+                        if loop_count <= 10 and self.pd_controller.controller_enabled:
+                            print(f"[CONTROL DEBUG] Control calc {loop_count}: yaw={current_yaw:.1f}, target={self.pd_controller.target_yaw:.1f}")
                         
                         # Calculate time step
                         dt = current_time - last_time
