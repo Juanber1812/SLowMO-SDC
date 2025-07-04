@@ -1119,36 +1119,30 @@ class ADCSController:
         """Start automatic control mode"""
         try:
             print(f"[ADCS DEBUG] Starting auto control - mode: {mode}")
-            
+
             if not self.motor_available:
                 print(f"[ADCS DEBUG] Motor not available")
                 return {"status": "error", "message": "Motor control not available"}
-            
+
             if not self.mpu_sensor.sensor_ready:
                 print(f"[ADCS DEBUG] MPU sensor not ready")
                 return {"status": "error", "message": "MPU6050 sensor not ready"}
-            
-            # Check if manual control is active
-            with self.data_lock:
-                manual_active = self.manual_control_active
-                print(f"[ADCS DEBUG] Manual control active: {manual_active}")
-                
-                if manual_active:
-                    return {"status": "error", "message": "Cannot start auto control - manual control is active. Stop manual control first."}
-            
+
+            # Manual control always available: removed manual_control_active check
+
             print(f"[ADCS DEBUG] Starting PD controller...")
             self.pd_controller.start_controller()
-            
+
             # Add a small delay to allow system to stabilize
             import time
             time.sleep(0.1)
-            
+
             print(f"[ADCS DEBUG] PD controller started successfully")
-            
+
             # Check system resources after starting
             resources = self.get_system_resources()
             print(f"[ADCS DEBUG] System resources after start - Threads: {resources.get('threads', 'unknown')}, Refs: {resources.get('ref_count', 'unknown')}")
-            
+
             # print(f"▶️ {mode} mode started with PWM PD controller")  # Commented out to reduce spam
             return {"status": "success", "message": f"{mode} mode started"}
         except Exception as e:
