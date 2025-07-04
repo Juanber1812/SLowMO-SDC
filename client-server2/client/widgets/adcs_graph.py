@@ -151,7 +151,7 @@ class YawGraphStacked(QWidget):
             border-radius: {BORDER_RADIUS}px;
             padding: 6px 12px;
             font-size: {FONT_SIZE_NORMAL}pt;
-            font-family: {FONT_FAMILY};
+            font-family: "{FONT_FAMILY}";
         }}
         QPushButton:hover, QPushButton:pressed {{
             background-color: {BUTTON_HOVER};
@@ -179,7 +179,7 @@ class YawGraphStacked(QWidget):
             border: 0px solid {BORDER_COLOR};
             border-radius: 8px;
             font-size: {FONT_SIZE_NORMAL}pt;
-            font-family: {FONT_FAMILY};
+            font-family: "{FONT_FAMILY}";
             color: {BUTTON_TEXT};
         }}
         """

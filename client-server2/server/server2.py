@@ -260,27 +260,18 @@ def start_background_tasks():
         time.sleep(2)  # Give the server time to start
         print("\n[INFO] Starting background tasks...")
         threading.Thread(target=camera.start_stream, daemon=True).start()
-        threading.Thread(target=sensors.start_sensors, daemon=True).start()
         threading.Thread(target=lidar.start_lidar, daemon=True).start()
-        # Start power monitoring
-        if power_monitor:
-            power_monitor.set_update_callback(power_data_callback)
-            if power_monitor.start_monitoring():
-                logging.info("Power monitoring started successfully")
-            else:
-                logging.error("Failed to start power monitoring")
         
-        # Start ADCS data broadcasting
+        # Start unified monitoring thread for sensors, power, thermal, and communications
+        start_unified_monitoring()
+        
+        # Start ADCS data broadcasting (separate thread due to high frequency - 20Hz)
         if adcs_controller:
             start_adcs_broadcast()
             logging.info("ADCS controller initialized and broadcasting started")
         
-        # Start thermal data broadcasting
-        if TEMPERATURE_AVAILABLE or ADCS_AVAILABLE:  # Start if we have any temperature source
-            start_thermal_broadcast()
-            logging.info("Thermal data broadcasting started")
+        logging.info("Unified monitoring thread started")
         
-        # Do NOT start communication monitoring here; start on client connect
     # Start the delayed initialization in a separate thread
     threading.Thread(target=delayed_start, daemon=True).start()
 
@@ -295,23 +286,15 @@ def handle_connect():
     emit('lidar_update', {}, broadcast=True)
     print("[INFO] Status update requests sent to camera and lidar subsystems")
     
-    # Start communication monitoring if not already running
-    if communication_monitor and not communication_monitor.is_monitoring:
-        communication_monitor.set_update_callback(communication_data_callback)
-        communication_monitor.set_throughput_test_callback(throughput_test_callback)
-        if communication_monitor.start_monitoring():
-            logging.info("Communication monitoring started (on client connect)")
-        else:
-            logging.error("Failed to start communication monitoring (on client connect)")
+    # Communication monitoring will be started automatically by unified monitoring thread
+    logging.info(f"Client connected. Total clients: {len(connected_clients)}")
 
 @socketio.on('disconnect')
 def handle_disconnect():
     print(f"[INFO] Client disconnected: {request.sid}")
     connected_clients.discard(request.sid)
-    # Stop communication monitoring if no clients remain
-    if communication_monitor and len(connected_clients) == 0:
-        communication_monitor.stop_monitoring()
-        logging.info("Communication monitoring stopped (no clients connected)")
+    # Communication monitoring will be stopped automatically by unified monitoring thread if no clients remain
+    logging.info(f"Client disconnected. Remaining clients: {len(connected_clients)}")
 
 @socketio.on("adcs_command")
 def handle_adcs_command(data):
@@ -441,6 +424,7 @@ def handle_stop_lidar():
 
 
 def power_data_callback(power_data):
+    global latest_battery_temp
     try:
         if power_data.get('status') in ['Disconnected', 'Error - Disconnected', 'Error']:
             formatted_data = {
@@ -452,7 +436,11 @@ def power_data_callback(power_data):
                 "battery_percentage": 0,
                 "status": "Disconnected"
             }
+            latest_battery_temp = None  # No battery temp when disconnected
         else:
+            # Store battery temperature for thermal broadcast
+            latest_battery_temp = power_data.get('temperature_c')
+            
             # Map power.py status to client-friendly status
             status_mapping = {
                 "OK": "Nominal",
@@ -674,18 +662,9 @@ def thermal_data_broadcast():
         })
 
 def start_thermal_broadcast():
-    """Start thermal data broadcasting at 2Hz"""
-    def thermal_broadcast_loop():
-        while True:
-            try:
-                thermal_data_broadcast()
-                time.sleep(0.5)  # 2Hz = 500ms interval
-            except Exception as e:
-                logging.error(f"Error in thermal broadcast loop: {e}")
-                time.sleep(1)  # Wait 1 second on error before retrying
-    
-    threading.Thread(target=thermal_broadcast_loop, daemon=True).start()
-    logging.info("Thermal data broadcasting started at 2Hz")
+    """Legacy function - thermal broadcasting is now handled by unified monitoring"""
+    logging.info("Thermal broadcasting is now handled by unified monitoring thread")
+    pass
 
 @socketio.on('latency_response')
 def handle_latency_response(data):
@@ -768,6 +747,95 @@ def handle_request_lidar_update():
         print("[INFO] Lidar status update requested manually")
     except Exception as e:
         print(f"[ERROR] request_lidar_update: {e}")
+
+def start_unified_monitoring():
+    """Start unified monitoring thread for sensors, power, thermal, and communications"""
+    def unified_monitoring_loop():
+        """Main loop that handles all monitoring tasks in a single thread"""
+        # Initialize components
+        sensors_started = False
+        power_started = False
+        communication_started = False
+        
+        # Timing variables for different broadcast rates
+        last_sensor_time = 0
+        last_power_time = 0
+        last_thermal_time = 0
+        last_communication_time = 0
+        
+        # Broadcast intervals (in seconds)
+        SENSOR_INTERVAL = 1.0      # 1Hz for sensors
+        POWER_INTERVAL = 0.5       # 2Hz for power
+        THERMAL_INTERVAL = 0.5     # 2Hz for thermal
+        COMMUNICATION_INTERVAL = 1.0  # 1Hz for communications
+        
+        logging.info("Unified monitoring loop started")
+        
+        while True:
+            try:
+                current_time = time.time()
+                
+                # Start sensors on first iteration
+                if not sensors_started:
+                    try:
+                        threading.Thread(target=sensors.start_sensors, daemon=True).start()
+                        sensors_started = True
+                        logging.info("Sensors started from unified monitoring")
+                    except Exception as e:
+                        logging.error(f"Failed to start sensors: {e}")
+                
+                # Start power monitoring on first iteration
+                if not power_started and power_monitor:
+                    try:
+                        power_monitor.set_update_callback(power_data_callback)
+                        if power_monitor.start_monitoring():
+                            power_started = True
+                            logging.info("Power monitoring started from unified monitoring")
+                        else:
+                            logging.error("Failed to start power monitoring")
+                    except Exception as e:
+                        logging.error(f"Failed to start power monitoring: {e}")
+                
+                # Start communication monitoring when clients are connected
+                if not communication_started and communication_monitor and len(connected_clients) > 0:
+                    try:
+                        communication_monitor.set_update_callback(communication_data_callback)
+                        communication_monitor.set_throughput_test_callback(throughput_test_callback)
+                        if communication_monitor.start_monitoring():
+                            communication_started = True
+                            logging.info("Communication monitoring started from unified monitoring")
+                        else:
+                            logging.error("Failed to start communication monitoring")
+                    except Exception as e:
+                        logging.error(f"Failed to start communication monitoring: {e}")
+                
+                # Stop communication monitoring when no clients are connected
+                if communication_started and communication_monitor and len(connected_clients) == 0:
+                    try:
+                        communication_monitor.stop_monitoring()
+                        communication_started = False
+                        logging.info("Communication monitoring stopped (no clients)")
+                    except Exception as e:
+                        logging.error(f"Failed to stop communication monitoring: {e}")
+                
+                # Thermal data broadcast (2Hz)
+                if current_time - last_thermal_time >= THERMAL_INTERVAL:
+                    if TEMPERATURE_AVAILABLE or ADCS_AVAILABLE:
+                        thermal_data_broadcast()
+                    last_thermal_time = current_time
+                
+                # Power data is handled by callback, but we can check status here if needed
+                
+                # Sleep for minimum interval (100ms) to prevent CPU spinning
+                time.sleep(0.1)
+                
+            except Exception as e:
+                logging.error(f"Error in unified monitoring loop: {e}")
+                time.sleep(1)  # Wait 1 second on error before retrying
+    
+    # Start the unified monitoring loop in a daemon thread
+    threading.Thread(target=unified_monitoring_loop, daemon=True).start()
+    logging.info("Unified monitoring thread started")
 
 if __name__ == "__main__":
     print("🚀 Server starting at http://0.0.0.0:5000")
