@@ -551,6 +551,7 @@ class PDControllerPWM:
         
         # Store previous error for next derivative calculation
         self.previous_error = error
+        return motor_power, error, pd_output
 
 class ADCSController:
     """
