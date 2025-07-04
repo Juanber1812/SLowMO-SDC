@@ -39,9 +39,9 @@ except ImportError as e:
     CommunicationMonitor = None
     COMMUNICATION_AVAILABLE = False
 
-# Import ADCS controller (now using adcs.py)
+# Import ADCS controller
 try:
-    from adcs import SimpleADCS as ADCSController
+    from ADCS_PD import ADCSController
     ADCS_AVAILABLE = True
 except ImportError as e:
     logging.warning(f"ADCS controller not available: {e}")
@@ -363,36 +363,43 @@ def handle_adcs_command(data):
         print(f"[SERVER] Received ADCS command: {data}")
         print(f"[DEBUG] Current connected clients: {len(connected_clients)}")
         print(f"[DEBUG] ADCS controller available: {adcs_controller is not None}")
-
+        
         if not adcs_controller:
             print("[ERROR] ADCS controller not available")
             emit("adcs_command_ack", {"status": "ERROR", "message": "ADCS controller not available"}, broadcast=True)
             return
-
+        
         # Extract command parameters
         mode = data.get("mode", "Unknown")
         command = data.get("command", "unknown")
         value = data.get("value")
-
+        
         print(f"[DEBUG] Processing ADCS command - Mode: {mode}, Command: {command}, Value: {value}")
-
-        # Use the new SimpleADCS command handler (mode is ignored, only command/value used)
-        adcs_controller.handle_command(command, value)
-        # Always respond with success for now
+        
+        # Use the new ADCS controller command handler
+        result = adcs_controller.handle_adcs_command(mode, command, value)
+        
+        print(f"[DEBUG] ADCS command result: {result}")
+        
+        # Send response back to client
         response_data = {
-            "status": "SUCCESS",
-            "message": f"Command '{command}' processed.",
+            "status": result.get("status", "error").upper(),
+            "message": result.get("message", "Command processed"),
             "mode": mode,
             "command": command
         }
+        
         print(f"[DEBUG] Sending ADCS response: {response_data}")
         emit("adcs_command_ack", response_data, broadcast=True)
-        print(f"[SERVER] ADCS command result: {response_data}")
+        
+        print(f"[SERVER] ADCS command result: {result}")
+        
     except Exception as e:
         print(f"[ERROR] ADCS command handling: {e}")
         print(f"[DEBUG] Exception type: {type(e).__name__}")
         import traceback
         traceback.print_exc()
+        
         error_response = {
             "status": "ERROR", 
             "message": f"Command failed: {str(e)}"
