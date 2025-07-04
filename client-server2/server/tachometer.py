@@ -13,10 +13,13 @@ def run_tachometer(report_func):
     last_pulse_time  = None
     rpm              = 0.0
 
+    print(f"[DEBUG] Initial GPIO {TACHO_PIN} level: {GPIO.input(TACHO_PIN)}")
+
     try:
         while True:
             level = GPIO.input(TACHO_PIN)
             if level == GPIO.HIGH and not prev_ref:
+                print(f"[DEBUG] Rising edge detected on GPIO {TACHO_PIN}")
                 now = time.perf_counter()
                 last_pulse_time = now
                 if initial_time is None:
@@ -26,7 +29,8 @@ def run_tachometer(report_func):
                     rpm    = 60.0 / period if period > 0 else 0.0
                     initial_time = now
                 prev_ref = True
-            elif level == GPIO.LOW:
+            elif level == GPIO.LOW and prev_ref:
+                print(f"[DEBUG] Falling edge detected on GPIO {TACHO_PIN}")
                 prev_ref = False
 
             # if we haven’t seen a pulse in ≥1 s, force rpm=0
