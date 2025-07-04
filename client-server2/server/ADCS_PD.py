@@ -15,6 +15,7 @@ import busio
 import smbus2
 import threading
 import math
+import traceback
 from datetime import datetime
 import logging
 import csv
@@ -162,10 +163,12 @@ def set_motor_power(power):
 
 def rotate_clockwise():
     """Rotate motor clockwise (full power) - for manual control"""
+    print(f"[MOTOR DEBUG] Starting manual clockwise rotation")
     set_motor_power(100)
 
 def rotate_counterclockwise():
     """Rotate motor counterclockwise (full power) - for manual control"""
+    print(f"[MOTOR DEBUG] Starting manual counterclockwise rotation")
     set_motor_power(-100)
 
 def stop_motor():
@@ -1641,110 +1644,42 @@ class ADCSController:
         except Exception as e:
             return {"status": "error", "message": f"Emergency stop failed: {e}"}
 
-    # REQUEST-RESPONSE FUNCTIONS (commented out for simple approach)
-    # def set_apriltag_request_callback(self, callback):
-    #     """Set the callback function to send AprilTag data requests to server"""
-    #     self.apriltag_request_callback = callback
-    #     print("[AUTO ZERO] AprilTag request callback set")
-
-    # def start_apriltag_requests(self):
-    #     """Start periodic AprilTag data requests"""
-    #     if not self.apriltag_request_callback:
-    #         print("[AUTO ZERO] ERROR: No request callback set! Call set_apriltag_request_callback() first")
-    #         return False
-    #         
-    #     print(f"[AUTO ZERO] Starting AprilTag requests every {self.apriltag_request_interval}s")
-    #     self._send_apriltag_request()
-    #     return True
-
-    # def stop_apriltag_requests(self):
-    #     """Stop periodic AprilTag data requests"""
-    #     if self.apriltag_request_timer:
-    #         self.apriltag_request_timer.cancel()
-    #         self.apriltag_request_timer = None
-    #     print("[AUTO ZERO] AprilTag requests stopped")
-
-    # def _send_apriltag_request(self):
-    #     """Internal method to send a single AprilTag data request"""
-    #     if not self.auto_zero_tag_enabled:
-    #         return
-    #         
-    #     try:
-    #         # Record request start time
-    #         self.apriltag_request_start_time = time.time()
-    #         
-    #         # Send request through callback
-    #         if self.apriltag_request_callback:
-    #             self.apriltag_request_callback("request_apriltag_data")
-    #             print(f"[AUTO ZERO] AprilTag data request sent at {self.apriltag_request_start_time:.3f}")
-    #         
-    #         # Schedule next request
-    #         if self.auto_zero_tag_enabled:
-    #             import threading
-    #             self.apriltag_request_timer = threading.Timer(
-    #                 self.apriltag_request_interval, 
-    #                 self._send_apriltag_request
-    #             )
-    #             self.apriltag_request_timer.start()
-    #             
-    #     except Exception as e:
-    #         print(f"[AUTO ZERO] Error sending AprilTag request: {e}")
-
-    # def handle_apriltag_response(self, relative_angle):
-    #     """
-    #     Handle AprilTag data response and calculate RTT
-    #     
-    #     Args:
-    #         relative_angle: The relative angle measurement from AprilTag (or None if lost)
-    #     """
-    #     if not self.auto_zero_tag_enabled:
-    #         return
-    #         
-    #     # Calculate round-trip time
-    #     response_time = time.time()
-    #     if self.apriltag_request_start_time > 0:
-    #         rtt_seconds = response_time - self.apriltag_request_start_time
-    #         rtt_ms = rtt_seconds * 1000
-    #         self.last_rtt_ms = rtt_ms
-    #         
-    #         print(f"[AUTO ZERO] AprilTag response received, RTT: {rtt_ms:.1f}ms")
-    #         
-    #         # Create data structure similar to old format
-    #         data = {
-    #             "relative_angle": relative_angle,
-    #             "rtt_ms": rtt_ms
-    #         }
-    #         
-    #         # Process the data using existing logic
-    #         self.auto_zero_tag(data)
-    #     else:
-    #         print("[AUTO ZERO] Warning: Received AprilTag response without pending request")
-
-    def get_system_health(self):
-        """Get comprehensive system health for disconnect diagnostics"""
+    def get_system_resources(self):
+        """Get current system resource usage for debugging"""
         try:
-            health = {
-                "timestamp": time.time(),
-                "mpu_sensor_ready": self.mpu_sensor.sensor_ready if hasattr(self, 'mpu_sensor') else False,
-                "lux_sensors_ready": self.lux_manager.sensors_ready if hasattr(self, 'lux_manager') else False,
-                "motor_available": self.motor_available,
-                "pd_controller_enabled": self.pd_controller.controller_enabled if hasattr(self, 'pd_controller') else False,
-                "data_thread_alive": self.data_thread.is_alive() if hasattr(self, 'data_thread') and self.data_thread else False,
-                "control_thread_alive": self.control_thread.is_alive() if hasattr(self, 'control_thread') and self.control_thread else False,
-                "manual_control_active": getattr(self, 'manual_control_active', False),
-                "stop_flags": {
-                    "stop_data_thread": getattr(self, 'stop_data_thread', False),
-                    "stop_control_thread": getattr(self, 'stop_control_thread', False)
-                }
+            import threading
+            import gc
+            import os
+            
+            # Get thread count
+            thread_count = threading.active_count()
+            
+            # Force garbage collection to get accurate memory info
+            gc.collect()
+            
+            # Get process memory info using psutil if available
+            try:
+                import psutil
+                process = psutil.Process(os.getpid())
+                memory_info = process.memory_info()
+                memory_mb = memory_info.rss / 1024 / 1024  # Convert to MB
+                cpu_percent = process.cpu_percent()
+            except ImportError:
+                memory_mb = 0
+                cpu_percent = 0
+            
+            # Get basic memory info (this is lightweight)
+            import sys
+            ref_count = sys.gettotalrefcount() if hasattr(sys, 'gettotalrefcount') else len(gc.get_objects())
+            
+            return {
+                "threads": thread_count,
+                "ref_count": ref_count,
+                "memory_mb": memory_mb,
+                "cpu_percent": cpu_percent
             }
-            
-            # Add resource info
-            resources = self.get_system_resources()
-            health.update(resources)
-            
-            return health
         except Exception as e:
-            return {"error": str(e), "timestamp": time.time()}
+            return {"error": str(e), "threads": "error", "ref_count": "error"}
 
 def main():
     """Main function for testing"""
