@@ -1038,10 +1038,6 @@ class ADCSController:
             if getattr(self, 'auto_zero_env_enabled', False):
                 self.stop_auto_zero_env()
             
-            # Stop manual control
-            with self.data_lock:
-                self.manual_control_active = False
-            
             # Stop motor
             stop_motor()
             
