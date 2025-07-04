@@ -39,7 +39,7 @@ except ImportError as e:
     CommunicationMonitor = None
     COMMUNICATION_AVAILABLE = False
 
-# Import ADCS controller - but don't initialize yet to avoid gevent conflicts
+# Import ADCS controller
 try:
     from ADCS_PD import ADCSController
     ADCS_AVAILABLE = True
@@ -65,8 +65,10 @@ communication_monitor = None
 if COMMUNICATION_AVAILABLE:
     communication_monitor = CommunicationMonitor()
 
-# Initialize ADCS controller - defer to avoid gevent/threading conflicts
+# Initialize ADCS controller
 adcs_controller = None
+if ADCS_AVAILABLE:
+    adcs_controller = ADCSController()
 
 def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
@@ -266,21 +268,8 @@ def handle_download_image(data):
 def start_background_tasks():
     """Start background tasks with a delay to ensure server is ready"""
     def delayed_start():
-        global adcs_controller  # Access the global variable
-        
         time.sleep(2)  # Give the server time to start
         print("\n[INFO] Starting background tasks...")
-        
-        # Initialize ADCS controller safely after gevent has settled
-        if ADCS_AVAILABLE and adcs_controller is None:
-            try:
-                print("[INFO] Initializing ADCS controller...")
-                adcs_controller = ADCSController()
-                print("[INFO] ADCS controller initialized successfully")
-            except Exception as e:
-                print(f"[ERROR] Failed to initialize ADCS controller: {e}")
-                adcs_controller = None
-        
         threading.Thread(target=camera.start_stream, daemon=True).start()
         threading.Thread(target=sensors.start_sensors, daemon=True).start()
         threading.Thread(target=lidar.start_lidar, daemon=True).start()

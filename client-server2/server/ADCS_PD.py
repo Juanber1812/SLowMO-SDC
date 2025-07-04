@@ -15,7 +15,6 @@ import busio
 import smbus2
 import threading
 import math
-import traceback
 from datetime import datetime
 import logging
 import csv
@@ -112,7 +111,7 @@ def setup_motor_control():
 
 def set_motor_power(power):
     """
-    Set motor power using PWM
+    Set motor power using PWM with conflict prevention
     Args:
         power: -100 to 100 (negative = CCW, positive = CW, 0 = stop)
     """
@@ -128,6 +127,22 @@ def set_motor_power(power):
         print(f"[MOTOR DEBUG] First motor power set: {power}")
         set_motor_power._first_power_set = True
     
+    # Track power change frequency to detect potential GPIO conflicts
+    current_time = time.time()
+    if not hasattr(set_motor_power, '_last_change_time'):
+        set_motor_power._last_change_time = 0
+        set_motor_power._change_count = 0
+        set_motor_power._last_reset_time = current_time
+    
+    # Count power changes per second
+    if current_time - set_motor_power._last_reset_time > 1.0:
+        if set_motor_power._change_count > 50:  # More than 50 changes per second
+            print(f"[MOTOR WARNING] High PWM change frequency: {set_motor_power._change_count}/sec")
+        set_motor_power._change_count = 0
+        set_motor_power._last_reset_time = current_time
+    
+    set_motor_power._change_count += 1
+    
     try:
         if power > 0:  # Clockwise
             motor_ccw_pwm.ChangeDutyCycle(0)
@@ -139,7 +154,7 @@ def set_motor_power(power):
             motor_cw_pwm.ChangeDutyCycle(0)
             motor_ccw_pwm.ChangeDutyCycle(0)
         
-        time.sleep(0.001)  # Brief delay to avoid I2C interference
+        time.sleep(0.002)  # Increased delay to prevent I2C/GPIO conflicts
     except Exception as e:
         print(f"[MOTOR DEBUG] Error setting motor power: {e}")
         import traceback
@@ -752,6 +767,17 @@ class ADCSController:
                 if loop_count % 200 == 0:
                     print(f"[CONTROL DEBUG] Control loop running, count: {loop_count}")
                 
+                # Resource monitoring every 2000 loops (~5 minutes at 10Hz)
+                if loop_count % 2000 == 0:
+                    resources = self.get_system_resources()
+                    print(f"[RESOURCE DEBUG] Loop {loop_count}: Threads={resources.get('threads', '?')}, Memory={resources.get('memory_mb', '?'):.1f}MB, Refs={resources.get('ref_count', '?')}")
+                    
+                    # Check for resource leaks
+                    if isinstance(resources.get('threads'), int) and resources.get('threads') > 10:
+                        print(f"[RESOURCE WARNING] High thread count detected: {resources.get('threads')}")
+                    if isinstance(resources.get('memory_mb'), float) and resources.get('memory_mb') > 200:
+                        print(f"[RESOURCE WARNING] High memory usage detected: {resources.get('memory_mb'):.1f}MB")
+                
                 # Fix: Make manual_control_active access thread-safe
                 with self.data_lock:
                     manual_active = self.manual_control_active
@@ -795,9 +821,24 @@ class ADCSController:
                         next_control_time += interval
                         
                     except Exception as e:
-                        print(f"[CONTROL DEBUG] Error in control thread inner loop: {e}")
+                        error_msg = f"[CONTROL DEBUG] Error in control thread inner loop: {e}"
+                        print(error_msg)
                         import traceback
                         traceback.print_exc()
+                        
+                        # Check if this is a hardware-related error that might cause disconnects
+                        error_str = str(e).lower()
+                        if any(keyword in error_str for keyword in ['i2c', 'gpio', 'device', 'permission', 'resource']):
+                            print(f"[CONTROL CRITICAL] Hardware error detected: {e}")
+                            health = self.get_system_health()
+                            print(f"[CONTROL CRITICAL] System health: {health}")
+                            
+                            # Stop controller to prevent further hardware conflicts
+                            self.pd_controller.stop_controller()
+                            print(f"[CONTROL CRITICAL] PD controller stopped due to hardware error")
+                        
+                        # Brief pause to prevent error spam
+                        time.sleep(0.1)
                 
                 time.sleep(0.001)  # 1ms sleep
                 
@@ -1679,27 +1720,34 @@ class ADCSController:
     #     else:
     #         print("[AUTO ZERO] Warning: Received AprilTag response without pending request")
 
-    def get_system_resources(self):
-        """Get current system resource usage for debugging"""
+    def get_system_health(self):
+        """Get comprehensive system health for disconnect diagnostics"""
         try:
-            import gc
-            import threading
-            
-            resources = {
-                'active_threads': threading.active_count(),
-                'ref_count': len(gc.get_objects()),
-                'data_thread_alive': hasattr(self, 'data_thread') and self.data_thread and self.data_thread.is_alive(),
-                'control_thread_alive': hasattr(self, 'control_thread') and self.control_thread and self.control_thread.is_alive(),
-                'pd_controller_enabled': self.pd_controller.controller_enabled if hasattr(self, 'pd_controller') else False,
-                'manual_control_active': getattr(self, 'manual_control_active', False)
+            health = {
+                "timestamp": time.time(),
+                "mpu_sensor_ready": self.mpu_sensor.sensor_ready if hasattr(self, 'mpu_sensor') else False,
+                "lux_sensors_ready": self.lux_manager.sensors_ready if hasattr(self, 'lux_manager') else False,
+                "motor_available": self.motor_available,
+                "pd_controller_enabled": self.pd_controller.controller_enabled if hasattr(self, 'pd_controller') else False,
+                "data_thread_alive": self.data_thread.is_alive() if hasattr(self, 'data_thread') and self.data_thread else False,
+                "control_thread_alive": self.control_thread.is_alive() if hasattr(self, 'control_thread') and self.control_thread else False,
+                "manual_control_active": getattr(self, 'manual_control_active', False),
+                "stop_flags": {
+                    "stop_data_thread": getattr(self, 'stop_data_thread', False),
+                    "stop_control_thread": getattr(self, 'stop_control_thread', False)
+                }
             }
-            return resources
+            
+            # Add resource info
+            resources = self.get_system_resources()
+            health.update(resources)
+            
+            return health
         except Exception as e:
-            return {'error': str(e)}
+            return {"error": str(e), "timestamp": time.time()}
 
 def main():
     """Main function for testing"""
-
     print("🛰️ ADCS Controller - PWM PD Version")
     print("=" * 70)
     
