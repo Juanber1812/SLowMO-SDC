@@ -80,14 +80,14 @@ from theme import (
     BORDER_COLOR, BORDER_ERROR, BORDER_HIGHLIGHT,
     FONT_FAMILY, FONT_SIZE_NORMAL, FONT_SIZE_LABEL, FONT_SIZE_TITLE,
     ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR, SECOND_COLUMN,
-    BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE, BUTTON_HEIGHT
+    BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE
 )
 
 ##############################################################################
 #                            CONFIGURATION                                  #
 ##############################################################################
 
-SERVER_URL = "http://192.168.55.89:5000"
+SERVER_URL = "http://192.168.1.146:5000"
 
 ##############################################################################
 #                        SOCKETIO AND BRIDGE SETUP                         #
@@ -954,7 +954,9 @@ class MainWindow(QWidget):
             if name == "Power Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    print(f"[DEBUG] QLabel stylesheet (Power): {style_str}")
+                    lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     if "Current:" in text:
@@ -973,7 +975,9 @@ class MainWindow(QWidget):
             elif name == "Thermal Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    print(f"[DEBUG] QLabel stylesheet (Thermal): {style_str}")
+                    lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     if "Pi:" in text:
@@ -990,7 +994,9 @@ class MainWindow(QWidget):
             elif name == "ADCS Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    print(f"[DEBUG] QLabel stylesheet (ADCS): {style_str}")
+                    lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     if "Gyro X:" in text:
@@ -1017,7 +1023,9 @@ class MainWindow(QWidget):
             elif name == "Command & Data Handling Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    print(f"[DEBUG] QLabel stylesheet (CDH): {style_str}")
+                    lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     if "CPU Usage" in text:
@@ -1032,7 +1040,9 @@ class MainWindow(QWidget):
             elif name == "Communication Subsystem":
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    print(f"[DEBUG] QLabel stylesheet (Comms): {style_str}")
+                    lbl.setStyleSheet(style_str)
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     if "Downlink Frequency:" in text:
@@ -1052,17 +1062,21 @@ class MainWindow(QWidget):
 
             elif name == "Payload Subsystem":
                 self.payload_camera_label = QLabel("Camera: Checking...")
-                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                print(f"[DEBUG] QLabel stylesheet (Payload Camera): {style_str}")
+                self.payload_camera_label.setStyleSheet(style_str)
                 self.payload_camera_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_camera_label)
 
                 self.payload_lidar_label = QLabel("Lidar: Checking...")
-                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                print(f"[DEBUG] QLabel stylesheet (Payload Lidar): {style_str}")
+                self.payload_lidar_label.setStyleSheet(style_str)
                 self.payload_lidar_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_lidar_label)
 
                 self.payload_status_label = QLabel("Status: Not Ready")
-                self.payload_status_label.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                print(f"[DEBUG] QLabel stylesheet (Payload Status): {style_str}")
+                self.payload_status_label.setStyleSheet(style_str)
                 self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_status_label)
 
@@ -1071,7 +1085,9 @@ class MainWindow(QWidget):
             else:
                 for text in items:
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    style_str = f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}"
+                    print(f"[DEBUG] QLabel stylesheet (Other): {style_str}")
+                    lbl.setStyleSheet(style_str)
                     if name != "Error Log" and name != "Overall Status":
                         lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)

@@ -92,53 +92,106 @@ class PowerMonitor:
         
     print
     def get_power_values(self):
-        """Read power values from sensor or return disconnected status"""
+        """Read power values from sensor or return partial data with per-field errors"""
+        logging.debug("[get_power_values] Called. sensor_connected=%s, ina228=%s", self.sensor_connected, self.ina228 is not None)
         if not self.sensor_connected or not self.ina228:
-            # Return disconnected status with no data
+            logging.warning("[get_power_values] Not connected or INA228 missing. Returning Disconnected.")
             return {
-                "current_ma": 0.0,
-                "voltage_v": 0.0,
-                "power_mw": 0.0,
-                "energy_j": 0.0,
-                "temperature_c": 0.0,
-                "battery_percentage": 0,
+                "current_ma": "error",
+                "voltage_v": "error",
+                "power_mw": "error",
+                "energy_j": "error",
+                "temperature_c": "error",
+                "battery_percentage": "error",
                 "status": "Disconnected"
             }
+
+        result = {}
+        errors = {}
+        # Try to get each value independently
         try:
-            # Read actual values from INA228
-            current_ma = self.ina228.current * 1000  # Convert A to mA
-            voltage_v = self.ina228.bus_voltage
-            power_mw = self.ina228.power * 1000  # Convert W to mW
-            energy_j = getattr(self.ina228, 'energy', 0.0)  # Some versions may not have energy
-            temperature_c = getattr(self.ina228, 'die_temperature', 25.0)  # Fallback temp
-            battery_pct = self.get_battery_percentage(voltage_v, current_ma / 1000)  # Convert mA to A for percentage calculation
-
-            # Determine intelligent status based on readings
-            power_status = self.determine_power_status(current_ma, voltage_v, power_mw, battery_pct, temperature_c)
-
-            return {
-                "current_ma": current_ma,
-                "voltage_v": voltage_v,
-                "power_mw": power_mw,
-                "energy_j": energy_j,
-                "temperature_c": temperature_c,
-                "battery_percentage": battery_pct,
-                "status": power_status
-            }
-
+            current_ma = self.ina228.current * 1000
+            result["current_ma"] = current_ma
+            logging.debug(f"[get_power_values] current_ma: {current_ma}")
         except Exception as e:
-            logging.error(f"Error reading sensor data: {e}")
-            # If we get an error reading, mark as disconnected
-            self.sensor_connected = False
-            return {
-                "current_ma": 0.0,
-                "voltage_v": 0.0,
-                "power_mw": 0.0,
-                "energy_j": 0.0,
-                "temperature_c": 0.0,
-                "battery_percentage": 0,
-                "status": "Error - Disconnected"
-            }
+            logging.error(f"Error reading current: {e}")
+            result["current_ma"] = "error"
+            errors["current_ma"] = str(e)
+
+        try:
+            voltage_v = self.ina228.bus_voltage
+            result["voltage_v"] = voltage_v
+            logging.debug(f"[get_power_values] voltage_v: {voltage_v}")
+        except Exception as e:
+            logging.error(f"Error reading voltage: {e}")
+            result["voltage_v"] = "error"
+            errors["voltage_v"] = str(e)
+
+        try:
+            power_mw = self.ina228.power * 1000
+            result["power_mw"] = power_mw
+            logging.debug(f"[get_power_values] power_mw: {power_mw}")
+        except Exception as e:
+            logging.error(f"Error reading power: {e}")
+            result["power_mw"] = "error"
+            errors["power_mw"] = str(e)
+
+        try:
+            energy_j = getattr(self.ina228, 'energy', None)
+            if energy_j is None:
+                raise AttributeError("INA228 object has no attribute 'energy'")
+            result["energy_j"] = energy_j
+            logging.debug(f"[get_power_values] energy_j: {energy_j}")
+        except Exception as e:
+            logging.error(f"Error reading energy: {e}")
+            result["energy_j"] = "error"
+            errors["energy_j"] = str(e)
+
+        try:
+            temperature_c = getattr(self.ina228, 'die_temperature', None)
+            if temperature_c is None:
+                raise AttributeError("INA228 object has no attribute 'die_temperature'")
+            result["temperature_c"] = temperature_c
+            logging.debug(f"[get_power_values] temperature_c: {temperature_c}")
+        except Exception as e:
+            logging.error(f"Error reading temperature: {e}")
+            result["temperature_c"] = "error"
+            errors["temperature_c"] = str(e)
+
+        # Battery percentage depends on voltage and current
+        try:
+            if isinstance(result.get("voltage_v"), (int, float)) and isinstance(result.get("current_ma"), (int, float)):
+                battery_pct = self.get_battery_percentage(result["voltage_v"], result["current_ma"] / 1000)
+                result["battery_percentage"] = battery_pct
+                logging.debug(f"[get_power_values] battery_percentage: {battery_pct}")
+            else:
+                raise ValueError("voltage_v or current_ma unavailable for battery percentage calculation")
+        except Exception as e:
+            logging.error(f"Error calculating battery percentage: {e}")
+            result["battery_percentage"] = "error"
+            errors["battery_percentage"] = str(e)
+
+        # Determine status if possible
+        try:
+            if all(isinstance(result.get(k), (int, float)) for k in ["current_ma", "voltage_v", "power_mw", "battery_percentage"]):
+                temp_val = result["temperature_c"] if isinstance(result["temperature_c"], (int, float)) else None
+                power_status = self.determine_power_status(
+                    result["current_ma"], result["voltage_v"], result["power_mw"], result["battery_percentage"], temp_val
+                )
+                result["status"] = power_status
+                logging.debug(f"[get_power_values] status: {power_status}")
+            else:
+                result["status"] = "Partial Error"
+                logging.debug(f"[get_power_values] status: Partial Error")
+        except Exception as e:
+            logging.error(f"Error determining power status: {e}")
+            result["status"] = "error"
+            errors["status"] = str(e)
+
+        if errors:
+            result["field_errors"] = errors
+        logging.debug(f"[get_power_values] Final result: {result}")
+        return result
 
     def log_data_to_csv(self, data):
         """Log power data to CSV file - only log real data, not disconnected status"""

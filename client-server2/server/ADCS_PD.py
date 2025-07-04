@@ -1166,7 +1166,7 @@ class ADCSController:
         print("[AUTO ZERO ENV] Starting environmental auto-zeroing routine...")
         self.auto_zero_env_enabled = True
         self.lux_peak_windows = {1: [], 2: [], 3: []}
-        self.lux_angles = {1: 90, 2: -150, 3: -30}
+        self.lux_angles = {1: 0, 2: 90, 3: 180}
         self.lux_zero_offset = 0.0
         self.env_peak_log = []
 
@@ -1199,7 +1199,7 @@ class ADCSController:
                 yaw = self.current_data['mpu']['yaw']
                 lux = self.current_data['lux'].copy()
             # Set PD target to always be 30° ahead of current yaw
-            self.pd_controller.set_target(yaw + 30)  # No wrapping needed
+            self.pd_controller.set_target(yaw + 2)  # No wrapping needed
 
             # Detect yaw wrap-around
             if last_yaw is not None:
