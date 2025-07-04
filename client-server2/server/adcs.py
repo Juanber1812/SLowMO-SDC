@@ -80,6 +80,36 @@ class SimplePDController:
 
 # --- Main ADCS Controller ---
 class SimpleADCS:
+    def get_adcs_data_for_server(self):
+        # Simulate a data structure similar to the original ADCS_PD
+        yaw = self.mpu.get_yaw_angle()
+        roll = 0.0
+        pitch = 0.0
+        lux = self.lux.read_lux_sensors()
+        temp = 25.0
+        gyro_rate_x, gyro_rate_y, gyro_rate_z = self.mpu.read_gyroscope()
+        return {
+            'gyro': f"{yaw:.1f}°",
+            'orientation': f"Y:{yaw:.1f}° R:{roll:.1f}° P:{pitch:.1f}°",
+            'lux1': f"{lux[1]:.1f}",
+            'lux2': f"{lux[2]:.1f}",
+            'lux3': f"{lux[3]:.1f}",
+            'rpm': "0.0",
+            'status': 'OK',
+            'gyro_rate_x': f"{gyro_rate_x:.2f}",
+            'gyro_rate_y': f"{gyro_rate_y:.2f}",
+            'gyro_rate_z': f"{gyro_rate_z:.2f}",
+            'angle_x': f"{pitch:.1f}",
+            'angle_y': f"{roll:.1f}",
+            'angle_z': f"{yaw:.1f}",
+            'temperature': f"{temp:.1f}°C",
+            'controller_enabled': self.pd.enabled,
+            'target_yaw': f"{self.pd.target:.1f}°",
+            'yaw_error': f"{self.pd.target - yaw:.1f}°",
+            'motor_power': "0",
+            'pd_output': "0.0",
+            'motor_available': True
+        }
     def __init__(self):
         self.mpu = MPU6050Sensor()
         self.lux = LuxSensorManager()
@@ -98,6 +128,7 @@ class SimpleADCS:
             time.sleep(0.1)
 
     def handle_command(self, cmd, value=None):
+
         # Accept both simple and legacy command names for compatibility
         if cmd in ("cw", "manual_clockwise_start"):
             self.manual_mode = True
