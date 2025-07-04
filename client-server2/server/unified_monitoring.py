@@ -232,6 +232,7 @@ class UnifiedMonitor:
 
     def update_communication(self):
         """Update communication monitoring data"""
+        # Only run if we have external clients connected
         if not self.communication_monitor or len(self.connected_clients) == 0:
             return
             
@@ -255,6 +256,10 @@ class UnifiedMonitor:
             
         except Exception as e:
             logging.error(f"Error updating communication: {e}")
+
+    def get_external_client_count(self):
+        """Get count of external clients (not internal components)"""
+        return len(self.connected_clients)
 
     def determine_thermal_status(self, battery_temp, pi_temp, payload_temp):
         """Determine overall thermal status"""

@@ -85,7 +85,16 @@ if ADCS_AVAILABLE:
 def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
 
+# Single client management - only allow one external client (you)
 connected_clients = set()
+current_client = None  # Track the single allowed client
+MAX_CLIENTS = 1
+
+# Internal component identifiers (these don't count as clients)
+INTERNAL_COMPONENTS = {
+    'camera_internal', 'lidar_internal', 'sensors_internal', 
+    'adcs_internal', 'power_internal', 'thermal_internal'
+}
 
 # ===================== SCANNING MODE DATA RECEIVER (TEST) =====================
 
@@ -300,30 +309,79 @@ def start_background_tasks():
 
 @socketio.on('connect')
 def handle_connect():
-    print(f"[INFO] Client connected: {request.sid}")
-    connected_clients.add(request.sid)
+    global current_client
+    
+    client_id = request.sid
+    print(f"[INFO] Connection attempt from: {client_id}")
+    
+    # Check if this is an internal component (allow unlimited internal connections)
+    user_agent = request.headers.get('User-Agent', '')
+    is_internal = any(comp in user_agent.lower() for comp in ['python', 'internal', 'component'])
+    
+    if is_internal:
+        print(f"[INFO] Internal component connected: {client_id}")
+        # Don't count internal components as clients
+        return
+    
+    # Handle external client connections (limit to 1)
+    if current_client is not None and current_client != client_id:
+        print(f"[WARNING] Rejecting connection - client limit reached. Current client: {current_client}")
+        emit('connection_rejected', {
+            'reason': 'Maximum clients reached (1)',
+            'message': 'Only one client connection allowed. Please try again later.'
+        })
+        # Disconnect the new client
+        return False
+    
+    # Accept the client connection
+    current_client = client_id
+    connected_clients.add(client_id)
     
     # Add client to unified monitoring
     if unified_monitor:
-        unified_monitor.add_client(request.sid)
+        unified_monitor.add_client(client_id)
+    
+    print(f"[INFO] ✅ Client connected successfully: {client_id}")
+    print(f"[INFO] Total external clients: {len(connected_clients)}/1")
     
     # Request current status from camera and lidar subsystems
     emit('camera_update', {}, broadcast=True)
     emit('lidar_update', {}, broadcast=True)
     print("[INFO] Status update requests sent to camera and lidar subsystems")
     
-    logging.info(f"Client connected. Total clients: {len(connected_clients)}")
+    # Send welcome message to the connected client
+    emit('connection_accepted', {
+        'message': 'Connected successfully as the primary client',
+        'client_id': client_id,
+        'max_clients': MAX_CLIENTS
+    })
+    
+    logging.info(f"External client connected. Total clients: {len(connected_clients)}/{MAX_CLIENTS}")
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print(f"[INFO] Client disconnected: {request.sid}")
-    connected_clients.discard(request.sid)
+    global current_client
     
-    # Remove client from unified monitoring
-    if unified_monitor:
-        unified_monitor.remove_client(request.sid)
+    client_id = request.sid
+    print(f"[INFO] Client disconnected: {client_id}")
     
-    logging.info(f"Client disconnected. Remaining clients: {len(connected_clients)}")
+    # Only handle external client disconnections
+    if client_id in connected_clients:
+        connected_clients.discard(client_id)
+        
+        # Clear current client if this was the active client
+        if current_client == client_id:
+            current_client = None
+            print(f"[INFO] Primary client slot now available")
+        
+        # Remove client from unified monitoring
+        if unified_monitor:
+            unified_monitor.remove_client(client_id)
+        
+        logging.info(f"External client disconnected. Remaining clients: {len(connected_clients)}/{MAX_CLIENTS}")
+    else:
+        print(f"[INFO] Internal component disconnected: {client_id}")
+        # Internal component disconnection - no special handling needed
 
 @socketio.on("adcs_command")
 def handle_adcs_command(data):
@@ -785,10 +843,184 @@ def start_unified_monitoring():
     logging.info("Legacy unified monitoring function called - using UnifiedMonitor class instead")
     pass
 
+def get_data_transmission_rate():
+    """Get current data transmission rate from unified monitoring"""
+    try:
+        if unified_monitor and unified_monitor.communication_monitor:
+            comm_data = unified_monitor.communication_monitor.get_current_data()
+            return comm_data.get('data_transmission_rate', 0.0)
+        elif communication_monitor:
+            comm_data = communication_monitor.get_current_data()
+            return comm_data.get('data_transmission_rate', 0.0)
+        else:
+            return 0.0
+    except Exception as e:
+        logging.error(f"Error getting data transmission rate: {e}")
+        return 0.0
+
+def get_system_resource_summary():
+    """Get detailed system resource summary for debugging"""
+    try:
+        import threading
+        import gc
+        import os
+        
+        # Force garbage collection
+        gc.collect()
+        
+        # Get thread information
+        thread_count = threading.active_count()
+        thread_names = [t.name for t in threading.enumerate()]
+        
+        # Get memory info
+        try:
+            import psutil
+            process = psutil.Process(os.getpid())
+            memory_info = process.memory_info()
+            memory_mb = memory_info.rss / 1024 / 1024
+            cpu_percent = process.cpu_percent()
+        except ImportError:
+            memory_mb = 0
+            cpu_percent = 0
+        
+        # Get object count
+        ref_count = len(gc.get_objects())
+        
+        # Check for specific resource issues
+        issues = []
+        if thread_count > 12:
+            issues.append(f"High thread count: {thread_count}")
+        if memory_mb > 200:
+            issues.append(f"High memory usage: {memory_mb:.1f}MB")
+        if ref_count > 70000:
+            issues.append(f"High object count: {ref_count:,}")
+        
+        summary = {
+            "threads": {
+                "count": thread_count,
+                "names": thread_names,
+                "status": "CRITICAL" if thread_count > 15 else "WARNING" if thread_count > 10 else "OK"
+            },
+            "memory": {
+                "mb": memory_mb,
+                "status": "CRITICAL" if memory_mb > 300 else "WARNING" if memory_mb > 200 else "OK"
+            },
+            "objects": {
+                "count": ref_count,
+                "status": "CRITICAL" if ref_count > 100000 else "WARNING" if ref_count > 60000 else "OK"
+            },
+            "cpu_percent": cpu_percent,
+            "issues": issues,
+            "data_transmission_rate": get_data_transmission_rate()
+        }
+        
+        return summary
+        
+    except Exception as e:
+        logging.error(f"Error getting system resource summary: {e}")
+        return {"error": str(e)}
+
+@socketio.on('get_system_resources')
+def handle_get_system_resources():
+    """Handle request for system resource information"""
+    try:
+        resource_summary = get_system_resource_summary()
+        emit('system_resources_response', resource_summary)
+        
+        # Log if there are any issues
+        if resource_summary.get('issues'):
+            logging.warning(f"System resource issues detected: {resource_summary['issues']}")
+            
+    except Exception as e:
+        logging.error(f"Error handling system resources request: {e}")
+        emit('system_resources_response', {"error": str(e)})
+
+@socketio.on('get_data_transmission_rate')
+def handle_get_data_transmission_rate():
+    """Handle request for current data transmission rate"""
+    try:
+        rate = get_data_transmission_rate()
+        emit('data_transmission_rate_response', {
+            "success": True,
+            "data_transmission_rate": rate,
+            "unit": "KB/s"
+        })
+    except Exception as e:
+        logging.error(f"Error getting data transmission rate: {e}")
+        emit('data_transmission_rate_response', {
+            "success": False,
+            "error": str(e)
+        })
+
+def get_external_client_count():
+    """Get count of external clients (excluding internal components)"""
+    return len(connected_clients)
+
+def is_client_connected():
+    """Check if any external client is connected"""
+    return len(connected_clients) > 0
+
+def get_client_status():
+    """Get detailed client connection status"""
+    return {
+        "external_clients": len(connected_clients),
+        "max_clients": MAX_CLIENTS,
+        "current_client": current_client,
+        "slots_available": MAX_CLIENTS - len(connected_clients),
+        "accepting_connections": len(connected_clients) < MAX_CLIENTS
+    }
+
+@socketio.on('get_client_status')
+def handle_get_client_status():
+    """Handle request for client connection status"""
+    try:
+        status = get_client_status()
+        emit('client_status_response', status)
+    except Exception as e:
+        logging.error(f"Error getting client status: {e}")
+        emit('client_status_response', {"error": str(e)})
+
+@socketio.on('force_disconnect_clients')
+def handle_force_disconnect_clients():
+    """Emergency function to disconnect all clients (admin only)"""
+    global current_client
+    try:
+        if len(connected_clients) > 0:
+            # Disconnect all external clients
+            for client_id in connected_clients.copy():
+                emit('forced_disconnect', {
+                    'reason': 'Server administrator requested disconnection'
+                }, room=client_id)
+            
+            connected_clients.clear()
+            current_client = None
+            
+            print("[ADMIN] All external clients forcefully disconnected")
+            emit('force_disconnect_response', {
+                "success": True, 
+                "message": "All clients disconnected"
+            })
+        else:
+            emit('force_disconnect_response', {
+                "success": True, 
+                "message": "No clients were connected"
+            })
+    except Exception as e:
+        logging.error(f"Error force disconnecting clients: {e}")
+        emit('force_disconnect_response', {
+            "success": False, 
+            "error": str(e)
+        })
+
 if __name__ == "__main__":
-    print("🚀 Server starting at http://0.0.0.0:5000")
-    print("Background tasks will start after server initialization.")
+    print("🚀 SLowMO Server starting at http://0.0.0.0:5000")
+    print(f"📱 Client configuration: Single client mode (max {MAX_CLIENTS} external client)")
+    print("🔧 Internal components (camera, lidar, sensors) connect automatically")
+    print("⚡ Background tasks will start after server initialization")
     print("Press Ctrl+C to stop the server and clean up resources.")
+    print(f"🌐 Connect your client to: http://[server-ip]:5000")
+    print("-" * 60)
+    
     # Start background tasks with delay
     start_background_tasks()
     try:
