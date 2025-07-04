@@ -1321,11 +1321,10 @@ class ADCSController:
             desired_mpu_yaw = -float(rel_angle)
             with self.data_lock:
                 self.mpu_sensor.angle_yaw = desired_mpu_yaw
-            self.pd_controller.set_target(0.0)
-            self.pd_controller.start_controller()
-            print(f"[AUTO ZERO] AprilTag: {rel_angle:.1f}° → MPU: {desired_mpu_yaw:.1f}° (PD target 0°)")
-            # Print current yaw for confirmation
-            with self.data_lock:
+                # Also update PD controller target to point to tag (not just zero)
+                self.pd_controller.set_target(0.0)
+                self.pd_controller.start_controller()
+                print(f"[AUTO ZERO] AprilTag: {rel_angle:.1f}° → MPU: {desired_mpu_yaw:.1f}° (PD target 0°)")
                 print(f"[AUTO ZERO] MPU yaw is now: {self.mpu_sensor.angle_yaw:.2f}")
         except Exception as e:
             print(f"[AUTO ZERO] Error: {e}")
