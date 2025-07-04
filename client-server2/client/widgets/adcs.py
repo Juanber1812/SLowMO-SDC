@@ -239,7 +239,7 @@ class ADCSSection(QGroupBox):
             btn.setFixedHeight(25)
             quick_buttons_layout.addWidget(btn)
         
-        layout.addLayout(quick_buttons_layout, 1, 0, 1, 2)
+        layout.addLayout(quick_buttons_layout, 1, 0, 1, 5)
 
         # Row 2: Controller and zero buttons
         self.run_controller_btn = QPushButton("Start Controller")
