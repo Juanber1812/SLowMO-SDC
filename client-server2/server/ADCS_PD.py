@@ -1441,7 +1441,7 @@ class ADCSController:
             new_target = current_mpu_yaw - float(rel_angle)
             
             # Set the new target for the PD controller
-            self.pd_controller.set_target(new_target)
+            self.pd_controller.set_target(-new_target)
             
             # Print concise update
             print(f"[AUTO ZERO TAG] AprilTag: {rel_angle:.1f}° → Target: {new_target:.1f}° (Current: {current_mpu_yaw:.1f}°, Δt: {timestamp_diff_ms:.0f}ms)")
