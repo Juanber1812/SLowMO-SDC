@@ -14,7 +14,7 @@ from theme import (
 )
 
 # Crop Factor Constants
-DEFAULT_CROP_FACTOR = 3
+DEFAULT_CROP_FACTOR = 2.5
 MIN_CROP_FACTOR = 1.0
 MAX_CROP_FACTOR = 10 
 CROP_FACTOR_STEP = 0.5
@@ -72,7 +72,7 @@ class CameraSettingsWidget(QGroupBox):
         self.jpeg_label = QLabel("JPEG: 70")
         self.jpeg_slider.valueChanged.connect(lambda val: self.jpeg_label.setText(f"JPEG: {val}"))
 
-        self.cropped = False # Initial crop state
+        self.cropped = True  # Changed to True - crop on by default
 
         self.preset_buttons_layout = QHBoxLayout()
         self.low_btn = QPushButton("Low")
@@ -82,7 +82,7 @@ class CameraSettingsWidget(QGroupBox):
             btn.setCheckable(True)
             btn.setMinimumWidth(60)
             btn.setMinimumHeight(BUTTON_HEIGHT)
-        self.low_btn.setChecked(True)
+        self.mid_btn.setChecked(True)  # Changed to Mid preset default
 
         self.preset_group = QButtonGroup(self)
         self.preset_group.setExclusive(True)
@@ -93,7 +93,7 @@ class CameraSettingsWidget(QGroupBox):
         self.preset_buttons_layout.addWidget(self.mid_btn)
         self.preset_buttons_layout.addWidget(self.high_btn)
         self.preset_group.idClicked.connect(self.on_preset_changed)
-        self.current_presets = RES_PRESETS_LOW
+        self.current_presets = RES_PRESETS_MID  # Changed to Mid preset default
 
         self.res_dropdown = QComboBox()
 
@@ -101,7 +101,7 @@ class CameraSettingsWidget(QGroupBox):
         self.fps_label = QLabel("FPS Setting:") 
         self.fps_slider = QSlider(Qt.Orientation.Horizontal)
         self.fps_slider.setRange(1, 120) 
-        self.fps_slider.setValue(10)     
+        self.fps_slider.setValue(120)     # Changed to 120 fps default
         self.fps_value_label = QLabel(f"FPS: {self.fps_slider.value()}") 
         self.fps_slider.valueChanged.connect(lambda val: self.fps_value_label.setText(f"FPS: {val}"))
 
@@ -180,7 +180,7 @@ class CameraSettingsWidget(QGroupBox):
         brightness_label = QLabel("Brightness:")
         self.brightness_slider = QSlider(Qt.Orientation.Horizontal)
         self.brightness_slider.setRange(-10, 10)   # maps to -1.0…1.0
-        self.brightness_slider.setValue(0)
+        self.brightness_slider.setValue(1)         # Changed to 1 (0.1 brightness) default
         self.brightness_slider.setSingleStep(1)
         self.brightness_slider.setToolTip("Adjust brightness (-1.0 to 1.0)")
         # numeric display
@@ -201,7 +201,7 @@ class CameraSettingsWidget(QGroupBox):
         exposure_label = QLabel("Exposure (μs):")
         self.exposure_slider = QSlider(Qt.Orientation.Horizontal)
         self.exposure_slider.setRange(10, 66660)  # µs
-        self.exposure_slider.setValue(20000)
+        self.exposure_slider.setValue(1500)       # Changed to 1500 µs default
         self.exposure_slider.setSingleStep(10)
         self.exposure_slider.setToolTip("Exposure time in microseconds")
         self.exposure_value_label = QLabel(str(self.exposure_slider.value()))
