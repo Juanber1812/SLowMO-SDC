@@ -63,7 +63,7 @@ from payload import detector4
 from widgets.camera_controls import CameraControlsWidget
 from widgets.camera_settings import CameraSettingsWidget, CALIBRATION_FILES
 from widgets.graph_section import GraphSection
-from widgets.adcs_graph import YawGraphStacked
+from widgets.yaw_graph import YawGraphWidget
 from widgets.detector_control import DetectorControlWidget
 from widgets.adcs import ADCSSection
 from widgets.detector_settings_widget import DetectorSettingsWidget
@@ -141,11 +141,8 @@ class MainWindow(QWidget):
                 relative_angle = None  # Or "-" if you prefer
         except Exception:
             relative_angle = None
-        timestamp = datetime.datetime.utcnow().isoformat(timespec='milliseconds') + 'Z'
         data = {
             'relative_angle': relative_angle,
-            'timestamp': timestamp,
-            'mode': 'scanning',
         }
         try:
             sio.emit('scanning_mode_data', data)
@@ -155,11 +152,14 @@ class MainWindow(QWidget):
 
     def start_scanning_mode_stream(self):
         """Start automatic 1Hz scanning mode data emission."""
+        self._start_timer()
+
+    def _start_timer(self):
         if hasattr(self, '_scanning_mode_timer') and self._scanning_mode_timer is not None:
             return  # Already running
         self._scanning_mode_timer = QTimer(self)
         self._scanning_mode_timer.timeout.connect(self.emit_scanning_mode_data)
-        self._scanning_mode_timer.start(200)  # 1Hz
+        self._scanning_mode_timer.start(200)  
         logging.info("[SCANNING MODE] Started automatic 1Hz emission.")
 
     def stop_scanning_mode_stream(self):
@@ -295,22 +295,28 @@ class MainWindow(QWidget):
 
 
     def __init__(self):
+        print("[DEBUG] MainWindow.__init__ starting...")
         super().__init__()
+        print("[DEBUG] MainWindow: super().__init__() complete")
         self.tag_detected_in_last_frame = False  # <-- Add this line
         self.show_crosshairs = False 
         # Set global styling
-        self.setStyleSheet(f"""
-            QWidget {{
-                background-color: {BACKGROUND};
-                color: {TEXT_COLOR};
-                font-family: {self.FONT_FAMILY};
-                font-size: {FONT_SIZE_NORMAL}pt;
-            }}
-        """)
+        try:
+            print(f"[DEBUG] Setting main window stylesheet with BACKGROUND={BACKGROUND}, TEXT_COLOR={TEXT_COLOR}, FONT_FAMILY={self.FONT_FAMILY}, FONT_SIZE_NORMAL={FONT_SIZE_NORMAL}")
+            self.setStyleSheet(f"""
+                QWidget {{
+                    background-color: {BACKGROUND};
+                    color: {TEXT_COLOR};
+                    font-family: {self.FONT_FAMILY};
+                    font-size: {FONT_SIZE_NORMAL}pt;
+                }}
+            """)
+        except Exception as e:
+            print(f"[DEBUG] Exception setting main stylesheet: {e}")
         self.smooth_mode = None
         # Window configuration
         self.setWindowTitle("SLowMO Client")
-        
+        print("[DEBUG] MainWindow: Window title set")
         # Initialize state variables
         self.streaming = False
         self.detector_active = False
@@ -337,11 +343,15 @@ class MainWindow(QWidget):
         self._last_graph_draw = 0.0
 
         # ── instantiate plotters early ─────────────────────────────
+        print("[DEBUG] Instantiating plotters...")
         self.spin_plotter     = AngularPositionPlotter()
         self.distance_plotter = RelativeDistancePlotter()
         self.angular_plotter  = RelativeAnglePlotter()
 
-        self.yaw_graph = YawGraphStacked()
+        print("[DEBUG] Importing and instantiating YawGraphWidget...")
+        from widgets.yaw_graph import YawGraphWidget
+        self.yaw_graph = YawGraphWidget()
+        print("[DEBUG] YawGraphWidget instantiated")
         # ── end instantiation ───────────────────────────────────────
 
         # Setup Log Display Widget
@@ -351,33 +361,43 @@ class MainWindow(QWidget):
         log_text_color = getattr(self, 'TEXT_COLOR', 'white')
         log_border_color = getattr(self, 'BORDER_COLOR', '#333333')
         log_font_family = getattr(self, 'FONT_FAMILY', 'Consolas, "Courier New", monospace')
-        
-        self.log_display_widget.setStyleSheet(f"""
-            QTextEdit {{
-                background-color: {SECOND_COLUMN}; 
-                color: {TEXT_COLOR};
-                font-family: {FONT_FAMILY};
-                font-size: 9pt;
-                border: 0px solid {BORDER_COLOR};
-            }}
-        """)
+        try:
+            print(f"[DEBUG] Setting log_display_widget stylesheet with SECOND_COLUMN={SECOND_COLUMN}, TEXT_COLOR={TEXT_COLOR}, FONT_FAMILY={FONT_FAMILY}, BORDER_COLOR={BORDER_COLOR}")
+            self.log_display_widget.setStyleSheet(f"""
+                QTextEdit {{
+                    background-color: {SECOND_COLUMN}; 
+                    color: {TEXT_COLOR};
+                    font-family: {FONT_FAMILY};
+                    font-size: 9pt;
+                    border: 0px solid {BORDER_COLOR};
+                }}
+            """)
+        except Exception as e:
+            print(f"[DEBUG] Exception setting log_display_widget stylesheet: {e}")
 
         # Setup custom log handler
+        print("[DEBUG] Setting up QtLogHandler...")
         self.qt_log_handler = QtLogHandler(self) # Pass self as parent
         self.qt_log_handler.new_log_message.connect(self.append_log_message)
         
         self.qt_log_handler.setLevel(logging.INFO) # Or logging.DEBUG for more detail
         
         logging.getLogger().addHandler(self.qt_log_handler)
+        print("[DEBUG] QtLogHandler setup complete")
 
         # Setup UI and connections
+        print("[DEBUG] Calling setup_ui()...")
         self.setup_ui() # self.camera_settings and self.graph_section are created here
+        print("[DEBUG] setup_ui() complete")
 
         # Update Error Log and Overall Status boxes to nominal on startup
+        print("[DEBUG] Calling update_status_boxes_to_nominal()...")
         self.update_status_boxes_to_nominal()
+        print("[DEBUG] update_status_boxes_to_nominal() complete")
 
         # ── Hook the graph‐rate spinbox to each plotter’s redraw rate ─────────
         if hasattr(self, 'graph_section') and self.graph_section:
+            print("[DEBUG] Connecting graph_update_frequency_changed signals...")
             # spinbox emits graph_update_frequency_changed(float Hz)
             self.graph_section.graph_update_frequency_changed.connect(self.spin_plotter.set_redraw_rate)
             self.graph_section.graph_update_frequency_changed.connect(self.distance_plotter.set_redraw_rate)
@@ -388,28 +408,38 @@ class MainWindow(QWidget):
             if spin is not None:
                 try:
                     freq = spin.value()
+                    print(f"[DEBUG] Initializing plotter redraw rates to freq_spinbox value: {freq}")
                     if freq > 0:
                         self.spin_plotter.set_redraw_rate(freq)
                         self.distance_plotter.set_redraw_rate(freq)
                         self.angular_plotter.set_redraw_rate(freq)
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"[DEBUG] Exception initializing plotter redraw rates: {e}")
 
         # Initialize active_config_for_detector with the initial UI settings
         # This will be updated upon server acknowledgment of config changes
         if hasattr(self, 'camera_settings') and self.camera_settings is not None:
+             print("[DEBUG] Getting initial config from camera_settings...")
              self.active_config_for_detector = self.camera_settings.get_config()
         else:
              # Fallback if camera_settings isn't ready for some reason.
+             print("[DEBUG] camera_settings not available for initial active_config_for_detector.")
              self.active_config_for_detector = None
              logging("[WARNING] MainWindow.__init__: camera_settings not available for initial active_config_for_detector.")
 
+        print("[DEBUG] Calling setup_socket_events()...")
         self.setup_socket_events()
+        print("[DEBUG] setup_socket_events() complete")
+        print("[DEBUG] Calling setup_signals()...")
         self.setup_signals()
+        print("[DEBUG] setup_signals() complete")
+        print("[DEBUG] Calling setup_timers()...")
         self.setup_timers()
+        print("[DEBUG] setup_timers() complete")
         self.tab_widget.currentChanged.connect(self._on_tab_changed)
         # Graph window reference
         self.graph_window = None
+        print("[DEBUG] MainWindow.__init__ complete!")
 
     def append_log_message(self, message: str):
         """Appends a message to the log display widget and auto-scrolls."""
@@ -911,11 +941,9 @@ class MainWindow(QWidget):
             ("Overall Status", ["No Anomalies Detected: Pending...", "Recommended Actions: Pending..."])
         ]
 
-        for name, items in subsystems:
-            group = QGroupBox(name)
-            layout = QVBoxLayout()
-            layout.setSpacing(2)
-            layout.setContentsMargins(2, 2, 2, 2)
+
+        # Fixed color for all status group labels
+        FIXED_LABEL_COLOR = "#B8FFD9"  # Light green, change as desired
 
         for name, items in subsystems:
             group = QGroupBox(name)
@@ -924,13 +952,11 @@ class MainWindow(QWidget):
             layout.setContentsMargins(2, 2, 2, 2)
 
             if name == "Power Subsystem":
-                # Store references to power labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
-                    # Store label references to match your power.py data structure
                     if "Current:" in text:
                         self.power_labels["current"] = lbl
                     elif "Voltage:" in text:
@@ -943,15 +969,13 @@ class MainWindow(QWidget):
                         self.power_labels["battery"] = lbl
                     elif "Status:" in text:
                         self.power_labels["status"] = lbl
-                        
+
             elif name == "Thermal Subsystem":
-                # Store references to thermal labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
-                    # Store label references for your new thermal labels
                     if "Pi:" in text:
                         self.thermal_labels["pi_temp"] = lbl
                     elif "Power PCB:" in text:
@@ -962,15 +986,13 @@ class MainWindow(QWidget):
                         self.thermal_labels["payload_temp"] = lbl
                     elif "Status:" in text:
                         self.thermal_labels["status"] = lbl
-                        
+
             elif name == "ADCS Subsystem":
-                # Store references to ADCS labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
-                    # Store label references for the individual ADCS components
                     if "Gyro X:" in text:
                         self.adcs_labels["gyro_x"] = lbl
                     elif "Gyro Y:" in text:
@@ -991,15 +1013,13 @@ class MainWindow(QWidget):
                         self.adcs_labels["lux3"] = lbl
                     elif "Status:" in text:
                         self.adcs_labels["status"] = lbl
-                        
+
             elif name == "Command & Data Handling Subsystem":
-                # Store references to CDH labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
-                    # Store label references
                     if "CPU Usage" in text:
                         self.cdh_labels["cpu_usage"] = lbl
                     elif "Memory Usage" in text:
@@ -1008,15 +1028,13 @@ class MainWindow(QWidget):
                         self.cdh_labels["uptime"] = lbl
                     elif "Status" in text:
                         self.cdh_labels["status"] = lbl
-                        
+
             elif name == "Communication Subsystem":
-                # Store references to communication labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
-                    # Store label references for the new communication labels
                     if "Downlink Frequency:" in text:
                         self.comms_labels["downlink_frequency"] = lbl
                     elif "Uplink Frequency:" in text:
@@ -1031,36 +1049,32 @@ class MainWindow(QWidget):
                         self.comms_labels["latency"] = lbl
                     elif "Status:" in text:
                         self.comms_labels["status"] = lbl
+
             elif name == "Payload Subsystem":
-                # Create payload subsystem labels with combined format
                 self.payload_camera_label = QLabel("Camera: Checking...")
-                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_camera_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_camera_label)
-                
+
                 self.payload_lidar_label = QLabel("Lidar: Checking...")
-                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_lidar_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_lidar_label)
-                
+
                 self.payload_status_label = QLabel("Status: Not Ready")
-                self.payload_status_label.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_status_label.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                 self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_status_label)
-                
-                # Initialize payload status tracking variables
-                self.camera_payload_status = "Error"  # Default to Error until we get actual status
-                self.lidar_payload_status = "Error"   # Default to Error until we get actual status
+
+                self.camera_payload_status = "Error"
+                self.lidar_payload_status = "Error"
             else:
-                # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    lbl.setStyleSheet(f"QLabel {{ color: {FIXED_LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
                     if name != "Error Log" and name != "Overall Status":
                         lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
-                    
-                    # Store references for Error Log and Overall Status
                     if name == "Error Log":
                         self.error_labels["critical_errors"] = lbl
                     elif name == "Overall Status":
@@ -1075,7 +1089,7 @@ class MainWindow(QWidget):
                 self.COLOR_BOX_BORDER_RIGHT,
                 self.COLOR_BOX_BG_RIGHT,
                 self.COLOR_BOX_TITLE_RIGHT,
-                is_part_of_right_column=True # Explicitly flag as right column item
+                is_part_of_right_column=True
             )
             parent_layout.addWidget(group)
 

@@ -264,15 +264,15 @@ class ADCSSection(QGroupBox):
 
         # Row 0
         layout.addWidget(QLabel("Kp:"), 0, 0)
-        self.kp_input = QLineEdit("0.5")
+        self.kp_input = QLineEdit("10")
         layout.addWidget(self.kp_input, 0, 1)
         layout.addWidget(QLabel("Kd:"), 0, 2)
-        self.kd_input = QLineEdit("0.1")
+        self.kd_input = QLineEdit("10")
         layout.addWidget(self.kd_input, 0, 3)
         
         # Row 1
         layout.addWidget(QLabel("Deadband:"), 1, 0)
-        self.deadband_input = QLineEdit("1.0")
+        self.deadband_input = QLineEdit("0.5")
         layout.addWidget(self.deadband_input, 1, 1)
         layout.addWidget(QLabel("Min Pulse:"), 1, 2)
         self.min_pulse_input = QLineEdit("0.1")
