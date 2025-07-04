@@ -87,7 +87,7 @@ from theme import (
 #                            CONFIGURATION                                  #
 ##############################################################################
 
-SERVER_URL = "http://192.168.1.146:5000"
+SERVER_URL = "http://192.168.134.89:5000"
 
 ##############################################################################
 #                        SOCKETIO AND BRIDGE SETUP                         #
@@ -159,7 +159,7 @@ class MainWindow(QWidget):
             return  # Already running
         self._scanning_mode_timer = QTimer(self)
         self._scanning_mode_timer.timeout.connect(self.emit_scanning_mode_data)
-        self._scanning_mode_timer.start(1000)  # 1Hz
+        self._scanning_mode_timer.start(200)  # 1Hz
         logging.info("[SCANNING MODE] Started automatic 1Hz emission.")
 
     def stop_scanning_mode_stream(self):

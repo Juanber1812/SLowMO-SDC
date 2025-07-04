@@ -684,9 +684,10 @@ class ADCSController:
         # Yaw history for timestamp matching
         self.yaw_history = deque(maxlen=100)  # Store (timestamp, yaw) tuples
         
-        # Auto zero tag control with request-response system
+        # Auto zero tag control with improved state management
         self.auto_zero_tag_enabled = False
-        self.auto_zero_tag_target_set = False  # Track if we've already set target to 0
+        self.auto_zero_tag_initialized = False  # Track if initial setup is done
+        self.auto_zero_tag_on_hold = False  # Track if PD is on hold due to manual control
         self.last_rtt_ms = 0  # Last measured round-trip time in milliseconds
         
         # Request-response system for AprilTag data
@@ -963,12 +964,24 @@ class ADCSController:
                 if command == "zero_yaw":
                     return self.zero_yaw_position()
                 elif command == "manual_clockwise_start":
+                    # Put auto-zero tag on hold if active
+                    if getattr(self, 'auto_zero_tag_enabled', False):
+                        self.auto_zero_tag_on_hold = True
+                        print("[AUTO ZERO TAG] PD controller on hold for manual control")
                     rotate_clockwise()
                     return {"status": "success", "message": "Manual CW started"}
                 elif command == "manual_stop":
+                    # Resume auto-zero tag if it was on hold
+                    if getattr(self, 'auto_zero_tag_enabled', False) and getattr(self, 'auto_zero_tag_on_hold', False):
+                        self.auto_zero_tag_on_hold = False
+                        print("[AUTO ZERO TAG] PD controller resumed from manual control")
                     stop_motor()
                     return {"status": "success", "message": "Manual stop"}
                 elif command == "manual_counterclockwise_start":
+                    # Put auto-zero tag on hold if active
+                    if getattr(self, 'auto_zero_tag_enabled', False):
+                        self.auto_zero_tag_on_hold = True
+                        print("[AUTO ZERO TAG] PD controller on hold for manual control")
                     rotate_counterclockwise()
                     return {"status": "success", "message": "Manual CCW started"}
                 if command == "set_zero":
@@ -1026,14 +1039,17 @@ class ADCSController:
         This is a clean return to normal state from any mode.
         """
         try:
-            # print("🛑 Returning to raw mode - stopping all systems...")  # Commented out to reduce spam
+            print("🛑 Returning to raw mode - stopping all systems...")
             
             # Stop PD controller
             self.pd_controller.stop_controller()
             
             # Stop all auto zero modes
             if getattr(self, 'auto_zero_tag_enabled', False):
-                self.stop_auto_zero_tag()
+                self.auto_zero_tag_enabled = False
+                self.auto_zero_tag_initialized = False
+                self.auto_zero_tag_on_hold = False
+                print("[AUTO ZERO TAG] AprilTag auto-zero disabled by raw mode")
             
             if getattr(self, 'auto_zero_env_enabled', False):
                 self.stop_auto_zero_env()
@@ -1041,7 +1057,7 @@ class ADCSController:
             # Stop motor
             stop_motor()
             
-            # print("✓ Raw mode activated - all systems stopped")  # Commented out to reduce spam
+            print("✓ Raw mode activated - all systems stopped")
             return {"status": "success", "message": "Raw mode activated - all systems stopped"}
             
         except Exception as e:
@@ -1368,24 +1384,34 @@ class ADCSController:
 
     def auto_zero_tag(self, data):
         """
-        Called when scanning_mode_data is received or when AprilTag command is triggered.
-        
-        SIMPLIFIED APPROACH: Just compare timestamps and update MPU angle directly.
-        - Compare timestamp from AprilTag data with current MPU timestamp
-        - Print timestamp difference in ms
-        - Simply update current MPU yaw angle with received relative angle
+        Updated AprilTag auto-zero with proper initialization and hold logic.
         """
         if not self.auto_zero_tag_enabled:
-            # Silently ignore when disabled to reduce spam
             return
+        
+        # Skip processing if on hold due to manual control
+        if getattr(self, 'auto_zero_tag_on_hold', False):
+            return
+            
         try:
             rel_angle = data.get("relative_angle")
             apriltag_timestamp = data.get("timestamp")
             
+            # Handle initialization on first run
+            if not getattr(self, 'auto_zero_tag_initialized', False):
+                print("[AUTO ZERO TAG] Initializing AprilTag auto-zero mode...")
+                # Zero yaw position and start PD controller
+                self.mpu_sensor.zero_yaw_position()
+                self.pd_controller.set_target(0.0)
+                self.pd_controller.start_controller()
+                self.auto_zero_tag_initialized = True
+                print("[AUTO ZERO TAG] PD controller started, yaw zeroed, target set to 0°")
+                return
+            
             if rel_angle is None:
-                # Only print once when AprilTag is lost to avoid spam
+                # AprilTag not detected - keep current target, don't change anything
                 if not hasattr(self, '_apriltag_lost_printed') or not self._apriltag_lost_printed:
-                    # Silently handle AprilTag loss to reduce spam
+                    print("[AUTO ZERO TAG] AprilTag lost - maintaining current PD target")
                     self._apriltag_lost_printed = True
                 return
             else:
@@ -1401,114 +1427,56 @@ class ADCSController:
             timestamp_diff_ms = 0
             if apriltag_timestamp:
                 try:
-                    # Parse ISO timestamp from AprilTag data
                     import datetime
                     apriltag_dt = datetime.datetime.fromisoformat(apriltag_timestamp.replace('Z', '+00:00'))
                     apriltag_time = apriltag_dt.timestamp()
                     timestamp_diff_ms = (current_time - apriltag_time) * 1000
                 except Exception as e:
-                    print(f"[AUTO ZERO] Could not parse timestamp: {e}")
+                    print(f"[AUTO ZERO TAG] Could not parse timestamp: {e}")
                     timestamp_diff_ms = 0
             
-            # Simple update: set MPU angle to negative of relative angle
-            # (We want MPU to read negative rel_angle when pointing at tag)
-            desired_mpu_yaw = -float(rel_angle)
+            # Calculate new target based on AprilTag relative angle
+            # We want the target to be the current yaw minus the relative angle
+            # so that when we reach the target, we'll be pointing at the tag
+            new_target = current_mpu_yaw - float(rel_angle)
             
-            # Update the MPU angle directly
-            with self.data_lock:
-                self.mpu_sensor.angle_yaw = desired_mpu_yaw
-                
-            # Set PD controller target to 0° (now aligned with AprilTag)
-            self.pd_controller.set_target(0.0)
+            # Set the new target for the PD controller
+            self.pd_controller.set_target(new_target)
             
-            # Print concise update (only essential info)
-            print(f"[AUTO ZERO] AprilTag: {rel_angle:.1f}° → MPU: {desired_mpu_yaw:.1f}° (Δt: {timestamp_diff_ms:.0f}ms)")
+            # Print concise update
+            print(f"[AUTO ZERO TAG] AprilTag: {rel_angle:.1f}° → Target: {new_target:.1f}° (Current: {current_mpu_yaw:.1f}°, Δt: {timestamp_diff_ms:.0f}ms)")
 
         except Exception as e:
             # Only print error once to avoid spam
             if not hasattr(self, '_last_error_msg') or self._last_error_msg != str(e):
-                print(f"[AUTO ZERO] Error: {e}")
+                print(f"[AUTO ZERO TAG] Error: {e}")
                 self._last_error_msg = str(e)
-            
-        # Comment out the complex RTT-based approach for now
-        # # OLD RTT-BASED APPROACH (commented out for simplicity)
-        # try:
-        #     rel_angle = data.get("relative_angle")
-        #     rtt_ms = data.get("rtt_ms", self.last_rtt_ms)  # Use provided RTT or last known
-        #     
-        #     if rel_angle is None:
-        #         # Only set target to 0° once when AprilTag is lost, then let controller stabilize
-        #         if not self.auto_zero_tag_target_set:
-        #             print("[AUTO ZERO] AprilTag lost, setting PD target to 0° (ONCE) - maintaining current position.")
-        #             self.pd_controller.set_target(0.0)
-        #             self.auto_zero_tag_target_set = True
-        #         return
-        #         
-        #     # AprilTag detected - reset the "target set" flag for next time it's lost
-        #     self.auto_zero_tag_target_set = False
-        #     
-        #     # Update last known RTT
-        #     if rtt_ms > 0:
-        #         self.last_rtt_ms = rtt_ms
-        #     
-        #     # Get current MPU data and apply motion compensation
-        #     with self.data_lock:
-        #         current_mpu_yaw = self.current_data['mpu']['yaw']
-        #         gyro_rate = self.current_data['mpu']['gyro_rate_z']
-        #     
-        #     # Estimate MPU position when AprilTag measurement was taken
-        #     # RTT includes both directions, so divide by 2 for one-way delay
-        #     one_way_delay_s = (rtt_ms / 2.0) / 1000.0
-        #     
-        #     # Compensate for rotation during transmission delay
-        #     rotation_during_delay = gyro_rate * one_way_delay_s
-        #     estimated_mpu_at_capture = current_mpu_yaw - rotation_during_delay
-        #     
-        #     # Calculate the alignment correction
-        #     desired_mpu_yaw = -float(rel_angle)  # We want MPU to read negative rel_angle when pointing at tag
-        #     correction_needed = desired_mpu_yaw - estimated_mpu_at_capture
-        #     
-        #     # Apply the correction to the current MPU angle
-        #     with self.data_lock:
-        #         self.mpu_sensor.angle_yaw += correction_needed
-        #         corrected_yaw = self.mpu_sensor.angle_yaw
-        #         
-        #     # Set PD controller target to 0° (now aligned with AprilTag)
-        #     self.pd_controller.set_target(0.0)
-        #     
-        #     print(f"[AUTO ZERO RTT] AprilTag alignment with motion compensation:")
-        #     print(f"  AprilTag relative angle: {rel_angle:.2f}°")
-        #     print(f"  Round-trip time: {rtt_ms:.0f}ms (one-way: {one_way_delay_s*1000:.0f}ms)")
-        #     print(f"  Current MPU yaw: {current_mpu_yaw:.2f}°")
-        #     print(f"  Gyro rate: {gyro_rate:.2f}°/s")
-        #     print(f"  Rotation during delay: {rotation_during_delay:.2f}°")
-        #     print(f"  Estimated MPU at capture: {estimated_mpu_at_capture:.2f}°")
-        #     print(f"  Correction applied: {correction_needed:.2f}°")
-        #     print(f"  MPU yaw after correction: {corrected_yaw:.2f}°")
-        #     print(f"  PD target set to 0° - now aligned with AprilTag")
-        #
-        # except Exception as e:
-        #     print(f"[AUTO ZERO RTT] Error: {e}")
 
 
     def start_auto_zero_tag(self):
-        """Enable AprilTag auto zeroing with simple timestamp comparison."""
-        # Manual control always available: removed manual control check
+        """Enable AprilTag auto zeroing with proper initialization."""
+        print("[AUTO ZERO TAG] Starting AprilTag auto-zero mode...")
         
         self.auto_zero_tag_enabled = True
-        self.auto_zero_tag_target_set = False  # Reset the flag when starting
+        self.auto_zero_tag_initialized = False  # Will be set to True on first data
+        self.auto_zero_tag_on_hold = False  # Reset hold state
         
-        # Simple approach - just enable the auto_zero_tag function
-        # It will be called when scanning_mode_data is received
-        # print("[AUTO ZERO TAG] AprilTag mode enabled with simple timestamp comparison")  # Commented out to reduce spam
+        print("[AUTO ZERO TAG] Mode enabled - waiting for first AprilTag data to initialize...")
         return {"status": "success", "message": "AprilTag mode enabled"}
 
     def stop_auto_zero_tag(self):
-        """Disable AprilTag auto zeroing."""
+        """Disable AprilTag auto zeroing and stop PD controller."""
+        print("[AUTO ZERO TAG] Stopping AprilTag auto-zero mode...")
+        
         self.auto_zero_tag_enabled = False
-        # Stop the request-response system (commented out for now)
-        # self.stop_apriltag_requests()
-        # print("[AUTO ZERO] auto_zero_tag DISABLED.")  # Commented out to reduce spam
+        self.auto_zero_tag_initialized = False
+        self.auto_zero_tag_on_hold = False
+        
+        # Stop PD controller and motor
+        self.pd_controller.stop_controller()
+        stop_motor()
+        
+        print("[AUTO ZERO TAG] AprilTag auto-zero DISABLED - PD controller and motor stopped.")
 
     def get_system_state(self):
         """Get current system state for debugging"""

@@ -96,6 +96,7 @@ class ADCSSection(QGroupBox):
         self.setObjectName("ADCSSection")
         self.setFixedSize(850,220)
         self.current_auto_mode = "adcs" # Default auto mode
+        self.current_target_value = 0.0  # Track current target value
         # Apply groupbox style to self
         if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
             self.setStyleSheet(ADCS_GROUPBOX_STYLE)
@@ -151,11 +152,8 @@ class ADCSSection(QGroupBox):
         return group
 
     def get_target_yaw(self):
-        """Return the current target yaw as a float (from the input box)."""
-        try:
-            return float(self.value_input.text())
-        except Exception:
-            return 0.0
+        """Return the current target yaw as a float."""
+        return self.current_target_value
 
     def _create_manual_controls_group(self):
         group = QGroupBox()
@@ -207,19 +205,8 @@ class ADCSSection(QGroupBox):
             group.setStyleSheet(ADCS_GROUPBOX_STYLE)
         layout = QGridLayout()
 
-        # Row 0: Target input and current value display
-        layout.addWidget(QLabel("Target Angle:"), 0, 0)
-        self.value_input = QLineEdit("0.0")
-        self.value_input.setFixedWidth(60)
-        layout.addWidget(self.value_input, 0, 1)
-        self.set_value_btn = QPushButton("Set")
-        self.set_value_btn.setStyleSheet(ADCS_BUTTON_STYLE)
-        self.set_value_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.set_value_btn.setFixedWidth(40)
-        layout.addWidget(self.set_value_btn, 0, 2)
-        
-        # Current target display
-        layout.addWidget(QLabel("Current:"), 0, 3)
+        # Row 0: Current target display
+        layout.addWidget(QLabel("Current Target:"), 0, 0)
         self.current_target_label = QLabel("0.0°")
         # Safe styling for current target label
         try:
@@ -229,7 +216,7 @@ class ADCSSection(QGroupBox):
                 self.current_target_label.setStyleSheet("color: white; font-size: 10pt; font-weight: bold;")
         except Exception:
             self.current_target_label.setStyleSheet("color: white; font-size: 10pt; font-weight: bold;")
-        layout.addWidget(self.current_target_label, 0, 4)
+        layout.addWidget(self.current_target_label, 0, 1)
 
         # Row 1: Quick increment/decrement buttons
         quick_buttons_layout = QHBoxLayout()
@@ -237,13 +224,14 @@ class ADCSSection(QGroupBox):
         self.btn_minus_45 = QPushButton("-45")
         self.btn_minus_10 = QPushButton("-10")
         self.btn_minus_1 = QPushButton("-1")
+        self.btn_zero = QPushButton("0")
         self.btn_plus_1 = QPushButton("+1")
         self.btn_plus_10 = QPushButton("+10")
         self.btn_plus_45 = QPushButton("+45")
         
         # Style and add all quick buttons
         quick_buttons = [self.btn_minus_45, self.btn_minus_10, self.btn_minus_1, 
-                        self.btn_plus_1, self.btn_plus_10, self.btn_plus_45]
+                        self.btn_zero, self.btn_plus_1, self.btn_plus_10, self.btn_plus_45]
         
         for btn in quick_buttons:
             btn.setStyleSheet(ADCS_BUTTON_STYLE)
@@ -251,7 +239,7 @@ class ADCSSection(QGroupBox):
             btn.setFixedHeight(25)
             quick_buttons_layout.addWidget(btn)
         
-        layout.addLayout(quick_buttons_layout, 1, 0, 1, 5)
+        layout.addLayout(quick_buttons_layout, 1, 0, 1, 2)
 
         # Row 2: Controller and zero buttons
         self.run_controller_btn = QPushButton("Start Controller")
@@ -316,13 +304,13 @@ class ADCSSection(QGroupBox):
         # Auto controls
         self.run_controller_btn.clicked.connect(self._handle_run_controller_clicked)
         self.set_zero_btn.clicked.connect(self._handle_set_zero_clicked)
-        self.set_value_btn.clicked.connect(self._handle_set_value_clicked)
         self.set_pd_btn.clicked.connect(self._handle_set_pd_clicked)
         
         # Quick target buttons
         self.btn_minus_45.clicked.connect(lambda: self._handle_quick_target(-45))
         self.btn_minus_10.clicked.connect(lambda: self._handle_quick_target(-10))
         self.btn_minus_1.clicked.connect(lambda: self._handle_quick_target(-1))
+        self.btn_zero.clicked.connect(lambda: self._handle_set_target_zero())
         self.btn_plus_1.clicked.connect(lambda: self._handle_quick_target(1))
         self.btn_plus_10.clicked.connect(lambda: self._handle_quick_target(10))
         self.btn_plus_45.clicked.connect(lambda: self._handle_quick_target(45))
@@ -351,6 +339,15 @@ class ADCSSection(QGroupBox):
         logging.info("Calibrating sensors...")
         self._handle_action_clicked("adcs", "calibrate")
 
+    def _set_quick_target_buttons_enabled(self, enabled):
+        """Enable or disable all quick target buttons"""
+        quick_buttons = [
+            self.btn_minus_45, self.btn_minus_10, self.btn_minus_1,
+            self.btn_zero, self.btn_plus_1, self.btn_plus_10, self.btn_plus_45
+        ]
+        for btn in quick_buttons:
+            btn.setDisabled(not enabled)
+
     def _update_current_auto_mode(self, mode_name):
         prev_mode = getattr(self, "current_auto_mode", "adcs")
         self.current_auto_mode = mode_name
@@ -361,36 +358,38 @@ class ADCSSection(QGroupBox):
         elif prev_mode == "Environmental" and mode_name != "Environmental":
             self._handle_action_clicked("adcs", "stop_auto_zero_lux")
 
-        # Special handling when switching FROM AprilTag mode TO Raw mode
-        # If controller is running, unpress the button to match server logic
-        if prev_mode == "AprilTag" and mode_name == "adcs":
-            if hasattr(self, 'run_controller_btn') and self.run_controller_btn.isChecked():
-                self.run_controller_btn.setChecked(False)
-                self.run_controller_btn.setText("Start Controller")
-                # Don't send stop command here - the mode switch command will handle it
-        # For other mode switches, stop controller normally
-        elif prev_mode != mode_name and hasattr(self, 'run_controller_btn'):
+        # Handle controller button state when switching modes
+        if prev_mode != mode_name and hasattr(self, 'run_controller_btn'):
             if self.run_controller_btn.isChecked():
                 self.run_controller_btn.setChecked(False)
                 self.run_controller_btn.setText("Start Controller")
-                self._handle_action_clicked("adcs", "stop")
+                # Special handling when switching FROM AprilTag mode TO Raw mode
+                # Don't send stop command here - the mode switch command will handle it
+                if not (prev_mode == "AprilTag" and mode_name == "adcs"):
+                    self._handle_action_clicked("adcs", "stop")
 
         # Set button states based on mode
-        if mode_name == "adcs":  # Raw mode - everything enabled
+        if mode_name == "adcs":  # Raw mode - everything enabled, controller unchecked
             self.set_zero_btn.setDisabled(False)
-            self.set_value_btn.setDisabled(False)
             self.run_controller_btn.setDisabled(False)
-            self.value_input.setDisabled(False)
-        elif mode_name == "Environmental":  # Environmental mode - start controller disabled
+            self.run_controller_btn.setChecked(False)
+            self.run_controller_btn.setText("Start Controller")
+            # Enable quick target buttons
+            self._set_quick_target_buttons_enabled(True)
+        elif mode_name == "Environmental":  # Environmental mode - controller disabled but checked
             self.set_zero_btn.setDisabled(False)
-            self.set_value_btn.setDisabled(False)
             self.run_controller_btn.setDisabled(True)  # Disabled because Environmental mode manages its own controller
-            self.value_input.setDisabled(False)
-        elif mode_name == "AprilTag":  # AprilTag mode - set target disabled, controller available
+            self.run_controller_btn.setChecked(True)   # Show as checked since Environmental mode has its own controller
+            self.run_controller_btn.setText("Stop Controller")
+            # Enable quick target buttons
+            self._set_quick_target_buttons_enabled(True)
+        elif mode_name == "AprilTag":  # AprilTag mode - auto target, controller automatically started
             self.set_zero_btn.setDisabled(False)
-            self.set_value_btn.setDisabled(True)  # Target is managed by AprilTag alignment
             self.run_controller_btn.setDisabled(False)
-            self.value_input.setDisabled(True)  # Target input disabled in AprilTag mode
+            self.run_controller_btn.setChecked(True)   # Automatically check controller for AprilTag mode
+            self.run_controller_btn.setText("Stop Controller")
+            # Disable quick target buttons since target is automatic
+            self._set_quick_target_buttons_enabled(False)
 
     def _handle_run_controller_clicked(self):
         if self.run_controller_btn.isChecked():
@@ -416,19 +415,15 @@ class ADCSSection(QGroupBox):
         except ValueError:
             logging.warning("Invalid PD values")
 
-    def _handle_set_value_clicked(self):
+    def _handle_set_target_zero(self):
+        """Set target to zero immediately"""
+        self.current_target_value = 0.0
+        self._handle_action_clicked("adcs", "set_value", 0.0)
+        # Update the current target display safely
         try:
-            value = float(self.value_input.text())
-            self._handle_action_clicked("adcs", "set_value", value)
-            # Update the current target display safely
-            try:
-                self.current_target_label.setText(f"{value:.1f}°")
-            except Exception as e:
-                logging.warning(f"Could not update current target label: {e}")
-        except ValueError:
-            logging.warning("Invalid target value")
+            self.current_target_label.setText("0.0°")
         except Exception as e:
-            logging.error(f"Error in set value handler: {e}")
+            logging.warning(f"Could not update current target label: {e}")
 
     def _handle_set_zero_clicked(self):
         self._handle_action_clicked("adcs", "set_zero")
@@ -444,11 +439,11 @@ class ADCSSection(QGroupBox):
                 self.kd_input.setText(str(controller_data.get('kd', '')))
                 self.deadband_input.setText(str(controller_data.get('deadband', '')))
                 
-                # Update target value input and current target display
+                # Update current target value and display
                 target_yaw = controller_data.get('target_yaw', '')
-                self.value_input.setText(str(target_yaw))
                 if target_yaw != '':
                     try:
+                        self.current_target_value = float(target_yaw)
                         self.current_target_label.setText(f"{float(target_yaw):.1f}°")
                     except (ValueError, AttributeError) as e:
                         logging.warning(f"Could not update target display: {e}")
@@ -480,8 +475,10 @@ class ADCSSection(QGroupBox):
             self._handle_action_clicked("adcs", "stop")
         
         self._update_current_auto_mode("AprilTag")
-        # AprilTag mode enables auto zeroing but doesn't automatically start controller
+        # AprilTag mode enables auto zeroing and automatically starts controller
         self._handle_action_clicked("adcs", "auto_zero_tag")
+        # Start the controller automatically for AprilTag mode
+        self._handle_action_clicked("adcs", "start")
 
     def _handle_manual_cal_clicked(self):
         try:
@@ -494,19 +491,22 @@ class ADCSSection(QGroupBox):
         """Handle Raw mode selection - sends command to exit AprilTag mode if needed"""
         prev_mode = getattr(self, "current_auto_mode", "adcs")
         
+        # Stop any running controller when switching to Raw mode
+        if self.run_controller_btn.isChecked():
+            self._handle_action_clicked("adcs", "stop")
+        
         # If coming from AprilTag mode, send explicit stop command
         if prev_mode == "AprilTag":
             self._handle_action_clicked("adcs", "stop_auto_zero_tag")
         
-        # Update to Raw mode
+        # Update to Raw mode (this will uncheck the controller button)
         self._update_current_auto_mode("adcs")
 
     def _handle_quick_target(self, increment):
         """Handle quick target increment/decrement buttons"""
         try:
-            current_value = float(self.value_input.text())
-            new_value = current_value + increment
-            self.value_input.setText(str(new_value))
+            new_value = self.current_target_value + increment
+            self.current_target_value = new_value
             # Automatically send the new target value
             self._handle_action_clicked("adcs", "set_value", new_value)
             # Update the current target display safely
@@ -514,7 +514,5 @@ class ADCSSection(QGroupBox):
                 self.current_target_label.setText(f"{new_value:.1f}°")
             except Exception as e:
                 logging.warning(f"Could not update current target label: {e}")
-        except ValueError:
-            logging.warning("Invalid current target value for quick adjustment")
         except Exception as e:
             logging.error(f"Error in quick target handler: {e}")

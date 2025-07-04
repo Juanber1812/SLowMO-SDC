@@ -106,7 +106,7 @@ class CameraControlsWidget(QGroupBox):
         self.detector_btn.setEnabled(False)  # Will be enabled when connected
         
         # Set crosshairs button to be checked by default
-        self.orientation_btn.setChecked(True)
+        self.orientation_btn.setChecked(False)
 
         # Add to layout vertically (all buttons stacked)
         #self.layout.addWidget(self.run_camera_btn)

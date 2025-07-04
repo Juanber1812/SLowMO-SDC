@@ -13,7 +13,7 @@ from theme import (
 )
 
 class YawGraphWidget(QWidget):
-    def __init__(self, parent=None, width=400, height=180, window_seconds=10):
+    def __init__(self, parent=None, width=400, height=160, window_seconds=10):
         super().__init__(parent)
         self.setFixedSize(width, height)
         self.window_seconds = window_seconds
@@ -200,7 +200,7 @@ class YawGraphStacked(QWidget):
         hbox = QHBoxLayout()
         self.back_btn = QPushButton("Back")
         self.back_btn.setStyleSheet(self.BUTTON_STYLE)
-        self.back_btn.setFixedSize(70, 30)
+        self.back_btn.setFixedSize(70, 20)
 
         hbox.addWidget(self.back_btn, alignment=Qt.AlignmentFlag.AlignLeft)
         hbox.addStretch(1)
