@@ -1,6 +1,12 @@
 # server2.py
 
-from gevent import monkey; monkey.patch_all()
+# Selective gevent patching - avoid threading conflicts with ADCS
+from gevent import monkey
+# Only patch socket and select, not threading or time
+monkey.patch_socket()
+monkey.patch_select()
+# Do NOT patch threading - this would conflict with ADCS_PD.py
+
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
 import camera
@@ -49,7 +55,8 @@ except ImportError as e:
     ADCS_AVAILABLE = False
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Use threading instead of gevent to avoid conflicts with ADCS_PD.py
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Camera state is now managed entirely by camera.py via camera_info events
 # No need for server-side state tracking
@@ -68,7 +75,16 @@ if COMMUNICATION_AVAILABLE:
 # Initialize ADCS controller
 adcs_controller = None
 if ADCS_AVAILABLE:
-    adcs_controller = ADCSController()
+    try:
+        print("[DEBUG] Initializing ADCS controller...")
+        adcs_controller = ADCSController()
+        # Give the ADCS controller a moment to initialize properly
+        time.sleep(0.5)
+        print("[DEBUG] ADCS controller initialized successfully")
+    except Exception as e:
+        print(f"[ERROR] Failed to initialize ADCS controller: {e}")
+        adcs_controller = None
+        ADCS_AVAILABLE = False
 
 def print_server_status(status):
     print(f"[SERVER STATUS] {status}".ljust(80), end='\r', flush=True)
@@ -600,6 +616,10 @@ def adcs_data_broadcast():
         # Check if we have connected clients before broadcasting
         if len(connected_clients) == 0:
             return
+        
+        # Check if ADCS controller is still running
+        if not hasattr(adcs_controller, 'running') or not adcs_controller.running:
+            return
             
         adcs_data = adcs_controller.get_adcs_data_for_server()
         
@@ -626,6 +646,7 @@ def adcs_data_broadcast():
     except Exception as e:
         print(f"[ERROR] Error in ADCS data broadcast: {e}")
         print(f"[DEBUG] Connected clients: {len(connected_clients)}")
+        print(f"[DEBUG] ADCS controller state: {adcs_controller.running if adcs_controller and hasattr(adcs_controller, 'running') else 'Unknown'}")
         import traceback
         traceback.print_exc()
         
@@ -654,21 +675,40 @@ def start_adcs_broadcast():
     def adcs_broadcast_loop():
         print("[DEBUG] ADCS broadcast loop started")
         loop_count = 0
+        consecutive_errors = 0
+        max_consecutive_errors = 10
+        
         while True:
             try:
+                # Check if ADCS controller is still running
+                if not hasattr(adcs_controller, 'running') or not adcs_controller.running:
+                    print("[INFO] ADCS controller stopped, exiting broadcast loop")
+                    break
+                
                 adcs_data_broadcast()
                 loop_count += 1
+                consecutive_errors = 0  # Reset error counter on success
                 
                 # Print debug info every 200 loops (10 seconds at 20Hz)
                 if loop_count % 200 == 0:
                     print(f"[DEBUG] ADCS broadcast loop running, count: {loop_count}, clients: {len(connected_clients)}")
                 
                 time.sleep(0.05)  # 20Hz = 50ms interval
+                
             except Exception as e:
-                print(f"[ERROR] Error in ADCS broadcast loop: {e}")
+                consecutive_errors += 1
+                print(f"[ERROR] Error in ADCS broadcast loop (error #{consecutive_errors}): {e}")
+                
+                # If too many consecutive errors, exit the loop
+                if consecutive_errors >= max_consecutive_errors:
+                    print(f"[ERROR] Too many consecutive errors ({consecutive_errors}), stopping ADCS broadcast")
+                    break
+                
                 import traceback
                 traceback.print_exc()
                 time.sleep(1)  # Wait 1 second on error before retrying
+        
+        print("[DEBUG] ADCS broadcast loop exited")
     
     threading.Thread(target=adcs_broadcast_loop, daemon=True).start()
     print("[DEBUG] ADCS data broadcasting thread started at 20Hz")
