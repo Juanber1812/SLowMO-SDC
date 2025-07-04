@@ -927,7 +927,11 @@ class MainWindow(QWidget):
                 # Store references to power labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    # Safe fallback for theme variables
+                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
+                    font_family = FONT_FAMILY or "Arial"
+                    font_size = FONT_SIZE_NORMAL or 10
+                    lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references to match your power.py data structure
@@ -948,7 +952,11 @@ class MainWindow(QWidget):
                 # Store references to thermal labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    # Safe fallback for theme variables
+                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
+                    font_family = FONT_FAMILY or "Arial"
+                    font_size = FONT_SIZE_NORMAL or 10
+                    lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references for your new thermal labels
@@ -967,7 +975,11 @@ class MainWindow(QWidget):
                 # Store references to ADCS labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    # Safe fallback for theme variables
+                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
+                    font_family = FONT_FAMILY or "Arial"
+                    font_size = FONT_SIZE_NORMAL or 10
+                    lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references for the individual ADCS components
@@ -996,7 +1008,11 @@ class MainWindow(QWidget):
                 # Store references to CDH labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    # Safe fallback for theme variables
+                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
+                    font_family = FONT_FAMILY or "Arial"
+                    font_size = FONT_SIZE_NORMAL or 10
+                    lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references
@@ -1013,7 +1029,11 @@ class MainWindow(QWidget):
                 # Store references to communication labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    # Safe fallback for theme variables
+                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
+                    font_family = FONT_FAMILY or "Arial"
+                    font_size = FONT_SIZE_NORMAL or 10
+                    lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
                     # Store label references for the new communication labels
@@ -1033,18 +1053,23 @@ class MainWindow(QWidget):
                         self.comms_labels["status"] = lbl
             elif name == "Payload Subsystem":
                 # Create payload subsystem labels with combined format
+                # Safe fallback for theme variables
+                label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
+                font_family = FONT_FAMILY or "Arial"
+                font_size = FONT_SIZE_NORMAL or 10
+                
                 self.payload_camera_label = QLabel("Camera: Checking...")
-                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_camera_label.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                 self.payload_camera_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_camera_label)
                 
                 self.payload_lidar_label = QLabel("Lidar: Checking...")
-                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_lidar_label.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                 self.payload_lidar_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_lidar_label)
                 
                 self.payload_status_label = QLabel("Status: Not Ready")
-                self.payload_status_label.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                self.payload_status_label.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                 self.payload_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 layout.addWidget(self.payload_status_label)
                 
@@ -1055,7 +1080,11 @@ class MainWindow(QWidget):
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
                     lbl = QLabel(text)
-                    lbl.setStyleSheet(f"QLabel {{ color: {LABEL_COLOR}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {FONT_FAMILY}; font-size: {FONT_SIZE_NORMAL}pt; }}")
+                    # Safe fallback for theme variables
+                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
+                    font_family = FONT_FAMILY or "Arial"
+                    font_size = FONT_SIZE_NORMAL or 10
+                    lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     if name != "Error Log" and name != "Overall Status":
                         lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
