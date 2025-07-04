@@ -69,9 +69,9 @@ MPU_ADDRESS = 0x68
 # These values can be easily changed here and will be used for initialization
 # The set_pd_values function can still change these during runtime
 DEFAULT_KP = 10.0           # Proportional gain
-DEFAULT_KD = 2.0            # Derivative gain  
+DEFAULT_KD = 10.0            # Derivative gain  
 DEFAULT_MAX_POWER = 100     # Maximum PWM power (0-100%)
-DEFAULT_DEADBAND = 1.0      # Deadband in degrees (±1° no action zone)
+DEFAULT_DEADBAND = 0.5      # Deadband in degrees (±1° no action zone)
 DEFAULT_INTEGRAL_LIMIT = 50.0  # Integral windup protection limit
 
 # ── GPIO PIN DEFINITIONS ───────────────────────────────────────────────
@@ -641,7 +641,7 @@ class ADCSController:
         # Initialize motor control
         self.motor_available = setup_motor_control()
         self.running = True
-        self.manual_control_active = False
+        # self.manual_control_active = False  # Removed manual control mode
         self.status = "Initializing"
         
         # Initialize PWM PD controller with default values
@@ -783,13 +783,7 @@ class ADCSController:
                     if isinstance(resources.get('memory_mb'), float) and resources.get('memory_mb') > 200:
                         print(f"[RESOURCE WARNING] High memory usage detected: {resources.get('memory_mb'):.1f}MB")
                 
-                # Fix: Make manual_control_active access thread-safe
-                with self.data_lock:
-                    manual_active = self.manual_control_active
-                
-                if manual_active:
-                    time.sleep(0.05)  # Sleep briefly to prevent busy-waiting
-                    continue
+                # Manual control always available: removed manual_control_active logic
                 
                 if current_time >= next_control_time:
                     try:
@@ -963,17 +957,20 @@ class ADCSController:
             if mode == "Calibration" or (mode == "adcs" and command == "calibrate"):
                 if command == "start_calibration" or command == "calibrate":
                     return self.calibrate_sensors()
-                    
-            # Handle manual control commands
+
+            # Handle manual motor commands directly
             elif mode == "adcs":
                 if command == "zero_yaw":
                     return self.zero_yaw_position()
                 elif command == "manual_clockwise_start":
-                    return self.start_manual_control("CW")
+                    rotate_clockwise()
+                    return {"status": "success", "message": "Manual CW started"}
                 elif command == "manual_stop":
-                    return self.stop_manual_control()
+                    stop_motor()
+                    return {"status": "success", "message": "Manual stop"}
                 elif command == "manual_counterclockwise_start":
-                    return self.start_manual_control("CCW")
+                    rotate_counterclockwise()
+                    return {"status": "success", "message": "Manual CCW started"}
                 if command == "set_zero":
                     return self.zero_yaw_position()
                 elif command == "set_value":
@@ -999,7 +996,7 @@ class ADCSController:
                     return self.manual_calibration(value)
                 elif command == "raw":
                     return self.return_to_raw_mode()
-            
+
         except Exception as e:
             error_msg = f"ADCS command error: {e}"
             print(f"❌ {error_msg}")
@@ -1105,77 +1102,6 @@ class ADCSController:
         status = f"YAW:{current_yaw:+7.1f}° | Target:{target_yaw:+7.1f}° | Error:{error:+6.1f}° | Power:{motor_power:+4.0f}% | Rate:{gyro_rate:+6.1f}°/s | T:{temp:4.1f}°C | {ctrl_status}"
         print(f"\r{status:<100}", end="", flush=True)
     
-    def start_manual_control(self, direction):
-        """Start manual motor control - special handling for AprilTag mode"""
-        try:
-            if not self.motor_available:
-                return {"status": "error", "message": "Motor control not available"}
-            
-            # SPECIAL CASE: If AprilTag mode is active, only pause PD controller
-            if getattr(self, 'auto_zero_tag_enabled', False):
-                # print("� AprilTag mode active - pausing PD controller only")  # Commented out to reduce spam
-                self.pd_controller.stop_controller()  # Just pause PD controller
-                
-                # Set manual control flag thread-safely
-                with self.data_lock:
-                    self.manual_control_active = True
-
-                if direction == "CW":
-                    rotate_clockwise()
-                    return {"status": "success", "message": "Manual CW started (AprilTag mode paused)"}
-                elif direction == "CCW":
-                    rotate_counterclockwise()
-                    return {"status": "success", "message": "Manual CCW started (AprilTag mode paused)"}
-                else:
-                    return {"status": "error", "message": "Invalid direction"}
-            
-            # NORMAL CASE: Stop all other modes
-            # print("🛑 Manual control requested - stopping all other modes...")  # Commented out to reduce spam
-            
-            # Stop PD controller
-            self.pd_controller.stop_controller()
-            
-            # Stop auto zero env mode  
-            if getattr(self, 'auto_zero_env_enabled', False):
-                self.stop_auto_zero_env()
-            
-            # Set manual control flag thread-safely
-            with self.data_lock:
-                self.manual_control_active = True
-
-            if direction == "CW":
-                rotate_clockwise()
-                # print("🔄 Manual clockwise started (all other modes stopped)")  # Commented out to reduce spam
-                return {"status": "success", "message": "Manual CW started"}
-            elif direction == "CCW":
-                rotate_counterclockwise()
-                # print("🔄 Manual counterclockwise started (all other modes stopped)")  # Commented out to reduce spam
-                return {"status": "success", "message": "Manual CCW started"}
-            else:
-                return {"status": "error", "message": "Invalid direction"}
-                
-        except Exception as e:
-            return {"status": "error", "message": f"Manual control error: {e}"}
-
-    def stop_manual_control(self):
-        """Stop manual motor control - special handling for AprilTag mode"""
-        try:
-            # Set manual control flag thread-safely
-            with self.data_lock:
-                self.manual_control_active = False
-            
-            stop_motor()
-            
-            # SPECIAL CASE: If AprilTag mode is still active, resume PD controller
-            if getattr(self, 'auto_zero_tag_enabled', False):
-                self.pd_controller.start_controller()
-                # print("⏹️ Manual control stopped - AprilTag mode resumed")  # Commented out to reduce spam
-                return {"status": "success", "message": "Manual control stopped (AprilTag mode resumed)"}
-            else:
-                # print("⏹️ Manual control stopped")  # Commented out to reduce spam
-                return {"status": "success", "message": "Manual control stopped"}
-        except Exception as e:
-            return {"status": "error", "message": f"Stop manual control error: {e}"}
 
     def set_target_yaw(self, target_angle):
         """Set target yaw angle for PD controller"""
@@ -1312,11 +1238,7 @@ class ADCSController:
         4. After 2 full rotations, set target to 0° and leave PD controller on.
         5. Enter continuous mode: update sun reference to 0° on new peaks.
         """
-        # Check if manual control is active
-        with self.data_lock:
-            if self.manual_control_active:
-                print("[AUTO ZERO ENV] Cannot start - manual control is active. Stop manual control first.")
-                return {"status": "error", "message": "Cannot start Environmental mode - manual control is active"}
+        # Manual control always available: removed manual control check
         
         print("[AUTO ZERO ENV] Starting environmental auto-zeroing routine...")
         self.auto_zero_env_enabled = True
@@ -1581,11 +1503,7 @@ class ADCSController:
 
     def start_auto_zero_tag(self):
         """Enable AprilTag auto zeroing with simple timestamp comparison."""
-        # Check if manual control is active
-        with self.data_lock:
-            if self.manual_control_active:
-                print("[AUTO ZERO TAG] Cannot start - manual control is active. Stop manual control first.")
-                return {"status": "error", "message": "Cannot start AprilTag mode - manual control is active"}
+        # Manual control always available: removed manual control check
         
         self.auto_zero_tag_enabled = True
         self.auto_zero_tag_target_set = False  # Reset the flag when starting
@@ -1604,11 +1522,7 @@ class ADCSController:
 
     def get_system_state(self):
         """Get current system state for debugging"""
-        with self.data_lock:
-            manual_active = self.manual_control_active
-        
         return {
-            "manual_control_active": manual_active,
             "pd_controller_enabled": self.pd_controller.controller_enabled,
             "auto_zero_tag_enabled": getattr(self, 'auto_zero_tag_enabled', False),
             "auto_zero_env_enabled": getattr(self, 'auto_zero_env_enabled', False),
@@ -1631,9 +1545,7 @@ class ADCSController:
             if getattr(self, 'auto_zero_env_enabled', False):
                 self.stop_auto_zero_env()
             
-            # Stop manual control
-            with self.data_lock:
-                self.manual_control_active = False
+        # Manual control always available: removed manual control stop
             
             # Stop motor
             stop_motor()
