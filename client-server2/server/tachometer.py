@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 
-TACHO_PIN = 0  # Changed to GPIO 0 as requested
+TACHO_PIN = 16  # Changed to GPIO 16 as requested
 
 def run_tachometer(report_func):
     """Continuously sample TACHO_PIN and call report_func(rpm)."""
