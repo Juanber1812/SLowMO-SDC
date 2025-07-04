@@ -347,7 +347,6 @@ class ADCSSection(QGroupBox):
         ]
         for btn in quick_buttons:
             btn.setDisabled(not enabled)
-
     def _update_current_auto_mode(self, mode_name):
         prev_mode = getattr(self, "current_auto_mode", "adcs")
         self.current_auto_mode = mode_name
@@ -389,6 +388,7 @@ class ADCSSection(QGroupBox):
             self.run_controller_btn.setChecked(True)   # Automatically check controller for AprilTag mode
             self.run_controller_btn.setText("Stop Controller")
             # Disable quick target buttons since target is automatic
+            self._set_quick_target_buttons_enabled(False)
             self._set_quick_target_buttons_enabled(False)
 
     def _handle_run_controller_clicked(self):

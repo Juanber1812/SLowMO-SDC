@@ -55,9 +55,9 @@ class CameraControlsWidget(QGroupBox):
             background-color: {PLOT_LINE_PRIMARY};
             color: black;
         }}
-            QPushButton:checked:hover {{
-        background-color: {BUTTON_HOVER};
-        color: black;
+        QPushButton:checked:hover {{
+            background-color: {BUTTON_HOVER};
+            color: black;
         }}
         QPushButton:disabled {{
             background-color: {BUTTON_DISABLED};
