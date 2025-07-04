@@ -22,6 +22,36 @@ import os
 from collections import deque
 import datetime
 
+# ── GEVENT COMPATIBILITY ───────────────────────────────────────────────
+# Handle gevent/threading compatibility for server environments
+# This prevents conflicts when running under gevent-based servers (like Flask-SocketIO)
+# which monkey-patch threading. When gevent is available, we use gevent-compatible
+# locks and greenlets instead of standard threading primitives.
+try:
+    import gevent.lock
+    import gevent
+    GEVENT_AVAILABLE = True
+    print("ℹ️ Using gevent-compatible locks for server threading")
+except ImportError:
+    import threading
+    GEVENT_AVAILABLE = False
+    print("ℹ️ Using standard threading locks")
+
+def create_thread(target, daemon=True):
+    """Create a thread using gevent or threading based on availability
+    
+    When gevent is available, creates a greenlet (cooperative threading).
+    Otherwise, creates a standard preemptive thread.
+    """
+    if GEVENT_AVAILABLE:
+        # Use gevent's greenlet spawning instead of threads
+        greenlet = gevent.spawn(target)
+        return greenlet
+    else:
+        # Use standard threading
+        thread = threading.Thread(target=target, daemon=daemon)
+        return thread
+
 # Try to import hardware libraries
 try:
     import RPi.GPIO as GPIO
@@ -47,6 +77,15 @@ LUX_CHANNELS = [1, 2, 3]
 
 # MPU6050 constants  
 MPU_ADDRESS = 0x68
+
+# ── PD CONTROLLER DEFAULT VALUES ───────────────────────────────────────────
+# These values can be easily changed here and will be used for initialization
+# The set_pd_values function can still change these during runtime
+DEFAULT_KP = 10.0           # Proportional gain
+DEFAULT_KD = 2.0            # Derivative gain  
+DEFAULT_MAX_POWER = 100     # Maximum PWM power (0-100%)
+DEFAULT_DEADBAND = 1.0      # Deadband in degrees (±1° no action zone)
+DEFAULT_INTEGRAL_LIMIT = 50.0  # Integral windup protection limit
 
 # ── GPIO PIN DEFINITIONS ───────────────────────────────────────────────
 # Motor control pins (PWM)
@@ -116,11 +155,11 @@ def set_motor_power(power):
 
 def rotate_clockwise():
     """Rotate motor clockwise (full power) - for manual control"""
-    set_motor_power(50)
+    set_motor_power(100)
 
 def rotate_counterclockwise():
     """Rotate motor counterclockwise (full power) - for manual control"""
-    set_motor_power(-50)
+    set_motor_power(-100)
 
 def stop_motor():
     """Stop motor (no power)"""
@@ -140,10 +179,7 @@ def cleanup_motor_control():
         except:
             pass
 
-# --- Add this utility function near the top (after imports) ---
-def wrap_angle(angle):
-    """Wrap angle to [-180, 180]"""
-    return ((angle + 180) % 360) - 180
+# --- Utility function removed - using full angle range to infinity ---
 
 class MPU6050Sensor:
     """Dedicated MPU6050 sensor class for ADCS"""
@@ -152,23 +188,22 @@ class MPU6050Sensor:
         self.bus = smbus2.SMBus(bus_number)
         self.device_address = device_address
         
-        # Calibration values
+        # Calibration values - unified system
         self.gyro_x_cal = 0.0
         self.gyro_y_cal = 0.0
         self.gyro_z_cal = 0.0
         
+        # Calibration state tracking
+        self.calibration_type = "raw"  # "raw", "auto", "manual"
+        
         # Angle variables (spacecraft convention: yaw is primary control axis)
-        self.angle_yaw = 0.0      # Primary control angle
+        self.angle_yaw = 0.0      # Primary control angle - unified calibrated value
         self.angle_roll = 0.0
         self.angle_pitch = 0.0
-        self.angle_yaw_pure = 0.0  # Pure gyro integration for control
         
         # Timing variables
         self.last_time = time.time()
         self.dt = 0.0
-        
-        # Filter parameters
-        self.use_gyro_only = True  # Use pure gyro for control
         
         # Sensor status
         self.sensor_ready = False
@@ -221,9 +256,19 @@ class MPU6050Sensor:
         self.gyro_x_cal = gyro_sum[0] / samples
         self.gyro_y_cal = gyro_sum[1] / samples  
         self.gyro_z_cal = gyro_sum[2] / samples
+        self.calibration_type = "auto"  # Mark as auto-calibrated
         
-        print(f"✓ MPU6050 calibration complete!")
+        print(f"✓ MPU6050 auto-calibration complete!")
         print(f"  Offsets - X: {self.gyro_x_cal:.3f}, Y: {self.gyro_y_cal:.3f}, Z: {self.gyro_z_cal:.3f}")
+        print(f"  Calibration type: {self.calibration_type}")
+    
+    def set_manual_calibration(self, gyro_z_offset):
+        """Set manual calibration for Z-axis gyro"""
+        self.gyro_z_cal = gyro_z_offset
+        self.calibration_type = "manual"  # Mark as manually calibrated
+        print(f"✓ MPU6050 manual calibration set!")
+        print(f"  Z-axis offset: {self.gyro_z_cal:.3f}")
+        print(f"  Calibration type: {self.calibration_type}")
     
     def read_raw_data(self, addr):
         """Read raw 16-bit data from sensor"""
@@ -285,38 +330,33 @@ class MPU6050Sensor:
             return 0.0
     
     def update_angles(self):
-        """Update yaw angle using gyro integration"""
+        """Update yaw angle using gyro integration - unified calibrated system"""
         current_time = time.time()
         self.dt = current_time - self.last_time
         self.last_time = current_time
         
-        # Read gyroscope data
+        # Read gyroscope data (always uses current calibration)
         gyro = self.read_gyroscope()
         
         if gyro and self.dt > 0:
-            # Pure gyro integration for yaw (primary control axis)
-            self.angle_yaw_pure += gyro[2] * self.dt  # Z-axis gyro for yaw
-            self.angle_yaw_pure = wrap_angle(self.angle_yaw_pure)  # <-- Add this line
+            # Integrate yaw angle (Z-axis gyro) - no wrapping, full range
+            self.angle_yaw += gyro[2] * self.dt  # Primary control angle
 
             # Update other angles for completeness
             self.angle_roll += gyro[1] * self.dt
             self.angle_pitch += gyro[0] * self.dt
-            
-            # For display purposes, use pure gyro yaw
-            self.angle_yaw = self.angle_yaw_pure
     
     def get_yaw_angle(self):
-        """Get current yaw angle for control"""
+        """Get current calibrated yaw angle for control"""
         self.update_angles()
-        return self.angle_yaw_pure
+        return self.angle_yaw  # Always returns unified calibrated value
     
     def zero_yaw_position(self):
         """Zero the current yaw position - set as reference"""
         self.angle_yaw = 0.0
-        self.angle_yaw_pure = 0.0
         self.angle_roll = 0.0
         self.angle_pitch = 0.0
-        print("✓ Yaw position zeroed - current orientation set as zero reference")
+        print(f"✓ Yaw position zeroed - current orientation set as zero reference (calibration: {self.calibration_type})")
     
     def attempt_reconnection(self):
         """Try to reconnect to the MPU6050 sensor"""
@@ -331,11 +371,7 @@ class MPU6050Sensor:
             print(f"✗ MPU6050 reconnection failed: {e}")
             return False
 
-    def wrap_angle(self, angle):
-        """Wrap angle to [-180, 180]"""
-        return ((angle + 180) % 360) - 180
-
-
+    # Removed duplicate wrap_angle method - using full angle range
 
     def get_zeroed_yaw(self, mpu_yaw):
         """Return yaw adjusted so sun is at 0° using the last detected offset."""
@@ -418,16 +454,16 @@ class PDControllerPWM:
     """
     PWM-based PD Controller for smooth motor control
     """
-    def __init__(self, kp=10.0, kd=2.0, max_power=80, deadband=1.0, integral_limit=50.0):
+    def __init__(self, kp=DEFAULT_KP, kd=DEFAULT_KD, max_power=DEFAULT_MAX_POWER, deadband=DEFAULT_DEADBAND, integral_limit=DEFAULT_INTEGRAL_LIMIT):
         """
         PWM PD Controller
         
         Args:
-            kp: Proportional gain
-            kd: Derivative gain
-            max_power: Maximum PWM power (0-100%)
-            deadband: Angle deadband in degrees (no action within this range)
-            integral_limit: Maximum integral windup protection
+            kp: Proportional gain (default from DEFAULT_KP)
+            kd: Derivative gain (default from DEFAULT_KD)
+            max_power: Maximum PWM power 0-100% (default from DEFAULT_MAX_POWER)
+            deadband: Angle deadband in degrees (default from DEFAULT_DEADBAND)
+            integral_limit: Maximum integral windup protection (default from DEFAULT_INTEGRAL_LIMIT)
         """
         self.kp = kp
         self.kd = kd
@@ -455,24 +491,24 @@ class PDControllerPWM:
         self.yaw_log_start_time = None
         
     def set_target(self, target_angle):
-        """Set target yaw angle in degrees"""
-        self.target_yaw = wrap_angle(target_angle)
+        """Set target yaw angle in degrees - no wrapping, full range"""
+        self.target_yaw = target_angle  # Use full angle range
         # Reset integral when target changes to prevent windup
         self.integral = 0.0
-        print(f"Target yaw set to: {self.target_yaw:.1f}°")
+        # print(f"Target yaw set to: {self.target_yaw:.1f}°")  # Commented out to reduce spam
     
     def start_controller(self):
         """Start the PD controller"""
         self.controller_enabled = True
         self.integral = 0.0  # Reset integral
-        print("PWM PD Controller STARTED - Motor control active")
+        # print("PWM PD Controller STARTED - Motor control active")  # Commented out to reduce spam
     
     def stop_controller(self):
         """Stop the PD controller and motor"""
         self.controller_enabled = False
         self.integral = 0.0
         stop_motor()  # Immediately stop motor
-        print("PWM PD Controller STOPPED - Motor disabled")
+        # print("PWM PD Controller STOPPED - Motor disabled")  # Commented out to reduce spam
     
     def update(self, current_yaw, gyro_rate, dt):
         """
@@ -488,8 +524,8 @@ class PDControllerPWM:
             error: Current error in degrees
             pd_output: Raw PD output before limiting
         """
-        # Calculate error using shortest path (wrap-around)
-        error = wrap_angle(self.target_yaw - current_yaw)
+        # Calculate error - no wrapping, direct difference
+        error = self.target_yaw - current_yaw
         
         # If controller is disabled or in input mode, don't execute control
         if not self.controller_enabled or self.input_mode:
@@ -518,9 +554,9 @@ class PDControllerPWM:
             # Apply minimum power threshold (20% minimum when active)
             if motor_power != 0:  # Only apply minimum when motor should be active
                 if motor_power > 0:
-                    motor_power = max(0, motor_power)  # Minimum 20% CW
+                    motor_power = max(5, motor_power)  # Minimum 20% CW
                 else:
-                    motor_power = min(0, motor_power)  # Minimum 20% CCW
+                    motor_power = min(-5, motor_power)  # Minimum 20% CCW
         
         # Apply motor power
         if self.controller_enabled:
@@ -577,12 +613,12 @@ class ADCSController:
         self.manual_control_active = False
         self.status = "Initializing"
         
-        # Initialize PWM PD controller
+        # Initialize PWM PD controller with default values
         self.pd_controller = PDControllerPWM(
-            kp=10.0,          # Proportional gain
-            kd=2.0,           # Derivative gain
-            max_power=80,     # Maximum PWM power (80%)
-            deadband=1.0      # ±1° deadband
+            kp=DEFAULT_KP,          # Proportional gain
+            kd=DEFAULT_KD,          # Derivative gain
+            max_power=DEFAULT_MAX_POWER,  # Maximum PWM power
+            deadband=DEFAULT_DEADBAND     # Deadband (±degrees)
         )
         
         # Shared data and threading
@@ -590,7 +626,13 @@ class ADCSController:
         self.control_thread = None
         self.stop_data_thread = False
         self.stop_control_thread = False
-        self.data_lock = threading.Lock()
+        
+        # Use gevent-compatible locks if available, otherwise standard threading
+        if GEVENT_AVAILABLE:
+            self.data_lock = gevent.lock.RLock()
+        else:
+            self.data_lock = threading.RLock()
+            
         self.last_reading_time = time.time()
         
         # Current sensor data (shared between threads)
@@ -614,8 +656,16 @@ class ADCSController:
         # Yaw history for timestamp matching
         self.yaw_history = deque(maxlen=100)  # Store (timestamp, yaw) tuples
         
-        # Auto zero tag control
+        # Auto zero tag control with request-response system
         self.auto_zero_tag_enabled = False
+        self.auto_zero_tag_target_set = False  # Track if we've already set target to 0
+        self.last_rtt_ms = 0  # Last measured round-trip time in milliseconds
+        
+        # Request-response system for AprilTag data
+        self.apriltag_request_timer = None
+        self.apriltag_request_start_time = 0
+        self.apriltag_request_interval = 2.0  # Request every 2 seconds
+        self.apriltag_request_callback = None  # Callback to send requests to server
         
         # Start high-speed data acquisition
         self.start_data_thread()
@@ -623,14 +673,16 @@ class ADCSController:
         # Start control thread
         self.start_control_thread()
         
-        print("✓ ADCS Controller initialization complete")
+        # print("✓ ADCS Controller initialization complete")  # Commented out to reduce spam
     
     def start_data_thread(self):
         """Start high-speed data acquisition thread"""
         self.stop_data_thread = False
-        self.data_thread = threading.Thread(target=self._data_thread_worker, daemon=True)
-        self.data_thread.start()
-        print(f"🚀 Data acquisition started at {LOG_FREQUENCY}Hz")
+        self.data_thread = create_thread(target=self._data_thread_worker)
+        if hasattr(self.data_thread, 'start'):  # threading.Thread
+            self.data_thread.start()
+        # For gevent, spawn already starts the greenlet
+        # print(f"🚀 Data acquisition started at {LOG_FREQUENCY}Hz")  # Commented out to reduce spam
     
     def _data_thread_worker(self):
         """High-speed sensor data acquisition worker"""
@@ -638,35 +690,46 @@ class ADCSController:
         next_read_time = time.time()
         
         while not self.stop_data_thread:
-            current_time = time.time()
-            
-            if current_time >= next_read_time:
-                try:
-                    # Read all sensors
-                    new_data = self.read_all_sensors()
-                    
-                    # Thread-safe update
-                    with self.data_lock:
-                        self.current_data.update(new_data)
-                        self.last_reading_time = current_time
-                        # Store yaw history for timestamp matching
-                        self.yaw_history.append((current_time, new_data['mpu']['yaw']))
-                    
-                    next_read_time += interval
-                    
-                except Exception as e:
-                    print(f"Error in data thread: {e}")
-                    with self.data_lock:
-                        self.current_data['status'] = 'Error'
-            
-            time.sleep(0.001)  # 1ms sleep
+            try:
+                current_time = time.time()
+                
+                if current_time >= next_read_time:
+                    try:
+                        # Read all sensors
+                        new_data = self.read_all_sensors()
+                        
+                        # Thread-safe update
+                        with self.data_lock:
+                            self.current_data.update(new_data)
+                            self.last_reading_time = current_time
+                            # Store yaw history for timestamp matching
+                            self.yaw_history.append((current_time, new_data['mpu']['yaw']))
+                        
+                        next_read_time += interval
+                        
+                    except Exception as e:
+                        print(f"Error in data thread: {e}")
+                        with self.data_lock:
+                            self.current_data['status'] = 'Error'
+                
+                time.sleep(0.001)  # 1ms sleep
+                
+            except (KeyboardInterrupt, SystemExit):
+                # Handle graceful shutdown
+                print("Data thread received shutdown signal")
+                break
+            except Exception as e:
+                print(f"Unexpected error in data thread: {e}")
+                time.sleep(0.01)  # Brief pause on unexpected errors
     
     def start_control_thread(self):
         """Start high-speed control thread"""
         self.stop_control_thread = False
-        self.control_thread = threading.Thread(target=self._control_thread_worker, daemon=True)
-        self.control_thread.start()
-        print(f"🎮 Control thread started at 50Hz")
+        self.control_thread = create_thread(target=self._control_thread_worker)
+        if hasattr(self.control_thread, 'start'):  # threading.Thread
+            self.control_thread.start()
+        # For gevent, spawn already starts the greenlet
+        # print(f"🎮 Control thread started at 50Hz")  # Commented out to reduce spam
 
     def _control_thread_worker(self):
         """High-speed control worker thread"""
@@ -675,43 +738,55 @@ class ADCSController:
         last_time = time.time()
         
         while not self.stop_control_thread:
-            # If in manual mode, skip the automatic control logic
-            if self.manual_control_active:
-                time.sleep(0.05) # Sleep briefly to prevent busy-waiting
-                continue
-
-            current_time = time.time()
-            
-            if current_time >= next_control_time:
-                try:
-                    # Get current sensor data
-                    with self.data_lock:
-                        current_yaw = self.current_data['mpu']['yaw']
-                        gyro_rate = self.current_data['mpu']['gyro_rate_z']
-                    
-                    # Calculate time step
-                    dt = current_time - last_time
-                    last_time = current_time
-                    
-                    # Update PWM PD controller
-                    motor_power, error, pd_output = self.pd_controller.update(current_yaw, gyro_rate, dt)
-                    
-                    # Update shared data
-                    with self.data_lock:
-                        self.current_data['controller'].update({
-                            'enabled': self.pd_controller.controller_enabled,
-                            'target_yaw': self.pd_controller.target_yaw,
-                            'error': error,
-                            'motor_power': motor_power,
-                            'pd_output': pd_output
-                        })
-                    
-                    next_control_time += interval
-                    
-                except Exception as e:
-                    print(f"Error in control thread: {e}")
-            
-            time.sleep(0.001)  # 1ms sleep
+            try:
+                current_time = time.time()
+                
+                # Fix: Make manual_control_active access thread-safe
+                with self.data_lock:
+                    manual_active = self.manual_control_active
+                
+                if manual_active:
+                    time.sleep(0.05)  # Sleep briefly to prevent busy-waiting
+                    continue
+                
+                if current_time >= next_control_time:
+                    try:
+                        # Get current sensor data
+                        with self.data_lock:
+                            current_yaw = self.current_data['mpu']['yaw']
+                            gyro_rate = self.current_data['mpu']['gyro_rate_z']
+                        
+                        # Calculate time step
+                        dt = current_time - last_time
+                        last_time = current_time
+                        
+                        # Update PWM PD controller
+                        motor_power, error, pd_output = self.pd_controller.update(current_yaw, gyro_rate, dt)
+                        
+                        # Update shared data
+                        with self.data_lock:
+                            self.current_data['controller'].update({
+                                'enabled': self.pd_controller.controller_enabled,
+                                'target_yaw': self.pd_controller.target_yaw,
+                                'error': error,
+                                'motor_power': motor_power,
+                                'pd_output': pd_output
+                            })
+                        
+                        next_control_time += interval
+                        
+                    except Exception as e:
+                        print(f"Error in control thread: {e}")
+                
+                time.sleep(0.001)  # 1ms sleep
+                
+            except (KeyboardInterrupt, SystemExit):
+                # Handle graceful shutdown
+                print("Control thread received shutdown signal")
+                break
+            except Exception as e:
+                print(f"Unexpected error in control thread: {e}")
+                time.sleep(0.01)  # Brief pause on unexpected errors
     
     def read_all_sensors(self):
         """Read all sensors and return formatted data"""
@@ -728,15 +803,15 @@ class ADCSController:
         # Read MPU6050
         if self.mpu_sensor.sensor_ready:
             try:
-                yaw_angle = wrap_angle(self.mpu_sensor.get_yaw_angle())
+                yaw_angle = self.mpu_sensor.get_yaw_angle()  # Get unified calibrated yaw
                 gyro = self.mpu_sensor.read_gyroscope()
                 accel = self.mpu_sensor.read_accelerometer()
                 temp = self.mpu_sensor.read_temperature()
                 
-                # Position angles (integrated from gyro)
-                data['mpu']['yaw'] = yaw_angle  # Primary control angle (Z-axis)
-                data['mpu']['roll'] = wrap_angle(self.mpu_sensor.angle_roll)
-                data['mpu']['pitch'] = wrap_angle(self.mpu_sensor.angle_pitch)
+                # Position angles (integrated from gyro) - no wrapping
+                data['mpu']['yaw'] = yaw_angle  # Primary control angle (unified calibrated)
+                data['mpu']['roll'] = self.mpu_sensor.angle_roll
+                data['mpu']['pitch'] = self.mpu_sensor.angle_pitch
                 data['mpu']['temp'] = temp
                 
                 # All gyro rates (deg/s)
@@ -745,10 +820,10 @@ class ADCSController:
                     data['mpu']['gyro_rate_y'] = gyro[1]  # Roll rate  
                     data['mpu']['gyro_rate_z'] = gyro[2]  # Yaw rate
                 
-                # All angle positions (degrees)
-                data['mpu']['angle_x'] = wrap_angle(self.mpu_sensor.angle_pitch)  # Pitch angle
-                data['mpu']['angle_y'] = wrap_angle(self.mpu_sensor.angle_roll)   # Roll angle
-                data['mpu']['angle_z'] = wrap_angle(self.mpu_sensor.angle_yaw)    # Yaw angle
+                # All angle positions (degrees) - no wrapping
+                data['mpu']['angle_x'] = self.mpu_sensor.angle_pitch  # Pitch angle
+                data['mpu']['angle_y'] = self.mpu_sensor.angle_roll   # Roll angle
+                data['mpu']['angle_z'] = self.mpu_sensor.angle_yaw    # Yaw angle
                 
             except Exception as e:
                 print(f"MPU read error: {e}")
@@ -774,9 +849,9 @@ class ADCSController:
     def get_adcs_data_for_server(self):
         """Format data for server ADCS broadcast"""
         data, _ = self.get_current_data()
-        yaw = wrap_angle(data['mpu']['yaw'])
-        roll = wrap_angle(data['mpu']['roll'])
-        pitch = wrap_angle(data['mpu']['pitch'])
+        yaw = data['mpu']['yaw']    # Use full range yaw
+        roll = data['mpu']['roll']   # Use full range roll
+        pitch = data['mpu']['pitch'] # Use full range pitch
         
         return {
             # Primary display values (legacy format)
@@ -813,7 +888,7 @@ class ADCSController:
     def handle_adcs_command(self, mode, command, value=None):
         """Handle ADCS commands from client"""
         try:
-            print(f"🎛️ ADCS Command: Mode='{mode}', Command='{command}', Value='{value}'")
+            # print(f"🎛️ ADCS Command: Mode='{mode}', Command='{command}', Value='{value}'")  # Commented out to reduce spam
 
             # Handle calibration commands
             if mode == "Calibration" or (mode == "adcs" and command == "calibrate"):
@@ -842,11 +917,9 @@ class ADCSController:
                     return self.set_controller_gains(value)
                 # --- Handle new zero commands ---
                 elif command == "auto_zero_tag":
-                    self.start_auto_zero_tag()
-                    return {"status": "success", "message": "AprilTag"}
+                    return self.start_auto_zero_tag()
                 elif command == "auto_zero_lux":
-                    self.start_auto_zero_env()
-                    return {"status": "success", "message": "Environmental"}
+                    return self.start_auto_zero_env()
                 elif command == "stop_auto_zero_tag":
                     self.stop_auto_zero_tag()
                     return {"status": "success", "message": "Stopped AprilTag"}
@@ -855,6 +928,8 @@ class ADCSController:
                     return {"status": "success", "message": "Stopped Environmental"}
                 elif command == "manual_cal":
                     return self.manual_calibration(value)
+                elif command == "raw":
+                    return self.return_to_raw_mode()
             
         except Exception as e:
             error_msg = f"ADCS command error: {e}"
@@ -873,11 +948,42 @@ class ADCSController:
                 return {"status": "error", "message": "No yaw rate offset provided"}
             offset = float(yaw_rate_offset)
             with self.data_lock:
-                self.mpu_sensor.gyro_z_cal = offset
-            print(f"[MANUAL CAL] Gyro Z rate offset set to {offset:.3f} deg/s")
-            return {"status": "success", "message": f"Gyro Z rate offset set to {offset:.3f} deg/s"}
+                self.mpu_sensor.set_manual_calibration(offset)
+            # print(f"[MANUAL CAL] Gyro Z rate offset set to {offset:.3f} deg/s (type: manual)")  # Commented out to reduce spam
+            return {"status": "success", "message": f"Manual calibration set: {offset:.3f} deg/s (overrides auto calibration)"}
         except Exception as e:
             return {"status": "error", "message": f"Manual calibration failed: {e}"}
+
+    def return_to_raw_mode(self):
+        """
+        Return system to raw mode - stops all controllers and auto modes.
+        This is a clean return to normal state from any mode.
+        """
+        try:
+            # print("🛑 Returning to raw mode - stopping all systems...")  # Commented out to reduce spam
+            
+            # Stop PD controller
+            self.pd_controller.stop_controller()
+            
+            # Stop all auto zero modes
+            if getattr(self, 'auto_zero_tag_enabled', False):
+                self.stop_auto_zero_tag()
+            
+            if getattr(self, 'auto_zero_env_enabled', False):
+                self.stop_auto_zero_env()
+            
+            # Stop manual control
+            with self.data_lock:
+                self.manual_control_active = False
+            
+            # Stop motor
+            stop_motor()
+            
+            # print("✓ Raw mode activated - all systems stopped")  # Commented out to reduce spam
+            return {"status": "success", "message": "Raw mode activated - all systems stopped"}
+            
+        except Exception as e:
+            return {"status": "error", "message": f"Return to raw mode failed: {e}"}
 
     def zero_yaw_position(self):
         """Zero the yaw position"""
@@ -890,7 +996,7 @@ class ADCSController:
     def calibrate_sensors(self):
         """Calibrate all sensors"""
         try:
-            print("🎯 Starting sensor calibration...")
+            # print("🎯 Starting sensor calibration...")  # Commented out to reduce spam
             
             # Calibrate MPU6050
             if self.mpu_sensor.sensor_ready:
@@ -934,22 +1040,50 @@ class ADCSController:
         print(f"\r{status}", end="", flush=True)
     
     def start_manual_control(self, direction):
-        """Start manual motor control"""
+        """Start manual motor control - special handling for AprilTag mode"""
         try:
             if not self.motor_available:
                 return {"status": "error", "message": "Motor control not available"}
             
-            # Stop PD controller first
+            # SPECIAL CASE: If AprilTag mode is active, only pause PD controller
+            if getattr(self, 'auto_zero_tag_enabled', False):
+                # print("� AprilTag mode active - pausing PD controller only")  # Commented out to reduce spam
+                self.pd_controller.stop_controller()  # Just pause PD controller
+                
+                # Set manual control flag thread-safely
+                with self.data_lock:
+                    self.manual_control_active = True
+
+                if direction == "CW":
+                    rotate_clockwise()
+                    return {"status": "success", "message": "Manual CW started (AprilTag mode paused)"}
+                elif direction == "CCW":
+                    rotate_counterclockwise()
+                    return {"status": "success", "message": "Manual CCW started (AprilTag mode paused)"}
+                else:
+                    return {"status": "error", "message": "Invalid direction"}
+            
+            # NORMAL CASE: Stop all other modes
+            # print("🛑 Manual control requested - stopping all other modes...")  # Commented out to reduce spam
+            
+            # Stop PD controller
             self.pd_controller.stop_controller()
-            self.manual_control_active = True
+            
+            # Stop auto zero env mode  
+            if getattr(self, 'auto_zero_env_enabled', False):
+                self.stop_auto_zero_env()
+            
+            # Set manual control flag thread-safely
+            with self.data_lock:
+                self.manual_control_active = True
 
             if direction == "CW":
                 rotate_clockwise()
-                print("🔄 Manual clockwise started")
+                # print("🔄 Manual clockwise started (all other modes stopped)")  # Commented out to reduce spam
                 return {"status": "success", "message": "Manual CW started"}
             elif direction == "CCW":
                 rotate_counterclockwise()
-                print("🔄 Manual counterclockwise started")
+                # print("🔄 Manual counterclockwise started (all other modes stopped)")  # Commented out to reduce spam
                 return {"status": "success", "message": "Manual CCW started"}
             else:
                 return {"status": "error", "message": "Invalid direction"}
@@ -958,12 +1092,22 @@ class ADCSController:
             return {"status": "error", "message": f"Manual control error: {e}"}
 
     def stop_manual_control(self):
-        """Stop manual motor control"""
+        """Stop manual motor control - special handling for AprilTag mode"""
         try:
-            self.manual_control_active = False
+            # Set manual control flag thread-safely
+            with self.data_lock:
+                self.manual_control_active = False
+            
             stop_motor()
-            print("⏹️ Manual control stopped")
-            return {"status": "success", "message": "Manual control stopped"}
+            
+            # SPECIAL CASE: If AprilTag mode is still active, resume PD controller
+            if getattr(self, 'auto_zero_tag_enabled', False):
+                self.pd_controller.start_controller()
+                # print("⏹️ Manual control stopped - AprilTag mode resumed")  # Commented out to reduce spam
+                return {"status": "success", "message": "Manual control stopped (AprilTag mode resumed)"}
+            else:
+                # print("⏹️ Manual control stopped")  # Commented out to reduce spam
+                return {"status": "success", "message": "Manual control stopped"}
         except Exception as e:
             return {"status": "error", "message": f"Stop manual control error: {e}"}
 
@@ -988,8 +1132,13 @@ class ADCSController:
             if not self.mpu_sensor.sensor_ready:
                 return {"status": "error", "message": "MPU6050 sensor not ready"}
             
+            # Check if manual control is active
+            with self.data_lock:
+                if self.manual_control_active:
+                    return {"status": "error", "message": "Cannot start auto control - manual control is active. Stop manual control first."}
+            
             self.pd_controller.start_controller()
-            print(f"▶️ {mode} mode started with PWM PD controller")
+            # print(f"▶️ {mode} mode started with PWM PD controller")  # Commented out to reduce spam
             return {"status": "success", "message": f"{mode} mode started"}
         except Exception as e:
             return {"status": "error", "message": f"Auto control start error: {e}"}
@@ -998,7 +1147,7 @@ class ADCSController:
         """Stop automatic control mode"""
         try:
             self.pd_controller.stop_controller()
-            print("⏹️ Auto control stopped")
+            # print("⏹️ Auto control stopped")  # Commented out to reduce spam
             return {"status": "success", "message": "Auto control stopped"}
         except Exception as e:
             return {"status": "error", "message": f"Auto control stop error: {e}"}
@@ -1016,7 +1165,7 @@ class ADCSController:
                 if 'max_power' in gains:
                     self.pd_controller.max_power = float(gains['max_power'])
                 
-                print(f"PWM Controller gains updated: Kp={self.pd_controller.kp}, Kd={self.pd_controller.kd}, Max Power={self.pd_controller.max_power}%, Deadband={self.pd_controller.deadband}")
+                # print(f"PWM Controller gains updated: Kp={self.pd_controller.kp}, Kd={self.pd_controller.kd}, Max Power={self.pd_controller.max_power}%, Deadband={self.pd_controller.deadband}")  # Commented out to reduce spam
                 return {"status": "success", "message": "Controller gains updated"}
             else:
                 return {"status": "error", "message": "Gains must be a dictionary"}
@@ -1025,7 +1174,7 @@ class ADCSController:
 
     def shutdown(self):
         """Shutdown the ADCS controller"""
-        print("\n🛰️ ADCS Controller shutdown...")
+        # print("\n🛰️ ADCS Controller shutdown...")  # Commented out to reduce spam
         
         # Stop PD controller
         self.pd_controller.stop_controller()
@@ -1041,13 +1190,20 @@ class ADCSController:
         self.stop_control_thread = True
         
         if self.data_thread:
-            self.data_thread.join(timeout=1.0)
+            if hasattr(self.data_thread, 'join'):  # threading.Thread
+                self.data_thread.join(timeout=1.0)
+            elif hasattr(self.data_thread, 'kill'):  # gevent.Greenlet
+                self.data_thread.kill()
+                
         if self.control_thread:
-            self.control_thread.join(timeout=1.0)
+            if hasattr(self.control_thread, 'join'):  # threading.Thread
+                self.control_thread.join(timeout=1.0)
+            elif hasattr(self.control_thread, 'kill'):  # gevent.Greenlet
+                self.control_thread.kill()
         
         # Cleanup motor control
         cleanup_motor_control()
-        print("✓ ADCS Controller shutdown complete")
+        # print("✓ ADCS Controller shutdown complete")  # Commented out to reduce spam
 
     def start_auto_zero_env(self):
         """
@@ -1058,6 +1214,12 @@ class ADCSController:
         4. After 2 full rotations, set target to 0° and leave PD controller on.
         5. Enter continuous mode: update sun reference to 0° on new peaks.
         """
+        # Check if manual control is active
+        with self.data_lock:
+            if self.manual_control_active:
+                print("[AUTO ZERO ENV] Cannot start - manual control is active. Stop manual control first.")
+                return {"status": "error", "message": "Cannot start Environmental mode - manual control is active"}
+        
         print("[AUTO ZERO ENV] Starting environmental auto-zeroing routine...")
         self.auto_zero_env_enabled = True
         self.lux_peak_windows = {1: [], 2: [], 3: []}
@@ -1094,7 +1256,7 @@ class ADCSController:
                 yaw = self.current_data['mpu']['yaw']
                 lux = self.current_data['lux'].copy()
             # Set PD target to always be 30° ahead of current yaw
-            self.pd_controller.set_target(wrap_angle(yaw + 30))
+            self.pd_controller.set_target(yaw + 30)  # No wrapping needed
 
             # Detect yaw wrap-around
             if last_yaw is not None:
@@ -1147,16 +1309,20 @@ class ADCSController:
                         # Thresholds: lux > 50, angle change > 10°
                         if win[1] > win[0] and win[1] > win[2] and win[1] > 50:
                             last_peak = self.env_peak_log[-1] if self.env_peak_log else None
-                            if not last_peak or abs(wrap_angle(yaw - last_peak['yaw'])) > 10:
+                            if not last_peak or abs(yaw - last_peak['yaw']) > 10:  # No wrapping needed
                                 sensor_angle = self.lux_angles[ch]
-                                offset = wrap_angle(yaw - sensor_angle)
+                                offset = yaw - sensor_angle  # Direct calculation
                                 self.lux_zero_offset = offset
                                 self.env_peak_log.append({'ch': ch, 'lux': win[1], 'yaw': yaw, 'offset': offset, 'time': time.time()})
                                 print(f"[AUTO ZERO ENV] [LIVE] Peak Lux{ch} {win[1]:.1f} at yaw {yaw:.1f}°, offset set to {offset:.1f}°")
                 time.sleep(0.05)
 
-        threading.Thread(target=continuous_env_loop, daemon=True).start()
+        env_thread = create_thread(target=continuous_env_loop)
+        if hasattr(env_thread, 'start'):  # threading.Thread
+            env_thread.start()
+        # For gevent, spawn already starts the greenlet
         print("[AUTO ZERO ENV] You may now point to any target. Sun reference will update on new peaks.")
+        return {"status": "success", "message": "Environmental mode started"}
     
     def stop_auto_zero_env(self):
         """Disable environmental (lux-based) auto zeroing and stop motor cleanly."""
@@ -1195,63 +1361,270 @@ class ADCSController:
     def auto_zero_tag(self, data):
         """
         Called when scanning_mode_data is received or when AprilTag command is triggered.
-        Sets the MPU yaw to the received relative angle at the matching timestamp.
-        If rel_angle is None, sets yaw and PD target to zero.
+        
+        SIMPLIFIED APPROACH: Just compare timestamps and update MPU angle directly.
+        - Compare timestamp from AprilTag data with current MPU timestamp
+        - Print timestamp difference in ms
+        - Simply update current MPU yaw angle with received relative angle
         """
         if not self.auto_zero_tag_enabled:
-            print("[AUTO ZERO] auto_zero_tag is disabled, ignoring data.")
+            # Silently ignore when disabled to reduce spam
             return
         try:
             rel_angle = data.get("relative_angle")
-            timestamp_str = data.get("timestamp")
+            apriltag_timestamp = data.get("timestamp")
+            
             if rel_angle is None:
-                print("[AUTO ZERO] rel_angle is None, setting yaw and PD target to 0.")
-                with self.data_lock:
-                    self.mpu_sensor.angle_yaw = 0.0
-                    self.mpu_sensor.angle_yaw_pure = 0.0
-                self.pd_controller.set_target(0.0)
+                # Only print once when AprilTag is lost to avoid spam
+                if not hasattr(self, '_apriltag_lost_printed') or not self._apriltag_lost_printed:
+                    # Silently handle AprilTag loss to reduce spam
+                    self._apriltag_lost_printed = True
                 return
-            if not timestamp_str:
-                print("[AUTO ZERO] Invalid data received (no timestamp).")
-                return
-
-            # Parse ISO timestamp to epoch
-            ts = datetime.datetime.fromisoformat(timestamp_str.replace("Z", "+00:00")).timestamp()
-
-            # Find the closest yaw measurement in history
+            else:
+                # Reset the lost flag when AprilTag is detected again
+                self._apriltag_lost_printed = False
+                
+            # Get current MPU data and timestamp
+            current_time = time.time()
             with self.data_lock:
-                if not self.yaw_history:
-                    print("[AUTO ZERO] No yaw history available.")
-                    return
-                closest = min(self.yaw_history, key=lambda tup: abs(tup[0] - ts))
-                yaw_at_ts = closest[1]
-                print(f"[AUTO ZERO] Closest yaw at {closest[0]:.3f} (diff {abs(closest[0]-ts):.3f}s): {yaw_at_ts:.2f}")
-
-            # Optionally flip sign here if needed:
-            # rel_angle = -rel_angle
-
-            # Set the MPU yaw to the relative angle
+                current_mpu_yaw = self.current_data['mpu']['yaw']
+                
+            # Parse AprilTag timestamp and calculate difference
+            timestamp_diff_ms = 0
+            if apriltag_timestamp:
+                try:
+                    # Parse ISO timestamp from AprilTag data
+                    import datetime
+                    apriltag_dt = datetime.datetime.fromisoformat(apriltag_timestamp.replace('Z', '+00:00'))
+                    apriltag_time = apriltag_dt.timestamp()
+                    timestamp_diff_ms = (current_time - apriltag_time) * 1000
+                except Exception as e:
+                    print(f"[AUTO ZERO] Could not parse timestamp: {e}")
+                    timestamp_diff_ms = 0
+            
+            # Simple update: set MPU angle to negative of relative angle
+            # (We want MPU to read negative rel_angle when pointing at tag)
+            desired_mpu_yaw = -float(rel_angle)
+            
+            # Update the MPU angle directly
             with self.data_lock:
-                self.mpu_sensor.angle_yaw = -float(rel_angle)
-                self.mpu_sensor.angle_yaw_pure = -float(rel_angle)
-
-            # Set PD controller target to 0
+                self.mpu_sensor.angle_yaw = desired_mpu_yaw
+                
+            # Set PD controller target to 0° (now aligned with AprilTag)
             self.pd_controller.set_target(0.0)
-            print(f"[AUTO ZERO] MPU yaw set to {rel_angle:.2f}, PD target set to 0.")
+            
+            # Print concise update (only essential info)
+            print(f"[AUTO ZERO] AprilTag: {rel_angle:.1f}° → MPU: {desired_mpu_yaw:.1f}° (Δt: {timestamp_diff_ms:.0f}ms)")
 
         except Exception as e:
-            print(f"[AUTO ZERO] Error: {e}")
+            # Only print error once to avoid spam
+            if not hasattr(self, '_last_error_msg') or self._last_error_msg != str(e):
+                print(f"[AUTO ZERO] Error: {e}")
+                self._last_error_msg = str(e)
+            
+        # Comment out the complex RTT-based approach for now
+        # # OLD RTT-BASED APPROACH (commented out for simplicity)
+        # try:
+        #     rel_angle = data.get("relative_angle")
+        #     rtt_ms = data.get("rtt_ms", self.last_rtt_ms)  # Use provided RTT or last known
+        #     
+        #     if rel_angle is None:
+        #         # Only set target to 0° once when AprilTag is lost, then let controller stabilize
+        #         if not self.auto_zero_tag_target_set:
+        #             print("[AUTO ZERO] AprilTag lost, setting PD target to 0° (ONCE) - maintaining current position.")
+        #             self.pd_controller.set_target(0.0)
+        #             self.auto_zero_tag_target_set = True
+        #         return
+        #         
+        #     # AprilTag detected - reset the "target set" flag for next time it's lost
+        #     self.auto_zero_tag_target_set = False
+        #     
+        #     # Update last known RTT
+        #     if rtt_ms > 0:
+        #         self.last_rtt_ms = rtt_ms
+        #     
+        #     # Get current MPU data and apply motion compensation
+        #     with self.data_lock:
+        #         current_mpu_yaw = self.current_data['mpu']['yaw']
+        #         gyro_rate = self.current_data['mpu']['gyro_rate_z']
+        #     
+        #     # Estimate MPU position when AprilTag measurement was taken
+        #     # RTT includes both directions, so divide by 2 for one-way delay
+        #     one_way_delay_s = (rtt_ms / 2.0) / 1000.0
+        #     
+        #     # Compensate for rotation during transmission delay
+        #     rotation_during_delay = gyro_rate * one_way_delay_s
+        #     estimated_mpu_at_capture = current_mpu_yaw - rotation_during_delay
+        #     
+        #     # Calculate the alignment correction
+        #     desired_mpu_yaw = -float(rel_angle)  # We want MPU to read negative rel_angle when pointing at tag
+        #     correction_needed = desired_mpu_yaw - estimated_mpu_at_capture
+        #     
+        #     # Apply the correction to the current MPU angle
+        #     with self.data_lock:
+        #         self.mpu_sensor.angle_yaw += correction_needed
+        #         corrected_yaw = self.mpu_sensor.angle_yaw
+        #         
+        #     # Set PD controller target to 0° (now aligned with AprilTag)
+        #     self.pd_controller.set_target(0.0)
+        #     
+        #     print(f"[AUTO ZERO RTT] AprilTag alignment with motion compensation:")
+        #     print(f"  AprilTag relative angle: {rel_angle:.2f}°")
+        #     print(f"  Round-trip time: {rtt_ms:.0f}ms (one-way: {one_way_delay_s*1000:.0f}ms)")
+        #     print(f"  Current MPU yaw: {current_mpu_yaw:.2f}°")
+        #     print(f"  Gyro rate: {gyro_rate:.2f}°/s")
+        #     print(f"  Rotation during delay: {rotation_during_delay:.2f}°")
+        #     print(f"  Estimated MPU at capture: {estimated_mpu_at_capture:.2f}°")
+        #     print(f"  Correction applied: {correction_needed:.2f}°")
+        #     print(f"  MPU yaw after correction: {corrected_yaw:.2f}°")
+        #     print(f"  PD target set to 0° - now aligned with AprilTag")
+        #
+        # except Exception as e:
+        #     print(f"[AUTO ZERO RTT] Error: {e}")
 
 
     def start_auto_zero_tag(self):
-        """Enable AprilTag auto zeroing."""
+        """Enable AprilTag auto zeroing with simple timestamp comparison."""
+        # Check if manual control is active
+        with self.data_lock:
+            if self.manual_control_active:
+                print("[AUTO ZERO TAG] Cannot start - manual control is active. Stop manual control first.")
+                return {"status": "error", "message": "Cannot start AprilTag mode - manual control is active"}
+        
         self.auto_zero_tag_enabled = True
-        print("[AUTO ZERO] auto_zero_tag ENABLED.")
+        self.auto_zero_tag_target_set = False  # Reset the flag when starting
+        
+        # Simple approach - just enable the auto_zero_tag function
+        # It will be called when scanning_mode_data is received
+        # print("[AUTO ZERO TAG] AprilTag mode enabled with simple timestamp comparison")  # Commented out to reduce spam
+        return {"status": "success", "message": "AprilTag mode enabled"}
 
     def stop_auto_zero_tag(self):
         """Disable AprilTag auto zeroing."""
         self.auto_zero_tag_enabled = False
-        print("[AUTO ZERO] auto_zero_tag DISABLED.")
+        # Stop the request-response system (commented out for now)
+        # self.stop_apriltag_requests()
+        # print("[AUTO ZERO] auto_zero_tag DISABLED.")  # Commented out to reduce spam
+
+    def get_system_state(self):
+        """Get current system state for debugging"""
+        with self.data_lock:
+            manual_active = self.manual_control_active
+        
+        return {
+            "manual_control_active": manual_active,
+            "pd_controller_enabled": self.pd_controller.controller_enabled,
+            "auto_zero_tag_enabled": getattr(self, 'auto_zero_tag_enabled', False),
+            "auto_zero_env_enabled": getattr(self, 'auto_zero_env_enabled', False),
+            "motor_available": self.motor_available,
+            "mpu_sensor_ready": self.mpu_sensor.sensor_ready
+        }
+
+    def stop_all_modes(self):
+        """Emergency stop all modes - helper method"""
+        try:
+            print("🛑 EMERGENCY STOP - Stopping all modes...")
+            
+            # Stop PD controller
+            self.pd_controller.stop_controller()
+            
+            # Stop auto zero modes
+            if getattr(self, 'auto_zero_tag_enabled', False):
+                self.stop_auto_zero_tag()
+            
+            if getattr(self, 'auto_zero_env_enabled', False):
+                self.stop_auto_zero_env()
+            
+            # Stop manual control
+            with self.data_lock:
+                self.manual_control_active = False
+            
+            # Stop motor
+            stop_motor()
+            
+            print("✓ All modes stopped")
+            return {"status": "success", "message": "All modes stopped"}
+        except Exception as e:
+            return {"status": "error", "message": f"Emergency stop failed: {e}"}
+
+    # REQUEST-RESPONSE FUNCTIONS (commented out for simple approach)
+    # def set_apriltag_request_callback(self, callback):
+    #     """Set the callback function to send AprilTag data requests to server"""
+    #     self.apriltag_request_callback = callback
+    #     print("[AUTO ZERO] AprilTag request callback set")
+
+    # def start_apriltag_requests(self):
+    #     """Start periodic AprilTag data requests"""
+    #     if not self.apriltag_request_callback:
+    #         print("[AUTO ZERO] ERROR: No request callback set! Call set_apriltag_request_callback() first")
+    #         return False
+    #         
+    #     print(f"[AUTO ZERO] Starting AprilTag requests every {self.apriltag_request_interval}s")
+    #     self._send_apriltag_request()
+    #     return True
+
+    # def stop_apriltag_requests(self):
+    #     """Stop periodic AprilTag data requests"""
+    #     if self.apriltag_request_timer:
+    #         self.apriltag_request_timer.cancel()
+    #         self.apriltag_request_timer = None
+    #     print("[AUTO ZERO] AprilTag requests stopped")
+
+    # def _send_apriltag_request(self):
+    #     """Internal method to send a single AprilTag data request"""
+    #     if not self.auto_zero_tag_enabled:
+    #         return
+    #         
+    #     try:
+    #         # Record request start time
+    #         self.apriltag_request_start_time = time.time()
+    #         
+    #         # Send request through callback
+    #         if self.apriltag_request_callback:
+    #             self.apriltag_request_callback("request_apriltag_data")
+    #             print(f"[AUTO ZERO] AprilTag data request sent at {self.apriltag_request_start_time:.3f}")
+    #         
+    #         # Schedule next request
+    #         if self.auto_zero_tag_enabled:
+    #             import threading
+    #             self.apriltag_request_timer = threading.Timer(
+    #                 self.apriltag_request_interval, 
+    #                 self._send_apriltag_request
+    #             )
+    #             self.apriltag_request_timer.start()
+    #             
+    #     except Exception as e:
+    #         print(f"[AUTO ZERO] Error sending AprilTag request: {e}")
+
+    # def handle_apriltag_response(self, relative_angle):
+    #     """
+    #     Handle AprilTag data response and calculate RTT
+    #     
+    #     Args:
+    #         relative_angle: The relative angle measurement from AprilTag (or None if lost)
+    #     """
+    #     if not self.auto_zero_tag_enabled:
+    #         return
+    #         
+    #     # Calculate round-trip time
+    #     response_time = time.time()
+    #     if self.apriltag_request_start_time > 0:
+    #         rtt_seconds = response_time - self.apriltag_request_start_time
+    #         rtt_ms = rtt_seconds * 1000
+    #         self.last_rtt_ms = rtt_ms
+    #         
+    #         print(f"[AUTO ZERO] AprilTag response received, RTT: {rtt_ms:.1f}ms")
+    #         
+    #         # Create data structure similar to old format
+    #         data = {
+    #             "relative_angle": relative_angle,
+    #             "rtt_ms": rtt_ms
+    #         }
+    #         
+    #         # Process the data using existing logic
+    #         self.auto_zero_tag(data)
+    #     else:
+    #         print("[AUTO ZERO] Warning: Received AprilTag response without pending request")
 
 def main():
     """Main function for testing"""
