@@ -20,6 +20,8 @@ from datetime import datetime
 import logging
 import csv
 import os
+import sys
+import select
 from collections import deque
 import datetime
 
@@ -1085,26 +1087,23 @@ class ADCSController:
             return {"status": "error", "message": f"Calibration failed: {e}"}
     
     def display_readings(self):
-        """Display current sensor readings (for debugging)"""
+        """Display current sensor readings (for debugging) - simplified for PD testing"""
         data, reading_time = self.get_current_data()
         
-        # MPU data with all axes
-        mpu_info = f"YAW:{data['mpu']['angle_z']:+6.1f}° ROLL:{data['mpu']['angle_y']:+6.1f}° PITCH:{data['mpu']['angle_x']:+6.1f}°"
-        gyro_info = f"GyroX:{data['mpu']['gyro_rate_x']:+6.1f}°/s GyroY:{data['mpu']['gyro_rate_y']:+6.1f}°/s GyroZ:{data['mpu']['gyro_rate_z']:+6.1f}°/s"
-        temp_info = f"T:{data['mpu']['temp']:4.1f}°C"
+        # MPU data - only yaw for PD control
+        current_yaw = data['mpu']['yaw']
+        gyro_rate = data['mpu']['gyro_rate_z']
+        temp = data['mpu']['temp']
         
         # Controller info
         ctrl_status = "[ON]" if data['controller']['enabled'] else "[OFF]"
-        ctrl_info = f"Target:{data['controller']['target_yaw']:+6.1f}° Error:{data['controller']['error']:+5.1f}° Power:{data['controller']['motor_power']:+4.0f}% {ctrl_status}"
+        target_yaw = data['controller']['target_yaw']
+        error = data['controller']['error']
+        motor_power = data['controller']['motor_power']
         
-        # Lux data
-        lux_parts = []
-        for ch in LUX_CHANNELS:
-            lux_parts.append(f"L{ch}:{data['lux'][ch]:6.1f}")
-        lux_info = " ".join(lux_parts)
-        
-        status = f"{mpu_info} | {gyro_info} | {temp_info} | {ctrl_info} | {lux_info} | Status: {data['status']}"
-        print(f"\r{status}", end="", flush=True)
+        # Simplified status - focus on PD controller
+        status = f"YAW:{current_yaw:+7.1f}° | Target:{target_yaw:+7.1f}° | Error:{error:+6.1f}° | Power:{motor_power:+4.0f}% | Rate:{gyro_rate:+6.1f}°/s | T:{temp:4.1f}°C | {ctrl_status}"
+        print(f"\r{status:<100}", end="", flush=True)
     
     def start_manual_control(self, direction):
         """Start manual motor control - special handling for AprilTag mode"""
@@ -1681,35 +1680,106 @@ class ADCSController:
         except Exception as e:
             return {"error": str(e), "threads": "error", "ref_count": "error"}
 
+def display_pd_status(controller):
+    """Display clean, live updating PD controller status"""
+    data, _ = controller.get_current_data()
+    
+    # Get current PD parameters
+    kp = controller.pd_controller.kp
+    kd = controller.pd_controller.kd
+    max_power = controller.pd_controller.max_power
+    deadband = controller.pd_controller.deadband
+    
+    # Current values
+    current_yaw = data['mpu']['yaw']
+    target_yaw = data['controller']['target_yaw']
+    error = data['controller']['error']
+    motor_power = data['controller']['motor_power']
+    gyro_rate = data['mpu']['gyro_rate_z']
+    ctrl_enabled = data['controller']['enabled']
+    
+    # Status indicators
+    ctrl_status = "ACTIVE" if ctrl_enabled else "STOPPED"
+    motor_direction = "CW" if motor_power > 0 else "CCW" if motor_power < 0 else "STOP"
+    
+    # Create clean status line
+    status_line = (
+        f"📊 PD CONTROLLER | "
+        f"Current: {current_yaw:+7.1f}° | "
+        f"Target: {target_yaw:+7.1f}° | "
+        f"Error: {error:+6.1f}° | "
+        f"Power: {motor_power:+4.0f}% ({motor_direction}) | "
+        f"Rate: {gyro_rate:+6.1f}°/s | "
+        f"Status: {ctrl_status:8s} | "
+        f"Kp:{kp:4.1f} Kd:{kd:4.1f} Max:{max_power:3.0f}% DB:{deadband:3.1f}°"
+    )
+    
+    # Clear line and print (overwrite previous)
+    print(f"\r{status_line:<120}", end="", flush=True)
+
+def get_user_input(prompt, input_type=str, default=None):
+    """Get user input with type conversion and default value"""
+    try:
+        user_input = input(f"\n{prompt}")
+        if user_input.strip() == "" and default is not None:
+            return default
+        return input_type(user_input)
+    except (ValueError, KeyboardInterrupt):
+        if default is not None:
+            return default
+        raise
+
 def main():
-    """Main function for testing"""
-    print("🛰️ ADCS Controller - PWM PD Version")
-    print("=" * 70)
+    """Enhanced main function for PD controller testing and tuning"""
+    print("🛰️ ADCS PD CONTROLLER TESTING & TUNING")
+    print("=" * 80)
     
     controller = ADCSController()
     
+    # Wait for sensor initialization
+    time.sleep(1.0)
+    
     try:
-        print("\nTesting sensor readings and PWM PD controller...")
-        print("Commands:")
-        print("  'z' = zero_yaw")
-        print("  'c' = calibrate sensors")
-        print("  'g' = start PD controller")
-        print("  's' = stop PD controller") 
-        print("  '1' = target +20°")
-        print("  '2' = target +45°")
-        print("  '3' = target +90°")
-        print("  '4' = target -20°")
-        print("  '5' = target -45°")
-        print("  '6' = target -90°")
-        print("  '0' = target 0°")
-        print("  'q' = quit")
-        print("-" * 50)
+        print("\n📋 PD CONTROLLER COMMANDS:")
+        print("  Basic Controls:")
+        print("    'z' = Zero yaw position")
+        print("    'c' = Calibrate sensors")
+        print("    'g' = Start PD controller")
+        print("    's' = Stop PD controller")
+        print("    'q' = Quit")
+        print("")
+        print("  Target Angles:")
+        print("    '0' = 0°    '1' = +15°   '2' = +30°   '3' = +45°   '4' = +90°")
+        print("    '7' = -15°  '8' = -30°   '9' = -45°   '6' = -90°   't' = Custom target")
+        print("")
+        print("  PD Tuning:")
+        print("    'p' = Set Kp (Proportional gain)")
+        print("    'd' = Set Kd (Derivative gain)")
+        print("    'm' = Set Max Power (%)")
+        print("    'b' = Set Deadband (degrees)")
+        print("    'r' = Reset to default values")
+        print("    'i' = Show current PD parameters")
+        print("")
+        print("  Manual Control:")
+        print("    'a' = Manual CW")
+        print("    'f' = Manual CCW") 
+        print("    'x' = Stop manual")
+        print("=" * 80)
+        
+        # Show initial parameters
+        print(f"\n🔧 Initial PD Parameters:")
+        print(f"   Kp (Proportional): {controller.pd_controller.kp}")
+        print(f"   Kd (Derivative):   {controller.pd_controller.kd}")
+        print(f"   Max Power:         {controller.pd_controller.max_power}%")
+        print(f"   Deadband:          {controller.pd_controller.deadband}°")
+        print(f"\n🎯 Ready for commands... (Live status shown below)")
+        print("-" * 80)
         
         while True:
-            # Display readings at 5Hz (data acquisition runs at 20Hz in background)
-            controller.display_readings()
+            # Display live status (updates every 200ms)
+            display_pd_status(controller)
             
-            # Check for commands (simplified for testing)
+            # Check for commands
             import select
             import sys
             
@@ -1717,34 +1787,110 @@ def main():
                 command = sys.stdin.read(1).lower().strip()
                 
                 if command == 'q':
+                    print("\n\n👋 Shutting down...")
                     break
+                    
+                # Basic controls
                 elif command == 'z':
-                    print(f"\n🎯 {controller.zero_yaw_position()}")
+                    print(f"\n🎯 Zero yaw: {controller.zero_yaw_position()}")
                 elif command == 'c':
-                    print(f"\n🎯 {controller.calibrate_sensors()}")
+                    print(f"\n🎯 Calibrate: {controller.calibrate_sensors()}")
                 elif command == 'g':
-                    print(f"\n🎯 {controller.start_auto_control('PWM PD')}")
+                    print(f"\n▶️  Start PD: {controller.start_auto_control('PWM PD')}")
                 elif command == 's':
-                    print(f"\n🎯 {controller.stop_auto_control()}")
-                elif command == '1':
-                    print(f"\n🎯 {controller.set_target_yaw(20.0)}")
-                elif command == '2':
-                    print(f"\n🎯 {controller.set_target_yaw(45.0)}")
-                elif command == '3':
-                    print(f"\n🎯 {controller.set_target_yaw(90.0)}")
-                elif command == '4':
-                    print(f"\n🎯 {controller.set_target_yaw(-20.0)}")
-                elif command == '5':
-                    print(f"\n🎯 {controller.set_target_yaw(-45.0)}")
-                elif command == '6':
-                    print(f"\n🎯 {controller.set_target_yaw(-90.0)}")
+                    print(f"\n⏹️  Stop PD: {controller.stop_auto_control()}")
+                
+                # Target angles
                 elif command == '0':
-                    print(f"\n🎯 {controller.set_target_yaw(0.0)}")
+                    print(f"\n🎯 Target 0°: {controller.set_target_yaw(0.0)}")
+                elif command == '1':
+                    print(f"\n🎯 Target +15°: {controller.set_target_yaw(15.0)}")
+                elif command == '2':
+                    print(f"\n🎯 Target +30°: {controller.set_target_yaw(30.0)}")
+                elif command == '3':
+                    print(f"\n🎯 Target +45°: {controller.set_target_yaw(45.0)}")
+                elif command == '4':
+                    print(f"\n🎯 Target +90°: {controller.set_target_yaw(90.0)}")
+                elif command == '7':
+                    print(f"\n🎯 Target -15°: {controller.set_target_yaw(-15.0)}")
+                elif command == '8':
+                    print(f"\n🎯 Target -30°: {controller.set_target_yaw(-30.0)}")
+                elif command == '9':
+                    print(f"\n🎯 Target -45°: {controller.set_target_yaw(-45.0)}")
+                elif command == '6':
+                    print(f"\n🎯 Target -90°: {controller.set_target_yaw(-90.0)}")
+                elif command == 't':
+                    try:
+                        target = get_user_input("Enter target angle (degrees): ", float)
+                        print(f"\n🎯 Target {target}°: {controller.set_target_yaw(target)}")
+                    except:
+                        print("\n❌ Invalid target angle")
+                
+                # PD Tuning
+                elif command == 'p':
+                    try:
+                        kp = get_user_input(f"Enter Kp (current: {controller.pd_controller.kp}): ", float)
+                        result = controller.set_controller_gains({'kp': kp})
+                        print(f"\n🔧 Set Kp = {kp}: {result}")
+                    except:
+                        print("\n❌ Invalid Kp value")
+                elif command == 'd':
+                    try:
+                        kd = get_user_input(f"Enter Kd (current: {controller.pd_controller.kd}): ", float)
+                        result = controller.set_controller_gains({'kd': kd})
+                        print(f"\n🔧 Set Kd = {kd}: {result}")
+                    except:
+                        print("\n❌ Invalid Kd value")
+                elif command == 'm':
+                    try:
+                        max_power = get_user_input(f"Enter Max Power % (current: {controller.pd_controller.max_power}): ", float)
+                        result = controller.set_controller_gains({'max_power': max_power})
+                        print(f"\n🔧 Set Max Power = {max_power}%: {result}")
+                    except:
+                        print("\n❌ Invalid Max Power value")
+                elif command == 'b':
+                    try:
+                        deadband = get_user_input(f"Enter Deadband ° (current: {controller.pd_controller.deadband}): ", float)
+                        result = controller.set_controller_gains({'deadband': deadband})
+                        print(f"\n🔧 Set Deadband = {deadband}°: {result}")
+                    except:
+                        print("\n❌ Invalid Deadband value")
+                elif command == 'r':
+                    # Reset to defaults
+                    gains = {
+                        'kp': DEFAULT_KP,
+                        'kd': DEFAULT_KD, 
+                        'max_power': DEFAULT_MAX_POWER,
+                        'deadband': DEFAULT_DEADBAND
+                    }
+                    result = controller.set_controller_gains(gains)
+                    print(f"\n🔄 Reset to defaults: {result}")
+                elif command == 'i':
+                    # Show current parameters
+                    print(f"\n🔧 Current PD Parameters:")
+                    print(f"   Kp (Proportional): {controller.pd_controller.kp}")
+                    print(f"   Kd (Derivative):   {controller.pd_controller.kd}")
+                    print(f"   Max Power:         {controller.pd_controller.max_power}%")
+                    print(f"   Deadband:          {controller.pd_controller.deadband}°")
+                
+                # Manual control
+                elif command == 'a':
+                    print(f"\n🔄 Manual CW: {controller.start_manual_control('CW')}")
+                elif command == 'f':
+                    print(f"\n🔄 Manual CCW: {controller.start_manual_control('CCW')}")
+                elif command == 'x':
+                    print(f"\n⏹️  Stop Manual: {controller.stop_manual_control()}")
+                
+                # Unknown command
+                else:
+                    print(f"\n❓ Unknown command: '{command}' (type 'q' to quit)")
                     
     except KeyboardInterrupt:
-        print("\n\nInterrupted by user")
+        print("\n\n⚠️  Interrupted by user")
     finally:
+        print("\n🛠️  Shutting down controller...")
         controller.shutdown()
+        print("✅ Shutdown complete")
 
 if __name__ == "__main__":
     main()
