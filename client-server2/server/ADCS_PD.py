@@ -1745,11 +1745,17 @@ def main():
                 
                 # Manual control
                 elif command == 'a':
-                    print(f"\n🔄 Manual CW: {controller.start_manual_control('CW')}")
+                    print(f"\n🔄 Manual CW: Starting clockwise rotation...")
+                    rotate_clockwise()
+                    print("Manual CW rotation started")
                 elif command == 'f':
-                    print(f"\n🔄 Manual CCW: {controller.start_manual_control('CCW')}")
+                    print(f"\n🔄 Manual CCW: Starting counterclockwise rotation...")
+                    rotate_counterclockwise()
+                    print("Manual CCW rotation started")
                 elif command == 'x':
-                    print(f"\n⏹️  Stop Manual: {controller.stop_manual_control()}")
+                    print(f"\n⏹️  Stop Manual: Stopping motor...")
+                    stop_motor()
+                    print("Manual control stopped")
                 
                 # Unknown command
                 else:
