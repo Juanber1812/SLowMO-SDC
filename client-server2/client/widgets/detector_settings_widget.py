@@ -76,16 +76,16 @@ class DetectorSettingsWidget(QGroupBox):
 
         # Tag size control - auto-update on value change
         tag_size_layout = QHBoxLayout()
-        tag_size_layout.addWidget(QLabel("Tag Size (cm):"))
+        tag_size_layout.addWidget(QLabel("Tag Size (m):"))
         self.tag_size_input = QDoubleSpinBox()
-        self.tag_size_input.setRange(0.1, 100.0)  # 0.1cm to 100cm range
-        self.tag_size_input.setDecimals(2)
-        self.tag_size_input.setValue(5.5)  # Default 5.5cm (0.055m)
-        self.tag_size_input.setSingleStep(0.1)
+        self.tag_size_input.setRange(0.001, 1.0)
+        self.tag_size_input.setDecimals(4)
+        self.tag_size_input.setValue(0.055)  # Current default
+        self.tag_size_input.setSingleStep(0.0001)
 
-        # Connect to update immediately when value changes - convert cm to meters
+        # Connect to update immediately when value changes
         self.tag_size_input.valueChanged.connect(
-            lambda value: self.tagSizeUpdated.emit(value / 100.0)  # Convert cm to meters
+            lambda value: self.tagSizeUpdated.emit(value)
         )
         
         tag_size_layout.addWidget(self.tag_size_input)

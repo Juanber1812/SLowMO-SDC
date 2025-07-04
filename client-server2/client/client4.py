@@ -83,6 +83,23 @@ from theme import (
     BORDER_WIDTH, BORDER_RADIUS, PADDING_NORMAL, PADDING_LARGE, BUTTON_HEIGHT
 )
 
+def get_safe_stylesheet_values():
+    """
+    Get safe fallback values for theme variables to prevent stylesheet parsing errors.
+    Returns tuple of (label_color, font_family, font_size)
+    """
+    try:
+        # Ensure we have valid string values, not None or empty
+        label_color = LABEL_COLOR if LABEL_COLOR and isinstance(LABEL_COLOR, str) else (
+            TEXT_COLOR if TEXT_COLOR and isinstance(TEXT_COLOR, str) else "#ffffff"
+        )
+        font_family = FONT_FAMILY if FONT_FAMILY and isinstance(FONT_FAMILY, str) else "Arial"
+        font_size = FONT_SIZE_NORMAL if isinstance(FONT_SIZE_NORMAL, (int, float)) and FONT_SIZE_NORMAL > 0 else 10
+        return label_color, font_family, font_size
+    except:
+        # Ultimate fallback if anything goes wrong
+        return "#ffffff", "Arial", 10
+
 ##############################################################################
 #                            CONFIGURATION                                  #
 ##############################################################################
@@ -927,10 +944,8 @@ class MainWindow(QWidget):
                 # Store references to power labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    # Safe fallback for theme variables
-                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
-                    font_family = FONT_FAMILY or "Arial"
-                    font_size = FONT_SIZE_NORMAL or 10
+                    # Use bulletproof theme variable handling
+                    label_color, font_family, font_size = get_safe_stylesheet_values()
                     lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
@@ -952,10 +967,8 @@ class MainWindow(QWidget):
                 # Store references to thermal labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    # Safe fallback for theme variables
-                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
-                    font_family = FONT_FAMILY or "Arial"
-                    font_size = FONT_SIZE_NORMAL or 10
+                    # Use bulletproof theme variable handling
+                    label_color, font_family, font_size = get_safe_stylesheet_values()
                     lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
@@ -975,10 +988,8 @@ class MainWindow(QWidget):
                 # Store references to ADCS labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    # Safe fallback for theme variables
-                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
-                    font_family = FONT_FAMILY or "Arial"
-                    font_size = FONT_SIZE_NORMAL or 10
+                    # Use bulletproof theme variable handling
+                    label_color, font_family, font_size = get_safe_stylesheet_values()
                     lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
@@ -1008,10 +1019,8 @@ class MainWindow(QWidget):
                 # Store references to CDH labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    # Safe fallback for theme variables
-                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
-                    font_family = FONT_FAMILY or "Arial"
-                    font_size = FONT_SIZE_NORMAL or 10
+                    # Use bulletproof theme variable handling
+                    label_color, font_family, font_size = get_safe_stylesheet_values()
                     lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
@@ -1029,10 +1038,8 @@ class MainWindow(QWidget):
                 # Store references to communication labels for live updates
                 for i, text in enumerate(items):
                     lbl = QLabel(text)
-                    # Safe fallback for theme variables
-                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
-                    font_family = FONT_FAMILY or "Arial"
-                    font_size = FONT_SIZE_NORMAL or 10
+                    # Use bulletproof theme variable handling
+                    label_color, font_family, font_size = get_safe_stylesheet_values()
                     lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                     layout.addWidget(lbl)
@@ -1053,10 +1060,8 @@ class MainWindow(QWidget):
                         self.comms_labels["status"] = lbl
             elif name == "Payload Subsystem":
                 # Create payload subsystem labels with combined format
-                # Safe fallback for theme variables
-                label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
-                font_family = FONT_FAMILY or "Arial"
-                font_size = FONT_SIZE_NORMAL or 10
+                # Use bulletproof theme variable handling
+                label_color, font_family, font_size = get_safe_stylesheet_values()
                 
                 self.payload_camera_label = QLabel("Camera: Checking...")
                 self.payload_camera_label.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
@@ -1080,10 +1085,8 @@ class MainWindow(QWidget):
                 # Standard subsystem items (Error Log, Overall Status)
                 for text in items:
                     lbl = QLabel(text)
-                    # Safe fallback for theme variables
-                    label_color = LABEL_COLOR or TEXT_COLOR or "#ffffff"
-                    font_family = FONT_FAMILY or "Arial"
-                    font_size = FONT_SIZE_NORMAL or 10
+                    # Use bulletproof theme variable handling
+                    label_color, font_family, font_size = get_safe_stylesheet_values()
                     lbl.setStyleSheet(f"QLabel {{ color: {label_color}; margin: 1px 0px 1px 0px; padding: 1px 0px 1px 0px; font-family: {font_family}; font-size: {font_size}pt; }}")
                     if name != "Error Log" and name != "Overall Status":
                         lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -2014,13 +2017,17 @@ class MainWindow(QWidget):
                 else:
                     logging.info(f"[ERROR] Failed to load image: {image_path}")
                     self._full_lbl.setText("Failed to load image")
-                    self._full_lbl.setStyleSheet(f"background-color: black; color: {TEXT_COLOR}; font-size: 24pt;")
+                    # Use safe theme color with fallback
+                    safe_text_color = TEXT_COLOR if TEXT_COLOR and isinstance(TEXT_COLOR, str) else "#ffffff"
+                    self._full_lbl.setStyleSheet(f"background-color: black; color: {safe_text_color}; font-size: 24pt;")
                     self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     self._full_lbl.show()
             else:
                 logging.info(f"[ERROR] Image file not found: {image_path}")
                 self._full_lbl.setText("Image file not found")
-                self._full_lbl.setStyleSheet(f"background-color: black; color: {TEXT_COLOR}; font-size: 24pt;")
+                # Use safe theme color with fallback
+                safe_text_color = TEXT_COLOR if TEXT_COLOR and isinstance(TEXT_COLOR, str) else "#ffffff"
+                self._full_lbl.setStyleSheet(f"background-color: black; color: {safe_text_color}; font-size: 24pt;")
                 self._full_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 self._full_lbl.show()
             

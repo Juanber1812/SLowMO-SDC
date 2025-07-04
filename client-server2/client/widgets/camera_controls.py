@@ -33,7 +33,7 @@ class CameraControlsWidget(QGroupBox):
         
         # Manual Orientation Button
         self.orientation_btn = QPushButton("Show Crosshairs")
-        self.show_crosshairs = True  # Track crosshair state - default ON
+        self.show_crosshairs = False  # Track crosshair state
 
         # Define button style (thinner, same as Start Detector)
         self.BUTTON_STYLE = f"""
@@ -104,9 +104,12 @@ class CameraControlsWidget(QGroupBox):
         self.toggle_btn.setEnabled(False)
         self.capture_btn.setEnabled(False)  # Will be enabled when connected
         self.detector_btn.setEnabled(False)  # Will be enabled when connected
+<<<<<<< HEAD
         
         # Set crosshairs button to be checked by default
         self.orientation_btn.setChecked(False)
+=======
+>>>>>>> parent of 964304f (updated codes, start some tesitng)
 
         # Add to layout vertically (all buttons stacked)
         #self.layout.addWidget(self.run_camera_btn)
