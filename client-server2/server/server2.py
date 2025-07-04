@@ -81,9 +81,9 @@ connected_clients = set()
 def handle_scanning_mode_data(data):
     try:
         print(f"[SCANNING MODE DATA RECEIVED] {data}")
-        # Only run auto zero if enabled
-        if adcs_controller and getattr(adcs_controller, "auto_zero_tag_enabled", False):
-            adcs_controller.auto_zero_tag(data)
+        # Do not call auto_zero_tag here; mode is enabled by a separate signal
+        # This handler now only logs the data for debugging
+        pass
     except Exception as e:
         print(f"[ERROR] Failed to handle scanning_mode_data: {e}")
 
