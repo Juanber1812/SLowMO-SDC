@@ -3,6 +3,7 @@
 # Selective gevent patching - avoid threading conflicts with ADCS
 from gevent import monkey
 # Only patch socket and select, not threading or time
+# Patch early to avoid conflicts with other modules
 monkey.patch_socket()
 monkey.patch_select()
 # Do NOT patch threading - this would conflict with ADCS_PD.py
@@ -56,7 +57,14 @@ except ImportError as e:
 
 app = Flask(__name__)
 # Use threading instead of gevent to avoid conflicts with ADCS_PD.py
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+# Limit the number of SocketIO worker threads to prevent thread explosion
+socketio = SocketIO(
+    app, 
+    cors_allowed_origins="*", 
+    async_mode='threading',
+    logger=False,  # Reduce logging overhead
+    engineio_logger=False  # Reduce logging overhead
+)
 
 # Camera state is now managed entirely by camera.py via camera_info events
 # No need for server-side state tracking
@@ -342,6 +350,10 @@ def handle_connect():
         connected_clients.add(request.sid)
         print(f"[DEBUG] Total connected clients: {len(connected_clients)}")
         
+        # Log thread count after client connection
+        info = get_thread_info()
+        print(f"[THREAD DEBUG] Thread count after client connect: {info['count']}")
+        
         # Request current status from camera and lidar subsystems
         emit('camera_update', {}, broadcast=True)
         emit('lidar_update', {}, broadcast=True)
@@ -349,16 +361,22 @@ def handle_connect():
         
         # Start communication monitoring if not already running
         if communication_monitor and not communication_monitor.is_monitoring:
+            thread_count_before = get_thread_info()['count']
             communication_monitor.set_update_callback(communication_data_callback)
             communication_monitor.set_throughput_test_callback(throughput_test_callback)
             if communication_monitor.start_monitoring():
                 logging.info("Communication monitoring started (on client connect)")
+                thread_count_after = get_thread_info()['count']
+                print(f"[THREAD DEBUG] Communication monitor threads: {thread_count_before} -> {thread_count_after}")
             else:
                 logging.error("Failed to start communication monitoring (on client connect)")
         elif communication_monitor and communication_monitor.is_monitoring:
             print("[DEBUG] Communication monitoring already running, skipping start")
         
         print(f"[DEBUG] Client {request.sid} connection setup completed successfully")
+        
+        # Check for thread growth trends
+        check_thread_trend()
     except Exception as e:
         print(f"[ERROR] Exception during client connect: {e}")
         import traceback
@@ -750,6 +768,7 @@ latest_payload_temp = None
 # Thread tracking variables
 adcs_broadcast_thread = None
 thermal_broadcast_thread = None
+thread_monitor_thread = None
 
 def determine_thermal_status(battery_temp, pi_temp, payload_temp):
     """Determine overall thermal status based on temperature thresholds"""
@@ -969,12 +988,13 @@ def log_thread_status():
     
     if info['count'] > 25:  # Warning threshold
         print(f"[THREAD WARNING] High thread count detected: {info['count']}")
+        analyze_thread_growth()  # Show breakdown when high
         return True
     return False
 
 def cleanup_dead_threads():
     """Attempt to clean up any dead thread references"""
-    global adcs_broadcast_thread, thermal_broadcast_thread
+    global adcs_broadcast_thread, thermal_broadcast_thread, thread_monitor_thread
     
     if adcs_broadcast_thread and not adcs_broadcast_thread.is_alive():
         print("[THREAD DEBUG] Cleaning up dead ADCS broadcast thread")
@@ -983,9 +1003,20 @@ def cleanup_dead_threads():
     if thermal_broadcast_thread and not thermal_broadcast_thread.is_alive():
         print("[THREAD DEBUG] Cleaning up dead thermal broadcast thread")
         thermal_broadcast_thread = None
+        
+    if thread_monitor_thread and not thread_monitor_thread.is_alive():
+        print("[THREAD DEBUG] Cleaning up dead thread monitor thread")
+        thread_monitor_thread = None
 
 def start_thread_monitor():
     """Start periodic thread monitoring"""
+    global thread_monitor_thread
+    
+    # Check if thread is already running
+    if thread_monitor_thread and thread_monitor_thread.is_alive():
+        print("[DEBUG] Thread monitor already running, skipping...")
+        return
+    
     def thread_monitor_loop():
         print("[DEBUG] Thread monitoring started")
         while True:
@@ -996,12 +1027,13 @@ def start_thread_monitor():
                 
                 # If thread count is very high, log more detailed info
                 if high_count:
+                    analyze_thread_growth()
                     info = get_thread_info()
                     print("[THREAD DEBUG] Detailed thread info:")
-                    for i, thread in enumerate(info['threads'][:10]):  # Show first 10
+                    for i, thread in enumerate(info['threads'][:15]):  # Show first 15
                         print(f"  {i+1}. {thread['name']} (daemon={thread['daemon']}, alive={thread['alive']})")
-                    if len(info['threads']) > 10:
-                        print(f"  ... and {len(info['threads']) - 10} more threads")
+                    if len(info['threads']) > 15:
+                        print(f"  ... and {len(info['threads']) - 15} more threads")
                 
             except Exception as e:
                 print(f"[ERROR] Thread monitor error: {e}")
@@ -1010,6 +1042,79 @@ def start_thread_monitor():
     thread_monitor_thread = threading.Thread(target=thread_monitor_loop, daemon=True)
     thread_monitor_thread.start()
     print("[DEBUG] Thread monitoring thread started")
+
+# Track thread count trends
+last_thread_analysis = {"time": 0, "count": 0}
+
+def analyze_thread_growth():
+    """Analyze thread growth patterns to identify sources of thread leaks"""
+    info = get_thread_info()
+    thread_types = {}
+    
+    for thread in info['threads']:
+        name = thread['name']
+        # Categorize threads by type
+        if 'Thread-' in name:
+            if 'data_thread' in name:
+                thread_types['ADCS Data'] = thread_types.get('ADCS Data', 0) + 1
+            elif 'control_thread' in name:
+                thread_types['ADCS Control'] = thread_types.get('ADCS Control', 0) + 1
+            elif 'listen' in name:
+                thread_types['GPIO Listen'] = thread_types.get('GPIO Listen', 0) + 1
+            elif 'socketio' in name.lower():
+                thread_types['SocketIO'] = thread_types.get('SocketIO', 0) + 1
+            else:
+                thread_types['Generic Worker'] = thread_types.get('Generic Worker', 0) + 1
+        elif 'MainThread' in name:
+            thread_types['Main'] = thread_types.get('Main', 0) + 1
+        elif 'Dummy' in name:
+            thread_types['Dummy'] = thread_types.get('Dummy', 0) + 1
+        else:
+            thread_types['Other'] = thread_types.get('Other', 0) + 1
+    
+    print(f"[THREAD ANALYSIS] Thread breakdown:")
+    for thread_type, count in thread_types.items():
+        print(f"  {thread_type}: {count}")
+    
+    # Track thread count trends
+    global last_thread_analysis
+    current_time = time.time()
+    if last_thread_analysis["count"] == 0:
+        last_thread_analysis = {"time": current_time, "count": info['count']}
+        return
+    
+    # Calculate time since last analysis
+    time_diff = current_time - last_thread_analysis["time"]
+    thread_diff = info['count'] - last_thread_analysis["count"]
+    
+    # Log significant changes in thread count
+    if abs(thread_diff) > 5:
+        direction = "increased" if thread_diff > 0 else "decreased"
+        print(f"[THREAD TREND] Thread count {direction} by {abs(thread_diff)} (from {last_thread_analysis['count']} to {info['count']}) over {time_diff:.1f} seconds")
+        
+        # Update last analysis time and count
+        last_thread_analysis = {"time": current_time, "count": info['count']}
+
+    return thread_types
+
+def check_thread_trend():
+    """Check for significant thread count changes and log analysis"""
+    global last_thread_analysis
+    
+    current_time = time.time()
+    current_count = get_thread_info()['count']
+    
+    # Check if it's been more than 5 minutes or thread count increased significantly
+    time_diff = current_time - last_thread_analysis["time"]
+    count_diff = current_count - last_thread_analysis["count"]
+    
+    if time_diff > 300 or count_diff >= 5:  # 5 minutes or 5+ new threads
+        if count_diff >= 5:
+            print(f"[THREAD TREND] Thread count increased by {count_diff} ({last_thread_analysis['count']} -> {current_count})")
+            analyze_thread_growth()
+        
+        last_thread_analysis["time"] = current_time
+        last_thread_analysis["count"] = current_count
 
 # ===================== END THREAD MONITORING =====================
 
@@ -1036,7 +1141,6 @@ if __name__ == "__main__":
     
     # Start background tasks with delay
     start_background_tasks()
-    start_thread_monitor()
     
     try:
         print("[DEBUG] Starting SocketIO server...")
