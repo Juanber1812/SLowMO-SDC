@@ -15,6 +15,7 @@ import busio
 import smbus2
 import threading
 import math
+import traceback
 from datetime import datetime
 import logging
 import csv
@@ -22,35 +23,19 @@ import os
 from collections import deque
 import datetime
 
-# ── GEVENT COMPATIBILITY ───────────────────────────────────────────────
-# Handle gevent/threading compatibility for server environments
-# This prevents conflicts when running under gevent-based servers (like Flask-SocketIO)
-# which monkey-patch threading. When gevent is available, we use gevent-compatible
-# locks and greenlets instead of standard threading primitives.
-try:
-    import gevent.lock
-    import gevent
-    GEVENT_AVAILABLE = True
-    print("ℹ️ Using gevent-compatible locks for server threading")
-except ImportError:
-    import threading
-    GEVENT_AVAILABLE = False
-    print("ℹ️ Using standard threading locks")
+# ── THREADING CONFIGURATION ───────────────────────────────────────────────
+# Use standard threading only to avoid gevent/threading conflicts
+# This ensures compatibility with Flask-SocketIO server environment
+print("ℹ️ Using standard threading for ADCS control")
 
 def create_thread(target, daemon=True):
-    """Create a thread using gevent or threading based on availability
+    """Create a standard daemon thread for ADCS control
     
-    When gevent is available, creates a greenlet (cooperative threading).
-    Otherwise, creates a standard preemptive thread.
+    Uses only standard threading to avoid conflicts with gevent monkey-patching.
+    All threads are created as daemon threads to ensure clean shutdown.
     """
-    if GEVENT_AVAILABLE:
-        # Use gevent's greenlet spawning instead of threads
-        greenlet = gevent.spawn(target)
-        return greenlet
-    else:
-        # Use standard threading
-        thread = threading.Thread(target=target, daemon=daemon)
-        return thread
+    thread = threading.Thread(target=target, daemon=daemon)
+    return thread
 
 # Try to import hardware libraries
 try:
@@ -169,8 +154,10 @@ def rotate_counterclockwise():
     set_motor_power(-100)
 
 def stop_motor():
-    """Stop motor (no power)"""
+    """Stop motor (no power) with small delay for hardware stability"""
     set_motor_power(0)
+    # Small delay to ensure motor hardware settles before potential restart
+    time.sleep(0.01)
 
 def cleanup_motor_control():
     """Cleanup GPIO pins and PWM"""
@@ -513,10 +500,25 @@ class PDControllerPWM:
         # print("PWM PD Controller STARTED - Motor control active")  # Commented out to reduce spam
     
     def stop_controller(self):
-        """Stop the PD controller and motor"""
+        """Stop the PD controller and motor with proper cleanup"""
+        print(f"[PD DEBUG] Stopping PD controller...")
         self.controller_enabled = False
         self.integral = 0.0
         stop_motor()  # Immediately stop motor
+        
+        # Wait for control thread to finish cleanly
+        if hasattr(self, 'control_thread') and self.control_thread and self.control_thread.is_alive():
+            try:
+                self.stop_control_thread = True
+                self.control_thread.join(timeout=2.0)  # Wait up to 2 seconds
+                if self.control_thread.is_alive():
+                    print(f"[PD DEBUG] Warning: Control thread did not stop cleanly")
+                else:
+                    print(f"[PD DEBUG] Control thread stopped cleanly")
+            except Exception as e:
+                print(f"[PD DEBUG] Error stopping control thread: {e}")
+        
+        print(f"[PD DEBUG] PD controller stopped")
         # print("PWM PD Controller STOPPED - Motor disabled")  # Commented out to reduce spam
     
     def update(self, current_yaw, gyro_rate, dt):
@@ -636,11 +638,8 @@ class ADCSController:
         self.stop_data_thread = False
         self.stop_control_thread = False
         
-        # Use gevent-compatible locks if available, otherwise standard threading
-        if GEVENT_AVAILABLE:
-            self.data_lock = gevent.lock.RLock()
-        else:
-            self.data_lock = threading.RLock()
+        # Use standard threading locks only to avoid gevent conflicts
+        self.data_lock = threading.RLock()
             
         self.last_reading_time = time.time()
         
@@ -688,9 +687,7 @@ class ADCSController:
         """Start high-speed data acquisition thread"""
         self.stop_data_thread = False
         self.data_thread = create_thread(target=self._data_thread_worker)
-        if hasattr(self.data_thread, 'start'):  # threading.Thread
-            self.data_thread.start()
-        # For gevent, spawn already starts the greenlet
+        self.data_thread.start()
         # print(f"🚀 Data acquisition started at {LOG_FREQUENCY}Hz")  # Commented out to reduce spam
     
     def _data_thread_worker(self):
@@ -735,10 +732,8 @@ class ADCSController:
         """Start high-speed control thread"""
         self.stop_control_thread = False
         self.control_thread = create_thread(target=self._control_thread_worker)
-        if hasattr(self.control_thread, 'start'):  # threading.Thread
-            self.control_thread.start()
-        # For gevent, spawn already starts the greenlet
-        # print(f"🎮 Control thread started at 50Hz")  # Commented out to reduce spam
+        self.control_thread.start()
+        # print(f"🎮 Control thread started at 10Hz")  # Commented out to reduce spam
 
     def _control_thread_worker(self):
         """High-speed control worker thread"""
@@ -1235,21 +1230,31 @@ class ADCSController:
         if self.pd_controller.enable_yaw_logging:
             self.pd_controller.stop_yaw_logging()
         
-        # Stop threads
+        # Stop threads cleanly
         self.stop_data_thread = True
         self.stop_control_thread = True
         
-        if self.data_thread:
-            if hasattr(self.data_thread, 'join'):  # threading.Thread
-                self.data_thread.join(timeout=1.0)
-            elif hasattr(self.data_thread, 'kill'):  # gevent.Greenlet
-                self.data_thread.kill()
+        # Wait for data thread to finish
+        if hasattr(self, 'data_thread') and self.data_thread and self.data_thread.is_alive():
+            try:
+                self.data_thread.join(timeout=2.0)
+                if self.data_thread.is_alive():
+                    print("[ADCS DEBUG] Warning: Data thread did not stop cleanly")
+                else:
+                    print("[ADCS DEBUG] Data thread stopped cleanly")
+            except Exception as e:
+                print(f"[ADCS DEBUG] Error stopping data thread: {e}")
                 
-        if self.control_thread:
-            if hasattr(self.control_thread, 'join'):  # threading.Thread
-                self.control_thread.join(timeout=1.0)
-            elif hasattr(self.control_thread, 'kill'):  # gevent.Greenlet
-                self.control_thread.kill()
+        # Wait for control thread to finish  
+        if hasattr(self, 'control_thread') and self.control_thread and self.control_thread.is_alive():
+            try:
+                self.control_thread.join(timeout=2.0)
+                if self.control_thread.is_alive():
+                    print("[ADCS DEBUG] Warning: Control thread did not stop cleanly")
+                else:
+                    print("[ADCS DEBUG] Control thread stopped cleanly")
+            except Exception as e:
+                print(f"[ADCS DEBUG] Error stopping control thread: {e}")
         
         # Cleanup motor control
         cleanup_motor_control()
@@ -1368,9 +1373,7 @@ class ADCSController:
                 time.sleep(0.05)
 
         env_thread = create_thread(target=continuous_env_loop)
-        if hasattr(env_thread, 'start'):  # threading.Thread
-            env_thread.start()
-        # For gevent, spawn already starts the greenlet
+        env_thread.start()
         print("[AUTO ZERO ENV] You may now point to any target. Sun reference will update on new peaks.")
         return {"status": "success", "message": "Environmental mode started"}
     
@@ -1679,28 +1682,24 @@ class ADCSController:
     def get_system_resources(self):
         """Get current system resource usage for debugging"""
         try:
-            import threading
             import gc
+            import threading
             
-            # Get thread count
-            thread_count = threading.active_count()
-            
-            # Force garbage collection to get accurate memory info
-            gc.collect()
-            
-            # Get basic memory info (this is lightweight)
-            import sys
-            ref_count = sys.gettotalrefcount() if hasattr(sys, 'gettotalrefcount') else 0
-            
-            return {
-                "threads": thread_count,
-                "ref_count": ref_count
+            resources = {
+                'active_threads': threading.active_count(),
+                'ref_count': len(gc.get_objects()),
+                'data_thread_alive': hasattr(self, 'data_thread') and self.data_thread and self.data_thread.is_alive(),
+                'control_thread_alive': hasattr(self, 'control_thread') and self.control_thread and self.control_thread.is_alive(),
+                'pd_controller_enabled': self.pd_controller.controller_enabled if hasattr(self, 'pd_controller') else False,
+                'manual_control_active': getattr(self, 'manual_control_active', False)
             }
+            return resources
         except Exception as e:
-            return {"error": str(e)}
+            return {'error': str(e)}
 
 def main():
     """Main function for testing"""
+
     print("🛰️ ADCS Controller - PWM PD Version")
     print("=" * 70)
     
