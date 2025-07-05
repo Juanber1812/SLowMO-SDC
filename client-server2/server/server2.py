@@ -854,20 +854,42 @@ def handle_request_lidar_update():
     except Exception as e:
         print(f"[ERROR] request_lidar_update: {e}")
 
+import sys
+import threading
+
+def hotkey_listener():
+    """Listen for hotkeys in the main server process (non-blocking)."""
+    print("[HOTKEY] Press 's' + Enter at any time to EMERGENCY STOP all ADCS modes.")
+    while True:
+        try:
+            key = sys.stdin.readline().strip().lower()
+            if key == 's':
+                print("[HOTKEY] 's' pressed: Calling adcs_controller.stop_all_modes()...")
+                if adcs_controller:
+                    result = adcs_controller.stop_all_modes()
+                    print(f"[HOTKEY] stop_all_modes result: {result}")
+                else:
+                    print("[HOTKEY] ADCS controller not available.")
+        except Exception as e:
+            print(f"[HOTKEY] Error in hotkey listener: {e}")
+
 if __name__ == "__main__":
     print("🚀 Server starting at http://0.0.0.0:5000")
     print("Background tasks will start after server initialization.")
     print("Press Ctrl+C to stop the server and clean up resources.")
-    
+
     # Add debug information about available modules
     print(f"[DEBUG] Power monitoring available: {POWER_AVAILABLE}")
     print(f"[DEBUG] Temperature monitoring available: {TEMPERATURE_AVAILABLE}")
     print(f"[DEBUG] Communication monitoring available: {COMMUNICATION_AVAILABLE}")
     print(f"[DEBUG] ADCS controller available: {ADCS_AVAILABLE}")
-    
+
     # Start background tasks with delay
     start_background_tasks()
-    
+
+    # Start hotkey listener in a background thread
+    threading.Thread(target=hotkey_listener, daemon=True).start()
+
     try:
         print("[DEBUG] Starting SocketIO server...")
         socketio.run(app, host="0.0.0.0", port=5000, debug=False, log_output=True)
