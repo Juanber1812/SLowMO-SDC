@@ -255,7 +255,6 @@ class ADCSSection(QGroupBox):
 
         group.setLayout(layout)
         return group
-
     def _create_pd_tuning_group(self):
         group = QGroupBox()
         if 'ADCS_GROUPBOX_STYLE' in globals() and ADCS_GROUPBOX_STYLE:
@@ -264,15 +263,15 @@ class ADCSSection(QGroupBox):
 
         # Row 0
         layout.addWidget(QLabel("Kp:"), 0, 0)
-        self.kp_input = QLineEdit("10")
+        self.kp_input = QLineEdit("17")  # Changed default to 17
         layout.addWidget(self.kp_input, 0, 1)
         layout.addWidget(QLabel("Kd:"), 0, 2)
-        self.kd_input = QLineEdit("10")
+        self.kd_input = QLineEdit("15")  # Changed default to 15
         layout.addWidget(self.kd_input, 0, 3)
         
         # Row 1
         layout.addWidget(QLabel("Deadband:"), 1, 0)
-        self.deadband_input = QLineEdit("0.5")
+        self.deadband_input = QLineEdit("1")  # Changed default to 1
         layout.addWidget(self.deadband_input, 1, 1)
         layout.addWidget(QLabel("Min Pulse:"), 1, 2)
         self.min_pulse_input = QLineEdit("0.1")
@@ -286,6 +285,7 @@ class ADCSSection(QGroupBox):
 
         group.setLayout(layout)
         return group
+
 
     def _connect_signals(self):
         # Mode selection

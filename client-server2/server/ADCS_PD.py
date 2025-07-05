@@ -83,10 +83,10 @@ MPU_ADDRESS = 0x68
 # ── PD CONTROLLER DEFAULT VALUES ───────────────────────────────────────────
 # These values can be easily changed here and will be used for initialization
 # The set_pd_values function can still change these during runtime
-DEFAULT_KP = 10.0           # Proportional gain
-DEFAULT_KD = 10            # Derivative gain  
+DEFAULT_KP = 17           # Proportional gain
+DEFAULT_KD = 15           # Derivative gain  
 DEFAULT_MAX_POWER = 100     # Maximum PWM power (0-100%)
-DEFAULT_DEADBAND = 0.5      # Deadband in degrees (±1° no action zone)
+DEFAULT_DEADBAND = 1      # Deadband in degrees (±1° no action zone)
 DEFAULT_INTEGRAL_LIMIT = 50.0  # Integral windup protection limit
 
 # ── GPIO PIN DEFINITIONS ───────────────────────────────────────────────
